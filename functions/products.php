@@ -7,7 +7,7 @@ function getProductInfos($pid) {
 
     $carac = getProductCaracts($pid);
 
-    $r[0]["carac"] = $carac;
+    $r[0]["caracteristiques"] = $carac;
 
     return $r[0];
 }
@@ -20,7 +20,7 @@ function getProductCaracts($pid) {
     if (empty($r))
         return (null);
 
-    return $r[0];
+    return $r;
 }
 
 ?>

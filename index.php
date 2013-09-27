@@ -4,8 +4,10 @@ include ('configs/settings.php');
 require('libs/Smarty.class.php');
 require('classes/MysqliDb.php');
 require('classes/panier.php');
+require('classes/paypal.php');
 require('functions/users.php');
 require('functions/products.php');
+require('functions/tools.php');
 
 
 
@@ -29,6 +31,29 @@ $cart = new Panier();
 $product_caract = $db->where('id_product', 1)
         ->get('av_product_caract');
 
+
+/* action Caddie */
+
+if (isset($_GET["cart"])) {
+    if (isset($_POST["id_product"]) and $_POST["id_product"] != "") {
+
+        $pid = $_POST["id_product"];
+        $pqte = @$_POST["quantity"];
+
+        $productInfos = getProductInfos($_POST["id_product"]);
+
+        if (isset($_POST["add"]))
+            $cart->addItem($pid, 1, $productInfos["price"], $productInfos["name"]);
+        if (isset($_POST["del"]))
+            $cart->removeItem($pid, $pqte, $productInfos["price"]);
+    }
+}
+
+$items = $cart->showCart();
+$cart_nb_items = count($items);
+
+
+
 /* dispatcher */
 $page = "home";
 
@@ -44,7 +69,6 @@ if (isset($_GET["p"])) {
     $product = getProductInfos($_GET["id"]);
     $smarty->assign('product', $product);
 }
-
 if (isset($_GET["n"]))
     $page = "form_user_account";
 
@@ -54,25 +78,30 @@ if (isset($_GET["cart"]))
 if (isset($_GET["my-account"]))
     $page = "my-account";
 
-/* action Caddie */
+if (isset($_GET["orders-list"])){
+    $page = "orders-list";
+    $orders = getUserOrders($_SESSION["user"]["id_customer"]);    
+    print_r($orders);
+    $smarty->assign('orders', $orders);
+}   
+    
 
-if (isset($_GET["cart"])) {
-    if (isset($_POST["id_product"]) and $_POST["id_product"] != "") {
+$smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
-        $pid = $_POST["id_product"];
-        $pqte = @$_POST["qte"];
-        
-        $productInfos = getProductInfos($_POST["id_product"]);
+if (isset($_GET["order-resume"])) {
+    $page = "cart";
 
-        if (isset($_POST["add"]))
-            $cart->addItem($pid, 1, $productInfos["price"], $productInfos["name"]);
-        if (isset($_POST["del"]))
-            $cart->removeItem($pid, $pqte);
-    }
+    $pp = new paypalcheckout(); //Create an instance of the class
+    $pp->addMultipleItems($items); //Add all the items to the cart in one go
+    //$cartHTML = $pp->getCartContentAsHtml();
+    $PaypalCheckoutForm = $pp->getCheckoutForm();
+    $CheckoutFormTest = "<form action='?action=order_validate' method='post'>
+        <input type='submit' value='Valider' />
+        </form>";
+
+    $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
+    $smarty->assign('PAYPAL_CHECKOUT_FORM_TEST', $CheckoutFormTest);
 }
-
-$items = $cart->showCart();
-$cart_nb_items = count($items);
 
 
 /* switch ($page) {
@@ -155,7 +184,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 
         createNewAdresse($invoice_adresse);
         createNewAdresse($delivery_adresse);
-        
+
         //auto login
         checkUserLogin($_POST["email"], $_POST["passwd"]);
     }
@@ -181,6 +210,48 @@ if (isset($_GET["action"]) && $_GET["action"] == "logout") {
 }
 
 
+/* Order */
+if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
+    $order_summary = array(
+        "id_customer" => $_SESSION["user"]["id_customer"],
+        "reference" => RandomString(),
+        "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
+        "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
+        "current_state" => 1,
+        "total_paid" => $_SESSION["cart_summary"]["total_amount"],
+        "invoice_date" => date("Y-m-d h:i:s"),
+        "delivery_date" => date("Y-m-d h:i:s"),
+        "date_add" => date("Y-m-d h:i:s"),
+        "date_upd" => date("Y-m-d h:i:s"),
+    );
+
+    $oid = $db->insert("av_orders", $order_summary);
+
+    foreach ($items as $item) {
+        $order_detail = array(
+            "id_order" => $oid,
+            "product_id" => $item["id"],
+            "product_name" => $item["name"],
+            "product_quantity" => $item["quantity"],
+            "product_price" => $item["price"]
+        );
+
+        $db->insert("av_order_detail", $order_detail);
+    }
+
+    //on flush le caddie
+    unset($_SESSION["cart"]);
+    unset($_SESSION["cart_summary"]);
+    $items = array();
+    
+    //on redirige sur la listes des commandes
+    $page = "orders-list";
+    $orders = getUserOrders($_SESSION["user"]["id_customer"]);    
+    $smarty->assign('orders', $orders);
+}
+
+
+
 /* session */
 $smarty->assign('is_logged', false);
 $smarty->assign('user', null);
@@ -198,14 +269,11 @@ if (@$_SESSION["is_logged"]) {
 
 $smarty->assign('sub_menu', $sub_menu);
 $smarty->assign('page', $page);
-
-$smarty->assign('product_caract', $product_caract);
-
 $smarty->assign('cart', $items);
 $smarty->assign('cart_nb_items', $cart_nb_items);
-
 
 $smarty->display('index.tpl');
 
 print_r($_SESSION);
+print_r($items);
 ?>

@@ -9,24 +9,27 @@ class Panier {
         @session_start();
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = array();
+            $_SESSION['cart_summary'] = array();
         }
         $this->panier = & $_SESSION['cart'];
+        $this->panier_summary = & $_SESSION['cart_summary'];
     }
 
     // ajouter un article $refproduit
-    public function addItem($refproduit = "", $nb = 1, $prix = 0, $nom) {
+    public function addItem($refproduit = "", $nb = 1, $price = 0, $name) {
         @$this->panier[$refproduit]['quantity'] += $nb;
-        @$this->panier[$refproduit]['prix'] += $prix;
-        @$this->panier[$refproduit]['nom'] = $nom;
+        @$this->panier[$refproduit]['price'] += $price;
+        @$this->panier_summary['total_amount'] += $nb * $price;
+        @$this->panier[$refproduit]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
     }
 
     // ajouter un article $refproduit
-    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $prix = 0,$nom) {
+    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0,$name) {
         @$this->panier[$refproduit][$refoption]['quantity'] += $nb;
-        @$this->panier[$refproduit][$refoption]['prix'] += $prix;
-        @$this->panier[$refproduit][$refoption]['nom'] = $nom;
+        @$this->panier[$refproduit][$refoption]['price'] += $price;
+        @$this->panier[$refproduit][$refoption]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit][$refoption]);
     }
@@ -42,8 +45,9 @@ class Panier {
     }
 
     // supprimer un article $refproduit
-    public function removeItem($refproduit = "", $nb = 1) {
+    public function removeItem($refproduit = "", $nb = 1, $price = 0) {
         @$this->panier[$refproduit]['quantity'] -= $nb;
+        @$this->panier_summary['total_amount'] -= $nb * $price;
         if ($this->panier[$refproduit]['quantity'] <= 0)
             unset($this->panier[$refproduit]);
     }
@@ -78,12 +82,13 @@ class Panier {
         foreach ($this->panier as $ref => $data) {
             if (!empty($ref)) {
                 $list[$i]["id"] = $ref;
-                $list[$i]["qte"] = $data['quantity'];
-                $list[$i]["prix"] = $data['prix'];
-                $list[$i]["nom"] = $data['nom'];
+                $list[$i]["quantity"] = $data['quantity'];
+                $list[$i]["shipping"] = 0;
+                $list[$i]["price"] = $data['price'];
+                $list[$i]["name"] = $data['name'];
                 foreach ($this->panier[$ref] as $oref => $option) {
                     if (!empty($option['quantity']) && $option['quantity'] > 0) {
-                        $list[$i]["options"][] = array("o_id" => $oref, "o_qte" => $option['quantity'], "o_prix" => $option['prix'], "o_nom" => $option['nom']);
+                        $list[$i]["options"][] = array("o_id" => $oref, "o_qte" => $option['quantity'], "o_price" => $option['price'], "o_name" => $option['name']);
                         //$list[$i]["options"][] = $option;
                     }
                 }

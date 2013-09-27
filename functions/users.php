@@ -35,7 +35,6 @@ function createNewAdresse($infos) {
     return $id;
 }
 
-
 function getAdresse($uid, $alias) {
     global $db;
 
@@ -74,6 +73,25 @@ function getUserDetail($id) {
             ->get("av_customer");
 
     return $r[0];
+}
+
+function getUserOrders($id) {
+    global $db;
+    $r = $db->where("id_customer", $id)
+            ->get("av_orders");
+
+    foreach ($r as $k => $order) {
+        $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
+    }
+    return $r;
+}
+
+function getUserOrdersDetail($oid) {
+    global $db;
+    $r = $db->where("id_order", $oid)
+            ->get("av_order_detail");
+
+    return $r;
 }
 
 ?>

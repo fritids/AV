@@ -11,8 +11,8 @@
                 <hr />	
                 {assign var="total" value="0"}
                 {foreach key=key item=product from=$cart}
-                    <p>{$product.id} nom={$product.nom} qte= {$product.qte} prix = {$product.prix}</p> 
-                    {$total = $total + $product.prix}
+                    <p>{$product.id} nom={$product.name} qte= {$product.quantity} price = {$product.price}</p> 
+                    {$total = $total + $product.price}
                 {/foreach}
                 <hr />
 
@@ -20,9 +20,10 @@
                     Expédition xx,00 €<br/>
                     Taxes xx,xx €<br/>
                     Total {$total} €<br/>
-                    Les prix sont TTC <br/>
+                    Les price sont TTC <br/>
                 </p>
-                <a class="bouton" href="?cart">Panier</a><a class="bouton" href="">Commander</a>
+                <a class="bouton" href="?cart">Panier</a>
+                <a class="bouton" href="?order-resume">Commander</a>
             </div>
             <div class="bloc-droite">
                 <h2>NOS SERVICES</h2>

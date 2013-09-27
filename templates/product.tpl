@@ -28,10 +28,10 @@
         <li>description_short   : {$product.description_short}</li> 
     </ul>
 
-    {if isset($product.product_caract)}
+    {if isset($product.caracteristiques)}
         <h2>details </h2>
         <ul>
-            {foreach key=key item=caracts from=$product.product_caract}
+            {foreach key=key item=caracts from=$product.caracteristiques}
                 <li>
                     {$caracts.caract_name} : {$caracts.caract_value}  
                 </li>                            
