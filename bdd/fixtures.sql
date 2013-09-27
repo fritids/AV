@@ -12,16 +12,16 @@ INSERT INTO `allovitres`.`av_category` (`id_category`, `id_parent`, `active`, `d
 
 #-- produits
 INSERT INTO `allovitres`.`av_product` (`id_product`, `id_category`, `quantity`, `price`, `unit_price_ratio`, `reference`, `width`, `height`, `depth`, `weight`, `active`, `date_add`, `date_upd`, `name`, `description`, `description_short`) VALUES
-(1,  1,'5', '0', '1.5', 'REF 1', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 1', 'Produit de test', 'Description'),
-(2,  2,'5', '0', '2.5', 'REF 2', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 2', 'Produit de test', 'Description'),
-(3,  3,'5', '0', '3.5', 'REF 3', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 3', 'Produit de test', 'Description'),
-(4,  4,'5', '0', '4.5', 'REF 4', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 4', 'Produit de test', 'Description'),
-(5,  5,'5', '0', '5.5', 'REF 5', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 5', 'Produit de test', 'Description'),
-(6,  6,'5', '0', '6.5', 'REF 6', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 6', 'Produit de test', 'Description'),
-(7,  7,'5', '0', '7.5', 'REF 7', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 7', 'Produit de test', 'Description'),
-(8,  1,'5', '0', '8.5', 'REF 8', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 8', 'Produit de test', 'Description'),
-(9,  2,'5', '0', '9.5', 'REF 9', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 9', 'Produit de test', 'Description'),
-(10, 3,'5', '0', '10.5','REF 0', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 0', 'Produit de test', 'Description');
+(1,  1,'5', '1.5','1.5', 'REF 1', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 1', 'Produit de test', 'Description'),
+(2,  2,'5', '2.5','2.5', 'REF 2', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 2', 'Produit de test', 'Description'),
+(3,  3,'5', '3.5','3.5', 'REF 3', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 3', 'Produit de test', 'Description'),
+(4,  4,'5', '4.5','4.5', 'REF 4', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 4', 'Produit de test', 'Description'),
+(5,  5,'5', '5.5','5.5', 'REF 5', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 5', 'Produit de test', 'Description'),
+(6,  6,'5', '6.5','6.5', 'REF 6', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 6', 'Produit de test', 'Description'),
+(7,  7,'5', '7.5','7.5', 'REF 7', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 7', 'Produit de test', 'Description'),
+(8,  1,'5', '8.5','8.5', 'REF 8', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 8', 'Produit de test', 'Description'),
+(9,  2,'5', '9.5','9.5', 'REF 9', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 9', 'Produit de test', 'Description'),
+(10, 3,'5', '10.5''10.5','REF 0', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 0', 'Produit de test', 'Description');
     
 #-- produits carac
 INSERT INTO `allovitres`.`av_product_caract` (`id_product_caract`, `id_product`, `caract_name`, `caract_value`) VALUES

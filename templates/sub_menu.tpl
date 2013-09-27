@@ -5,8 +5,7 @@
         <ul>
             {foreach key=key item=menu from=$sub_menu}
                 <li><a href='{$menu.url}'><span>{$menu.title}</span></a></li>
-                {/foreach}
-
+            {/foreach}
         </ul>
     </div>
     <div id="menu-separation-bas"></div>

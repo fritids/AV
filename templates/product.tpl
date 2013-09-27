@@ -2,6 +2,11 @@
     <div class="bloc-titre">Produit</div>
     <div class="bloc-bas" style="height:400px">
 
+        <form action="?cart" method="post">
+            <input type="hidden" name="id_product" value="{$product.id_product}">
+            <input type="hidden" name="add">
+            <input type="submit" value="Ajouter au panier" >
+        </form> 
 
         <h1>Produits</h1>
         <ul>
@@ -23,13 +28,18 @@
             <li>description_short   : {$product.description_short}</li> 
         </ul>
 
-        <h2>details </h2>
-        <ul>
-            {foreach key=key item=caracts from=$product_caract}
-                <li>
-                    {$caracts.caract_name} : {$caracts.caract_value}  
-                </li>                            
-            {/foreach}
-        </ul>
+        {if isset($product.product_caract)}
+            <h2>details </h2>
+            <ul>
+                {foreach key=key item=caracts from=$product.product_caract}
+                    <li>
+                        {$caracts.caract_name} : {$caracts.caract_value}  
+                    </li>                            
+                {/foreach}
+            </ul>
+        {/if}
+
+
+
     </div>
 </div>

@@ -67,9 +67,20 @@
                 <div id="top-header">
                     <div id="top-header-centre">
                         <span id="top-header-texte" >Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</span>
-                        <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">5</p></div></div><img src="img/caddie.png"/>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="?page=creer_compte" title="connexion">SE CONNECTER</a></div>
+                        <div id="top-header-droit">
+                            <div class="puce_caddie">
+                                <div class="puce_caddie_taille">
+                                    <p class="puce_caddie_taille">{$cart_nb_items}</p>
+                                </div>
+                            </div>
+                            <a href="?cart"><img src="img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
 
-
+                            {if $is_logged}
+                                Bonjour <a href="?my-account">{$user.lastname} {$user.firstname}</a>
+                                <a href="?action=logout">deconnexion</a>
+                            {else}
+                                <a href="?n" title="connexion">SE CONNECTER</a></div>
+                            {/if}
                     </div>
                 </div>
                 <div id="header">

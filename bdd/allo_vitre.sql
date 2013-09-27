@@ -52,15 +52,34 @@ CREATE TABLE IF NOT EXISTS `av_customer` (
   `lastname` varchar(32) NOT NULL,
   `email` varchar(128) NOT NULL,
   `passwd` varchar(32) NOT NULL,
-  `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `birthday` date DEFAULT NULL,
-  `newsletter` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `phone` varchar(32) DEFAULT NULL,
+  `phone_mobile` varchar(32) DEFAULT NULL,
   `secure_key` varchar(32) NOT NULL DEFAULT '-1',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_customer`)  
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Structure de la table `av_address`
+--
+CREATE TABLE IF NOT EXISTS `av_address` (
+  `id_address` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_customer` int(10) unsigned NOT NULL DEFAULT '0',
+  `alias` varchar(32) NOT NULL,
+  `address1` varchar(128) NOT NULL,
+  `address2` varchar(128) DEFAULT NULL,
+  `postcode` varchar(12) DEFAULT NULL,
+  `country` varchar(64) NOT NULL,
+  `city` varchar(64) NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_address`)  
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
 
 -- --------------------------------------------------------
 
@@ -148,28 +167,6 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   PRIMARY KEY (`id_product`) 
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
---
--- Structure de la table `av_address`
---
-CREATE TABLE IF NOT EXISTS `av_address` (
-  `id_address` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `id_customer` int(10) unsigned NOT NULL DEFAULT '0',
-  `alias` varchar(32) NOT NULL,
-  `company` varchar(32) DEFAULT NULL,
-  `lastname` varchar(32) NOT NULL,
-  `firstname` varchar(32) NOT NULL,
-  `address1` varchar(128) NOT NULL,
-  `address2` varchar(128) DEFAULT NULL,
-  `postcode` varchar(12) DEFAULT NULL,
-  `country` varchar(64) NOT NULL,
-  `city` varchar(64) NOT NULL,
-  `phone` varchar(32) DEFAULT NULL,
-  `phone_mobile` varchar(32) DEFAULT NULL,
-  `date_add` datetime NOT NULL,
-  `date_upd` datetime NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id_address`)  
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 --
