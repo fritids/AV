@@ -1,6 +1,6 @@
 #-- categories
 
-INSERT INTO `allovitres`.`av_category` (`id_category`, `id_parent`, `active`, `date_add`, `date_upd`, `position`, `name`, `description`) VALUES 
+INSERT INTO `av_category` (`id_category`, `id_parent`, `active`, `date_add`, `date_upd`, `position`, `name`, `description`) VALUES 
 (1, '', '1', '2013-09-26 00:00:00', '', '0', 'Simple Vitrage', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (2, '', '1', '2013-09-26 00:00:00', '', '0', 'Double Vitrage', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (3, '', '1', '2013-09-26 00:00:00', '', '0', 'Verre Spécifique', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
@@ -11,7 +11,7 @@ INSERT INTO `allovitres`.`av_category` (`id_category`, `id_parent`, `active`, `d
 
 
 #-- produits
-INSERT INTO `allovitres`.`av_product` (`id_product`, `id_category`, `quantity`, `price`, `unit_price_ratio`, `reference`, `width`, `height`, `depth`, `weight`, `active`, `date_add`, `date_upd`, `name`, `description`, `description_short`) VALUES
+INSERT INTO `av_product` (`id_product`, `id_category`, `quantity`, `price`, `unit_price_ratio`, `reference`, `width`, `height`, `depth`, `weight`, `active`, `date_add`, `date_upd`, `name`, `description`, `description_short`) VALUES
 (1,  1,'5', '1.5','1.5', 'REF 1', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 1', 'Produit de test', 'Description'),
 (2,  2,'5', '2.5','2.5', 'REF 2', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 2', 'Produit de test', 'Description'),
 (3,  3,'5', '3.5','3.5', 'REF 3', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 3', 'Produit de test', 'Description'),
@@ -21,10 +21,10 @@ INSERT INTO `allovitres`.`av_product` (`id_product`, `id_category`, `quantity`, 
 (7,  7,'5', '7.5','7.5', 'REF 7', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 7', 'Produit de test', 'Description'),
 (8,  1,'5', '8.5','8.5', 'REF 8', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 8', 'Produit de test', 'Description'),
 (9,  2,'5', '9.5','9.5', 'REF 9', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 9', 'Produit de test', 'Description'),
-(10, 3,'5', '10.5''10.5','REF 0', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 0', 'Produit de test', 'Description');
+(10, 3,'5', '10.5','10.5','REF 0', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 0', 'Produit de test', 'Description');
     
 #-- produits carac
-INSERT INTO `allovitres`.`av_product_caract` (`id_product_caract`, `id_product`, `caract_name`, `caract_value`) VALUES
+INSERT INTO `av_product_caract` (`id_product_caract`, `id_product`, `caract_name`, `caract_value`) VALUES
 (NULL, '1', 'Transparence', 'Verre d''eau'),
 (NULL, '1', 'Assemblage', '3 verres par un film ...'),
 (NULL, '1', 'Delais de livraison', ' 4-5 semaines'),
@@ -36,4 +36,4 @@ INSERT INTO `allovitres`.`av_product_caract` (`id_product_caract`, `id_product`,
 (NULL, '3', 'Delais de livraison', ' 4-5 semaines'),
 (NULL, '4', 'Transparence', 'Verre d''eau'),
 (NULL, '4', 'Assemblage', '3 verres par un film ...'),
-(NULL, '4', 'Delais de livraison', ' 4-5 semaines'),
+(NULL, '4', 'Delais de livraison', ' 4-5 semaines');

@@ -155,6 +155,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 
         createNewAdresse($invoice_adresse);
         createNewAdresse($delivery_adresse);
+        
+        //auto login
+        checkUserLogin($_POST["email"], $_POST["passwd"]);
     }
 }
 
