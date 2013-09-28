@@ -37,3 +37,18 @@ INSERT INTO `av_product_caract` (`id_product_caract`, `id_product`, `caract_name
 (NULL, '4', 'Transparence', 'Verre d''eau'),
 (NULL, '4', 'Assemblage', '3 verres par un film ...'),
 (NULL, '4', 'Delais de livraison', ' 4-5 semaines');
+
+
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES 
+(NULL, '1', 'RAL 1000', '11', '10', '0.00', '0'),
+(NULL, '1', 'RAL 1001', '12', '10', '0.00', '0'),
+(NULL, '1', 'RAL 1002', '13', '10', '0.00', '0'),
+(NULL, '1', 'RAL 1003', '14', '10', '0.00', '0'),
+(NULL, '1', 'RAL 1004', '15', '10', '0.00', '0'),
+(NULL, '1', 'RAL 1005', '16', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1000', '17', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1001', '18', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1002', '19', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1003', '11', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1004', '12', '10', '0.00', '0'),
+(NULL, '2', 'RAL 1005', '13', '10', '0.00', '0');

@@ -26,12 +26,13 @@ class Panier {
     }
 
     // ajouter un article $refproduit
-    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0,$name) {
-        @$this->panier[$refproduit][$refoption]['quantity'] += $nb;
-        @$this->panier[$refproduit][$refoption]['price'] += $price;
-        @$this->panier[$refproduit][$refoption]['name'] = $name;
+    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name) {
+        @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
+        @$this->panier[$refproduit]["options"][$refoption]['price'] += $price;
+        @$this->panier_summary['total_amount'] += $nb * $price;
+        @$this->panier[$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
-            unset($this->panier[$refproduit][$refoption]);
+            unset($this->panier[$refproduit]["options"][$refoption]);
     }
 
     // ajouter un article $refproduit
@@ -48,8 +49,16 @@ class Panier {
     public function removeItem($refproduit = "", $nb = 1, $price = 0) {
         @$this->panier[$refproduit]['quantity'] -= $nb;
         @$this->panier_summary['total_amount'] -= $nb * $price;
-        if ($this->panier[$refproduit]['quantity'] <= 0)
+        if ($this->panier[$refproduit]['quantity'] <= 0) {
+            //remove option
+            $option_amount = 0;
+            if (isset($this->panier[$refproduit]['options']))
+                foreach ($this->panier[$refproduit]['options'] as $k => $option)
+                    $option_amount += $option["quantity"] * $option["price"];
+
+            $this->panier_summary['total_amount'] -=$option_amount;
             unset($this->panier[$refproduit]);
+        }
     }
 
     // choisir la quantit� d'article $refproduit
@@ -86,13 +95,21 @@ class Panier {
                 $list[$i]["shipping"] = 0;
                 $list[$i]["price"] = $data['price'];
                 $list[$i]["name"] = $data['name'];
-                foreach ($this->panier[$ref] as $oref => $option) {
-                    if (!empty($option['quantity']) && $option['quantity'] > 0) {
-                        $list[$i]["options"][] = array("o_id" => $oref, "o_qte" => $option['quantity'], "o_price" => $option['price'], "o_name" => $option['name']);
-                        //$list[$i]["options"][] = $option;
+
+                //les options
+                if (!empty($this->panier[$ref]['options'])) {
+                    foreach ($this->panier[$ref]["options"] as $oref => $option) {
+                        if (!empty($option['quantity']) && $option['quantity'] > 0) {
+                            $list[$i]["options"][] = array("o_id" => $oref,
+                                "o_quantity" => $option['quantity'],
+                                "o_price" => $option['price'],
+                                "o_name" => $option['name'],
+                                "o_shipping" => 0
+                            );
+                            //$list[$i]["options"][] = $option;
+                        }
                     }
                 }
-
                 //les contacts
                 if (!empty($this->panier[$ref]['contact'])) {
                     foreach ($this->panier[$ref]['contact'] as $key => $contact) {

@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `id_order_detail` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_order` int(10) unsigned NOT NULL,
   `product_id` int(10) unsigned NOT NULL,
+  `product_attribute_id` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,
   `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
   `product_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
@@ -179,5 +180,17 @@ CREATE TABLE IF NOT EXISTS `av_product_caract` (
   `caract_name` varchar(120) NOT NULL ,
   `caract_value` varchar(210) NOT NULL,
   PRIMARY KEY (`id_product_caract`) 
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `av_product_attribute` (
+  `id_product_attribute` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_product` int(10) unsigned NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `weight` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `unit_price_impact` decimal(17,2) NOT NULL DEFAULT '0.00',
+  `default_on` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_product_attribute`)  
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

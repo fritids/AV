@@ -17,12 +17,21 @@
 
         <h2> Detail commande </h2>
 
+        {assign var="total_amount" value=0}
         {foreach key=key item=detail from=$order.details}
             <b>product_id	            </b> : {$detail.product_id}<br>
             <b>product_name	            </b> : {$detail.product_name}<br>
             <b>product_quantity	        </b> : {$detail.product_quantity}<br>
             <b>product_price	        </b> : {$detail.product_price}<br>
+            <b>attribut_name            </b> : {$detail.attribut_name}<br>
+            <b>total_price_tax_incl            </b> : {$detail.total_price_tax_incl}<br>
+            <br>
+            {$total_amount = $total_amount+ $detail.total_price_tax_incl}
+
         {/foreach}
+        TOTAL COMMANDE = {$total_amount} € TTC<br>
+
+        <hr>
     {/foreach}
 
 </div>

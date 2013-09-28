@@ -11,15 +11,22 @@
                 <hr />	
                 {assign var="total" value="0"}
                 {foreach key=key item=product from=$cart}
-                    <p>{$product.id} nom={$product.name} qte= {$product.quantity} price = {$product.price}</p> 
-                    {$total = $total + $product.price}
+                    <p>{$product.id} nom={$product.name} qte={$product.quantity} price={$product.price}</p> 
+                    {if isset($product.options)}
+                        <ul>
+                            {foreach key=key item=option from=$product.options}
+                                <li > id_option = {$option.o_id} option_name = {$option.o_name} option_qte={$option.o_quantity} option_price={$option.o_price} </li>
+                                {/foreach}   
+                        </ul>
+                    {/if} 
+                    
                 {/foreach}
                 <hr />
 
                 <p>
                     Expédition xx,00 €<br/>
                     Taxes xx,xx €<br/>
-                    Total {$total} €<br/>
+                    Total {$smarty.session.cart_summary.total_amount} €<br/>
                     Les price sont TTC <br/>
                 </p>
                 <a class="bouton" href="?cart">Panier</a>

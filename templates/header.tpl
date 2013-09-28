@@ -75,8 +75,8 @@
                             </div>
                             <a href="?cart"><img src="img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
 
-                            {if $is_logged}
-                                Bonjour <a href="?my-account">{$user.lastname} {$user.firstname}</a>
+                            {if $smarty.session.is_logged}
+                                Bonjour <a href="?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
                                 <a href="?action=logout">deconnexion</a>
                             {else}
                                 <a href="?n" title="connexion">SE CONNECTER</a></div>
