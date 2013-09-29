@@ -75,7 +75,7 @@
                             </div>
                             <a href="?cart"><img src="img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
 
-                            {if $smarty.session.is_logged}
+                            {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
                                 Bonjour <a href="?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
                                 <a href="?action=logout">deconnexion</a>
                             {else}

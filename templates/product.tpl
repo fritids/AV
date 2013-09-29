@@ -1,3 +1,24 @@
+<script>
+
+    $(document).ready(function($) {
+        var square = 0;
+        $('#width').change(function() {
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+            square = (pwidth * pheigth) / 10000;
+            $('#quantity').val(square.toFixed(2));
+
+        });
+        $('#heigth').change(function() {
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+            square = (pwidth * pheigth) / 10000;
+            $('#quantity').val(square.toFixed(2));
+
+        });
+    });
+
+</script>
 
 <div class="bloc-titre">Produit</div>
 <div class="bloc-bas" style="min-height:400px">
@@ -6,6 +27,10 @@
         <input type="hidden" name="id_product" value="{$product.id_product}">
         <input type="hidden" name="add">
         <input type="submit" value="Ajouter au panier" >
+
+        Width ({$product.min_width} mm - {$product.max_width}) : <input type="number" id ="width" name="width" value=""><br>
+        Height ({$product.min_height}mm - {$product.max_height}) : <input type="number" id ="heigth" name="height" value=""><br>
+        Total : <input type="number" id ="quantity" name="quantity" value="" required="true" readonly><br>
 
 
         <h1>Produits</h1>

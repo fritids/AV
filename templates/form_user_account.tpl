@@ -1,4 +1,4 @@
-{if !$is_logged}
+{if !isset($smarty.session.is_logged)}
     <div id="titre-bloc">CONNEXION</div>
     <h3>COMPTE EXISTANT</h3>
     <form action="index.php?action=login" method="post">

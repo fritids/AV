@@ -109,7 +109,6 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
   `id_order` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `reference` varchar(9) DEFAULT NULL,
   `id_customer` int(10) unsigned NOT NULL,
-  `id_cart` int(10) unsigned NOT NULL,
   `id_address_delivery` int(10) unsigned NOT NULL,
   `id_address_invoice` int(10) unsigned NOT NULL,
   `current_state` int(10) unsigned NOT NULL,
@@ -133,8 +132,13 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `product_id` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,
-  `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0',
   `product_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `product_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `attribute_name` varchar(255) NOT NULL,
+  `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0',
+  `attribute_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `attribute_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `total_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `total_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
@@ -155,18 +159,23 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `unit_price_ratio` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `reference` varchar(32) DEFAULT NULL,
-  `width` decimal(20,6) NULL DEFAULT '0.000000',
+  `width` decimal(20,6) DEFAULT '0.000000',
   `height` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `depth` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `weight` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
-  `date_upd` datetime NOT NULL,  
-  `name` varchar(150) NOT NULL ,  
-  `description` text NULL ,  
-  `description_short` text NULL,  
-  PRIMARY KEY (`id_product`) 
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `date_upd` datetime NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `description` text,
+  `description_short` text,
+  `min_width` int(11) NOT NULL,
+  `min_height` int(11) NOT NULL,
+  `max_surface` int(11) NOT NULL,
+  `max_width` int(11) NOT NULL,
+  `max_height` int(11) NOT NULL,
+  PRIMARY KEY (`id_product`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 
 
@@ -194,3 +203,11 @@ CREATE TABLE IF NOT EXISTS `av_product_attribute` (
   PRIMARY KEY (`id_product_attribute`)  
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+
+CREATE TABLE IF NOT EXISTS `av_range_weight` (
+  `id_range_weight` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `delimiter1` decimal(20,6) NOT NULL,
+  `delimiter2` decimal(20,6) NOT NULL,
+  `delivery_ratio` decimal(20,6) NOT NULL,
+  PRIMARY KEY (`id_range_weight`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;

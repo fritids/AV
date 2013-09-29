@@ -21,50 +21,52 @@ $sub_menu = array(
 // classes declaration
 
 $smarty = new Smarty;
-$smarty->error_reporting = E_ALL & ~E_NOTICE;
+//$smarty->error_reporting = E_ALL & ~E_NOTICE;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 //Caddie
 $cart = new Panier();
 
-$product_caract = $db->where('id_product', 1)
-        ->get('av_product_caract');
-
-
 /* action Caddie */
-
 if (isset($_GET["cart"])) {
-    if (isset($_POST["id_product"]) and $_POST["id_product"] != "") {
+    if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
 
         $pid = $_POST["id_product"];
-        $pqte = @$_POST["quantity"];
+        $pqte = $_POST["quantity"];
 
         $productInfos = getProductInfos($_POST["id_product"]);
 
+        $pweight = $productInfos["weight"];
+        $shipping_ratio = getDeliveryRatio($pweight);
+        $shipping_amount = $shipping_ratio * $pweight;
+
         if (isset($_POST["add"])) {
-            $cart->addItem($pid, 1, $productInfos["price"], $productInfos["name"]);
+            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount);
 
             //Si option
             if (isset($_POST["options"])) {
                 $id_option = $_POST["options"];
                 $option_price = $productInfos["attributes"][$id_option]["price"];
                 $option_name = $productInfos["attributes"][$id_option]["name"];
+                $option_weight = $productInfos["attributes"][$id_option]["weight"];
+                $shipping_ratio = getDeliveryRatio($option_weight);
+                $shipping_amount = $shipping_ratio * $option_weight;
 
-                $cart->addItemOption($pid, $id_option, 1, $option_price, $option_name);
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount);
             }
         }
 
         if (isset($_POST["del"]))
-            $cart->removeItem($pid, $pqte, $productInfos["price"]);
+            $cart->removeItem($pid, $pqte, $productInfos["price"], $shipping_amount);
 
         // on empecher de faire un F5
         header("Location: index.php?cart");
     }
 }
 
-$items = $cart->showCart();
-$cart_nb_items = count($items);
+$cartItems = $cart->showCart();
+$cart_nb_items = count($cartItems);
 
 
 
@@ -102,10 +104,9 @@ if (isset($_GET["orders-list"])) {
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
-    $page = "cart";
-
+    $page = "order-resume";
     $pp = new paypalcheckout(); //Create an instance of the class
-    $pp->addMultipleItems($items); //Add all the items to the cart in one go
+    $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
     //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
 
@@ -241,7 +242,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
 
     $oid = $db->insert("av_orders", $order_summary);
 
-    foreach ($items as $item) {
+    foreach ($cartItems as $item) {
 
         $order_detail = array(
             "id_order" => $oid,
@@ -249,14 +250,21 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
             "product_name" => $item["name"],
             "product_quantity" => $item["quantity"],
             "product_price" => $item["price"],
-            "total_price_tax_incl" => $item["quantity"] * $item["price"]
+            "product_shipping" => $item["shipping"],
+            "total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
+            "total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
         );
 
         // les options
         if (isset($item["options"])) {
             foreach ($item["options"] as $k => $option) {
                 $order_detail["product_attribute_id"] = $option["o_id"];
-                $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"];
+                $order_detail["attribute_name"] = $option["o_name"];
+                $order_detail["attribute_quantity"] = $option["o_quantity"];
+                $order_detail["attribute_price"] = $option["o_price"];
+                $order_detail["attribute_shipping"] = $option["o_shipping"];
+                $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
+                $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
 
                 $db->insert("av_order_detail", $order_detail);
             }
@@ -268,7 +276,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     //on flush le caddie
     unset($_SESSION["cart"]);
     unset($_SESSION["cart_summary"]);
-    $items = array();
+    $cartItems = array();
 
     //on redirige sur la listes des commandes
     $page = "orders-list";
@@ -289,16 +297,18 @@ if (@$_SESSION["is_logged"]) {
 /* Smarty */
 $smarty->assign('sub_menu', $sub_menu);
 $smarty->assign('page', $page);
-$smarty->assign('cart', $items);
+$smarty->assign('cart', $cartItems);
 $smarty->assign('cart_nb_items', $cart_nb_items);
 
 $smarty->display('index.tpl');
 ?>
 <h1>Session</h1>
 <?= print_r($_SESSION) ?>
-<h1>Cart</h1>
-<?= print_r($items); ?>
+<h1>Cart item</h1>
+<?= print_r($cartItems); ?>
 <h1>Orders</h1>
 <?= print_r($orders); ?>
+<h1>Product</h1>
+<?= print_r($product); ?>
 <h1>Post</h1>
 <?= print_r($_POST); ?>

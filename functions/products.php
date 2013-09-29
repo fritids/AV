@@ -28,8 +28,8 @@ function getProductCaracts($pid) {
 function getProductAttributes($pid) {
     global $db;
     $r = $db->where("id_product", $pid)
-            ->get("av_product_attribute");    
-    
+            ->get("av_product_attribute");
+
     foreach ($r as $k => $values) {
         $t[$values["id_product_attribute"]] = $values;
     }
@@ -39,15 +39,18 @@ function getProductAttributes($pid) {
 
     return $t;
 }
+
 function getAttributes($aid) {
     global $db;
     $r = $db->where("id_product_attribute", $aid)
-            ->get("av_product_attribute");    
-       
+            ->get("av_product_attribute");
+
     if (empty($r))
         return (null);
 
     return $r[0];
 }
+
+
 
 ?>
