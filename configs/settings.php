@@ -8,5 +8,6 @@ $bdd_name = "allovitres";
 $opts['hn'] = $bdd_host;
 $opts['un'] = $bdd_user;
 $opts['db'] = $bdd_name;
+$opts['pw'] = $bdd_pwd;
 
 ?>

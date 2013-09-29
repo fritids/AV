@@ -180,12 +180,6 @@ $opts['fdd']['date_add'] = array(
   'maxlen'   => 19,
   'sort'     => true
 );
-$opts['fdd']['date_upd'] = array(
-  'name'     => 'Date upd',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
-);
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

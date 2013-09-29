@@ -1,26 +1,23 @@
-phpMyAdmin SQL Dump
--- version 3.4.10.1
--- http://www.phpmyadmin.net
 --
--- Client: localhost
--- Généré le : Jeu 26 Septembre 2013 à 14:18
--- Version du serveur: 5.5.20
--- Version de PHP: 5.3.10
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
---
--- Base de données: `prestashop_1550`
+-- Structure de la table `av_address`
 --
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `av_address` (
+  `id_address` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_customer` int(10) unsigned NOT NULL DEFAULT '0',
+  `alias` varchar(32) NOT NULL,
+  `address1` varchar(128) NOT NULL,
+  `address2` varchar(128) DEFAULT NULL,
+  `postcode` varchar(12) DEFAULT NULL,
+  `country` varchar(64) NOT NULL,
+  `city` varchar(64) NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_address`),
+  KEY `id_customer` (`id_customer`),
+  KEY `id_customer_2` (`id_customer`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
 
 --
 -- Structure de la table `av_category`
@@ -34,11 +31,9 @@ CREATE TABLE IF NOT EXISTS `av_category` (
   `date_upd` datetime NOT NULL,
   `position` int(10) unsigned NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
-  `description` text, 
-  PRIMARY KEY (`id_category`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
+  `description` text,
+  PRIMARY KEY (`id_category`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 --
 -- Structure de la table `av_customer`
@@ -58,30 +53,8 @@ CREATE TABLE IF NOT EXISTS `av_customer` (
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
-  PRIMARY KEY (`id_customer`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
---
--- Structure de la table `av_address`
---
-CREATE TABLE IF NOT EXISTS `av_address` (
-  `id_address` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `id_customer` int(10) unsigned NOT NULL DEFAULT '0',
-  `alias` varchar(32) NOT NULL,
-  `address1` varchar(128) NOT NULL,
-  `address2` varchar(128) DEFAULT NULL,
-  `postcode` varchar(12) DEFAULT NULL,
-  `country` varchar(64) NOT NULL,
-  `city` varchar(64) NOT NULL,
-  `date_add` datetime NOT NULL,
-  `date_upd` datetime NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id_address`)  
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
-
--- --------------------------------------------------------
+  PRIMARY KEY (`id_customer`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Structure de la table `av_employee`
@@ -96,8 +69,8 @@ CREATE TABLE IF NOT EXISTS `av_employee` (
   `passwd` varchar(32) NOT NULL,
   `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id_employee`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id_employee`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -117,10 +90,12 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
   `delivery_date` datetime NOT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
-  PRIMARY KEY (`id_order`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id_order`),
+  KEY `id_customer` (`id_customer`),
+  KEY `id_address_delivery` (`id_address_delivery`),
+  KEY `id_address_invoice` (`id_address_invoice`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
--- --------------------------------------------------------
 
 --
 -- Structure de la table `av_order_detail`
@@ -132,19 +107,20 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `product_id` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,
-  `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0',
+  `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
   `product_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `product_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `attribute_name` varchar(255) NOT NULL,
-  `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0',
+  `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
   `attribute_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `attribute_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `total_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `total_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`id_order_detail`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id_order_detail`),
+  KEY `id_order` (`id_order`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -174,23 +150,13 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   `max_surface` int(11) NOT NULL,
   `max_width` int(11) NOT NULL,
   `max_height` int(11) NOT NULL,
-  PRIMARY KEY (`id_product`)
+  PRIMARY KEY (`id_product`),
+  KEY `id_category` (`id_category`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
-
-
 --
--- Structure de la table `av_product_caract`
+-- Structure de la table `av_product_attribute`
 --
-
-CREATE TABLE IF NOT EXISTS `av_product_caract` (
-  `id_product_caract` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `id_product` int(10) unsigned NOT NULL,
-  `caract_name` varchar(120) NOT NULL ,
-  `caract_value` varchar(210) NOT NULL,
-  PRIMARY KEY (`id_product_caract`) 
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
 
 CREATE TABLE IF NOT EXISTS `av_product_attribute` (
   `id_product_attribute` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -200,9 +166,26 @@ CREATE TABLE IF NOT EXISTS `av_product_attribute` (
   `weight` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `unit_price_impact` decimal(17,2) NOT NULL DEFAULT '0.00',
   `default_on` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id_product_attribute`)  
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id_product_attribute`),
+  KEY `id_product` (`id_product`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
 
+--
+-- Structure de la table `av_product_caract`
+--
+
+CREATE TABLE IF NOT EXISTS `av_product_caract` (
+  `id_product_caract` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_product` int(10) unsigned NOT NULL,
+  `caract_name` varchar(120) NOT NULL,
+  `caract_value` varchar(210) NOT NULL,
+  PRIMARY KEY (`id_product_caract`),
+  KEY `id_product` (`id_product`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+--
+-- Structure de la table `av_range_weight`
+--
 
 CREATE TABLE IF NOT EXISTS `av_range_weight` (
   `id_range_weight` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -210,4 +193,46 @@ CREATE TABLE IF NOT EXISTS `av_range_weight` (
   `delimiter2` decimal(20,6) NOT NULL,
   `delivery_ratio` decimal(20,6) NOT NULL,
   PRIMARY KEY (`id_range_weight`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+
+--
+-- Contenu de la table `av_range_weight`
+--
+
+--
+-- Contraintes pour la table `av_address`
+--
+ALTER TABLE `av_address`
+  ADD CONSTRAINT `av_address_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `av_address` (`id_customer`);
+
+--
+-- Contraintes pour la table `av_orders`
+--
+ALTER TABLE `av_orders`
+  ADD CONSTRAINT `av_orders_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `av_customer` (`id_customer`),
+  ADD CONSTRAINT `av_orders_ibfk_2` FOREIGN KEY (`id_address_delivery`) REFERENCES `av_address` (`id_address`),
+  ADD CONSTRAINT `av_orders_ibfk_3` FOREIGN KEY (`id_address_invoice`) REFERENCES `av_address` (`id_address`);
+
+--
+-- Contraintes pour la table `av_order_detail`
+--
+ALTER TABLE `av_order_detail`
+  ADD CONSTRAINT `av_order_detail_ibfk_1` FOREIGN KEY (`id_order`) REFERENCES `av_orders` (`id_order`);
+
+--
+-- Contraintes pour la table `av_product`
+--
+ALTER TABLE `av_product`
+  ADD CONSTRAINT `av_product_ibfk_1` FOREIGN KEY (`id_category`) REFERENCES `av_category` (`id_category`);
+
+--
+-- Contraintes pour la table `av_product_attribute`
+--
+ALTER TABLE `av_product_attribute`
+  ADD CONSTRAINT `av_product_attribute_ibfk_1` FOREIGN KEY (`id_product`) REFERENCES `av_product` (`id_product`);
+
+--
+-- Contraintes pour la table `av_product_caract`
+--
+ALTER TABLE `av_product_caract`
+  ADD CONSTRAINT `av_product_caract_ibfk_1` FOREIGN KEY (`id_product`) REFERENCES `av_product` (`id_product`);

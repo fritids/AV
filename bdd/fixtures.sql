@@ -23,7 +23,7 @@ INSERT INTO `av_product` (`id_product`, `id_category`, `quantity`, `price`, `uni
 (9,  2,'5', '9.5','9.5', 'REF 9', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 9', 'Produit de test', 'Description'),
 (10, 3,'5', '10.5','10.5','REF 0', '0', '0', '0', '0.000000', '1', '2013-09-26 00:00:00', '2013-09-26 00:00:00', 'Produit 0', 'Produit de test', 'Description');
 
-update av_product set weight = rand()*10, `min_width`= 100, `min_height`= 100, `max_width`= 1000, `max_height`= 1000, `max_surface`= 1000;
+update av_product set weight = round(rand()*10), `min_width`= 100, `min_height`= 100, `max_width`= 1000, `max_height`= 1000, `max_surface`= 1000;
     
 #-- produits carac
 INSERT INTO `av_product_caract` (`id_product_caract`, `id_product`, `caract_name`, `caract_value`) VALUES
@@ -54,3 +54,10 @@ INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `name`
 (NULL, '2', 'RAL 1003', '11', '10', '0.00', '0'),
 (NULL, '2', 'RAL 1004', '12', '10', '0.00', '0'),
 (NULL, '2', 'RAL 1005', '13', '10', '0.00', '0');
+
+
+INSERT INTO `av_range_weight` (`id_range_weight`, `delimiter1`, `delimiter2`, `delivery_ratio`) VALUES
+(2, '0.000000', '1.000000', '2.000000'),
+(3, '1.000000', '10.000000', '8.000000'),
+(4, '10.000000', '50.000000', '16.000000');
+

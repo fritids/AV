@@ -148,34 +148,7 @@ $opts['fdd']['reference'] = array(
   'maxlen'   => 32,
   'sort'     => true
 );
-$opts['fdd']['width'] = array(
-  'name'     => 'Width',
-  'select'   => 'T',
-  'maxlen'   => 22,
-  'default'  => '0.000000',
-  'sort'     => true
-);
-$opts['fdd']['height'] = array(
-  'name'     => 'Height',
-  'select'   => 'T',
-  'maxlen'   => 22,
-  'default'  => '0.000000',
-  'sort'     => true
-);
-$opts['fdd']['depth'] = array(
-  'name'     => 'Depth',
-  'select'   => 'T',
-  'maxlen'   => 22,
-  'default'  => '0.000000',
-  'sort'     => true
-);
-$opts['fdd']['weight'] = array(
-  'name'     => 'Weight',
-  'select'   => 'T',
-  'maxlen'   => 22,
-  'default'  => '0.000000',
-  'sort'     => true
-);
+
 $opts['fdd']['active'] = array(
   'name'     => 'Active',
   'select'   => 'T',
@@ -185,12 +158,6 @@ $opts['fdd']['active'] = array(
 );
 $opts['fdd']['date_add'] = array(
   'name'     => 'Date add',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
-);
-$opts['fdd']['date_upd'] = array(
-  'name'     => 'Date upd',
   'select'   => 'T',
   'maxlen'   => 19,
   'sort'     => true

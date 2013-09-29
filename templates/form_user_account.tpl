@@ -10,20 +10,20 @@
 <form action="index.php?action=new_user" method="post">
     <div id="titre-bloc">CREATION DE COMPTE</div>
     <h3>INFORMATION DE COMPTE</h3>
-    <label for="nom">Nom</label><input id="nom" name="lastname" type="text" value="{$user.lastname}" /><br />
-    <label for="prenom">Prénom</label><input id="prenom" name="firstname" type="text"  value="{$user.firstname}" /><br />
-    <label for="email">Adresse mail</label><input id="email" name="email" type="email" value="{$user.email}" /><br />
-    <label for="mdp">Mot de passe</label><input id="mdp" name="passwd" type="text" /><br />
-    <label for="tel">Numéro de téléphone</label><input id="tel" name="phone" type="tel" value="{$user.phone}" /><br />
+    <label for="nom">Nom</label><input id="nom" name="lastname" type="text" value="{$user.lastname}" required="true"/><br />
+    <label for="prenom">Prénom</label><input id="prenom" name="firstname" type="text"  value="{$user.firstname}" required="true"/><br />
+    <label for="email">Adresse mail</label><input id="email" name="email" type="email" value="{$user.email}" required="true"/><br />
+    <label for="mdp">Mot de passe</label><input id="mdp" name="passwd" type="text" required="true"/><br />
+    <label for="tel">Numéro de téléphone</label><input id="tel" name="phone" type="tel" value="{$user.phone}" required="true"/><br />
     <label for="tel2">Numéro de téléphone 2</label><input id="tel2" name="phone_mobile" type="tel"  value="{$user.phone_mobile}"/><br />
     <h3 class="clear-it">INFORMATION DE FACTURATION & LIVRAISON</h3>
     <div id="facturation">
         <label for="adresse">Adresse de facturation *</label>
-        <textarea id="adresse" name="invoice_address1" >{$user.invoice.address1}</textarea><br />
+        <textarea id="adresse" name="invoice_address1" required="true">{$user.invoice.address1}</textarea><br />
         <label for="cp">Code Postal *</label>
-        <input id="cp" name="invoice_postcode" type="text" value="{$user.invoice.postcode}"/><br />
+        <input id="cp" name="invoice_postcode" type="text" value="{$user.invoice.postcode}" required="true" /><br />
         <label for="ville">Ville *</label>
-        <input id="ville" name="invoice_country" type="text" value="{$user.invoice.country}"/><br />
+        <input id="ville" name="invoice_country" type="text" value="{$user.invoice.country}" required="true"/><br />
 
     </div>
     <div id="livraison">
