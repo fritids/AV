@@ -15,10 +15,6 @@ $opts['key_type'] = 'int';
 // Sorting field(s)
 $opts['sort_field'] = array('id_product_attribute');
 
-// Number of records to display on the screen
-// Value of -1 lists all records in a table
-$opts['inc'] = 15;
-
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
@@ -26,10 +22,6 @@ $opts['options'] = 'ACPVDF';
 
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
-
-// Navigation style: B - buttons (default), T - text links, G - graphic links
-// Buttons position: U - up, D - down (default)
-$opts['navigation'] = 'DB';
 
 // Display special page elements
 $opts['display'] = array(
@@ -40,12 +32,6 @@ $opts['display'] = array(
 	'tabs'  => true
 );
 
-// Set default prefixes for variables
-$opts['js']['prefix']               = 'PME_js_';
-$opts['dhtml']['prefix']            = 'PME_dhtml_';
-$opts['cgi']['prefix']['operation'] = 'PME_op_';
-$opts['cgi']['prefix']['sys']       = 'PME_sys_';
-$opts['cgi']['prefix']['data']      = 'PME_data_';
 
 /* Get the user's default language and use it if possible or you can
    specify particular one you want to use. Refer to official documentation
@@ -60,6 +46,13 @@ $opts['filters'] = "column1 like '%11%' AND column2<17";
 $opts['filters'] = "section_id = 9";
 $opts['filters'] = "PMEtable0.sessions_count > 200";
 */
+
+if (isset($_GET["p"]))
+    $opts['filters'] = "PMEtable0.id_product = ". $_GET["p"];
+    
+    
+    
+    
 
 /* Field definitions
    
@@ -116,44 +109,28 @@ $opts['fdd']['id_product'] = array(
     'column' => 'id_product',
     'description' => 'name'
   ),
-
   'sort'     => true
 );
 $opts['fdd']['name'] = array(
-  'name'     => 'Name',
+  'name'     => 'Nom',
   'select'   => 'T',
   'maxlen'   => 128,
   'sort'     => true
 );
 $opts['fdd']['price'] = array(
-  'name'     => 'Price',
+  'name'     => 'Prix unitaire',
   'select'   => 'T',
   'maxlen'   => 22,
   'default'  => '0.000000',
   'sort'     => true
 );
 $opts['fdd']['weight'] = array(
-  'name'     => 'Weight',
+  'name'     => 'Poids',
   'select'   => 'T',
   'maxlen'   => 22,
   'default'  => '0.000000',
   'sort'     => true
 );
-$opts['fdd']['unit_price_impact'] = array(
-  'name'     => 'Unit price impact',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'default'  => '0.00',
-  'sort'     => true
-);
-$opts['fdd']['default_on'] = array(
-  'name'     => 'Default on',
-  'select'   => 'T',
-  'maxlen'   => 1,
-  'default'  => '0',
-  'sort'     => true
-);
-
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);

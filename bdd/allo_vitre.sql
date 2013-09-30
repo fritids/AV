@@ -195,6 +195,15 @@ CREATE TABLE IF NOT EXISTS `av_range_weight` (
   PRIMARY KEY (`id_range_weight`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
+
+
+CREATE TABLE IF NOT EXISTS `av_order_status` (
+  `id_statut` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL,
+  PRIMARY KEY (`id_statut`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+
 --
 -- Contenu de la table `av_range_weight`
 --

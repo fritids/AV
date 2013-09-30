@@ -23,7 +23,7 @@
         <label for="cp">Code Postal *</label>
         <input id="cp" name="invoice_postcode" type="text" value="{$user.invoice.postcode}" required="true" /><br />
         <label for="ville">Ville *</label>
-        <input id="ville" name="invoice_country" type="text" value="{$user.invoice.country}" required="true"/><br />
+        <input id="ville" name="invoice_city" type="text" value="{$user.invoice.city}" required="true"/><br />
 
     </div>
     <div id="livraison">
@@ -32,7 +32,7 @@
         <label for="LIV_cp">Code Postal *</label>
         <input id="LIV_cp" name="delivery_postcode" type="text" value="{$user.delivery.postcode}"/><br />
         <label for="LIV_ville">Ville *</label>
-        <input id="LIV_ville" name="delivery_country" type="text" value="{$user.delivery.country}"/><br />
+        <input id="LIV_ville" name="delivery_city" type="text" value="{$user.delivery.city}"/><br />
 
     </div>
     <div id="creer-cpt-checking">

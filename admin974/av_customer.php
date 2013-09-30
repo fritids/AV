@@ -4,6 +4,7 @@ include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
 
+
 $opts['tb'] = 'av_customer';
 
 // Name of field which is the unique key
@@ -15,10 +16,6 @@ $opts['key_type'] = 'int';
 // Sorting field(s)
 $opts['sort_field'] = array('id_customer');
 
-// Number of records to display on the screen
-// Value of -1 lists all records in a table
-$opts['inc'] = 15;
-
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
@@ -26,10 +23,6 @@ $opts['options'] = 'ACPVDF';
 
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
-
-// Navigation style: B - buttons (default), T - text links, G - graphic links
-// Buttons position: U - up, D - down (default)
-$opts['navigation'] = 'DB';
 
 // Display special page elements
 $opts['display'] = array(
@@ -39,13 +32,6 @@ $opts['display'] = array(
 	'time'  => true,
 	'tabs'  => true
 );
-
-// Set default prefixes for variables
-$opts['js']['prefix']               = 'PME_js_';
-$opts['dhtml']['prefix']            = 'PME_dhtml_';
-$opts['cgi']['prefix']['operation'] = 'PME_op_';
-$opts['cgi']['prefix']['sys']       = 'PME_sys_';
-$opts['cgi']['prefix']['data']      = 'PME_data_';
 
 /* Get the user's default language and use it if possible or you can
    specify particular one you want to use. Refer to official documentation
@@ -107,29 +93,20 @@ $opts['fdd']['id_customer'] = array(
   'default'  => '0',
   'sort'     => true
 );
-$opts['fdd']['id_gender'] = array(
-  'name'     => 'ID gender',
-  'select'   => 'T',
-  'maxlen'   => 10,
-  'sort'     => true
-);
-$opts['fdd']['company'] = array(
-  'name'     => 'Company',
-  'select'   => 'T',
-  'maxlen'   => 64,
-  'sort'     => true
-);
+
 $opts['fdd']['firstname'] = array(
-  'name'     => 'Firstname',
+  'name'     => 'Prénom',
   'select'   => 'T',
   'maxlen'   => 32,
   'sort'     => true
 );
 $opts['fdd']['lastname'] = array(
-  'name'     => 'Lastname',
+  'name'     => 'Nom',
   'select'   => 'T',
   'maxlen'   => 32,
-  'sort'     => true
+  'sort'     => true,
+    'URL' => 'av_address.php?c=$key'
+  
 );
 $opts['fdd']['email'] = array(
   'name'     => 'Email',
@@ -137,50 +114,19 @@ $opts['fdd']['email'] = array(
   'maxlen'   => 128,
   'sort'     => true
 );
-$opts['fdd']['passwd'] = array(
-  'name'     => 'Passwd',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
 $opts['fdd']['phone'] = array(
-  'name'     => 'Phone',
+  'name'     => 'Tel.',
   'select'   => 'T',
   'maxlen'   => 32,
   'sort'     => true
 );
 $opts['fdd']['phone_mobile'] = array(
-  'name'     => 'Phone mobile',
+  'name'     => 'Tel.2',
   'select'   => 'T',
   'maxlen'   => 32,
   'sort'     => true
 );
-$opts['fdd']['secure_key'] = array(
-  'name'     => 'Secure key',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'default'  => '-1',
-  'sort'     => true
-);
-$opts['fdd']['active'] = array(
-  'name'     => 'Active',
-  'select'   => 'T',
-  'maxlen'   => 1,
-  'default'  => '0',
-  'sort'     => true
-);
-$opts['fdd']['date_add'] = array(
-  'name'     => 'Date add',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
-);
-$opts['fdd']['date_upd'] = array(
-  'name'     => 'Date upd',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
-);
+
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

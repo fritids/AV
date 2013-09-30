@@ -31,7 +31,7 @@ function updateUserAddress($infos, $alias, $aid) {
 
 function createNewAdresse($infos) {
     global $db;
-    $id = $db->insert("av_address", $infos);
+    $id = $db->insert("av_address", $infos);    
     return $id;
 }
 

@@ -21,6 +21,7 @@ $sub_menu = array(
 // classes declaration
 
 $smarty = new Smarty;
+//$smarty->caching = 0;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
@@ -162,13 +163,17 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "id_customer" => $uid,
             "address1" => @$_POST["invoice_address1"],
             "postcode" => @$_POST["invoice_postcode"],
-            "country" => @$_POST["invoice_country"]);
+            "country" => "France",
+            "city" => @$_POST["invoice_city"]
+        );
 
         $delivery_adresse = array(
             "id_customer" => $uid,
             "address1" => @$_POST["delivery_address1"],
             "postcode" => @$_POST["delivery_postcode"],
-            "country" => @$_POST["delivery_country"]);
+            "country" => "France",
+            "city" => @$_POST["delivery_city"]
+        );
 
         updateUserAddress($invoice_adresse, "invoice", $_SESSION["user"]["invoice"]["id_address"]);
         updateUserAddress($delivery_adresse, "delivery", $_SESSION["user"]["delivery"]["id_address"]);
@@ -182,7 +187,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "id_customer" => $uid,
             "address1" => @$_POST["invoice_address1"],
             "postcode" => @$_POST["invoice_postcode"],
-            "country" => @$_POST["invoice_country"],
+            "city" => @$_POST["invoice_city"],
+            "country" => 'France',
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
@@ -192,11 +198,11 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "id_customer" => $uid,
             "address1" => @$_POST["delivery_address1"],
             "postcode" => @$_POST["delivery_postcode"],
-            "country" => @$_POST["delivery_country"],
+            "city" => @$_POST["delivery_city"],
+            "country" => 'France',
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
-
 
         createNewAdresse($invoice_adresse);
         createNewAdresse($delivery_adresse);
@@ -277,8 +283,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     //on flush le caddie
     unset($_SESSION["cart"]);
     unset($_SESSION["cart_summary"]);
-     $cartItems = array();
-    
+    $cartItems = array();
+
 //on redirige sur la listes des commandes
     $page = "orders-list";
     $orders = getUserOrders($_SESSION["user"]["id_customer"]);
