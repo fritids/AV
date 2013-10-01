@@ -106,7 +106,20 @@ $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
-    $pp = new paypalcheckout(); //Create an instance of the class
+    
+    $settings = array(
+            'business' => $paypal["email_account"] , //paypal email address
+            'currency' => 'EUR', //paypal currency
+            'cursymbol' => '&euro;', //currency symbol
+            'location' => 'FR', //location code  (ex GB)
+            'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
+            'returntxt' => 'Retour au site', //What is written on the return button in paypal
+            'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
+            'shipping' => 0, //Shipping Cost
+            'custom' => ''                           //Custom attribute
+        );
+    
+    $pp = new paypalcheckout($settings); //Create an instance of the class
     $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
     //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
@@ -309,6 +322,7 @@ $smarty->assign('cart_nb_items', $cart_nb_items);
 
 $smarty->display('index.tpl');
 ?>
+
 <h1>Session</h1>
 <?= print_r($_SESSION) ?>
 <h1>Cart item</h1>

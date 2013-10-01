@@ -28,13 +28,13 @@ class paypalcheckout {
 
         //default settings
         $settings = array(
-            'business' => 'alamichel.s@free.fr', //paypal email address
+            'business' => '', //paypal email address
             'currency' => 'EUR', //paypal currency
             'cursymbol' => '&euro;', //currency symbol
             'location' => 'FR', //location code  (ex GB)
-            'returnurl' => 'http://moka-web.net/allovitres/', //where to go back when the transaction is done.
+            'returnurl' => '', //where to go back when the transaction is done.
             'returntxt' => 'Retour au site', //What is written on the return button in paypal
-            'cancelurl' => 'http://moka-web.net/allovitres/', //Where to go if the user cancels.
+            'cancelurl' => '', //Where to go if the user cancels.
             'shipping' => 0, //Shipping Cost
             'custom' => ''                           //Custom attribute
         );
@@ -148,8 +148,8 @@ class paypalcheckout {
                 $form.='
                     <div id="item_' . $cpt . '" class="itemwrap">
                       <input type="hidden" name="item_name_' . $cpt . '" value="' . $item['name'] . '" />
-                      <input type="hidden" name="quantity_' . $cpt . '" value="' . $item['quantity'] . '" />
-                      <input type="hidden" name="amount_' . $cpt . '" value="' . $item['price'] . '" />
+                      <input type="hidden" name="quantity_' . $cpt . '" value="1" />
+                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['price'] * $item['quantity'], 2) . '" />
                      <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
                    </div>';
                 $cpt++;
@@ -158,11 +158,11 @@ class paypalcheckout {
                         $form.='
                             <div id="item_' . $cpt . '" class="itemwrap">
                               <input type="hidden" name="item_name_' . $cpt . '" value="' . $option['o_name'] . '" />
-                              <input type="hidden" name="quantity_' . $cpt . '" value="' . $option['o_quantity'] . '" />
-                              <input type="hidden" name="amount_' . $cpt . '" value="' . $option['o_price'] . '" />
+                              <input type="hidden" name="quantity_' . $cpt . '" value="1" />
+                              <input type="hidden" name="amount_' . $cpt . '" value="' . round($option['o_price'] * $option['o_quantity'], 2) . '" />
                              <input type="hidden" name="shipping_' . $cpt . '" value="' . $option['o_shipping'] . '" />
                            </div>';
-                        
+
                         $cpt++;
                     }
                 }

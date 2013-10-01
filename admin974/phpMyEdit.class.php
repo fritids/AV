@@ -397,7 +397,7 @@ class phpMyEdit
 		while (! file_exists($file)) {
 			$pos = strrpos($language, '-');
 			if ($pos === false) {
-				$file = $this->dir['lang'].'PME.lang.EN.inc';
+				$file = $this->dir['lang'].'PME.lang.FR.inc';
 				break;
 			}
 			$language = substr($language, 0, $pos);

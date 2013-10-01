@@ -1,5 +1,4 @@
 <?php
-
 include ("header.php");
 
 // MySQL host name, user name, password, database, and table
@@ -144,15 +143,18 @@ $opts['fdd']['description'] = array(
     'select' => 'T',
     'maxlen' => 65535,
     'textarea' => array(
+        'html' => true,
         'rows' => 20,
         'cols' => 100),
-    'sort' => true    
+    'sort' => true,
+    'css' => array('id' => 'test','page_type' => 'test')
 );
 $opts['fdd']['description_short'] = array(
     'name' => 'Description courte',
     'select' => 'T',
     'maxlen' => 65535,
     'textarea' => array(
+        'html' => true,
         'rows' => 5,
         'cols' => 50),
     'sort' => true,
@@ -190,7 +192,8 @@ $opts['fdd']['max_height'] = array(
 );
 
 // Now important call to phpMyEdit
-require_once 'phpMyEdit.class.php';
-new phpMyEdit($opts);
+//require_once 'phpMyEdit.class.php';
+require_once 'extensions/phpMyEdit-mce-cal.class.php';
+new phpMyEdit_mce_cal($opts);
 ?>
 

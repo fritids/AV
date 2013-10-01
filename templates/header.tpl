@@ -67,22 +67,17 @@
                 <div id="top-header">
                     <div id="top-header-centre">
                         <span id="top-header-texte" >Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</span>
-                        <div id="top-header-droit">
-                            <div class="puce_caddie">
-                                <div class="puce_caddie_taille">
-                                    <p class="puce_caddie_taille">{$cart_nb_items}</p>
-                                </div>
-                            </div>
-                            <a href="?cart"><img src="img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
-
-                            {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
+                        <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><img src="img/caddie.png"/>&nbsp;&nbsp;|&nbsp;&nbsp;
+                                    {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
                                 Bonjour <a href="?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
                                 <a href="?action=logout">deconnexion</a>
                             {else}
-                                <a href="?n" title="connexion">SE CONNECTER</a></div>
+                                <a href="?n" title="connexion">SE CONNECTER</a>
                             {/if}
+                        </div>
                     </div>
                 </div>
+
                 <div id="header">
                     <a href='index.php'><img id="logo" src="img/logo.png" /></a>
                     <div id="header-droit">
@@ -95,57 +90,58 @@
                         <img class="rs-icon" src="img/RS-facebook.png" />
                         <div>
                         </div>
-                        </header>
+                    </div>
+            </header>
 
-                        {include file='sub_menu.tpl'}
+            {include file='sub_menu.tpl'}
 
-                        <div id="recherche">
-                            <div id="rech-conteneur-gauche" >
-                                <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
+            <div id="recherche">
+                <div id="rech-conteneur-gauche" >
+                    <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
                     switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
-                                    <span class="txt-recherche">RECHERCHE</span>
-                                    <span class="txt-recherche2">Par type de verre</span>
-                                </div>
-                                <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
+                        <span class="txt-recherche">RECHERCHE</span>
+                        <span class="txt-recherche2">Par type de verre</span>
+                    </div>
+                    <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
                     switch_recherche2('rech-selecteur2', 'rech-selecteur1');">
-                                    <span class="txt-recherche">RECHERCHE</span>
-                                    <span class="txt-recherche2">Par type de projet</span>
-                                </div>
-                            </div>
-                            <div id="rech-conteneur-droit1">
-                                <ul>
-                                    <li>
-                                        <label>Type 1</label>
-                                        <select id="select_type1">
-                                            <option value="0">choix 1</option>
-                                            <option value="1">choix 2</option>
-                                        </select>
-                                    </li>
-                                    <li>
-                                        <label>type 2</label>
-                                        <select id="select_type2">
-                                            <option value="0">choix 1</option>
-                                            <option value="1">choix 2</option>
-                                        </select>
-                                    </li>
-                                    <li>
-                                        <label>Type 3</label>
-                                        <select id="select_type3">
-                                            <option value="0">choix 1</option>
-                                            <option value="1">choix 2</option>
-                                        </select>
-                                    </li>
-                                    <li>
-                                        <label>type 4</label>
-                                        <select id="select_type4">
-                                            <option value="0">choix 1</option>
-                                            <option value="1">choix 2</option>
-                                        </select>
-                                    </li>
-                                </ul>
-                                <img id="btn-rechercher" src="img/rechercher.png" />
-                            </div>
-                            <div id="rech-conteneur-droit2">
+                        <span class="txt-recherche">RECHERCHE</span>
+                        <span class="txt-recherche2">Par type de projet</span>
+                    </div>
+                </div>
+                <div id="rech-conteneur-droit1">
+                    <ul>
+                        <li>
+                            <label>Type 1</label>
+                            <select id="select_type1">
+                                <option value="0">choix 1</option>
+                                <option value="1">choix 2</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>type 2</label>
+                            <select id="select_type2">
+                                <option value="0">choix 1</option>
+                                <option value="1">choix 2</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>Type 3</label>
+                            <select id="select_type3">
+                                <option value="0">choix 1</option>
+                                <option value="1">choix 2</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>type 4</label>
+                            <select id="select_type4">
+                                <option value="0">choix 1</option>
+                                <option value="1">choix 2</option>
+                            </select>
+                        </li>
+                    </ul>
+                    <img id="btn-rechercher" src="img/rechercher.png" />
+                </div>
+                <div id="rech-conteneur-droit2">
 
-                            </div>
-                        </div>
+                </div>
+            </div>

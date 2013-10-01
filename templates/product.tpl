@@ -75,6 +75,20 @@
             </select>
         {/if}
 
+        {if isset($product.cover)}
+            <h2>Cover</h2>
+            <img src="img/{$product.cover.filename}" /> 
+        {/if}
+
+        {if isset($product.images)}
+            <h2>Images </h2>
+            {foreach key=key item=image from=$product.images}
+                <img src="img/{$image.filename}" />                    
+            {/foreach}
+        {/if}      
+
+
+
     </form>
 
 </div>

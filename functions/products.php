@@ -7,9 +7,13 @@ function getProductInfos($pid) {
 
     $carac = getProductCaracts($pid);
     $attributes = getProductAttributes($pid);
+    $images = getImages($pid);
+    $cover = getImageCover($pid);
 
     $r[0]["caracteristiques"] = $carac;
     $r[0]["attributes"] = $attributes;
+    $r[0]["images"] = $images;
+    $r[0]["cover"] = $cover;
 
     return $r[0];
 }
@@ -51,6 +55,24 @@ function getAttributes($aid) {
     return $r[0];
 }
 
+function getImages($pid) {
+    global $db;
+    $r = $db->where("id_product", $pid)
+            ->where("cover", 0)
+            ->get("av_product_images");
+    if (empty($r))
+        return (null);
+    return $r;
+}
 
+function getImageCover($pid) {
+    global $db;
+    $r = $db->where("id_product", $pid)
+            ->where("cover", 1)
+            ->get("av_product_images");
+    if (empty($r))
+        return (null);
+    return $r[0];
+}
 
 ?>

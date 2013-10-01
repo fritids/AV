@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `av_address` (
   PRIMARY KEY (`id_address`),
   KEY `id_customer` (`id_customer`),
   KEY `id_customer_2` (`id_customer`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_category`
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `av_category` (
   `name` varchar(128) NOT NULL,
   `description` text,
   PRIMARY KEY (`id_category`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_customer`
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `av_customer` (
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_customer`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_employee`
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
   KEY `id_customer` (`id_customer`),
   KEY `id_address_delivery` (`id_address_delivery`),
   KEY `id_address_invoice` (`id_address_invoice`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
   PRIMARY KEY (`id_order_detail`),
   KEY `id_order` (`id_order`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   `max_height` int(11) NOT NULL,
   PRIMARY KEY (`id_product`),
   KEY `id_category` (`id_category`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_product_attribute`
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `av_product_attribute` (
   `default_on` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_product_attribute`),
   KEY `id_product` (`id_product`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_product_caract`
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `av_product_caract` (
   `caract_value` varchar(210) NOT NULL,
   PRIMARY KEY (`id_product_caract`),
   KEY `id_product` (`id_product`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Structure de la table `av_range_weight`
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `av_range_weight` (
   `delimiter2` decimal(20,6) NOT NULL,
   `delivery_ratio` decimal(20,6) NOT NULL,
   PRIMARY KEY (`id_range_weight`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 
@@ -201,7 +201,17 @@ CREATE TABLE IF NOT EXISTS `av_order_status` (
   `id_statut` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
   PRIMARY KEY (`id_statut`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `av_product_images` (
+  `id_image` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_product` int(10) unsigned NOT NULL,
+  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `filename` varchar(250) NOT NULL,
+  PRIMARY KEY (`id_image`)  
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 
 
 --
