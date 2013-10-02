@@ -4,7 +4,7 @@
 $bdd_host = "localhost";
 $bdd_user = "root";
 $bdd_pwd = "";
-$bdd_name = "allovitres";
+$bdd_name = "allo-vitres";
 $opts['hn'] = $bdd_host;
 $opts['un'] = $bdd_user;
 $opts['db'] = $bdd_name;

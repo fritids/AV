@@ -15,8 +15,7 @@ CREATE TABLE IF NOT EXISTS `av_address` (
   `date_upd` datetime NOT NULL,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_address`),
-  KEY `id_customer` (`id_customer`),
-  KEY `id_customer_2` (`id_customer`)
+  KEY `id_customer` (`id_customer`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
