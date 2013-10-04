@@ -6,17 +6,10 @@ require('classes/panier.php');
 require('classes/paypal.php');
 require('functions/users.php');
 require('functions/products.php');
+require('functions/categories.php');
 require('functions/orders.php');
 require('functions/tools.php');
 
-
-
-$sub_menu = array(
-    array("title" => "Simple Vitrage", "url" => "?c&id=1"),
-    array("title" => "Double Vitrage", "url" => "?c&id=2"),
-    array("title" => "Verre Spécifiques", "url" => "?c&id=3"),
-    array("title" => "Accessoires", "url" => "?c&id=4")
-);
 
 // classes declaration
 
@@ -25,6 +18,11 @@ $smarty = new Smarty;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+
+$nb_produits = 0;
+
+$sub_menu = getCategories();
+
 
 //Caddie
 $cart = new Panier();
@@ -76,9 +74,14 @@ $page = "home";
 
 if (isset($_GET["c"])) {
     $page = "category";
-    $products = $db->where('id_category', $_GET["id"])
-            ->get('av_product');
+    
+    $categorie = getCategorieInfo($_GET["id"]);
+    
+    $products = getProductByCategorie($_GET["id"]);
+    $nb_produits= count($products);
+    
     $smarty->assign('products', $products);
+    $smarty->assign('categorie', $categorie);
 }
 
 if (isset($_GET["p"])) {
@@ -86,14 +89,17 @@ if (isset($_GET["p"])) {
     $product = getProductInfos($_GET["id"]);
     $smarty->assign('product', $product);
 }
-if (isset($_GET["n"]))
-    $page = "form_user_account";
+if (isset($_GET["register"]))
+    $page = "register";
 
 if (isset($_GET["cart"]))
     $page = "cart";
 
 if (isset($_GET["my-account"]))
     $page = "my-account";
+
+if (isset($_GET["identification"]))
+    $page = "identification";
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
@@ -319,6 +325,7 @@ $smarty->assign('sub_menu', $sub_menu);
 $smarty->assign('page', $page);
 $smarty->assign('cart', $cartItems);
 $smarty->assign('cart_nb_items', $cart_nb_items);
+$smarty->assign('nb_produits', $nb_produits);
 
 $smarty->display('index.tpl');
 ?>

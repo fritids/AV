@@ -107,16 +107,16 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `product_attribute_id` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,
   `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
-  `product_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `product_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `product_price` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `product_shipping` decimal(20,2) NOT NULL DEFAULT '0.000000',
   `attribute_name` varchar(255) NOT NULL,
   `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
-  `attribute_price` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `attribute_shipping` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `total_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `total_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `attribute_price` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `attribute_shipping` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `total_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `total_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `unit_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `unit_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.000000',
   PRIMARY KEY (`id_order_detail`),
   KEY `id_order` (`id_order`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -131,13 +131,13 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   `id_product` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_category` int(10) unsigned NOT NULL,
   `quantity` int(10) NOT NULL DEFAULT '0',
-  `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `unit_price_ratio` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `price` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `unit_price_ratio` decimal(20,2) NOT NULL DEFAULT '0.000000',
   `reference` varchar(32) DEFAULT NULL,
-  `width` decimal(20,6) DEFAULT '0.000000',
-  `height` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `depth` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `weight` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `width` decimal(20,2) DEFAULT '0.000000',
+  `height` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `depth` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `weight` decimal(20,2) NOT NULL DEFAULT '0.000000',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
@@ -161,8 +161,8 @@ CREATE TABLE IF NOT EXISTS `av_product_attribute` (
   `id_product_attribute` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_product` int(10) unsigned NOT NULL,
   `name` varchar(128) NOT NULL,
-  `price` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `weight` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `price` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `weight` decimal(20,2) NOT NULL DEFAULT '0.000000',
   `unit_price_impact` decimal(17,2) NOT NULL DEFAULT '0.00',
   `default_on` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_product_attribute`),
@@ -188,9 +188,9 @@ CREATE TABLE IF NOT EXISTS `av_product_caract` (
 
 CREATE TABLE IF NOT EXISTS `av_range_weight` (
   `id_range_weight` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `delimiter1` decimal(20,6) NOT NULL,
-  `delimiter2` decimal(20,6) NOT NULL,
-  `delivery_ratio` decimal(20,6) NOT NULL,
+  `delimiter1` decimal(20,2) NOT NULL,
+  `delimiter2` decimal(20,2) NOT NULL,
+  `delivery_ratio` decimal(20,2) NOT NULL,
   PRIMARY KEY (`id_range_weight`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -211,6 +211,15 @@ CREATE TABLE IF NOT EXISTS `av_product_images` (
   PRIMARY KEY (`id_image`)  
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+
+
+CREATE TABLE IF NOT EXISTS `av_product_images` (
+  `id_image` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_product` int(10) unsigned NOT NULL,
+  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `filename` varchar(250) NOT NULL,
+  PRIMARY KEY (`id_image`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
 --

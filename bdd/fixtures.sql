@@ -3,7 +3,7 @@
 INSERT INTO `av_category` (`id_category`, `id_parent`, `active`, `date_add`, `date_upd`, `position`, `name`, `description`) VALUES 
 (1, '', '1', '2013-09-26 00:00:00', '', '0', 'Simple Vitrage', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (2, '', '1', '2013-09-26 00:00:00', '', '0', 'Double Vitrage', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
-(3, '', '1', '2013-09-26 00:00:00', '', '0', 'Verre Spécifique', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
+(3, '', '1', '2013-09-26 00:00:00', '', '0', 'Verre Spï¿½cifique', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (4, '', '1', '2013-09-26 00:00:00', '', '0', 'Miroir sur mesure', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (5, '', '1', '2013-09-26 00:00:00', '', '0', 'Paroi de douche', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
 (6, '', '1', '2013-09-26 00:00:00', '', '0', 'Verre decoratif', 'Itaque verae amicitiae difficillime reperiuntur in iis qui in honoribus reque publica versantur; ubi enim istum invenias qui honorem amici anteponat suo? Quid? Haec ut omittam, quam graves, quam difficiles plerisque videntur calamitatum societates! Ad quas non est facile inventu qui descendant. Quamquam Ennius recte.'),
@@ -61,3 +61,8 @@ INSERT INTO `av_range_weight` (`id_range_weight`, `delimiter1`, `delimiter2`, `d
 (3, '1.000000', '10.000000', '5.000000'),
 (4, '10.000000', '50.000000', '15.000000');
 
+
+INSERT INTO `av_product_images` (`id_image`, `id_product`, `cover`, `filename`) VALUES
+(1, 1, 1, 'verre-extra-clair-laque-securit.jpg'),
+(2, 1, 0, 'verre-extra-clair-laque-securit1.jpg'),
+(3, 1, 0, 'verre-extra-clair-laque-securit2.jpg');

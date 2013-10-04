@@ -16,22 +16,24 @@ class Panier {
     }
 
     // ajouter un article $refproduit
-    public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping) {
+    public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface) {
         @$this->panier[$refproduit]['quantity'] += $nb;
+        @$this->panier[$refproduit]['surface'] += $surface;
         @$this->panier[$refproduit]['price'] += $price;
         @$this->panier[$refproduit]['shipping'] += $shipping;
-        @$this->panier_summary['total_amount'] += $nb * $price + $shipping;
+        @$this->panier_summary['total_amount'] += $nb * $price * $surface + $shipping;
         @$this->panier[$refproduit]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
     }
 
     // ajouter un article $refproduit
-    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping) {
+    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface) {
         @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
+        @$this->panier[$refproduit]["options"][$refoption]['surface'] += $surface;
         @$this->panier[$refproduit]["options"][$refoption]['price'] += $price;
         @$this->panier[$refproduit]["options"][$refoption]['shipping'] += $shipping;
-        @$this->panier_summary['total_amount'] += $nb * $price + $shipping;
+        @$this->panier_summary['total_amount'] += $nb * $price * $surface + $shipping;
         @$this->panier[$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]["options"][$refoption]);
@@ -48,15 +50,16 @@ class Panier {
     }
 
     // supprimer un article $refproduit
-    public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping) {
+    public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface) {
         @$this->panier[$refproduit]['quantity'] -= $nb;
-        @$this->panier_summary['total_amount'] -= $nb * $price + $shipping;
+        @$this->panier[$refproduit]['surface'] -= $surface;
+        @$this->panier_summary['total_amount'] -= $nb * $price * $surface + $shipping;
         if ($this->panier[$refproduit]['quantity'] <= 0) {
             //remove option
             $option_amount = 0;
             if (isset($this->panier[$refproduit]['options']))
                 foreach ($this->panier[$refproduit]['options'] as $k => $option)
-                    $option_amount += $option["quantity"] * $option["price"] + $option['shipping'];
+                    $option_amount += $option["quantity"] * $option["price"] * $option["surface"] + $option['shipping'];
 
             $this->panier_summary['total_amount'] -=$option_amount;
             unset($this->panier[$refproduit]);
@@ -95,6 +98,7 @@ class Panier {
                 $list[$i]["id"] = $ref;
                 $list[$i]["quantity"] = $data['quantity'];
                 $list[$i]["shipping"] = $data['shipping'];
+                $list[$i]["surface"] = $data['surface'];
                 $list[$i]["price"] = $data['price'];
                 $list[$i]["name"] = $data['name'];
 
@@ -104,6 +108,7 @@ class Panier {
                         if (!empty($option['quantity']) && $option['quantity'] > 0) {
                             $list[$i]["options"][] = array("o_id" => $oref,
                                 "o_quantity" => $option['quantity'],
+                                "o_surface" => $option['surface'],
                                 "o_price" => $option['price'],
                                 "o_name" => $option['name'],
                                 "o_shipping" => $option['shipping'],

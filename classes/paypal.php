@@ -149,7 +149,7 @@ class paypalcheckout {
                     <div id="item_' . $cpt . '" class="itemwrap">
                       <input type="hidden" name="item_name_' . $cpt . '" value="' . $item['name'] . '" />
                       <input type="hidden" name="quantity_' . $cpt . '" value="1" />
-                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['price'] * $item['quantity'], 2) . '" />
+                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['price'] * $item['quantity'] * $item['surface'], 2) . '" />
                      <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
                    </div>';
                 $cpt++;
@@ -159,7 +159,7 @@ class paypalcheckout {
                             <div id="item_' . $cpt . '" class="itemwrap">
                               <input type="hidden" name="item_name_' . $cpt . '" value="' . $option['o_name'] . '" />
                               <input type="hidden" name="quantity_' . $cpt . '" value="1" />
-                              <input type="hidden" name="amount_' . $cpt . '" value="' . round($option['o_price'] * $option['o_quantity'], 2) . '" />
+                              <input type="hidden" name="amount_' . $cpt . '" value="' . round($option['o_price'] * $option['o_quantity'] * $item['surface'], 2) . '" />
                              <input type="hidden" name="shipping_' . $cpt . '" value="' . $option['o_shipping'] . '" />
                            </div>';
 

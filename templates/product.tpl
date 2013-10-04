@@ -2,11 +2,15 @@
 
     $(document).ready(function($) {
         var square = 0;
+        var weight = {$product.weight};
+        var unit_price = {$product.price};
         $('#width').change(function() {
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
             square = (pwidth * pheigth) / 10000;
             $('#quantity').val(square.toFixed(2));
+            $('#total_poids').val((square.toFixed(2) * weight).toFixed(2));
+            $('#total_price').val((square.toFixed(2) * unit_price).toFixed(2));
 
         });
         $('#heigth').change(function() {
@@ -14,81 +18,166 @@
             pheigth = $('#heigth').val();
             square = (pwidth * pheigth) / 10000;
             $('#quantity').val(square.toFixed(2));
-
+            $('#total_poids').val((square.toFixed(2) * weight).toFixed(2));
+            $('#total_price').text((square.toFixed(2) * unit_price).toFixed(2));
         });
     });
 
 </script>
 
-<div class="bloc-titre">Produit</div>
-<div class="bloc-bas" style="min-height:400px">
+<div id="produit" class="bloc_page_gauche clear-it">    
 
-    <form action="?cart" method="post">
-        <input type="hidden" name="id_product" value="{$product.id_product}">
-        <input type="hidden" name="add">
-        <input type="submit" value="Ajouter au panier" >
+    <p class="rouge">Délais de livraisons entre 4 à 5 semaines concernant ce produit.</p>
 
-        Width ({$product.min_width} mm - {$product.max_width}) : <input type="number" id ="width" name="width" value=""><br>
-        Height ({$product.min_height}mm - {$product.max_height}) : <input type="number" id ="heigth" name="height" value=""><br>
-        Total : <input type="number" id ="quantity" name="quantity" value="" required="true" readonly><br>
+    <h1>{$product.name}</h1>
 
-
-        <h1>Produits</h1>
-        <ul>
-            <li>id_product	        : {$product.id_product}   </li> 
-            <li>id_category         : {$product.id_category}</li> 
-            <li>quantity            : {$product.quantity}</li> 
-            <li>price               : {$product.price}</li> 
-            <li>unit_price_ratio    : {$product.unit_price_ratio}</li> 
-            <li>reference           : {$product.reference}</li> 
-            <li>width               : {$product.width}</li> 
-            <li>height              : {$product.height}</li> 
-            <li>depth               : {$product.depth}</li> 
-            <li>weight              : {$product.weight}</li> 
-            <li>active              : {$product.active}</li> 
-            <li>date_add            : {$product.date_add}</li> 
-            <li>date_upd            : {$product.date_upd}</li> 
-            <li>name                : {$product.name}</li> 
-            <li>description         : {$product.description}</li> 
-            <li>description_short   : {$product.description_short}</li> 
-        </ul>
-
-        {if isset($product.caracteristiques)}
-            <h2>details </h2>
-            <ul>
-                {foreach key=key item=caracts from=$product.caracteristiques}
-                    <li>
-                        {$caracts.caract_name} : {$caracts.caract_value}  
-                    </li>                            
-                {/foreach}
-            </ul>
-        {/if}
-
-        {if isset($product.attributes)}
-            <h2>Options </h2>
-            <select name="options">
-                {foreach key=key item=option from=$product.attributes}
-                    <option value='{$option.id_product_attribute}'>
-                        {$option.name} : prix = {$option.price}  : poids = {$option.weight}  
-                    </option>                            
-                {/foreach}
-            </select>
-        {/if}
-
-        {if isset($product.cover)}
-            <h2>Cover</h2>
-            <img src="img/{$product.cover.filename}" /> 
-        {/if}
-
-        {if isset($product.images)}
-            <h2>Images </h2>
+    <div id="features">
+        <div class="images">
+            {*
+            {literal}
+            <div class="cycle-slideshow"
+            data-cycle-timeout=0
+            data-cycle-pager="#custom-pager"
+            data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
+            >
+      
+            {/literal}
+            {if isset($product.images)}
             {foreach key=key item=image from=$product.images}
-                <img src="img/{$image.filename}" />                    
+            <img src="img/{$image.filename}" />                    
             {/foreach}
-        {/if}      
+            {/if}                      
+            </div>
+            *}
+            <div id="custom-pager"></div>
+        </div>	
+        <form action="?cart" method="post">
+            <div class="features">
+                <div class="separ clearfix">
+                    <div class="infos">
+                        <p class="prix" ><span id="total_price">{$product.price}</span> €</p>
+                        <p><input type="text" id ="quantity" name="quantity" value="" required="true" readonly style="width: 50px;"> m² calculé</p>
+                        <p><input type="text" id ="total_poids" name="total_poids" value="" required="true" readonly style="width: 50px;"> kg calculés</p>
+                    </div>
+                    <div class="add_to_cart">
+
+                        <input type="hidden" name="id_product" value="{$product.id_product}">
+                        <input type="hidden" name="add">
+                        <label for="qty">Quantité :</label>
+                        <input type="text" class="qte">
+                        <input type="submit" value="Ajouter au panier" class="indent submit">
+
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+                <p class="ref">Réference:{$product.reference} <img src="img/sans-frais.png" style="margin-left: 25px;" alt=""></p>
+
+                {if isset($product.attributes)}
+                    <div class="row clearfix">
+                        <label for="faconnage">Façonnage</label>
+                        <select name="options" id="faconnage">
+                            {foreach key=key item=option from=$product.attributes}
+                                <option value='{$option.id_product_attribute}'>
+                                    {$option.name} 
+                                </option>                            
+                            {/foreach}
+                        </select>
+                    </div>
+                {/if}
+                <div class="row clearfix">
+                    <label for="width">Largeur</label>
+                    <input type="text" id ="width" name="width" value="" class="text">
+                    <span class="info">de {$product.min_width} à {$product.max_width} mm</span>
+                </div>	
+                <div class="row clearfix">
+                    <label for="height">Longeur</label>
+                    <input type="text" id ="heigth" name="height" value="" class="text">
+                    <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
+
+                </div>
+                <div class="row clearfix">
+                    <input type="submit" value="Calcuer" class="submit">						
+                </div>
+            </div>   	
+        </form>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="share">
+        <a href="" class="indent imprimer">Imprimer</a>
+        <a href="" class="indent envoyer-a-un-ami">Envoyer a un ami</a>
+    </div>
 
 
+    <h3 class="paragraphe-titre">Caractéristiques techniques -  {$product.name} <a href="#" class="top"></a></h3>
+    <p class="produit-menu"><a href="">Produits complémentaires</a>
+        | <a href="">Descriptif du produit</a>
+        | <a href=""> Nos conseils de pose en vidéo</a>
+        | Caractéristiques techniques</p>
 
-    </form>
+    <div class="caracteristique">
+        {foreach key=key item=caracts from=$product.caracteristiques}
+            <div class="row">{$caracts.caract_name}</div>
+            <div class="row odd">{$caracts.caract_value}</div>
+        {/foreach}    
+    </div>
 
+    <h3 class="paragraphe-titre">DESCRITPIF DU PRODUIT : {$product.name} <a href="#" class="top"></a></h3>
+    <p class="produit-menu"><a href="">Produits complémentaires</a>
+        | <a href="">Descriptif du produit</a>
+        | <a href=""> Nos conseils de pose en vidéo</a>
+        | Caractéristiques techniques</p>
+</p>
+<div class="desc">
+    {$product.description}
+</div>
+
+<h3 class="paragraphe-titre">Nos conseils de pose en vidéo  <a href="#" class="top"></a></h3>
+<p class="produit-menu"><a href="">Produits complémentaires</a>
+    | <a href="">Descriptif du produit</a>
+    | <a href=""> Nos conseils de pose en vidéo</a>
+    | Caractéristiques techniques</p>
+</p>
+<div style="width:560px;margin:0 auto">
+    <iframe align="middle" width="560" height="315" src="//www.youtube.com/embed/wS8c4wuDYms" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<h3 class="paragraphe-titre">Julie D’ ALLOVITRES vous conseille ces produits complémentaires  <a href="#" class="top"></a></h3>
+<p class="produit-menu"><a href="">Produits complémentaires</a>
+    | <a href="">Descriptif du produit</a>
+    | <a href=""> Nos conseils de pose en vidéo</a>
+    | Caractéristiques techniques</p>
+</p>
+
+<div class="complement">
+    <div class="produit first">
+        <img src="img/product1.jpg" alt="">
+        <h3 class="titre">Miroir argenté 3 mm</h3>
+        <p class="prix">30€</p>
+        <p class="liens">
+            <a href="" class="panier indent">Panier</a>
+            <a href="" class="voir indent">Voir</a>
+        </p>
+    </div>
+    <div class="produit">
+        <img src="img/product1.jpg" alt="">
+        <h3 class="titre">Miroir argenté 3 mm</h3>
+        <p class="prix">30€</p>
+        <p class="liens">
+            <a href="" class="panier indent">Panier</a>
+            <a href="" class="voir indent">Voir</a>
+        </p>
+    </div>
+    <div class="produit">
+        <img src="img/product1.jpg" alt="">
+        <h3 class="titre">Miroir argenté 3 mm</h3>
+        <p class="prix">30€</p>
+        <p class="liens">
+            <a href="" class="panier indent">Panier</a>
+            <a href="" class="voir indent">Voir</a>
+        </p>
+    </div>			
+</div>
 </div>

@@ -13,9 +13,12 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/allovitres.css">
+        <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/menu.css" type="text/css">
         <script src="js/vendor/modernizr-2.6.2.min.js"></script>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+        <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>-->
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="http://malsup.github.io/jquery.cycle2.js"></script>
         <script>
             $(window).load(function() {
 
@@ -72,7 +75,7 @@
                                 Bonjour <a href="?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
                                 <a href="?action=logout">deconnexion</a>
                             {else}
-                                <a href="?n" title="connexion">SE CONNECTER</a>
+                                <a href="?identification" title="connexion">SE CONNECTER</a>
                             {/if}
                         </div>
                     </div>

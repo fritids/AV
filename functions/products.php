@@ -75,4 +75,15 @@ function getImageCover($pid) {
     return $r[0];
 }
 
+function getProductByCategorie($cid){
+    global $db;
+    $r = $db->where("id_category", $cid)
+            ->get("av_product");
+    $p =array();
+    foreach ($r as $k => $product){
+        $p[$k] = getProductInfos($product["id_product"]);
+    }
+    return ($p);
+}
+
 ?>

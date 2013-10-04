@@ -30,7 +30,7 @@ h3{
 #fil-ariane-page span {
 	color:#539cf1;
 }
-#bloc_page_gauche {
+#bloc_page_gauche,.bloc_page_gauche {
 	min-height:150px;
 	width:700px;
 	display:inline-block;
@@ -611,4 +611,33 @@ text-align:center;
 vertical-align:middle;
 font-family: 'Arial';
 font-size:0.8em;
+}
+
+
+/* PAGE PRODUIT */
+#bloc-img {
+float:left;
+display:inline-block;
+width:340px;
+height:270px;
+background:#567;
+}
+#bloc-choix-produit {
+float:right;
+display:inline-block;
+width:320px;
+height:270px;
+background:#789;
+}
+#bloc-choix-produit-gauche {
+float:left;
+display:inline-block;
+width:150px;
+background:#123;
+}
+#bloc-choix-produit-droite {
+float:right;
+display:inline-block;
+width:150px;
+background:#456;
 }
