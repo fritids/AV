@@ -123,3 +123,6 @@ new phpMyEdit($opts);
 
 ?>
 
+<?
+getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+?>

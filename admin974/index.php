@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 include("mysqlmdp.php");
 mysql_connect($bdserv, $bduser, $bdpass);
@@ -8,6 +9,7 @@ include ("header.php");
 ?>
 
 <?php
+
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
 } else {
@@ -28,8 +30,5 @@ switch ($page) {
 }
 
 include( $page . '.php');
+include( 'footer.php');
 ?>
-
-
-</body>
-</html>

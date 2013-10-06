@@ -1,8 +1,7 @@
 <?php
-
-include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
+include ("header.php");
 
 $opts['tb'] = 'av_orders';
 
@@ -139,13 +138,14 @@ $opts['fdd']['id_address_invoice'] = array(
 );
 $opts['fdd']['current_state'] = array(
     'name' => 'Status',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 10,
     'values' => array(
         'table' => 'av_order_status',
         'column' => 'id_statut',
         'description' => 'title'
     ),
+    "colattrs" => "name='order_state'",
     'sort' => true
 );
 $opts['fdd']['total_paid'] = array(
@@ -157,8 +157,77 @@ $opts['fdd']['total_paid'] = array(
     'URL' => 'av_order_detail.php?o=$key'
 );
 
+
+
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
+<br>
+<button id="edit" class="btn btn-primary"> Modifier les status </button>
+<?
+getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+?>
+
+ <script>
+        $("#edit").click(function() {
+            if ($(this).text() == "Terminer") {
+                location.reload();
+            }
+            var i = 0;
+            $('td[name=order_state]').each(function(index) {
+                id = $("input[class=pme-navigation-" + i).val();
+                dat = "";
+                //console.log("->" + id + " " + index + ": " + $(this).text());
+
+                $.ajax({
+                    url: "av_utilities.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        action: 'getOrderCombobox',
+                        module: 'orders',
+                        id_order: id,
+                        current_state: index
+                    },
+                    success: function(data) {
+                        dat = data;
+                    },
+                    error: function() {
+                        alert('Error occured');
+                    }
+                });
+                $(this).html(dat);
+                i++;
+            });
+
+
+            $("select")
+                    .change(function(i, v) {
+
+                //console.log(this.name + " " + this.value);
+
+                $.ajax({
+                    url: "av_utilities.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        action: 'update',
+                        module: 'orders',
+                        id_order: this.name,
+                        current_state: this.value
+                    },
+                    success: function(data) {
+                        //alert(data);
+                    }
+                });
+            })
+            $(this).text("Terminer");
+
+        })
+
+    </script>
+
 

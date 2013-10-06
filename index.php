@@ -29,8 +29,8 @@ $cart = new Panier();
 
 /* action Caddie */
 if (isset($_GET["cart"])) {
-    if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
 
+    if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
         $pid = $_POST["id_product"];
         $pqte = $_POST["quantity"];
 
@@ -40,8 +40,11 @@ if (isset($_GET["cart"])) {
         $shipping_ratio = getDeliveryRatio($pweight);
         $shipping_amount = $shipping_ratio * $pweight;
 
+
         if (isset($_POST["add"])) {
-            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount);
+            $surface = $_POST["width"] * $_POST["height"] / 10000;
+
+            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount, $surface);
 
             //Si option
             if (isset($_POST["options"])) {
@@ -52,13 +55,20 @@ if (isset($_GET["cart"])) {
                 $shipping_ratio = getDeliveryRatio($option_weight);
                 $shipping_amount = $shipping_ratio * $option_weight;
 
-                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount);
+
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface);
             }
         }
 
-        if (isset($_POST["del"]))
-            $cart->removeItem($pid, $pqte, $productInfos["price"], $shipping_amount);
-
+        if (isset($_POST["del"])) {
+            $surface = $_SESSION["cart"][$pid]["surface"];
+            echo $surface."<br>";
+            echo $shipping_amount."<br>";
+            echo $productInfos["price"]."<br>";
+            echo $pqte."<br>";
+            $cart->removeItem($pid, $pqte, $productInfos["price"], $shipping_amount, $surface);
+            //$cart->removeCartItem($_POST["id_cart_item"]);
+        }
         // on empecher de faire un F5
         header("Location: index.php?cart");
     }
@@ -74,12 +84,12 @@ $page = "home";
 
 if (isset($_GET["c"])) {
     $page = "category";
-    
+
     $categorie = getCategorieInfo($_GET["id"]);
-    
+
     $products = getProductByCategorie($_GET["id"]);
-    $nb_produits= count($products);
-    
+    $nb_produits = count($products);
+
     $smarty->assign('products', $products);
     $smarty->assign('categorie', $categorie);
 }
@@ -112,19 +122,19 @@ $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
-    
+
     $settings = array(
-            'business' => $paypal["email_account"] , //paypal email address
-            'currency' => 'EUR', //paypal currency
-            'cursymbol' => '&euro;', //currency symbol
-            'location' => 'FR', //location code  (ex GB)
-            'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
-            'returntxt' => 'Retour au site', //What is written on the return button in paypal
-            'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
-            'shipping' => 0, //Shipping Cost
-            'custom' => ''                           //Custom attribute
-        );
-    
+        'business' => $paypal["email_account"], //paypal email address
+        'currency' => 'EUR', //paypal currency
+        'cursymbol' => '&euro;', //currency symbol
+        'location' => 'FR', //location code  (ex GB)
+        'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
+        'returntxt' => 'Retour au site', //What is written on the return button in paypal
+        'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
+        'shipping' => 0, //Shipping Cost
+        'custom' => ''                           //Custom attribute
+    );
+
     $pp = new paypalcheckout($settings); //Create an instance of the class
     $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
     //$cartHTML = $pp->getCartContentAsHtml();

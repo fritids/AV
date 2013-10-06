@@ -25,10 +25,10 @@
             <hr />
 
             <p>
-                Expédition {$smarty.session.cart_summary.total_shipping} €<br/>
-                Taxes {$smarty.session.cart_summary.total_taxes} €<br/>
-                Total {$smarty.session.cart_summary.total_amount} €<br/>
-                Les price sont TTC <br/>
+                Total produit {$smarty.session.cart_summary.total_produits} € TTC<br/>
+                Expédition {$smarty.session.cart_summary.total_shipping} € TTC<br/>
+                Taxes incluses {$smarty.session.cart_summary.total_taxes} €<br/>                
+                Total {$smarty.session.cart_summary.total_amount} € TTC<br/>                
             </p>
             <a class="bouton" href="?cart">Panier</a>
             <a class="bouton" href="?order-resume">Commander</a>

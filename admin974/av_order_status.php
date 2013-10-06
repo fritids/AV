@@ -4,17 +4,20 @@ include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
 
-
-$opts['tb'] = 'av_customer';
+$opts['tb'] = 'av_order_status';
 
 // Name of field which is the unique key
-$opts['key'] = 'id_customer';
+$opts['key'] = 'id_statut';
 
 // Type of key field (int/real/string/date etc.)
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_customer');
+$opts['sort_field'] = array('id_statut');
+
+// Number of records to display on the screen
+// Value of -1 lists all records in a table
+$opts['inc'] = 15;
 
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
@@ -24,6 +27,10 @@ $opts['options'] = 'ACPVDF';
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
+// Navigation style: B - buttons (default), T - text links, G - graphic links
+// Buttons position: U - up, D - down (default)
+$opts['navigation'] = 'DB';
+
 // Display special page elements
 $opts['display'] = array(
 	'form'  => true,
@@ -32,6 +39,13 @@ $opts['display'] = array(
 	'time'  => true,
 	'tabs'  => true
 );
+
+// Set default prefixes for variables
+$opts['js']['prefix']               = 'PME_js_';
+$opts['dhtml']['prefix']            = 'PME_dhtml_';
+$opts['cgi']['prefix']['operation'] = 'PME_op_';
+$opts['cgi']['prefix']['sys']       = 'PME_sys_';
+$opts['cgi']['prefix']['data']      = 'PME_data_';
 
 /* Get the user's default language and use it if possible or you can
    specify particular one you want to use. Refer to official documentation
@@ -85,55 +99,26 @@ appear in generated list. Here are some most used field options documented.
   descriptions fields are also possible. Check documentation for this.
 */
 
-$opts['fdd']['id_customer'] = array(
-  'name'     => 'ID customer',
+$opts['fdd']['id_statut'] = array(
+  'name'     => 'ID statut',
   'select'   => 'T',
   'options'  => 'AVCPDR', // auto increment
-  'maxlen'   => 10,
+  'maxlen'   => 11,
   'default'  => '0',
   'sort'     => true
 );
-
-$opts['fdd']['firstname'] = array(
-  'name'     => 'Prénom',
+$opts['fdd']['title'] = array(
+  'name'     => 'Title',
   'select'   => 'T',
-  'maxlen'   => 32,
+  'maxlen'   => 50,
   'sort'     => true
 );
-$opts['fdd']['lastname'] = array(
-  'name'     => 'Nom',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true,
-    'URL' => 'av_address.php?c=$key'
-  
-);
-$opts['fdd']['email'] = array(
-  'name'     => 'Email',
-  'select'   => 'T',
-  'maxlen'   => 128,
-  'sort'     => true
-);
-$opts['fdd']['phone'] = array(
-  'name'     => 'Tel.',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
-$opts['fdd']['phone_mobile'] = array(
-  'name'     => 'Tel.2',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
-
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 
 ?>
-
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>

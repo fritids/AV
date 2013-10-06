@@ -160,6 +160,12 @@ $opts['fdd']['description_short'] = array(
     'sort' => true,
     'width' => '200px'
 );
+$opts['fdd']['video'] = array(
+    'name' => 'Video.',
+    'select' => 'T',
+    'maxlen' => 255
+);
+
 $opts['fdd']['min_width'] = array(
     'name' => 'Largeur Min.',
     'select' => 'T',
@@ -197,3 +203,6 @@ require_once 'extensions/phpMyEdit-mce-cal.class.php';
 new phpMyEdit_mce_cal($opts);
 ?>
 
+<?
+getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+?>

@@ -151,3 +151,6 @@ require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
 
+<?
+getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+?>

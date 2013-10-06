@@ -1,20 +1,23 @@
 <?php
-
 include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
 
 
-$opts['tb'] = 'av_customer';
+$opts['tb'] = 'admin_user';
 
 // Name of field which is the unique key
-$opts['key'] = 'id_customer';
+$opts['key'] = 'id_admin';
 
 // Type of key field (int/real/string/date etc.)
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_customer');
+$opts['sort_field'] = array('id_admin');
+
+// Number of records to display on the screen
+// Value of -1 lists all records in a table
+$opts['inc'] = 15;
 
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
@@ -85,55 +88,50 @@ appear in generated list. Here are some most used field options documented.
   descriptions fields are also possible. Check documentation for this.
 */
 
-$opts['fdd']['id_customer'] = array(
-  'name'     => 'ID customer',
+$opts['fdd']['id_admin'] = array(
+  'name'     => 'ID admin',
   'select'   => 'T',
   'options'  => 'AVCPDR', // auto increment
-  'maxlen'   => 10,
+  'maxlen'   => 11,
   'default'  => '0',
   'sort'     => true
-);
-
-$opts['fdd']['firstname'] = array(
-  'name'     => 'Prénom',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
-$opts['fdd']['lastname'] = array(
-  'name'     => 'Nom',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true,
-    'URL' => 'av_address.php?c=$key'
-  
 );
 $opts['fdd']['email'] = array(
   'name'     => 'Email',
   'select'   => 'T',
-  'maxlen'   => 128,
+  'maxlen'   => 320,
   'sort'     => true
 );
-$opts['fdd']['phone'] = array(
-  'name'     => 'Tel.',
+$opts['fdd']['mdp'] = array(
+  'name'     => 'Mdp',
   'select'   => 'T',
   'maxlen'   => 32,
   'sort'     => true
 );
-$opts['fdd']['phone_mobile'] = array(
-  'name'     => 'Tel.2',
+$opts['fdd']['nom'] = array(
+  'name'     => 'Nom',
   'select'   => 'T',
-  'maxlen'   => 32,
+  'maxlen'   => 100,
   'sort'     => true
 );
-
+$opts['fdd']['prenom'] = array(
+  'name'     => 'Prenom',
+  'select'   => 'T',
+  'maxlen'   => 100,
+  'sort'     => true
+);
+$opts['fdd']['date'] = array(
+  'name'     => 'Date',
+  'select'   => 'T',
+  'maxlen'   => 19,
+  'sort'     => true
+);
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 
 ?>
-
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>

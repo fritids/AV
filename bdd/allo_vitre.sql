@@ -2,6 +2,17 @@
 -- Structure de la table `av_address`
 --
 
+CREATE TABLE IF NOT EXISTS `admin_user` (
+  `id_admin` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(320) CHARACTER SET ascii NOT NULL,
+  `mdp` char(32) CHARACTER SET ascii NOT NULL,
+  `nom` varchar(100) NOT NULL,
+  `prenom` varchar(100) NOT NULL,
+  `date` datetime NOT NULL,
+  UNIQUE KEY `id_admin` (`id_admin`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
 CREATE TABLE IF NOT EXISTS `av_address` (
   `id_address` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_customer` int(10) unsigned NOT NULL DEFAULT '0',
@@ -152,6 +163,10 @@ CREATE TABLE IF NOT EXISTS `av_product` (
   PRIMARY KEY (`id_product`),
   KEY `id_category` (`id_category`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+ALTER TABLE  `av_product` ADD  `video` VARCHAR( 255 ) NULL
+
 
 --
 -- Structure de la table `av_product_attribute`

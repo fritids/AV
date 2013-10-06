@@ -22,6 +22,9 @@ class Panier {
         @$this->panier[$refproduit]['price'] += $price;
         @$this->panier[$refproduit]['shipping'] += $shipping;
         @$this->panier_summary['total_amount'] += $nb * $price * $surface + $shipping;
+        @$this->panier_summary['total_shipping'] += $shipping;
+        @$this->panier_summary['total_taxes'] += round($price - $price / 1.196, 2);
+        @$this->panier_summary['total_produits'] += $nb * $price * $surface;
         @$this->panier[$refproduit]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
@@ -29,11 +32,16 @@ class Panier {
 
     // ajouter un article $refproduit
     public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface) {
+        $montant_produit_ttc = $nb * $price * $surface;
+
         @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
         @$this->panier[$refproduit]["options"][$refoption]['surface'] += $surface;
         @$this->panier[$refproduit]["options"][$refoption]['price'] += $price;
         @$this->panier[$refproduit]["options"][$refoption]['shipping'] += $shipping;
-        @$this->panier_summary['total_amount'] += $nb * $price * $surface + $shipping;
+        @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
+        @$this->panier_summary['total_shipping'] += $shipping;
+        @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
+        @$this->panier_summary['total_produits'] += $montant_produit_ttc;
         @$this->panier[$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]["options"][$refoption]);
@@ -51,17 +59,32 @@ class Panier {
 
     // supprimer un article $refproduit
     public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface) {
+
+        $montant_produit_ttc = $nb * $price * $surface;
+
         @$this->panier[$refproduit]['quantity'] -= $nb;
         @$this->panier[$refproduit]['surface'] -= $surface;
-        @$this->panier_summary['total_amount'] -= $nb * $price * $surface + $shipping;
+        @$this->panier_summary['total_amount'] -= $montant_produit_ttc + $shipping;
+        @$this->panier_summary['total_shipping'] -= $shipping;
+        @$this->panier_summary['total_taxes'] -= round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
+        @$this->panier_summary['total_produits'] -= $montant_produit_ttc;
         if ($this->panier[$refproduit]['quantity'] <= 0) {
             //remove option
             $option_amount = 0;
             if (isset($this->panier[$refproduit]['options']))
-                foreach ($this->panier[$refproduit]['options'] as $k => $option)
+                foreach ($this->panier[$refproduit]['options'] as $k => $option) {
                     $option_amount += $option["quantity"] * $option["price"] * $option["surface"] + $option['shipping'];
+                    $option_amount_produit += $option["quantity"] * $option["price"] * $option["surface"];
+                }
 
-            $this->panier_summary['total_amount'] -=$option_amount;
+            $this->panier_summary['total_amount'] -= $option_amount;
+            $this->panier_summary['total_shipping'] -= $option['shipping'];
+            $this->panier_summary['total_taxes'] -= round($option_amount_produit - $option_amount_produit / 1.196, 2);
+            $this->panier_summary['total_produits'] -= $option_amount_produit;
+
+            if ($this->panier_summary['total_taxes'] < 0)
+                $this->panier_summary['total_taxes'] = 0;
+
             unset($this->panier[$refproduit]);
         }
     }
@@ -74,7 +97,7 @@ class Panier {
     }
 
     // afficher la quantit� de produits dans le panier
-    // param�tre : $refproduit : permet d'afficher la quantit� pour le produit de cette r�f�rence
+    // param�tre : $refproduit : permet d'afficher la quantité pour le produit de cette r�f�rence
     // si le param�tre est vide, on affiche la quantit� totale de produit
     public function showQuantity($refproduit = "") {
         if ($refproduit) {

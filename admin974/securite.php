@@ -1,5 +1,8 @@
 <?php
 
+mysql_connect($bdserv, $bduser, $bdpass);
+mysql_select_db($bdname);
+
 // on teste si nos variables sont d�finies
 if (isset($_SESSION['email']) && isset($_SESSION['mdp'])) {
     $email = $_SESSION['email'];
@@ -7,7 +10,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['mdp'])) {
     $sql = "SELECT * FROM admin_user WHERE email LIKE '$email' AND mdp='$mdp'";
     $result = mysql_query($sql);
     if (mysql_num_rows($result) == 1) {
-        // ok
+        // ok        
     } else {
         // HS on d�truit la session
         // on redirige vers l'identification

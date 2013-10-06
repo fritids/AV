@@ -101,19 +101,19 @@ $opts['fdd']['id_range_weight'] = array(
   'sort'     => true
 );
 $opts['fdd']['delimiter1'] = array(
-  'name'     => 'Delimiter1',
+  'name'     => 'Poids min kg',
   'select'   => 'T',
   'maxlen'   => 22,
   'sort'     => true
 );
 $opts['fdd']['delimiter2'] = array(
-  'name'     => 'Delimiter2',
+  'name'     => 'Poids max kg',
   'select'   => 'T',
   'maxlen'   => 22,
   'sort'     => true
 );
 $opts['fdd']['delivery_ratio'] = array(
-  'name'     => 'Delivery ratio',
+  'name'     => 'Prix Ttc',
   'select'   => 'T',
   'maxlen'   => 22,
   'sort'     => true
@@ -125,3 +125,6 @@ new phpMyEdit($opts);
 
 ?>
 
+<?
+getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+?>

@@ -4,22 +4,38 @@
         var square = 0;
         var weight = {$product.weight};
         var unit_price = {$product.price};
+
+
         $('#width').change(function() {
+            qte = $('#quantity').val();
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
             square = (pwidth * pheigth) / 10000;
-            $('#quantity').val(square.toFixed(2));
-            $('#total_poids').val((square.toFixed(2) * weight).toFixed(2));
-            $('#total_price').val((square.toFixed(2) * unit_price).toFixed(2));
+            $('#surface').val(square.toFixed(2));
+            $('#total_poids').val((square.toFixed(2) * weight * qte).toFixed(2));
+            $('#total_price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
 
         });
+        
         $('#heigth').change(function() {
+            qte = $('#quantity').val();
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
             square = (pwidth * pheigth) / 10000;
-            $('#quantity').val(square.toFixed(2));
-            $('#total_poids').val((square.toFixed(2) * weight).toFixed(2));
-            $('#total_price').text((square.toFixed(2) * unit_price).toFixed(2));
+            $('#surface').text(square.toFixed(2));
+            $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
+            $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+        });
+        
+        $('#quantity').change(function() {
+            qte = $('#quantity').val();
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+
+            square = (pwidth * pheigth) / 10000;
+            $('#surface').text(square.toFixed(2));
+            $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
+            $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
         });
     });
 
@@ -56,15 +72,15 @@
                 <div class="separ clearfix">
                     <div class="infos">
                         <p class="prix" ><span id="total_price">{$product.price}</span> €</p>
-                        <p><input type="text" id ="quantity" name="quantity" value="" required="true" readonly style="width: 50px;"> m² calculé</p>
-                        <p><input type="text" id ="total_poids" name="total_poids" value="" required="true" readonly style="width: 50px;"> kg calculés</p>
+                        <p><span id="surface"></span> m² calculé</p>
+                        <p><span id="total_poids"></span> kg calculés</p>
                     </div>
                     <div class="add_to_cart">
 
                         <input type="hidden" name="id_product" value="{$product.id_product}">
                         <input type="hidden" name="add">
                         <label for="qty">Quantité :</label>
-                        <input type="text" class="qte">
+                        <input type="text" class="qte" name="quantity" id ="quantity" value="1">
                         <input type="submit" value="Ajouter au panier" class="indent submit">
 
                     </div>
@@ -141,7 +157,7 @@
     | Caractéristiques techniques</p>
 </p>
 <div style="width:560px;margin:0 auto">
-    <iframe align="middle" width="560" height="315" src="//www.youtube.com/embed/wS8c4wuDYms" frameborder="0" allowfullscreen></iframe>
+    <iframe align="middle" width="560" height="315" src="{$product.video}" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <h3 class="paragraphe-titre">Julie D’ ALLOVITRES vous conseille ces produits complémentaires  <a href="#" class="top"></a></h3>

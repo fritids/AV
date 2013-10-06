@@ -1,10 +1,16 @@
 <?php
 
-
 $bdd_host = "localhost";
 $bdd_user = "root";
 $bdd_pwd = "";
 $bdd_name = "allo-vitres";
+
+$bdname = $bdd_name;
+$bdserv = $bdd_host;
+$bduser = $bdd_user;
+$bdpass = $bdd_pwd;
+
+
 $opts['hn'] = $bdd_host;
 $opts['un'] = $bdd_user;
 $opts['db'] = $bdd_name;

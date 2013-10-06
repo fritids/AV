@@ -1,3 +1,7 @@
+body {
+    min-height: 2000px;
+    padding-top: 70px;
+}
 .breadcrumb{position:relative; height:30px; width:100%;}
 .breadcrumb ul{position:relative; margin:0 5px 0 5px; padding:0; height:30px; background:url('../img/breadcrumbImage.png') 0px -30px repeat-x; }
 .breadcrumb ul li{padding:0; margin:0; list-style:none; float:left; height:30px display:inline;}

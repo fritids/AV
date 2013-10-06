@@ -1,6 +1,6 @@
 <?php
 
-$bdname = "allovitres";
+$bdname = "allo-vitres";
 $bdserv = "localhost";
 $bduser = "root";
 $bdpass = "";
