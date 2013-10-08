@@ -16,7 +16,7 @@
             $('#total_price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
 
         });
-        
+
         $('#heigth').change(function() {
             qte = $('#quantity').val();
             pwidth = $('#width').val();
@@ -26,7 +26,7 @@
             $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
             $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
         });
-        
+
         $('#quantity').change(function() {
             qte = $('#quantity').val();
             pwidth = $('#width').val();
@@ -51,18 +51,19 @@
         <div class="images">
             {*
             {literal}
-            <div class="cycle-slideshow"
-            data-cycle-timeout=0
-            data-cycle-pager="#custom-pager"
-            data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
-            >
-      
-            {/literal}
-            {if isset($product.images)}
-            {foreach key=key item=image from=$product.images}
-            <img src="img/{$image.filename}" />                    
-            {/foreach}
-            {/if}                      
+                <div class="cycle-slideshow"
+                     data-cycle-timeout=0
+                     data-cycle-pager="#custom-pager"
+                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
+                     >
+                {/literal}
+
+                {if isset($product.images)}
+                    {foreach key=key item=image from=$product.images}
+                        <img src="img/{$image.filename}" />                    
+                    {/foreach}
+                {/if} 
+
             </div>
             *}
             <div id="custom-pager"></div>
@@ -110,11 +111,7 @@
                     <label for="height">Longeur</label>
                     <input type="text" id ="heigth" name="height" value="" class="text">
                     <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
-
-                </div>
-                <div class="row clearfix">
-                    <input type="submit" value="Calcuer" class="submit">						
-                </div>
+                </div>                
             </div>   	
         </form>
     </div>

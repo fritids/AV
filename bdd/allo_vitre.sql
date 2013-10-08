@@ -237,6 +237,17 @@ CREATE TABLE IF NOT EXISTS `av_product_images` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
+CREATE TABLE IF NOT EXISTS `av_cms_lang` (
+  `id_cms` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `meta_title` varchar(128) NOT NULL,
+  `meta_description` varchar(255) DEFAULT NULL,
+  `meta_keywords` varchar(255) DEFAULT NULL,
+  `content` longtext , 
+  PRIMARY KEY (`id_cms`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 --
 -- Contenu de la table `av_range_weight`
 --

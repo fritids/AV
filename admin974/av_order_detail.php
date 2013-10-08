@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 include ("header.php");
 // MySQL host name, user name, password, database, and table
@@ -18,7 +18,7 @@ $opts['sort_field'] = array('id_order_detail');
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-$opts['options'] = 'ACPVDF';
+
 
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';

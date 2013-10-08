@@ -1,35 +1,26 @@
-﻿<?php
-
+<?php
 include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
 
-$opts['tb'] = 'av_order_status';
+$opts['tb'] = 'av_cms_lang';
 
 // Name of field which is the unique key
-$opts['key'] = 'id_statut';
+$opts['key'] = 'id_cms';
 
 // Type of key field (int/real/string/date etc.)
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_statut');
+$opts['sort_field'] = array('id_cms');
 
 // Number of records to display on the screen
 // Value of -1 lists all records in a table
 $opts['inc'] = 15;
 
-// Options you wish to give the users
-// A - add,  C - change, P - copy, V - view, D - delete,
-// F - filter, I - initial sort suppressed
-
 
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
-
-// Navigation style: B - buttons (default), T - text links, G - graphic links
-// Buttons position: U - up, D - down (default)
-$opts['navigation'] = 'DB';
 
 // Display special page elements
 $opts['display'] = array(
@@ -40,12 +31,6 @@ $opts['display'] = array(
 	'tabs'  => true
 );
 
-// Set default prefixes for variables
-$opts['js']['prefix']               = 'PME_js_';
-$opts['dhtml']['prefix']            = 'PME_dhtml_';
-$opts['cgi']['prefix']['operation'] = 'PME_op_';
-$opts['cgi']['prefix']['sys']       = 'PME_sys_';
-$opts['cgi']['prefix']['data']      = 'PME_data_';
 
 /* Get the user's default language and use it if possible or you can
    specify particular one you want to use. Refer to official documentation
@@ -99,26 +84,48 @@ appear in generated list. Here are some most used field options documented.
   descriptions fields are also possible. Check documentation for this.
 */
 
-$opts['fdd']['id_statut'] = array(
-  'name'     => 'ID statut',
+$opts['fdd']['id_cms'] = array(
+  'name'     => 'ID cms',
   'select'   => 'T',
   'options'  => 'AVCPDR', // auto increment
-  'maxlen'   => 11,
+  'maxlen'   => 10,
   'default'  => '0',
   'sort'     => true
 );
-$opts['fdd']['title'] = array(
-  'name'     => 'Title',
+$opts['fdd']['meta_title'] = array(
+  'name'     => 'Meta title',
   'select'   => 'T',
-  'maxlen'   => 50,
+  'maxlen'   => 128,
+  'sort'     => true
+);
+$opts['fdd']['meta_description'] = array(
+  'name'     => 'Meta description',
+  'select'   => 'T',
+  'maxlen'   => 255,
+  'sort'     => true
+);
+$opts['fdd']['meta_keywords'] = array(
+  'name'     => 'Meta keywords',
+  'select'   => 'T',
+  'maxlen'   => 255,
+  'sort'     => true
+);
+$opts['fdd']['content'] = array(
+  'name'     => 'Content',
+  'select'   => 'T',
+  'maxlen'   => -1,
+  'textarea' => array(
+    'rows' => 5,
+    'cols' => 50),
   'sort'     => true
 );
 
 // Now important call to phpMyEdit
-require_once 'phpMyEdit.class.php';
-new phpMyEdit($opts);
-
+require_once 'extensions/phpMyEdit-mce-cal.class.php';
+new phpMyEdit_mce_cal($opts);
 ?>
+
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
+

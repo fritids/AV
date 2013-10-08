@@ -9,6 +9,7 @@ require('functions/products.php');
 require('functions/categories.php');
 require('functions/orders.php');
 require('functions/tools.php');
+require('functions/cms.php');
 
 
 // classes declaration
@@ -22,6 +23,11 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $nb_produits = 0;
 
 $sub_menu = getCategories();
+
+
+/* Cms */
+$cms = getAllCmsInfo();        
+/* fin */
 
 
 //Caddie
@@ -110,6 +116,13 @@ if (isset($_GET["my-account"]))
 
 if (isset($_GET["identification"]))
     $page = "identification";
+
+if (isset($_GET["cms"])){
+    $page = "cms";
+    $cms = getCmsInfo($_GET["id"]);
+    $page_type = "full";
+}
+    
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
@@ -336,6 +349,9 @@ $smarty->assign('page', $page);
 $smarty->assign('cart', $cartItems);
 $smarty->assign('cart_nb_items', $cart_nb_items);
 $smarty->assign('nb_produits', $nb_produits);
+$smarty->assign('cms', $cms);
+$smarty->assign('page_info', $page);
+$smarty->assign('page_type', $page_type);
 
 $smarty->display('index.tpl');
 ?>

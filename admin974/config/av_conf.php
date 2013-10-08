@@ -15,6 +15,10 @@ $opts['cgi']['prefix']['data'] = 'PME_data_';
         
 $opts['logtable'] = 'changelog';
 
+// Options you wish to give the users
+// A - add,  C - change, P - copy, V - view, D - delete,
+// F - filter, I - initial sort suppressed
+$opts['options'] = 'ACPDF';
 
     
 ?>

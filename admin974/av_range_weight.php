@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 include ("header.php");
 
@@ -23,7 +23,7 @@ $opts['sort_field'] = array('id_range_weight');
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-$opts['options'] = 'ACPVDF';
+
 
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';

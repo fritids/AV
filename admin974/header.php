@@ -67,7 +67,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="av_customer.php">Clients</a></li>
                                 <li><a href="av_address.php">Adresses</a></li>
                             </ul>
-                        </li>                        
+                        </li>    
+                        
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
                             <ul class="dropdown-menu">
@@ -76,6 +77,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="av_range_weight.php">Transport</a></li>
                                 <li class="divider"></li>
                                 <li><a href="av_order_status.php">Commandes - statut </a></li>                                
+                                <li class="divider"></li>
+                                <li><a href="av_cms_lang.php">Contenu </a></li>                                
                             </ul>
                         </li>                        
                     </ul>

@@ -17,14 +17,18 @@ class Panier {
 
     // ajouter un article $refproduit
     public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface) {
+        
+        $montant_produit_ttc = $nb * $price * $surface;
+                
         @$this->panier[$refproduit]['quantity'] += $nb;
         @$this->panier[$refproduit]['surface'] += $surface;
         @$this->panier[$refproduit]['price'] += $price;
         @$this->panier[$refproduit]['shipping'] += $shipping;
-        @$this->panier_summary['total_amount'] += $nb * $price * $surface + $shipping;
+        
+        @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
         @$this->panier_summary['total_shipping'] += $shipping;
-        @$this->panier_summary['total_taxes'] += round($price - $price / 1.196, 2);
-        @$this->panier_summary['total_produits'] += $nb * $price * $surface;
+        @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
+        @$this->panier_summary['total_produits'] += $montant_produit_ttc;
         @$this->panier[$refproduit]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
