@@ -31,7 +31,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
             });
         </script>
         <!-- /tinyMCE -->
-        
+
     </head>
     <body>
         <script src="js/jquery.js"></script>
@@ -68,7 +68,14 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="av_address.php">Adresses</a></li>
                             </ul>
                         </li>    
-                        
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livrison <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="av_camion_product.php">La tournée</a></li>
+                                <li><a href="av_planning.php">Le planning</a></li>
+                            </ul>
+                        </li>    
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
                             <ul class="dropdown-menu">
@@ -77,6 +84,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="av_range_weight.php">Transport</a></li>
                                 <li class="divider"></li>
                                 <li><a href="av_order_status.php">Commandes - statut </a></li>                                
+                                <li class="divider"></li>
+                                <li><a href="av_camion.php">Camions</a></li>                                
                                 <li class="divider"></li>
                                 <li><a href="av_cms_lang.php">Contenu </a></li>                                
                             </ul>

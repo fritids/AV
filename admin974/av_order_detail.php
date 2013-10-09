@@ -180,6 +180,16 @@ $opts['fdd']['product_current_state'] = array(
     "colattrs" => "name='product_current_state'",
     'sort' => true
 );
+
+$opts['fdd']['CurrentDate'] = array( 
+  'name'     => 'Current Date', 
+  'select'   => 'T', 
+  'maxlen'   => 14, 
+  'options'  => 'L', 
+  'sql'    => 'CURDATE()', 
+  'sort'     => true 
+);
+
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
@@ -187,11 +197,13 @@ new phpMyEdit($opts);
 
 <button id="edit" class="btn btn-primary"> Modifier les status </button>
 
+
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
-<script>
+<script>    
+
     $("#edit").click(function() {
         if ($(this).text() == "Terminer") {
             location.reload();
@@ -200,10 +212,10 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
         $('td[name=product_current_state]').each(function(index) {
             id = $("input[class=pme-navigation-" + i).val();
             dat = "";
-            
+
             id_order_detail = $(this).parent().children(':nth-child(3)').text();
 
-console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
+            console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
 
             $.ajax({
                 url: "av_utilities.php",
@@ -229,7 +241,6 @@ console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
             if (i > 1)
                 i = 0;
         });
-
 
         $("select")
                 .change(function(i, v) {
