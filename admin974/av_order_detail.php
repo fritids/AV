@@ -1,5 +1,4 @@
 ﻿<?php
-
 include ("header.php");
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
@@ -18,8 +17,6 @@ $opts['sort_field'] = array('id_order_detail');
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-
-
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
@@ -98,8 +95,15 @@ $opts['fdd']['id_order_detail'] = array(
     'default' => '0',
     'sort' => true
 );
+$opts['fdd']['id_order_detail'] = array(
+    'name' => 'Seq',
+    'select' => 'T',
+    'maxlen' => 10,
+    'default' => '0',
+    'sort' => true
+);
 $opts['fdd']['id_order'] = array(
-    'name' => 'ID order',
+    'name' => 'Référence',
     'select' => 'T',
     'maxlen' => 10,
     'values' => array(
@@ -164,11 +168,97 @@ $opts['fdd']['total_price_tax_incl'] = array(
     'default' => '0.000000',
     'sort' => true
 );
+$opts['fdd']['product_current_state'] = array(
+    'name' => 'Etat',
+    'select' => 'D',
+    'maxlen' => 22,
+    'values' => array(
+        'table' => 'av_order_status',
+        'column' => 'id_statut',
+        'description' => 'title'
+    ),
+    "colattrs" => "name='product_current_state'",
+    'sort' => true
+);
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
 
+<button id="edit" class="btn btn-primary"> Modifier les status </button>
+
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
+
+<script>
+    $("#edit").click(function() {
+        if ($(this).text() == "Terminer") {
+            location.reload();
+        }
+        var i = 0;
+        $('td[name=product_current_state]').each(function(index) {
+            id = $("input[class=pme-navigation-" + i).val();
+            dat = "";
+            
+            id_order_detail = $(this).parent().children(':nth-child(3)').text();
+
+console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
+
+            $.ajax({
+                url: "av_utilities.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    action: 'getOrderDetailCombobox',
+                    module: 'orders_detail',
+                    id_order_detail: id_order_detail,
+                },
+                success: function(data) {
+                    dat = data;
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                }
+            });
+            $(this).html(dat);
+            i++;
+            if (i > 1)
+                i = 0;
+        });
+
+
+        $("select")
+                .change(function(i, v) {
+
+            console.log(this.name + " " + this.value);
+
+            $.ajax({
+                url: "av_utilities.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    action: 'update',
+                    module: 'orders_detail',
+                    id_order_detail: this.name,
+                    product_current_state: this.value
+                },
+                success: function(data) {
+                    //alert(data);
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                }
+            });
+        })
+        $(this).text("Terminer");
+
+    })
+
+</script>

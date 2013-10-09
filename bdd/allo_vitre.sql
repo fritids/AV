@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `id_order` int(10) unsigned NOT NULL,
   `product_id` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned NOT NULL,
+  `product_current_state` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,
   `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
   `product_price` decimal(20,2) NOT NULL DEFAULT '0.000000',

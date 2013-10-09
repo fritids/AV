@@ -20,7 +20,9 @@ $smarty = new Smarty;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
+/* vars */
 $nb_produits = 0;
+$page_type="";
 
 $sub_menu = getCategories();
 

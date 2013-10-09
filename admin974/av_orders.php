@@ -169,65 +169,72 @@ new phpMyEdit($opts);
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
- <script>
-        $("#edit").click(function() {
-            if ($(this).text() == "Terminer") {
-                location.reload();
-            }
-            var i = 0;
-            $('td[name=order_state]').each(function(index) {
-                id = $("input[class=pme-navigation-" + i).val();
-                dat = "";
-                //console.log("->" + id + " " + index + ": " + $(this).text());
+<script>
+    $("#edit").click(function() {
+        if ($(this).text() == "Terminer") {
+            location.reload();
+        }
+        var i = 0;
+        $('td[name=order_state]').each(function(index) {
+            dat = "";
+            reference = $(this).parent().children(':nth-child(3)').text();
 
-                $.ajax({
-                    url: "av_utilities.php",
-                    type: "POST",
-                    dataType: "json",
-                    async: false,
-                    data: {
-                        action: 'getOrderCombobox',
-                        module: 'orders',
-                        id_order: id,
-                        current_state: index
-                    },
-                    success: function(data) {
-                        dat = data;
-                    },
-                    error: function() {
-                        alert('Error occured');
-                    }
-                });
-                $(this).html(dat);
-                i++;
+            //console.log("->" + reference + " " + index + ": " + $(this).text());
+
+            $.ajax({
+                url: "av_utilities.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    action: 'getOrderCombobox',
+                    module: 'orders',
+                    reference: reference
+                },
+                success: function(data) {
+                    dat = data;
+                },
+                error: function() {
+                    console.log('Error occured');
+                }
             });
+            $(this).html(dat);
+            i++;
+            if (i > 1)
+                i = 0;
+        });
 
 
-            $("select")
-                    .change(function(i, v) {
+        $("select")
+                .change(function(i, v) {
 
-                //console.log(this.name + " " + this.value);
+            //console.log(this.name + " " + this.value);
 
-                $.ajax({
-                    url: "av_utilities.php",
-                    type: "POST",
-                    dataType: "json",
-                    async: false,
-                    data: {
-                        action: 'update',
-                        module: 'orders',
-                        id_order: this.name,
-                        current_state: this.value
-                    },
-                    success: function(data) {
-                        //alert(data);
-                    }
-                });
-            })
-            $(this).text("Terminer");
-
+            $.ajax({
+                url: "av_utilities.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    action: 'update',
+                    module: 'orders',
+                    id_order: this.name,
+                    current_state: this.value
+                },
+                success: function(data) {
+                    console.log('OK');
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                }
+            });
         })
+        $(this).text("Terminer");
 
-    </script>
+    })
+
+</script>
 
 

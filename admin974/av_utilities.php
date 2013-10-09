@@ -1,4 +1,5 @@
 <?php
+
 include ("../configs/settings.php");
 include ("../classes/MysqliDb.php");
 
@@ -31,12 +32,32 @@ function getOrderCombobox() {
     global $db;
     $r = $db->get("av_order_status");
 
-    $r2 = $db->where("id_order", $_POST["id_order"])
+    $r2 = $db->where("reference", $_POST["reference"])
             ->get("av_orders");
 
-    $opt = '<select name="' . $_POST["id_order"] . '" class="pme-input-1">';
+    $opt = '<select name="' . $r2[0]["id_order"] . '" class="pme-input-1">';
     foreach ($r as $k => $v) {
         if ($r2[0]["current_state"] == $v["id_statut"]) {
+            $opt .= '<option value="' . $v["id_statut"] . '" selected> ' . $v["title"] . '</option>';
+        } else {
+            $opt .= '<option value="' . $v["id_statut"] . '"> ' . $v["title"] . '</option>';
+        }
+    }
+    $opt .= "</select>";
+
+    return(print_r(json_encode($opt)));
+}
+function getOrderDetailCombobox() {
+
+    global $db;
+    $r = $db->get("av_order_status");
+
+    $r2 = $db->where("id_order_detail", $_POST["id_order_detail"])
+            ->get("av_order_detail");
+
+    $opt = '<select name="' . $r2[0]["id_order_detail"] . '" class="pme-input-1">';
+    foreach ($r as $k => $v) {
+        if ($r2[0]["product_current_state"] == $v["id_statut"]) {
             $opt .= '<option value="' . $v["id_statut"] . '" selected> ' . $v["title"] . '</option>';
         } else {
             $opt .= '<option value="' . $v["id_statut"] . '"> ' . $v["title"] . '</option>';
@@ -73,15 +94,30 @@ function updateOrder() {
         return(print_r(json_encode("ok")));
 }
 
-if (isset($_POST["action"]) && $_POST["action"] == "update") {
-    if ($_POST["module"] == "orders") {
-        updateOrder();
-    }
-}
-if (isset($_POST["action"]) && $_POST["action"] == "getOrderCombobox") {
-    if ($_POST["module"] == "orders") {
-        getOrderCombobox();
-    }
+function updateOrderDetail() {
+    global $db;
+    $r2 = $db->where("id_order_detail", $_POST["id_order_detail"])
+            ->get("av_order_detail");
+
+
+    $r = $db->where("id_order_detail", $_POST["id_order_detail"])
+            ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
+
+    $info = array(
+        "user" => addslashes(get_server_var('REMOTE_USER')),
+        "host" => addslashes(get_server_var('REMOTE_ADDR')),
+        "operation" => "update",
+        "tab" => "av_order_detail",
+        "rowkey" => $_POST["id_order_detail"],
+        "col" => "product_current_state",
+        "oldval" => $r2[0]["product_current_state"],
+        "newval" => $_POST["product_current_state"]
+    );
+
+    $r = $db->insert("changelog", $info);
+
+    if ($r)
+        return(print_r(json_encode("ok")));
 }
 
 function getChangeLog($table, $key) {
@@ -89,7 +125,7 @@ function getChangeLog($table, $key) {
 
     if (!empty($table))
         $db->where("tab", $table);
-    
+
     if (!empty($key))
         $db->where("rowkey", $key);
 
@@ -136,4 +172,32 @@ function getChangeLog($table, $key) {
     echo "</table>";
 }
 
+/* dispatcher */
+
+// Update 
+if (isset($_POST["action"]) && $_POST["action"] == "update") {
+    if ($_POST["module"] == "orders") {
+        updateOrder();
+    }
+    if ($_POST["module"] == "orders_detail") {
+        updateOrderDetail();
+    }
+}
+
+
+// Select
+if (isset($_POST["action"])) {
+    if ($_POST["module"] == "orders") {
+        if ($_POST["action"] == "getOrderCombobox") {
+            getOrderCombobox();
+        }
+    }
+    if ($_POST["module"] == "orders_detail") {
+        if ($_POST["action"] == "getOrderDetailCombobox") {
+            getOrderDetailCombobox();
+        }
+    }
+}
+/* dispatcher */
 ?>
+
