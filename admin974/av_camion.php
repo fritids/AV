@@ -2,16 +2,16 @@
 // MySQL host name, user name, password, database, and table
 include ("../configs/settings.php");
 include ("header.php");
-$opts['tb'] = 'av_camion';
+$opts['tb'] = 'av_truck';
 
 // Name of field which is the unique key
-$opts['key'] = 'id_camion';
+$opts['key'] = 'id_truck';
 
 // Type of key field (int/real/string/date etc.)
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_camion');
+$opts['sort_field'] = array('id_truck');
 
 // Number of records to display on the screen
 // Value of -1 lists all records in a table
@@ -78,8 +78,8 @@ appear in generated list. Here are some most used field options documented.
   descriptions fields are also possible. Check documentation for this.
 */
 
-$opts['fdd']['id_camion'] = array(
-  'name'     => 'ID camion',
+$opts['fdd']['id_truck'] = array(
+  'name'     => 'ID truck',
   'select'   => 'T',
   'options'  => 'AVCPDR', // auto increment
   'maxlen'   => 10,
@@ -98,14 +98,7 @@ $opts['fdd']['name'] = array(
   'maxlen'   => 100,
   'sort'     => true
 );
-$opts['fdd']['date_add'] = array(
-  'name'     => 'Date add',
-  'select'   => 'T',
-  'options'  => 'AVCPDR', // updated automatically (MySQL feature)
-  'maxlen'   => 19,
-  'default'  => 'CURRENT_TIMESTAMP',
-  'sort'     => true
-);
+
 $opts['fdd']['is_actif'] = array(
   'name'     => 'Is actif',
   'select'   => 'T',
@@ -113,8 +106,8 @@ $opts['fdd']['is_actif'] = array(
   'default'  => '1',
   'sort'     => true
 );
-$opts['fdd']['capactity'] = array(
-  'name'     => 'Capactity',
+$opts['fdd']['capacity'] = array(
+  'name'     => 'Capacity',
   'select'   => 'T',
   'maxlen'   => 10,
   'sort'     => true

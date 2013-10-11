@@ -249,6 +249,40 @@ CREATE TABLE IF NOT EXISTS `av_cms_lang` (
 
 
 
+CREATE TABLE IF NOT EXISTS `av_truck` (
+  `id_truck` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `imma` varchar(10) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_actif` int(1) NOT NULL DEFAULT '1',
+  `capacity` int(10) NOT NULL,
+  `status` int(11) NOT NULL,
+  PRIMARY KEY (`id_truck`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `av_truck_planning` (
+  `id_planning_truck` int(11) NOT NULL AUTO_INCREMENT,
+  `id_truck` int(11) unsigned NOT NULL,
+  `delivery_date` date NOT NULL,
+  `status` int(11) NOT NULL,
+  PRIMARY KEY (`id_planning_truck`),
+  UNIQUE KEY `id_truck` (`id_truck`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+CREATE TABLE IF NOT EXISTS `av_tournee` (
+  `id_tournee` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_truck` int(11) unsigned NOT NULL,
+  `id_order_detail` int(11) unsigned NOT NULL,
+  `status` int(11) NOT NULL,  
+  `date_livraison` date NOT NULL,
+  `horaire_livraison` varchar(50) NOT NULL,
+  PRIMARY KEY (`id_tournee`),
+  UNIQUE KEY `id_truck` ( `id_order_detail`),
+  KEY `	id_order_detail` (`id_order_detail`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 --
 -- Contenu de la table `av_range_weight`
 --
@@ -290,3 +324,11 @@ ALTER TABLE `av_product_attribute`
 --
 ALTER TABLE `av_product_caract`
   ADD CONSTRAINT `av_product_caract_ibfk_1` FOREIGN KEY (`id_product`) REFERENCES `av_product` (`id_product`);
+
+ALTER TABLE  `av_order_detail` ADD  `product_width` INT NULL AFTER  `produit_surface` ,
+ADD  `product_height` INT NULL AFTER  `product_width` ,
+ADD  `product_depth` INT NULL AFTER  `product_height`
+
+ALTER TABLE  `av_order_detail` ADD  `product_weight` INT NULL AFTER  `product_depth`
+
+ALTER TABLE  `av_order_detail` CHANGE  `product_quantity`  `product_quantity` INT( 10 ) UNSIGNED NOT NULL DEFAULT  '0.00'

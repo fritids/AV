@@ -69,9 +69,9 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             </ul>
                         </li>    
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livrison <b class="caret"></b></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livraison <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                <li><a href="av_camion_product.php">La tournée</a></li>
+                                <li><a href="av_tournee.php">La tournée</a></li>
                                 <li><a href="av_planning.php">Le planning</a></li>
                             </ul>
                         </li>    

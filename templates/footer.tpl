@@ -32,10 +32,12 @@
     </div>
     <div id="footer2-bg">
         <div id="footer2">
-
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">INFORMATIONS</li>
+                    {foreach key=key item=content from=$cms}
+                    <li><a href="?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
+                    {/foreach}
                 <li>Nous contacter</li>
                 <li>Mentions légales</li>
                 <li>CGU</li>
@@ -68,7 +70,7 @@
      background-image:url(bg/1.png);
      background-position:center top;
      background-repeat: no-repeat;
-     width:100%;height:100%;">test
+     width:100%;height:100%;">
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.js"></script>

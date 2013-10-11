@@ -11,6 +11,14 @@ function getUserOrders($id) {
     return $r;
 }
 
+function getOrderUserDetail($id) {
+    global $db;
+    $r = $db->where("id_customer", $id)
+            ->get("av_customer");
+    
+    return $r[0];
+}
+
 function getUserOrdersDetail($oid) {
     global $db;
     $params = array($oid);

@@ -1,11 +1,7 @@
 <div id="slider">
 </div>
 <div class="largeur">
-    <ul>
-        {foreach key=key item=content from=$cms}
-            <li><a href="?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
-            {/foreach}
-    </ul>
+    
 
     <div class="bloc-titre">ALLOVITRES : Spécialiste de la miroiterie</div>
     <div style="float: left;background: #fff;width: 100%">

@@ -10,7 +10,7 @@
             qte = $('#quantity').val();
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 10000;
+            square = (pwidth * pheigth) / 1000000;
             $('#surface').val(square.toFixed(2));
             $('#total_poids').val((square.toFixed(2) * weight * qte).toFixed(2));
             $('#total_price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
@@ -21,7 +21,7 @@
             qte = $('#quantity').val();
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 10000;
+            square = (pwidth * pheigth) / 1000000;
             $('#surface').text(square.toFixed(2));
             $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
             $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
@@ -32,7 +32,7 @@
             pwidth = $('#width').val();
             pheigth = $('#heigth').val();
 
-            square = (pwidth * pheigth) / 10000;
+            square = (pwidth * pheigth) / 1000000;
             $('#surface').text(square.toFixed(2));
             $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
             $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));

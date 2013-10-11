@@ -22,13 +22,13 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 /* vars */
 $nb_produits = 0;
-$page_type="";
+$page_type = "";
 
 $sub_menu = getCategories();
 
 
 /* Cms */
-$cms = getAllCmsInfo();        
+$cms = getAllCmsInfo();
 /* fin */
 
 
@@ -50,9 +50,14 @@ if (isset($_GET["cart"])) {
 
 
         if (isset($_POST["add"])) {
-            $surface = $_POST["width"] * $_POST["height"] / 10000;
+            $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
+            $dimension = array(
+                "width" => $_POST["width"],
+                "height" => $_POST["height"],
+                "depth" => $productInfos["depth"]
+            );
 
-            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount, $surface);
+            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount, $surface, $dimension);
 
             //Si option
             if (isset($_POST["options"])) {
@@ -64,16 +69,13 @@ if (isset($_GET["cart"])) {
                 $shipping_amount = $shipping_ratio * $option_weight;
 
 
-                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface);
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension);
             }
         }
 
         if (isset($_POST["del"])) {
             $surface = $_SESSION["cart"][$pid]["surface"];
-            echo $surface."<br>";
-            echo $shipping_amount."<br>";
-            echo $productInfos["price"]."<br>";
-            echo $pqte."<br>";
+
             $cart->removeItem($pid, $pqte, $productInfos["price"], $shipping_amount, $surface);
             //$cart->removeCartItem($_POST["id_cart_item"]);
         }
@@ -119,12 +121,12 @@ if (isset($_GET["my-account"]))
 if (isset($_GET["identification"]))
     $page = "identification";
 
-if (isset($_GET["cms"])){
+if (isset($_GET["cms"])) {
     $page = "cms";
     $cms = getCmsInfo($_GET["id"]);
     $page_type = "full";
 }
-    
+
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
@@ -295,6 +297,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
 
     foreach ($cartItems as $item) {
 
+        $p = getProductInfos($item["id"]) ;
+        
         $order_detail = array(
             "id_order" => $oid,
             "product_id" => $item["id"],
@@ -302,6 +306,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
             "product_quantity" => $item["quantity"],
             "product_price" => $item["price"],
             "product_shipping" => $item["shipping"],
+            "product_width" => $item["dimension"]["width"],
+            "product_height" => $item["dimension"]["height"],
+            "product_depth" => $item["dimension"]["depth"],
+            "product_weight" => $item["quantity"] * $p["weight"] * $item["surface"],
             "total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
             "total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
         );
