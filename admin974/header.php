@@ -21,6 +21,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <meta http-equiv="Content-Type" content="text/html">
         <link rel="stylesheet" href="css/admin.css">
         <link rel="stylesheet" href="css/av_admin.css">
+        <link rel="stylesheet" href="css/date-picker.css" type="text/css" media="screen"/>
+        
         <link href="css/bootstrap.css" rel="stylesheet">
         <!-- tinyMCE -->
         <script language="javascript" type="text/javascript" src="tinymce/tinymce.min.js"></script>
@@ -31,11 +33,12 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
             });
         </script>
         <!-- /tinyMCE -->
-
-    </head>
-    <body>
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    </head>
+    <body>
+
 
         <!-- Fixed navbar -->
         <div class="navbar navbar-default navbar-fixed-top navbar-inverse">

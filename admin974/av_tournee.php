@@ -6,10 +6,11 @@ include ("../functions/orders.php");
 
 define("TRUCK_OVER_LOAD", 95);
 
-function getProductTruck($id_order_detail) {
+function getProductTruck($id_order_detail, $date_delivery) {
     global $db;
 
     $p = $db->where("id_order_detail", $id_order_detail)
+            ->where("date_livraison", $date_delivery)
             ->get("av_tournee");
 
     if ($p)
@@ -29,8 +30,9 @@ function getTruckLoad($id) {
                     where a.id_order_detail = b.id_order_detail
                     and a.id_truck = c.id_truck
                     and a.id_truck = ?
+                    and a.date_livraison = ?
                     group by id_truck
-                    ", array($id));
+                    ", $id);
     if ($r)
         return ($r[0]);
 }
@@ -42,25 +44,29 @@ $id_planning = 1;
 $nb_produits = 0;
 $poids_produits = 0;
 $montant_produits = 0;
-
-$trucks = $db->get("av_truck");
-
-$orders = $db->where("current_state", 1)
-        ->get("av_orders");
 ?>
+<div id="datepicker"></div> 
+
 <form method="get">
-    <select name="planning" id="planning" class="pme-input-1">
-        <option value="2013-10-10">10-10-2013</option>
-        <option value="2013-10-11">11-10-2013</option>
-        <option value="2013-10-12">12-10-2013</option>
-        <option value="2013-10-13">13-10-2013</option>
-        <option value="2013-10-14">14-10-2013</option>
-    </select>
+    <input type="text" value="<?= @$_GET["planning"] ?>" name="planning" id="planning">
+
     <input type="submit" >
 </form>
 
 <?
 if (isset($_GET["planning"])) {
+
+    $date_livraison = $_GET["planning"];
+
+    // on recupère les camions disponible sur la date choisi
+    $trucks = $db->rawQuery("select * from av_truck 
+                          where id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($date_livraison));
+
+    $orders = $db->rawQuery("select distinct a.*
+                        from av_orders a, av_order_detail b 
+                        where a.id_order = b.id_order
+                        and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2 )
+                        ");
     ?>
 
     <table >
@@ -75,14 +81,14 @@ if (isset($_GET["planning"])) {
                             <th><?= $order["id_order"] ?></th>
                             <th><?= $order["reference"] ?></th>        
                             <th><?= $customer["firstname"] . " " . $customer["lastname"] ?></th>        
-                            <th><?= $order["total_paid"] ?></th>        
-                            <th>Action</th>        
-                            <th>Ok</th>        
+                            <th><?= $order["total_paid"] ?> €</th>        
+                            <th colspan="2">Actions</th>        
                         </tr>
                         <?
                         $listOrderProduct = $db->rawQuery("select a.id_order, b.*
                                                             from av_orders a, av_order_detail b 
                                                             where a.id_order = b.id_order
+                                                            and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2 )
                                                             and a.id_order = ? 
                                                             ", array($order["id_order"]));
 
@@ -99,11 +105,11 @@ if (isset($_GET["planning"])) {
                                         <?
                                         //on bloucle sur les camions
                                         foreach ($trucks as $truck) {
-                                            $truckLoad = getTruckLoad($truck["id_truck"]);
+                                            $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
                                             ?>
                                             <li>
                                                 <?
-                                                $mytruck = getProductTruck($OrderProduct["id_order_detail"]);
+                                                $mytruck = getProductTruck($OrderProduct["id_order_detail"], $date_livraison);
                                                 if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"]) {
                                                     ?>
                                                     <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
@@ -171,7 +177,7 @@ if (isset($_GET["planning"])) {
                     $volume_produit = 0;
                     $tmpRef = "";
 
-                    $truckLoad = getTruckLoad($truck["id_truck"]);
+                    $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
                     ?>
                     <table>
                         <tr>
@@ -191,8 +197,9 @@ if (isset($_GET["planning"])) {
                                                                     where a.id_order = b.id_order
                                                                     and b.id_order_detail = c.id_order_detail 
                                                                     and c.id_truck = ? 
+                                                                    and c.date_livraison = ?                                                                     
                                                                     order by a.id_order
-                                                                    ", array($truck["id_truck"]))
+                                                                    ", array($truck["id_truck"], $date_livraison))
                                             ?>
                                             <table class="table-condensed">
                                                 <tr>
@@ -290,6 +297,11 @@ if (isset($_GET["planning"])) {
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                <tr>
+                                                    <td colspan="6">
+                                                        <button name="validTruck" value="<?= $truck["id_truck"] ?>|<?= $_GET["planning"] ?>" type="button" class="btn btn-warning btn-lg btn-block">Valider</button>
+                                                    </td>
+                                                </tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -370,4 +382,72 @@ if (isset($_GET["planning"])) {
         });
         location.reload();
     });
+    $("button[name='validTruck']").click(function() {
+        var p = $(this).val();
+        var action = "upd";
+        var module = "ValidTruck";
+
+        var func = action + module;
+
+        console.log(p + " " + func);
+
+        $.ajax({
+            url: "functions/ajax_trucks.php",
+            type: "POST",
+            dataType: "json",
+            async: false,
+            data: {
+                func: func,
+                id: p,
+            },
+            success: function(data) {
+                console.log(data);
+            },
+            error: function(xhr, textStatus, error) {
+                console.log(xhr.statusText);
+                console.log(textStatus);
+                console.log(error);
+            }
+        });
+        location.reload();
+    });
+
+
+    jQuery(function($) {
+        $.datepicker.regional['fr'] = {
+            closeText: 'Fermer',
+            prevText: '<Préc',
+            nextText: 'Suiv>',
+            currentText: 'Courant',
+            monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+            monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+                'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+            dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+            dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+            dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+            weekHeader: 'Sm',
+            //dateFormat: 'dd/mm/yy',
+            dateFormat: 'dd/mm/yy',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: ''};
+
+        $.datepicker.setDefaults($.datepicker.regional['fr']);
+    });
+
+    $("#datepicker").datepicker(
+            {
+                //minDate: 0,
+                onSelect: function() {
+                    var day1 = $("#datepicker").datepicker('getDate').getDate();
+                    var month1 = $("#datepicker").datepicker('getDate').getMonth() + 1;
+                    var year1 = $("#datepicker").datepicker('getDate').getFullYear();
+                    var fullDate = year1 + "-" + month1 + "-" + day1;
+                    var str_output = "<h1><center>" + fullDate + "</center></h1><br/><br>";
+                    $("#planning").val(fullDate);
+                    //page_output.innerHTML = str_output;
+                }
+            });
 </script>
