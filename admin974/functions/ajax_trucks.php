@@ -41,23 +41,30 @@ function updValidTruck($id) {
 
     $imp = explode("|", $id);
 
-    $info = array(
-        "status" => 2,
-    );
+    /* on fixe la date livraison du camion */
+
+    $info = array("status" => 2);
 
     $r = $db->where("id_truck", $imp[0])
             ->where("date_livraison", $imp[1])
             ->update("av_tournee", $info);
 
-
-    $info = array(
+    /* on bloque le camion pour la date livraison */
+    $infoTruckPlanning = array(
         "id_truck" => $imp[0],
         "date_delivery" => $imp[1],
         "status" => 1
     );
-    
-    $r = $db->insert("av_truck_planning", $info);
 
+    $r = $db->insert("av_truck_planning", $infoTruckPlanning);
+
+    /* on passe les produits en livraison prévu */
+    $orderDetails = $db->rawQuery("select id_order_detail from av_tournee where id_truck = ? and date_livraison = ? and status = 2", array($imp[0], $imp[1]));
+
+    foreach ($orderDetails as $orderDetail) {
+        $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
+                ->update("av_order_detail", array("product_current_state" => 7));
+    }
 
     if ($r)
         return(json_encode($imp . "ok"));

@@ -29,8 +29,6 @@ $opts['display'] = array(
     'tabs' => true
 );
 
-
-
 /* Get the user's default language and use it if possible or you can
   specify particular one you want to use. Refer to official documentation
   for list of available languages. */
@@ -181,15 +179,6 @@ $opts['fdd']['product_current_state'] = array(
     'sort' => true
 );
 
-$opts['fdd']['CurrentDate'] = array( 
-  'name'     => 'Current Date', 
-  'select'   => 'T', 
-  'maxlen'   => 14, 
-  'options'  => 'L', 
-  'sql'    => 'CURDATE()', 
-  'sort'     => true 
-);
-
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
@@ -215,7 +204,7 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 
             id_order_detail = $(this).parent().children(':nth-child(3)').text();
 
-            console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
+            //console.log("->" + id_order_detail + " " + index + ": " + $(this).text());
 
             $.ajax({
                 url: "av_utilities.php",
@@ -245,7 +234,7 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
         $("select")
                 .change(function(i, v) {
 
-            console.log(this.name + " " + this.value);
+            //console.log(this.name + " " + this.value);
 
             $.ajax({
                 url: "av_utilities.php",

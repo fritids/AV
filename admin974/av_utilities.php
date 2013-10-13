@@ -36,6 +36,7 @@ function getOrderCombobox() {
             ->get("av_orders");
 
     $opt = '<select name="' . $r2[0]["id_order"] . '" class="pme-input-1">';
+    $opt .= '<option value="" selected> -- </option>';
     foreach ($r as $k => $v) {
         if ($r2[0]["current_state"] == $v["id_statut"]) {
             $opt .= '<option value="' . $v["id_statut"] . '" selected> ' . $v["title"] . '</option>';
@@ -56,6 +57,7 @@ function getOrderDetailCombobox() {
             ->get("av_order_detail");
 
     $opt = '<select name="' . $r2[0]["id_order_detail"] . '" class="pme-input-1">';
+    $opt .= '<option value="" selected> -- </option>';
     foreach ($r as $k => $v) {
         if ($r2[0]["product_current_state"] == $v["id_statut"]) {
             $opt .= '<option value="' . $v["id_statut"] . '" selected> ' . $v["title"] . '</option>';
