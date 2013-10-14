@@ -138,6 +138,7 @@ $opts['fdd']['id_address_invoice'] = array(
 );
 $opts['fdd']['current_state'] = array(
     'name' => 'Status',
+    'options' => 'L',
     'select' => 'D',
     'maxlen' => 10,
     'values' => array(
@@ -164,16 +165,13 @@ require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
 <br>
-<button id="edit" class="btn btn-primary"> Modifier les status </button>
+
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
 <script>
-    $("#edit").click(function() {
-        if ($(this).text() == "Terminer") {
-            location.reload();
-        }
+    $().ready(function() {
         var i = 0;
         $('td[name=order_state]').each(function(index) {
             dat = "";
@@ -204,7 +202,6 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
                 i = 0;
         });
 
-
         $("select")
                 .change(function(i, v) {
 
@@ -231,9 +228,7 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
                 }
             });
         })
-        $(this).text("Terminer");
-
-    })
+    });
 
 </script>
 

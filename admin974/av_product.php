@@ -1,4 +1,5 @@
 <?php
+
 include ("header.php");
 
 // MySQL host name, user name, password, database, and table
@@ -22,8 +23,6 @@ $opts['inc'] = 50;
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-
-
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '10';
 
@@ -142,17 +141,18 @@ $opts['fdd']['description'] = array(
     'name' => 'Description',
     'select' => 'T',
     'maxlen' => 65535,
+    'options' => 'C',
     'textarea' => array(
         'html' => true,
         'rows' => 20,
         'cols' => 100),
     'sort' => true,
-    'css' => array('id' => 'test','page_type' => 'test')
+    'css' => array('id' => 'test', 'page_type' => 'test')
 );
 $opts['fdd']['description_short'] = array(
     'name' => 'Description courte',
     'select' => 'T',
-    'maxlen' => 65535,
+    'maxlen' => 65535,    
     'textarea' => array(
         'html' => true,
         'rows' => 5,
@@ -162,36 +162,42 @@ $opts['fdd']['description_short'] = array(
 );
 $opts['fdd']['video'] = array(
     'name' => 'Video.',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 255
 );
 
 $opts['fdd']['min_width'] = array(
     'name' => 'Largeur Min.',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['min_height'] = array(
     'name' => 'Hauteur Min.',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_surface'] = array(
     'name' => 'Surface Max.',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_width'] = array(
     'name' => 'Largeur Max',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_height'] = array(
     'name' => 'Hauteur Max',
+    'options' => 'C',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
@@ -204,5 +210,6 @@ new phpMyEdit_mce_cal($opts);
 ?>
 
 <?
+
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>

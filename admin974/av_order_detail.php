@@ -184,19 +184,14 @@ require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
 
-<button id="edit" class="btn btn-primary"> Modifier les status </button>
-
-
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
 <script>    
 
-    $("#edit").click(function() {
-        if ($(this).text() == "Terminer") {
-            location.reload();
-        }
+    $().ready(function() {
+       
         var i = 0;
         $('td[name=product_current_state]').each(function(index) {
             id = $("input[class=pme-navigation-" + i).val();
@@ -257,7 +252,6 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
                 }
             });
         })
-        $(this).text("Terminer");
 
     })
 

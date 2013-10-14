@@ -83,13 +83,13 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <ul class="dropdown-menu">
                                 <li><a href="admin_user.php">Utilisateurs</a></li>
                                 <li class="divider"></li>
-                                <li><a href="av_range_weight.php">Transport</a></li>
+                                <li><a href="av_range_weight.php">Frais de port</a></li>
                                 <li class="divider"></li>
-                                <li><a href="av_order_status.php">Commandes - statut </a></li>                                
+                                <li><a href="av_order_status.php">Statuts des commandes </a></li>                                
                                 <li class="divider"></li>
                                 <li><a href="av_camion.php">Camions</a></li>                                
                                 <li class="divider"></li>
-                                <li><a href="av_cms_lang.php">Contenu </a></li>                                
+                                <li><a href="av_cms_lang.php">Contenu manager</a></li>                                
                             </ul>
                         </li>                        
                     </ul>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("mysqlmdp.php");
+include ("../configs/settings.php");
 mysql_connect($bdserv, $bduser, $bdpass);
 mysql_select_db($bdname);
 include('securite.php');
