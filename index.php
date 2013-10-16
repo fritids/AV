@@ -28,7 +28,8 @@ $sub_menu = getCategories();
 
 
 /* Cms */
-$cms = getAllCmsInfo();
+$AllCMS = getAllCmsInfo();
+$cms = array();
 /* fin */
 
 
@@ -124,7 +125,7 @@ if (isset($_GET["identification"]))
 if (isset($_GET["cms"])) {
     $page = "cms";
     $cms = getCmsInfo($_GET["id"]);
-    $page_type = "full";
+    $page_type = "full";    
 }
 
 
@@ -360,6 +361,7 @@ $smarty->assign('cart', $cartItems);
 $smarty->assign('cart_nb_items', $cart_nb_items);
 $smarty->assign('nb_produits', $nb_produits);
 $smarty->assign('cms', $cms);
+$smarty->assign('AllCMS', $AllCMS);
 $smarty->assign('page_info', $page);
 $smarty->assign('page_type', $page_type);
 

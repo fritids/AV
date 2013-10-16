@@ -22,7 +22,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <link rel="stylesheet" href="css/admin.css">
         <link rel="stylesheet" href="css/av_admin.css">
         <link rel="stylesheet" href="css/date-picker.css" type="text/css" media="screen"/>
-        
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
         <link href="css/bootstrap.css" rel="stylesheet">
         <!-- tinyMCE -->
         <script language="javascript" type="text/javascript" src="tinymce/tinymce.min.js"></script>
@@ -36,6 +36,21 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <script>
+            $(function() {
+                $("#datepicker").datepicker({
+                    showButtonPanel: true
+                });
+                $("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+            });
+            $(function() {
+                //$("#datepicker2").datepicker($.datepicker.regional[ "fr" ], showButtonPanel: true);
+                $("#datepicker2").datepicker({
+                    showButtonPanel: true
+                });
+                $("#datepicker2").datepicker("option", "dateFormat", "yy-mm-dd");
+            });
+        </script>
     </head>
     <body>
 
@@ -84,12 +99,14 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="admin_user.php">Utilisateurs</a></li>
                                 <li class="divider"></li>
                                 <li><a href="av_range_weight.php">Frais de port</a></li>
+                                <li><a href="av_zone.php">Zones</a></li>
+                                <li><a href="av_departements.php">Departement / Zones </a></li>
                                 <li class="divider"></li>
                                 <li><a href="av_order_status.php">Statuts des commandes </a></li>                                
                                 <li class="divider"></li>
                                 <li><a href="av_camion.php">Camions</a></li>                                
                                 <li class="divider"></li>
-                                <li><a href="av_cms_lang.php">Contenu manager</a></li>                                
+                                <li><a href="av_cms_lang.php">Contenu manager</a></li>
                             </ul>
                         </li>                        
                     </ul>

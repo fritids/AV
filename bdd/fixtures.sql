@@ -70,10 +70,10 @@ INSERT INTO `av_product_images` (`id_image`, `id_product`, `cover`, `filename`) 
 
 
 INSERT INTO `av_truck` (`id_truck`, `imma`, `name`, `date_add`, `is_actif`, `capacity`, `status`) VALUES
-(1, '12-APA-97', 'Mon truck', '2013-10-08 22:00:00', 1, 10, 0),
-(2, '45PAF-75', 'Mon truck 2', '2013-10-09 11:03:14', 1, 20, 0),
-(3, '65-PIF-45', 'Long courrier', '2013-10-10 13:58:30', 1, 30, 0),
-(4, '23-MAR-80', 'Regional', '2013-10-10 13:59:03', 1, 15, 0);
+(1, '12-APA-97', 'Mon truck', '2013-10-08 22:00:00', 1, 5, 0),
+(2, '45-PAF-75', 'Mon truck 2', '2013-10-09 11:03:14', 1, 10, 0),
+(3, '65-PIF-45', 'Long courrier', '2013-10-10 13:58:30', 1, 15, 0),
+(4, '23-MAR-80', 'Regional', '2013-10-10 13:59:03', 1, 20, 0);
 
 
 update av_order_detail set 
@@ -81,3 +81,10 @@ product_width = round(rand()*4000,2),
 product_height = round(rand()*4000,2),
 product_depth = round(rand()*200,2),
 product_weight = round(rand()*10,2)
+
+## supplier
+
+INSERT INTO `av_supplier` (`id_supplier`, `name`) VALUES
+(1, 'SL/PV'),
+(2, 'PV'),
+(3, 'MC');

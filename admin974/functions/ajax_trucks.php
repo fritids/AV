@@ -14,6 +14,7 @@ function addtruckTournee($id) {
         "id_truck" => $imp[1],
         "id_order_detail" => $imp[2],
         "date_livraison" => $imp[3],
+        "nb_product_delivered" => $imp[4],
         "status" => 1,
     );
 

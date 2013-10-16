@@ -284,11 +284,10 @@ CREATE TABLE IF NOT EXISTS `av_tournee` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE `av_dept_zone` (
-  `id_dept_zone` int(11) NOT NULL AUTO_INCREMENT,
-  `id_departement` varchar(2) NOT NULL,
+CREATE TABLE `av_zone` (
+  `id_zone` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id_dept_zone`)
+  PRIMARY KEY  (`id_zone`)
 );
 
 CREATE TABLE `av_regions` (
@@ -297,6 +296,18 @@ CREATE TABLE `av_regions` (
   PRIMARY KEY  (`id_region`)
 );
 
+
+ALTER TABLE  `av_tournee` ADD  `comment1` VARCHAR( 255 ) NOT NULL ,
+ADD  `comment2` VARCHAR( 255 ) NOT NULL ,
+ADD  `comment3` VARCHAR( 255 ) NOT NULL ,
+ADD  `nb_product_delivered` INT NOT NULL
+
+
+CREATE TABLE IF NOT EXISTS `av_supplier` (
+  `id_supplier` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id_supplier`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 INSERT INTO `av_regions` VALUES ('1', 'Alsace');
 INSERT INTO `av_regions` VALUES ('2', 'Aquitaine');
@@ -325,6 +336,7 @@ INSERT INTO `av_regions` VALUES ('22', 'Rhone Alpes');
 CREATE TABLE `av_departements` (
   `id_departement` varchar(2) NOT NULL,
   `id_region` varchar(2) NOT NULL,
+  `id_zone` int(10) UNSIGNED,
   `nom` char(32) NOT NULL,
   PRIMARY KEY  (`id_departement`),
   KEY `FK_DEPARTEMENT_REGION` (`id_region`)
@@ -477,3 +489,9 @@ ADD  `product_depth` INT NULL AFTER  `product_height`
 ALTER TABLE  `av_order_detail` ADD  `product_weight` INT NULL AFTER  `product_depth`
 
 ALTER TABLE  `av_order_detail` CHANGE  `product_quantity`  `product_quantity` INT( 10 ) UNSIGNED NOT NULL DEFAULT  '0.00'
+
+ALTER TABLE  `av_order_detail` ADD  `id_supplier` INT UNSIGNED NOT NULL AFTER  `id_order`
+
+ALTER TABLE  `av_order_detail` ADD  `supplier_date_delivery` DATE NOT NULL ,
+ADD  `nb_product_delivered` INT NOT NULL
+

@@ -35,7 +35,7 @@
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">INFORMATIONS</li>
-                    {foreach key=key item=content from=$cms}
+                    {foreach key=key item=content from=$AllCMS}
                     <li><a href="?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
                     {/foreach}
                 <li>Nous contacter</li>

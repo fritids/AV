@@ -112,6 +112,24 @@ $opts['fdd']['id_order'] = array(
     'sort' => true
 );
 
+$opts['fdd']['id_supplier'] = array(
+    'name' => 'Founisseur',
+    'select' => 'T',
+    'maxlen' => 255,
+    'values' => array(
+        'table' => 'av_supplier',
+        'column' => 'id_supplier',
+        'description' => 'name'
+    ),
+    'sort' => true    
+);
+
+$opts['fdd']['supplier_date_delivery'] = array(
+    'name' => 'Date livraison Fournisseur',
+    'select' => 'T',    
+    'sort' => true    
+);
+
 $opts['fdd']['product_name'] = array(
     'name' => 'Nom produit',
     'select' => 'T',
