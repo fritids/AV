@@ -131,10 +131,24 @@ $suppliers = $db->get("av_supplier");
 
 
 
-
+<h5>Critères :</h5>
 <?
-if (isset($_GET["planning"])) {
+if (!empty($_GET["reference"]))
+    echo "<li> Reference =" . $_GET["reference"] . "</li>";
+if (!empty($_GET["planning"]))
+    echo "<li> date livraison =" . $_GET["planning"] . "</li>";
+if (!empty($_GET["invoice_date"]))
+    echo "<li> date facturation >=" . $_GET["invoice_date"] . "</li>";
+if (!empty($_GET["id_supplier"]))
+    echo "<li> Fournisseur =" . $_GET["id_supplier"] . "</li>";
+if (!empty($_GET["prod_affecte"]))
+    echo "<li> hors produits affectés </li>";
+if (!empty($_GET["id_zone"]))
+    echo "<li> Zone =" . $_GET["id_zone"] . "</li>";
 
+
+if (isset($_GET["planning"])) {
+    
     $date_livraison = $_GET["planning"];
 
 
@@ -200,7 +214,7 @@ if (isset($_GET["planning"])) {
                             </th>        
                             <th><?= $order["total_paid"] ?> €</th>        
                             <th><?= $order["tot_weight"] ?> Kg</th>        
-                            <th colspan="2">Actions</th>        
+                            <th colspan="3">Actions</th>        
                         </tr>
                         <?
                         $queryOrderDetail = "select a.id_order, b.*,
@@ -250,7 +264,7 @@ if (isset($_GET["planning"])) {
 
                                         <select name="nb_<?= $OrderProduct["id_order_detail"] ?>" id="nb_<?= $OrderProduct["id_order_detail"] ?>" class="pme-input-1">
                                             <?
-                                            for ($i = 1; $i <= $qte_remaining; $i++) {
+                                            for ($i = $qte_remaining; $i > 0; $i--) {
                                                 ?>
                                                 <option value="<?= $i ?>"><?= $i ?></option>                                           
                                                 <?
@@ -275,7 +289,7 @@ if (isset($_GET["planning"])) {
                                                     <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                     <?
                                                 } else {
-                                                    if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /*|| $product_weight > $truck["capacity"]*/) {
+                                                    if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
                                                         ?>
                                                         <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
                                                         <?

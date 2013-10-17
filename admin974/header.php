@@ -43,16 +43,21 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 });
                 $("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
             });
+            
             $(function() {
                 //$("#datepicker2").datepicker($.datepicker.regional[ "fr" ], showButtonPanel: true);
                 $("#datepicker2").datepicker({
                     showButtonPanel: true
                 });
                 $("#datepicker2").datepicker("option", "dateFormat", "yy-mm-dd");
+
+                $('#datepicker2').val("<?= $_GET["planning"] ?>");
+                $('#datepicker').val("<?= @$_GET["invoice_date"] ?>");
             });
         </script>
     </head>
     <body>
+        
 
 
         <!-- Fixed navbar -->
