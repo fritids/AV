@@ -7,11 +7,16 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 function addtruckTournee($id) {
     global $db;
-
     $imp = explode("|", $id);
+
+    $order = $db->where("id_order_detail", $imp[2])
+            ->get("av_order_detail");
+
+
 
     $info = array(
         "id_truck" => $imp[1],
+        "id_order" => $order[0]["id_order"],
         "id_order_detail" => $imp[2],
         "date_livraison" => $imp[3],
         "nb_product_delivered" => $imp[4],

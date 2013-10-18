@@ -35,13 +35,32 @@ function getProductTruck($id_order_detail, $date_delivery) {
 }
 
 function updValidTruck($id_truck, $date_livraison, $updinfos) {
-    global $db;
+    global $db;   
 
-    /* on fixe la date livraison du camion */
-
-    $r = $db->where("id_truck", $id_truck)
-            ->where("date_livraison", $date_livraison)
-            ->update("av_tournee", $updinfos);
+    foreach ($updinfos["comment1"] as $id => $comment) {
+        $r = $db->where("id_truck", $id_truck)
+                ->where("date_livraison", $date_livraison)
+                ->where("id_order", $id)
+                ->update("av_tournee", array("comment1" => $comment));
+    }
+    foreach ($updinfos["comment2"] as $id => $comment) {
+        $r = $db->where("id_truck", $id_truck)
+                ->where("date_livraison", $date_livraison)
+                ->where("id_order", $id)
+                ->update("av_tournee", array("comment2" => $comment));
+    }
+    foreach ($updinfos["comment3"] as $id => $comment) {
+        $r = $db->where("id_truck", $id_truck)
+                ->where("date_livraison", $date_livraison)
+                ->where("id_order", $id)
+                ->update("av_tournee", array("comment3" => $comment));
+    }
+    foreach ($updinfos["horaire"] as $id => $comment) {
+        $r = $db->where("id_truck", $id_truck)
+                ->where("date_livraison", $date_livraison)
+                ->where("id_order", $id)
+                ->update("av_tournee", array("horaire" => $comment));
+    }
 
     /* on bloque le camion pour la date livraison */
     $infoTruckPlanning = array(
@@ -91,6 +110,7 @@ $qte_remaining = 0;
 <?
 if (isset($_POST) && !empty($_POST)) {
 
+    print_r($_POST);
     $updinfos = array(
         "status" => 2,
         "comment1" => $_POST["comment1"],
@@ -123,7 +143,6 @@ if (isset($_GET["planning"])) {
         $montant_produits = 0;
         $poids_produits = 0;
         $montant_transport = 0;
-        $volume_produit = 0;
         $tmpRef = "";
         $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
         ?>
@@ -143,7 +162,7 @@ if (isset($_GET["planning"])) {
                     <td colspan="4">
                         <?
                         // on recupère les produits affectés au camion
-                        $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, d.postcode, b.*, c.*
+                        $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, d.postcode, a.id_customer, b.*, c.*
                         from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
@@ -153,21 +172,13 @@ if (isset($_GET["planning"])) {
                         order by a.id_order
                         ", array($truck["id_truck"], $date_livraison))
                         ?>
-                        <table class="table-condensed">
-                            <tr>
-                                <td>Qty</td>
-                                <td>Nom</td>
-                                <td>Dimension</td>
-                                <td>Poids</td>
-                                <td>commentaire 1</td>
-                                <td>commentaire 2</td>
-                                <td>commentaire 3</td>
-                                <td>Horaire</td>
-                            </tr>
+                        <table class="table-condensed">                            
                             <?
                             //on boucle sur les produits
                             foreach ($listOrderProduct as $OrderProduct) {
                                 $p = getProductInfos($OrderProduct["id_product"]);
+                                $customer = getOrderUserDetail($OrderProduct["id_customer"]);
+                                $adresse = getAdresse($OrderProduct["id_customer"], 'delivery');
 
                                 $p_qty = $OrderProduct["nb_product_delivered"];
 
@@ -176,12 +187,28 @@ if (isset($_GET["planning"])) {
                                 $poids_produits += $p_qty * $OrderProduct["product_weight"];
                                 $montant_transport += $OrderProduct["product_shipping"];
 
+
+                                $addrs = $adresse["address1"] . "<br>";
+                                if ($adresse["address2"])
+                                    $addrs .= $adresse["address2"] . "<br>";
+                                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                                $addrs_link = str_replace(' ', '+', $addrs);
+                                $addrs_link = str_replace('<br>', '+', $addrs);
+
+
                                 if ($tmpRef != $OrderProduct["reference"]) {
                                     ?>
                                     <tr>
                                         <td>&nbsp;</td>
                                         <th colspan="2"><?= $OrderProduct["reference"] ?></th>
-                                        <th colspan="2"><?= getDeliveryZone($OrderProduct["postcode"]) ?></th>
+                                        <th colspan="2">
+                                            <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
+                                            <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
+                                        </th>
+                                        <th>temps de trajet <br><input type="text" value="" name="comment1[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                        <th>Heure de livraison<br><input type="text" value="" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                        <th>Informations <br><input type="text" value="" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                        <th>Horaire indiqué au client<br><input type="text" value="" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
                                     </tr>
                                     <?
                                     $tmpRef = $OrderProduct["reference"];
@@ -192,10 +219,7 @@ if (isset($_GET["planning"])) {
                                     <td nowrap><?= $p["name"] ?></td>
                                     <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
                                     <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
-                                    <td><input type="text" value="" name="comment1"> </td>                                                                                                              
-                                    <td><input type="text" value="" name="comment2"> </td>                                                                                                              
-                                    <td><input type="text" value="" name="comment3"> </td>                                                                                                              
-                                    <td><input type="text" value="" name="horaire"> </td>                                                                                                              
+
                                 </tr>
                                 <?
                             }
