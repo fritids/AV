@@ -1,0 +1,18 @@
+SELECT id_truck id_camion ,b.name, a.date_livraison, concat(lastname,' ', firstname,' ',address1,' ',address2,' ',postcode,' ',city) address, a.nb_product_delivered, concat(product_width, 'x',product_height, 'x', product_depth) dim, a.comment1, a.comment2, a.comment3, a.horaire
+FROM `av_tournee` a, av_truck b, av_order_detail c, av_orders d, av_address e, av_customer f
+ WHERE a.id_truck = b.id_truck
+and a.id_order_detail = c.id_order_detail
+and c.id_order = d.id_order
+and d.id_address_delivery = e.id_address
+and d.id_customer = f.id_customer
+
+CREATE OR REPLACE 
+ALGORITHM = UNDEFINED
+VIEW  `av_tournee_manifest` AS 
+SELECT b.id_truck id_camion, b.name, a.date_livraison, CONCAT( lastname,  ' ', firstname,  ' ', address1,  ' ', address2,  ' ', postcode,  ' ', city ) address, a.nb_product_delivered, CONCAT( product_width,  'x', product_height,  'x', product_depth ) dim, a.comment1, a.comment2, a.comment3, a.horaire
+FROM  `av_tournee` a, av_truck b, av_order_detail c, av_orders d, av_address e, av_customer f
+WHERE a.id_truck = b.id_truck
+AND a.id_order_detail = c.id_order_detail
+AND c.id_order = d.id_order
+AND d.id_address_delivery = e.id_address
+AND d.id_customer = f.id_customer

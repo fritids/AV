@@ -35,7 +35,7 @@ function getProductTruck($id_order_detail, $date_delivery) {
 }
 
 function updValidTruck($id_truck, $date_livraison, $updinfos) {
-    global $db;   
+    global $db;
 
     foreach ($updinfos["comment1"] as $id => $comment) {
         $r = $db->where("id_truck", $id_truck)
@@ -110,7 +110,6 @@ $qte_remaining = 0;
 <?
 if (isset($_POST) && !empty($_POST)) {
 
-    print_r($_POST);
     $updinfos = array(
         "status" => 2,
         "comment1" => $_POST["comment1"],
@@ -128,41 +127,31 @@ if (isset($_GET["planning"])) {
 
     $date_livraison = $_GET["planning"];
 
-
     // on recupère les camions disponible sur la date choisi
     $trucks = $db->rawQuery("select * from av_truck 
                           where id_truck = ?
                           and id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($_GET["id_truck"], $date_livraison));
+    $truck = $trucks[0];
+
+    // on recupère les camions
+
+    $nb_produits = 0;
+    $montant_produits = 0;
+    $poids_produits = 0;
+    $montant_transport = 0;
+    $tmpRef = "";
+    $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
     ?>
 
-    <?
-// on recupère les camions
-    foreach ($trucks as $truck) {
-
-        $nb_produits = 0;
-        $montant_produits = 0;
-        $poids_produits = 0;
-        $montant_transport = 0;
-        $tmpRef = "";
-        $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
-        ?>
-
+    <div class="container">
         <form action="" method="post">
             <input type="hidden" name="id_truck" value="<?= $truck["id_truck"] ?>"/>
             <input type="hidden" name="date_livraison" value="<?= $_GET["planning"] ?>"/>     
-            <input type="hidden" name="status" value="2"/>     
+            <input type="hidden" name="status" value="2"/> 
 
-            <table  class="table-bordered">
-                <tr>
-                    <th><?= $truck["id_truck"] ?></th>                
-                    <th><?= $truck["imma"] ?></th>
-                    <th><?= $truck["name"] ?></th>
-                </tr>
-                <tr>
-                    <td colspan="4">
-                        <?
-                        // on recupère les produits affectés au camion
-                        $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, d.postcode, a.id_customer, b.*, c.*
+            <?
+            // on recupère les produits affectés au camion
+            $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, d.postcode, a.id_customer, b.*, c.*
                         from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
@@ -171,120 +160,128 @@ if (isset($_GET["planning"])) {
                         and c.date_livraison = ?                                                                     
                         order by a.id_order
                         ", array($truck["id_truck"], $date_livraison))
-                        ?>
-                        <table class="table-condensed">                            
+            ?>
+
+
+            <table class="col-md-12 table-condensed">    
+                <tr>
+                    <td>
+                        <ul id="sortlist" class="list-unstyled">
                             <?
                             //on boucle sur les produits
                             foreach ($listOrderProduct as $OrderProduct) {
-                                $p = getProductInfos($OrderProduct["id_product"]);
-                                $customer = getOrderUserDetail($OrderProduct["id_customer"]);
-                                $adresse = getAdresse($OrderProduct["id_customer"], 'delivery');
-
-                                $p_qty = $OrderProduct["nb_product_delivered"];
-
-                                $montant_produits += $OrderProduct["product_price"];
-                                $nb_produits += $OrderProduct["nb_product_delivered"];
-                                $poids_produits += $p_qty * $OrderProduct["product_weight"];
-                                $montant_transport += $OrderProduct["product_shipping"];
-
-
-                                $addrs = $adresse["address1"] . "<br>";
-                                if ($adresse["address2"])
-                                    $addrs .= $adresse["address2"] . "<br>";
-                                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-                                $addrs_link = str_replace(' ', '+', $addrs);
-                                $addrs_link = str_replace('<br>', '+', $addrs);
-
-
-                                if ($tmpRef != $OrderProduct["reference"]) {
-                                    ?>
-                                    <tr>
-                                        <td>&nbsp;</td>
-                                        <th colspan="2"><?= $OrderProduct["reference"] ?></th>
-                                        <th colspan="2">
-                                            <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
-                                            <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
-                                        </th>
-                                        <th>temps de trajet <br><input type="text" value="" name="comment1[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
-                                        <th>Heure de livraison<br><input type="text" value="" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
-                                        <th>Informations <br><input type="text" value="" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
-                                        <th>Horaire indiqué au client<br><input type="text" value="" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
-                                    </tr>
-                                    <?
-                                    $tmpRef = $OrderProduct["reference"];
-                                }
                                 ?>
-                                <tr>
-                                    <td><?= $p_qty ?></td>
-                                    <td nowrap><?= $p["name"] ?></td>
-                                    <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
-                                    <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
+                                <li id="votre_id_1" class="sortable_item">
+                                    <table >
+                                        <?
+                                        $p = getProductInfos($OrderProduct["id_product"]);
+                                        $customer = getOrderUserDetail($OrderProduct["id_customer"]);
+                                        $adresse = getAdresse($OrderProduct["id_customer"], 'delivery');
 
-                                </tr>
+                                        $p_qty = $OrderProduct["nb_product_delivered"];
+
+                                        $montant_produits += $OrderProduct["product_price"];
+                                        $nb_produits += $OrderProduct["nb_product_delivered"];
+                                        $poids_produits += $p_qty * $OrderProduct["product_weight"];
+                                        $montant_transport += $OrderProduct["product_shipping"];
+
+
+                                        $addrs = $adresse["address1"] . "<br>";
+                                        if ($adresse["address2"])
+                                            $addrs .= $adresse["address2"] . "<br>";
+                                        $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                                        $addrs_link = str_replace(' ', '+', $addrs);
+                                        $addrs_link = str_replace('<br>', '+', $addrs);
+
+
+                                        if ($tmpRef != $OrderProduct["reference"]) {
+                                            ?>
+                                            <tr>
+                                                <td>&nbsp;</td>
+                                                <th colspan="2"><?= $OrderProduct["reference"] ?></th>
+                                                <th colspan="2">
+                                                    <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
+                                                    <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
+                                                </th>
+                                                <th>temps de trajet <br><input type="text" value="" name="comment1[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                                <th>Heure de livraison<br><input type="text" value="" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                                <th>Informations <br><input type="text" value="" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
+                                                <th>Horaire indiqué au client<br><input type="text" value="" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
+                                            </tr>
+                                            <?
+                                            $tmpRef = $OrderProduct["reference"];
+                                        }
+                                        ?>
+                                        <tr>
+                                            <td><?= $p_qty ?></td>
+                                            <td nowrap><?= $p["name"] ?></td>
+                                            <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                            <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
+
+                                        </tr>
+                                    </table>
+                                </li>
                                 <?
                             }
                             ?>
-                            <tr>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
-                            </tr>                   
-                            <tr>
-                                <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
-                            </tr>                   
-                            <tr>
-                                <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
-                            </tr>                   
-                            <tr>
-                                <td colspan="2">Poids. produits</td>
-                                <td nowrap><?= $poids_produits ?> Kg</td>
-                                <td colspan="2">Poids. restant</td>
-                                <td nowrap
-                                <?
-                                if ($truckLoad["poids_restant"] >= 100) {
-                                    echo 'class = "danger" ';
-                                }
-                                ?>
-                                    >
-                                    <?= $truckLoad["poids_restant"] ?> Kg
-                                </td>
-                            </tr> 
-                            <tr>
-                                <td colspan="9">
-                                    <div class="progress">
+                            <table class="col-md-6">
+                                <tr>
+                                    <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
+                                </tr>                   
+                                <tr>
+                                    <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
+                                </tr>                   
+                                <tr>
+                                    <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
+                                </tr>                   
+                                <tr>
+                                    <td colspan="2">Poids. produits</td>
+                                    <td nowrap><?= $poids_produits ?> Kg</td>
+                                    <td colspan="2">Poids. restant</td>
+                                    <td nowrap
+                                    <?
+                                    if ($truckLoad["poids_restant"] >= 100) {
+                                        echo 'class = "danger" ';
+                                    }
+                                    ?>
+                                        >
+                                        <?= $truckLoad["poids_restant"] ?> Kg
+                                    </td>
+                                </tr> 
+                                <tr>
+                                    <td colspan="9">
+                                        <div class="progress">
 
-                                        <?
-                                        if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
-                                            ?>
-                                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                            </div>
                                             <?
-                                        } else {
+                                            if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
+                                                ?>
+                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                </div>
+                                                <?
+                                            } else {
+                                                ?>
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                </div>
+                                                <?
+                                            }
                                             ?>
-                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                            </div>
-                                            <?
-                                        }
-                                        ?>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="9">
-                                    <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Valider</button>
-                                </td>
-                            </tr>
-                        </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="9">
+                                        <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Valider</button>
+                                    </td>
+                                </tr>
+                            </table>
                     </td>
                 </tr>
             </table>
+
         </form>
-        <?
-    }
-    ?>
+    </div>
     <?
 }
 ?>

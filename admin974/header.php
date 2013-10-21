@@ -3,6 +3,7 @@
 include ("config/av_conf.php");
 include ("./av_utilities.php");
 include ("./securite.php");
+setlocale (LC_ALL, 'fr-FR.utf8','fra'); 
 
 $_SERVER['REMOTE_USER'] = $_SESSION["email"];
 
@@ -36,6 +37,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <script src="js/jquery.chained.js"></script>
         <script>
             $(function() {
                 $("#datepicker").datepicker({
@@ -95,6 +97,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livraison <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a href="av_tournee.php?planning=<?= date("Y-m-d") ?>">La tournée</a></li>                                
+                                <li><a href="av_tournee_manifest.php">Manifest</a></li>                                
                             </ul>
                         </li>    
 

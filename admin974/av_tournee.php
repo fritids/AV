@@ -73,330 +73,352 @@ $zones = $db->get("av_zone");
 $suppliers = $db->get("av_supplier");
 ?>
 
-<form method="get">
-    <input type="hidden" id="planning" value="<?= @$_GET["planning"] ?>">
+<div class="container">
 
-    <table>
-        <tr>
-            <td>References</td>
-            <td>Zones</td>
-            <td>Founisseur </td>
-            <td>Date paiement</td>
-            <td>Date livraison</td>
 
-            <td>Produits affectés (O/N)</td>            
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                <input type="text" name="reference" value="<?= @$_GET["reference"] ?>" >
-            </td>
-            <td>
-                <select name="id_zone" class="pme-input-1">
-                    <option value="">--</option>
-                    <?
-                    foreach ($zones as $zone) {
-                        ?>
-                        <option value="<?= $zone["id_zone"] ?>" 
-                        <? if (isset($_GET["id_zone"]) && $_GET["id_zone"] == $zone["id_zone"]) echo "selected"; ?>  
-                                ><?= $zone["nom"] ?></option>
-                                <?
-                            }
+
+    <form method="get">
+        <input type="hidden" id="planning" value="<?= @$_GET["planning"] ?>">
+
+        <table>
+            <tr>
+                <td>References</td>
+                <td>Zones</td>
+                <td>Founisseur </td>
+                <td>Date paiement</td>
+                <td>Date tournée</td>
+                <td>Produits affectés (O/N)</td>            
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" name="reference" value="<?= @$_GET["reference"] ?>" >
+                </td>
+                <td>
+                    <select name="id_zone[]" class="pme-input-1" multiple="" >
+                        <?
+                        foreach ($zones as $zone) {
                             ?>
-                </select>
-            </td>
-            <td>
-                <select name="id_supplier" class="pme-input-1">
-                    <option value="">--</option>
-                    <?
-                    foreach ($suppliers as $supplier) {
-                        ?>
-                        <option value="<?= $supplier["id_supplier"] ?>" 
-                        <? if (isset($_GET["id_zone"]) && $_GET["id_supplier"] == $supplier["id_supplier"]) echo "selected"; ?>  
-                                ><?= $supplier["name"] ?></option>
-                                <?
-                            }
+                            <option value="<?= $zone["id_zone"] ?>" 
+                            <? if (isset($_GET["id_zone"]) && $_GET["id_zone"] == $zone["id_zone"]) echo "selected"; ?>  
+                                    ><?= $zone["nom"] ?></option>
+                                    <?
+                                }
+                                ?>
+                    </select>
+                </td>
+                <td>
+                    <select name="id_supplier" class="pme-input-1">
+                        <option value="">--</option>
+                        <?
+                        foreach ($suppliers as $supplier) {
                             ?>
-                </select>
-            </td>
-            <td><input type="text" id="datepicker" value="<?= @$_GET["invoice_date"] ?>" name="invoice_date"></td>
-            <td><input type="text" id="datepicker2" value="" name="planning"></td>
-            <td class="text-center">
-                <input type="checkbox" value="1" name="prod_affecte" <? if (isset($_GET["prod_affecte"])) echo "checked"; ?> /> 
-            </td>
-            <td><input type="submit" ></td>
-        </tr>
-    </table>
-</form>
+                            <option value="<?= $supplier["id_supplier"] ?>" 
+                            <? if (isset($_GET["id_zone"]) && $_GET["id_supplier"] == $supplier["id_supplier"]) echo "selected"; ?>  
+                                    ><?= $supplier["name"] ?></option>
+                                    <?
+                                }
+                                ?>
+                    </select>
+                </td>
+                <td><input type="text" id="datepicker" value="<?= @$_GET["invoice_date"] ?>" name="invoice_date"></td>
+                <td><input type="text" id="datepicker2" value="" name="planning"></td>
+                <td class="text-center">
+                    <input type="checkbox" value="1" name="prod_affecte" <? if (isset($_GET["prod_affecte"])) echo "checked"; ?> /> 
+                </td>
+                <td><input type="submit" ></td>
+            </tr>
+        </table>
+    </form>
 
 
 
-<h5>Critères :</h5>
-<?
-if (!empty($_GET["reference"]))
-    echo "<li> Reference =" . $_GET["reference"] . "</li>";
-if (!empty($_GET["planning"]))
-    echo "<li> date livraison =" . $_GET["planning"] . "</li>";
-if (!empty($_GET["invoice_date"]))
-    echo "<li> date facturation >=" . $_GET["invoice_date"] . "</li>";
-if (!empty($_GET["id_supplier"]))
-    echo "<li> Fournisseur =" . $_GET["id_supplier"] . "</li>";
-if (!empty($_GET["prod_affecte"]))
-    echo "<li> hors produits affectés </li>";
-if (!empty($_GET["id_zone"]))
-    echo "<li> Zone =" . $_GET["id_zone"] . "</li>";
+    <h5>Critères :</h5>
+    <?
+    if (!empty($_GET["reference"]))
+        echo "<li> Reference = " . $_GET["reference"] . "</li>";
+    if (!empty($_GET["planning"]))
+        echo "<li> date tournée = " . $_GET["planning"] . "</li>";
+    if (!empty($_GET["invoice_date"]))
+        echo "<li> date facturation >= " . $_GET["invoice_date"] . "</li>";
+    if (!empty($_GET["id_supplier"]))
+        echo "<li> Fournisseur = " . $_GET["id_supplier"] . "</li>";
+    if (!empty($_GET["prod_affecte"]))
+        echo "<li> hors produits affectés </li>";
+    if (!empty($_GET["id_zone"]))
+        echo "<li> Zone = " . implode(",", $_GET["id_zone"]) . "</li>";
 
 
-if (isset($_GET["planning"])) {
+    if (isset($_GET["planning"])) {
 
-    $date_livraison = $_GET["planning"];
+        $date_livraison = $_GET["planning"];
 
-
-    // on recupère les camions disponible sur la date choisi
-    $trucks = $db->rawQuery("select * from av_truck 
+        // on recupère les camions disponible sur la date choisi
+        $trucks = $db->rawQuery("select * from av_truck 
                           where id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($date_livraison));
 
 
-    $queryOrder = "select a.id_order, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
+        $queryOrder = "select a.id_order, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
                     round(sum(product_quantity * ( product_width * product_height * product_depth) / 1000000000),2) order_volume,
                     sum(product_quantity * product_weight) tot_weight
                     from av_orders a, av_order_detail b, av_address c
-                    where a.id_order = b.id_order
+                    where a.id_order = b.id_order                   
                     and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2 )
                     and a.id_address_delivery =  c.id_address ";
 
-    if (isset($_GET["id_zone"]) && !empty($_GET["id_zone"]))
-        $queryOrder .= " and  substr(c.postcode , 1 , 2) in (select id_departement from av_departements where id_zone = " . $_GET["id_zone"] . ")";
+        if (isset($_GET["id_zone"]) && !empty($_GET["id_zone"])) {
+            $z = implode(",", $_GET["id_zone"]);
+            $queryOrder .= " and  substr(c.postcode , 1 , 2) in (select id_departement from av_departements where id_zone in ( " . $z . ") )";
+        }
+        if (isset($_GET["id_supplier"]) && !empty($_GET["id_supplier"]))
+            $queryOrder .= " and id_supplier = " . $_GET["id_supplier"] . " ";
 
-    if (isset($_GET["id_supplier"]) && !empty($_GET["id_supplier"]))
-        $queryOrder .= " and id_supplier = " . $_GET["id_supplier"] . " ";
+        if (isset($_GET["invoice_date"]) && !empty($_GET["invoice_date"])) {
+            $queryOrder .= " and date(a.invoice_date) >= ? ";
+            $params[] = $_GET["invoice_date"];
+        }
+        if (isset($_GET["planning"]) && !empty($_GET["planning"])) {
+            $queryOrder .= " and ? >= date(b.supplier_date_delivery) ";
+            $params[] = $date_livraison;
+        }
 
-    if (isset($_GET["invoice_date"]) && !empty($_GET["invoice_date"])) {
-        $queryOrder .= " and date(a.invoice_date) >= ? ";
-        $params[] = $_GET["invoice_date"];
-    }
-    if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
-        $queryOrder .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
+        if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
+            $queryOrder .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
 
-    if (isset($_GET["reference"]) && !empty($_GET["reference"])) {
-        $queryOrder .= " and a.reference like ? ";
-        $params[] = "%" . $_GET["reference"] . "%";
-    }
-    $queryOrder .= "group by a.id_order, a.reference, a.id_customer, total_paid, a.invoice_date";
+        if (isset($_GET["reference"]) && !empty($_GET["reference"])) {
+            $queryOrder .= " and a.reference like ? ";
+            $params[] = "%" . $_GET["reference"] . "%";
+        }
+        $queryOrder .= "group by a.id_order, a.reference, a.id_customer, total_paid, a.invoice_date
+                        order by c.postcode asc";
 
-//    print_r($params);
-    $orders = $db->rawQuery($queryOrder, @$params);
-    ?>
+        $orders = $db->rawQuery($queryOrder, @$params);
+        ?>
 
-    <table >
-        <tr>
-            <td valign="top">
-                <table border="1" class="table-bordered">  
-                    <?
-                    foreach ($orders as $order) {
-                        $customer = getOrderUserDetail($order["id_customer"]);
-                        $adresse = getAdresse($customer["id_customer"], 'delivery');
-                        ?>
-                        <tr>
-                            <th nowrap class="alert alert-info" ><?= date("d/m", strtotime($order["invoice_date"])) ?></th>
-                            <th>
-                                <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>                                
-                            </th>
-                            <th><?= getDeliveryZone($order["postcode"]) ?></th>
-                            <th>
-                                <?
-                                $addrs = $adresse["address1"] . "<br>";
-                                if ($adresse["address2"])
-                                    $addrs .= $adresse["address2"] . "<br>";
-                                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-                                $addrs_link = str_replace(' ', '+', $addrs);
-                                $addrs_link = str_replace('<br>', '+', $addrs);
-                                ?>
-
-                                <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
-                                <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
-                            </th>        
-                            <th><?= $order["total_paid"] ?> €</th>        
-                            <th><?= $order["tot_weight"] ?> Kg</th>        
-                            <th colspan="3">Actions</th>        
-                        </tr>
+        <table >
+            <tr>
+                <td valign="top">
+                    <table border="1" class="table-bordered">  
                         <?
-                        $queryOrderDetail = "select a.id_order, b.*,
+                        foreach ($orders as $order) {
+                            if ($order)
+                                $customer = getOrderUserDetail($order["id_customer"]);
+                            $adresse = getAdresse($customer["id_customer"], 'delivery');
+                            ?>
+                            <tr>
+                                <th nowrap class="alert alert-info" ><?= date("d/m", strtotime($order["invoice_date"])) ?></th>
+                                <th>
+                                    <? /* <a href="av_order_detail.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>                                */ ?>
+                                    <a href="av_order_detail.php?o=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>    
+
+                                </th>
+                                <th><?= getDeliveryZone($order["postcode"]) ?></th>
+                                <th>
+                                    <?
+                                    $addrs = $adresse["address1"] . "<br>";
+                                    if ($adresse["address2"])
+                                        $addrs .= $adresse["address2"] . "<br>";
+                                    $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                                    $addrs_link = str_replace(' ', '+', $addrs);
+                                    $addrs_link = str_replace('<br>', '+', $addrs);
+                                    ?>
+
+                                    <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
+                                    <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
+                                </th>        
+                                <th><?= $order["total_paid"] ?> €</th>        
+                                <th><?= $order["tot_weight"] ?> Kg</th>        
+                                <th colspan="3">Actions</th>        
+                            </tr>
+                            <?
+                            $queryOrderDetail = "select a.id_order, b.*,
                                             product_quantity * product_weight tot_prod_weight
                                             from av_orders a, av_order_detail b
                                             where a.id_order = b.id_order                                            
                                             and b.id_order_detail not in(select id_order_detail from av_tournee where status = 2)
                                             and a.id_order = ?";
 
-                        if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
-                            $queryOrderDetail .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
 
-                        $listOrderProduct = $db->rawQuery($queryOrderDetail, array($order["id_order"]));
+                            $params = array($order["id_order"]);
 
-                        foreach ($listOrderProduct as $OrderProduct) {
-                            //$product_weight = $OrderProduct["product_quantity"] * round(($OrderProduct["product_width"] * $OrderProduct["product_height"] * $OrderProduct["product_depth"]) / 1000000000, 2);
-                            $mytruck = getProductTruck($OrderProduct["id_order_detail"], $date_livraison);
+                            if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
+                                $queryOrderDetail .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
+
+                            /*if (isset($_GET["planning"]) && !empty($_GET["planning"])) {
+                                $queryOrderDetail .= " and date(b.supplier_date_delivery) >= ? ";
+                                $params[] = $_GET["planning"];
+                            }*/
+
+                            if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
+                                $queryOrderDetail .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
+
+                            $listOrderProduct = $db->rawQuery($queryOrderDetail, $params);
+
+                            foreach ($listOrderProduct as $OrderProduct) {
+                                //$product_weight = $OrderProduct["product_quantity"] * round(($OrderProduct["product_width"] * $OrderProduct["product_height"] * $OrderProduct["product_depth"]) / 1000000000, 2);
+                                $mytruck = getProductTruck($OrderProduct["id_order_detail"], $date_livraison);
 
 
-                            $qte_remaining = $OrderProduct["product_quantity"] - $mytruck["nb_product_delivered"];
 
-                            $product_weight = $qte_remaining * $OrderProduct["product_weight"];
-                            ?>
-                            <tr id="<?= $OrderProduct["id_order_detail"] ?>">
-                                <td>&nbsp;</td>
-                                <td><?= $OrderProduct["id_order_detail"] ?></td>
-                                <td>
-                                    <?= $OrderProduct["product_quantity"] ?> x <?= $OrderProduct["product_name"] ?>
-                                    <?
-                                    if ($qte_remaining < $OrderProduct["product_quantity"]) {
-                                        ?>
-                                        <br/>qte restante : <?= $qte_remaining ?>
+                                $qte_remaining = $OrderProduct["product_quantity"] - $mytruck["nb_product_delivered"];
+
+                                $product_weight = $qte_remaining * $OrderProduct["product_weight"];
+                                ?>
+                                <tr id="<?= $OrderProduct["id_order_detail"] ?>" <? if ($OrderProduct["supplier_date_delivery"] == null) echo "class='alert alert-danger'" ?>>
+                                    <td>&nbsp;</td>
+                                    <td><?= $OrderProduct["id_order_detail"] ?></td>
+                                    <td>
+                                        <?= $OrderProduct["product_quantity"] ?> x <?= $OrderProduct["product_name"] ?>
                                         <?
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
-                                    <? if ($OrderProduct["supplier_date_delivery"] != "0000-00-00") echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?>
-                                </td>
-                                <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
-                                <td><?= $product_weight ?> kg</td>
-                                <td>
-                                    <?
-                                    if ($qte_remaining > 0) {
-                                        ?>
-
-                                        <select name="nb_<?= $OrderProduct["id_order_detail"] ?>" id="nb_<?= $OrderProduct["id_order_detail"] ?>" class="pme-input-1">
-                                            <?
-                                            for ($i = $qte_remaining; $i > 0; $i--) {
-                                                ?>
-                                                <option value="<?= $i ?>"><?= $i ?></option>                                           
-                                                <?
-                                            }
+                                        if ($qte_remaining < $OrderProduct["product_quantity"]) {
                                             ?>
-                                        </select>
-                                        <?
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <ul class = "list-inline">
-                                        <?
-                                        //on bloucle sur les camions
-                                        foreach ($trucks as $truck) {
-                                            $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
-                                            ?>
-                                            <li>
-                                                <?
-                                                if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"]) {
-                                                    ?>
-                                                    <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
-                                                    <?
-                                                } else {
-                                                    if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
-                                                        ?>
-                                                        <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
-                                                        <?
-                                                    } else {
-                                                        ?>
-                                                        <button name="addtruck"  class="btn btn-primary btn-sm btn " value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?> 
-                                                            <?
-                                                            if ($mytruck["date_livraison"]) {
-                                                                ?>
-                                                                <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
-                                                                <?
-                                                            }
-                                                            ?>
-                                                        </button>
-                                                        <?
-                                                    }
-                                                    if ($mytruck["date_livraison"] == $date_livraison) {
-                                                        if ($truckLoad["truck_weight_load"] >= TRUCK_OVER_LOAD) {
-                                                            ?>
-                                                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
-                                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                            </div>
-                                                            <?
-                                                        } else {
-                                                            ?>
-                                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
-                                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                            </div>
-                                                            <?
-                                                        }
-                                                    } else {
-                                                        $truckLoad = getTruckLoad(array($truck["id_truck"], $mytruck["date_livraison"]));
-
-                                                        if ($truckLoad["truck_weight_load"] >= TRUCK_OVER_LOAD) {
-                                                            ?>
-                                                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
-                                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                            </div>
-                                                            <?
-                                                        } else {
-                                                            ?>
-                                                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
-                                                                <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                            </div>
-                                                            <?
-                                                        }
-                                                    }
-                                                }
-                                                ?>
-                                            </li>
+                                            <br/>qte restante : <?= $qte_remaining ?>
                                             <?
                                         }
                                         ?>
-                                    </ul>
-                                </td>
-                                <td style="text-align: center">
-                                    <?
-                                    if (isset($mytruck)) {
-                                        ?>
-                                        <button name="delProduitTruck" value="<?= $OrderProduct["id_order_detail"] ?>" >
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </button>
+                                    </td>
+                                    <td>
+                                        <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
+                                        <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?>
+                                    </td>
+                                    <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                    <td><?= $product_weight ?> kg</td>
+                                    <td>
                                         <?
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                            <?
-                        }
-                    }
-                    ?>
-                </table>
-                <hr>
-            </td>
-            <td valign="top">
+                                        if ($qte_remaining > 0) {
+                                            ?>
 
-                <?
-                if ($orders) {
-// on recupère les camions
-                    foreach ($trucks as $truck) {
-
-                        $nb_produits = 0;
-                        $montant_produits = 0;
-                        $poids_produits = 0;
-                        $montant_transport = 0;
-                        $volume_produit = 0;
-                        $tmpRef = "";
-                        $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
-                        ?>
-                        <table>
-                            <tr>
-                                <td valign="top">
-                                    <table  class="table-bordered">
-                                        <tr>
-                                            <th><?= $truck["id_truck"] ?></th>                
-                                            <th><?= $truck["imma"] ?></th>
-                                            <th><?= $truck["name"] ?></th>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="4">
+                                            <select name="nb_<?= $OrderProduct["id_order_detail"] ?>" id="nb_<?= $OrderProduct["id_order_detail"] ?>" class="pme-input-1">
                                                 <?
-                                                // on recupère les produits affectés au camion
-                                                $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, id_product, b.*, c.*
+                                                for ($i = $qte_remaining; $i > 0; $i--) {
+                                                    ?>
+                                                    <option value="<?= $i ?>"><?= $i ?></option>                                           
+                                                    <?
+                                                }
+                                                ?>
+                                            </select>
+                                            <?
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <ul class = "list-inline">
+                                            <?
+                                            //on bloucle sur les camions
+                                            foreach ($trucks as $truck) {
+                                                $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
+                                                ?>
+                                                <li>
+                                                    <?
+                                                    if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"]) {
+                                                        ?>
+                                                        <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
+                                                        <?
+                                                    } else {
+                                                        if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
+                                                            ?>
+                                                            <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
+                                                            <?
+                                                        } else {
+                                                            ?>
+                                                            <button name="addtruck"  class="btn btn-primary btn-sm btn " value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?> 
+                                                                <?
+                                                                if ($mytruck["date_livraison"]) {
+                                                                    ?>
+                                                                    <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
+                                                                    <?
+                                                                }
+                                                                ?>
+                                                            </button>
+                                                            <?
+                                                        }
+                                                        if ($mytruck["date_livraison"] == $date_livraison) {
+                                                            if ($truckLoad["truck_weight_load"] >= TRUCK_OVER_LOAD) {
+                                                                ?>
+                                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
+                                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                </div>
+                                                                <?
+                                                            } else {
+                                                                ?>
+                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
+                                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                </div>
+                                                                <?
+                                                            }
+                                                        } else {
+                                                            $truckLoad = getTruckLoad(array($truck["id_truck"], $mytruck["date_livraison"]));
+
+                                                            if ($truckLoad["truck_weight_load"] >= TRUCK_OVER_LOAD) {
+                                                                ?>
+                                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
+                                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                </div>
+                                                                <?
+                                                            } else {
+                                                                ?>
+                                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%; height: 2px; margin-top: 2px; float: none;">
+                                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                </div>
+                                                                <?
+                                                            }
+                                                        }
+                                                    }
+                                                    ?>
+                                                </li>
+                                                <?
+                                            }
+                                            ?>
+                                        </ul>
+                                    </td>
+                                    <td style="text-align: center">
+                                        <?
+                                        if (isset($mytruck)) {
+                                            ?>
+                                            <button name="delProduitTruck" value="<?= $OrderProduct["id_order_detail"] ?>" >
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                            <?
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <?
+                            }
+                        }
+                        ?>
+                    </table>
+                    <hr>
+                </td>
+                <td valign="top">
+
+                    <?
+                    if ($orders) {
+// on recupère les camions
+                        foreach ($trucks as $truck) {
+
+                            $nb_produits = 0;
+                            $montant_produits = 0;
+                            $poids_produits = 0;
+                            $montant_transport = 0;
+                            $volume_produit = 0;
+                            $tmpRef = "";
+                            $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
+                            ?>
+                            <table>
+                                <tr>
+                                    <td valign="top">
+                                        <table  class="table-bordered">
+                                            <tr>
+                                                <th><?= $truck["id_truck"] ?></th>                
+                                                <th><?= $truck["imma"] ?></th>
+                                                <th><?= $truck["name"] ?></th>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <?
+                                                    // on recupère les produits affectés au camion
+                                                    $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, id_product, b.*, c.*
                                                                     from av_orders a, av_order_detail b , av_tournee c
                                                                     where a.id_order = b.id_order
                                                                     and b.id_order_detail = c.id_order_detail 
@@ -404,128 +426,128 @@ if (isset($_GET["planning"])) {
                                                                     and c.date_livraison = ?                                                                     
                                                                     order by a.id_order
                                                                     ", array($truck["id_truck"], $date_livraison))
-                                                ?>
-                                                <table class="table-condensed">
-                                                    <tr>
-                                                        <td>Qty</td>
-                                                        <td>Nom</td>
-                                                        <td>Dimension</td>
-                                                        <td>Poids</td>
-                                                    </tr>
-                                                    <?
-                                                    //on boucle sur les produits
-                                                    foreach ($listOrderProduct as $OrderProduct) {
-                                                        $p = getProductInfos($OrderProduct["id_product"]);
-
-                                                        $p_qty = $OrderProduct["nb_product_delivered"];
-
-                                                        $montant_produits += $OrderProduct["product_price"];
-                                                        $nb_produits += $OrderProduct["nb_product_delivered"];
-                                                        $poids_produits += $p_qty * $OrderProduct["product_weight"];
-                                                        $montant_transport += $OrderProduct["product_shipping"];
-
-                                                        if ($tmpRef != $OrderProduct["reference"]) {
-                                                            ?>
-                                                            <tr>
-                                                                <td>&nbsp;</td>
-                                                                <th colspan="4">
-                                                                    <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a>
-                                                                </th>
-                                                            </tr>
-                                                            <?
-                                                            $tmpRef = $OrderProduct["reference"];
-                                                        }
-                                                        ?>
+                                                    ?>
+                                                    <table class="table-condensed">
                                                         <tr>
-                                                            <td><?= $p_qty ?></td>
-                                                            <td nowrap><?= $p["name"] ?></td>
-                                                            <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
-                                                            <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                        
-                                                            <td>
-                                                                <button name="delProduitTruck" value="<?= $OrderProduct["id_order_detail"] ?>" ><span class="glyphicon glyphicon-remove"></span></button>
-                                                            </td>                                        
+                                                            <td>Qty</td>
+                                                            <td>Nom</td>
+                                                            <td>Dimension</td>
+                                                            <td>Poids</td>
                                                         </tr>
                                                         <?
-                                                    }
-                                                    ?>
-                                                    <tr>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
-                                                    </tr>                   
-                                                    <tr>
-                                                        <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
-                                                    </tr>                   
-                                                    <tr>
-                                                        <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
-                                                    </tr>                   
-                                                    <tr>
-                                                        <td colspan="2">Poids. produits</td>
-                                                        <td nowrap><?= $poids_produits ?> Kg</td>
-                                                        <td colspan="2">Poids. restant</td>
-                                                        <td nowrap
-                                                        <?
-                                                        if ($truckLoad["poids_restant"] >= 100) {
-                                                            echo 'class="danger"';
+                                                        //on boucle sur les produits
+                                                        foreach ($listOrderProduct as $OrderProduct) {
+                                                            $p = getProductInfos($OrderProduct["id_product"]);
+
+                                                            $p_qty = $OrderProduct["nb_product_delivered"];
+
+                                                            $montant_produits += $OrderProduct["product_price"];
+                                                            $nb_produits += $OrderProduct["nb_product_delivered"];
+                                                            $poids_produits += $p_qty * $OrderProduct["product_weight"];
+                                                            $montant_transport += $OrderProduct["product_shipping"];
+
+                                                            if ($tmpRef != $OrderProduct["reference"]) {
+                                                                ?>
+                                                                <tr>
+                                                                    <td>&nbsp;</td>
+                                                                    <th colspan="4">
+                                                                        <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a>
+                                                                    </th>
+                                                                </tr>
+                                                                <?
+                                                                $tmpRef = $OrderProduct["reference"];
+                                                            }
+                                                            ?>
+                                                            <tr>
+                                                                <td><?= $p_qty ?></td>
+                                                                <td nowrap><?= $p["name"] ?></td>
+                                                                <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                                                <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                        
+                                                                <td>
+                                                                    <button name="delProduitTruck" value="<?= $OrderProduct["id_order_detail"] ?>" ><span class="glyphicon glyphicon-remove"></span></button>
+                                                                </td>                                        
+                                                            </tr>
+                                                            <?
                                                         }
                                                         ?>
-                                                            >
-                                                            <?= $truckLoad["poids_restant"] ?> Kg
-                                                        </td>
-                                                    </tr> 
-                                                    <tr>
-                                                        <td colspan="6">
-                                                            <div class="progress">
-
-                                                                <?
-                                                                if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
-                                                                    ?>
-                                                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                                        <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                                    </div>
-                                                                    <?
-                                                                } else {
-                                                                    ?>
-                                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                                        <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                                    </div>
-                                                                    <?
-                                                                }
-                                                                ?>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <?
-                                                    if ($truckLoad["truck_weight_load"] > 0) {
-                                                        ?>
+                                                        <tr>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
+                                                        </tr>                   
+                                                        <tr>
+                                                            <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
+                                                        </tr>                   
+                                                        <tr>
+                                                            <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
+                                                        </tr>                   
+                                                        <tr>
+                                                            <td colspan="2">Poids. produits</td>
+                                                            <td nowrap><?= $poids_produits ?> Kg</td>
+                                                            <td colspan="2">Poids. restant</td>
+                                                            <td nowrap
+                                                            <?
+                                                            if ($truckLoad["poids_restant"] >= 100) {
+                                                                echo 'class="danger"';
+                                                            }
+                                                            ?>
+                                                                >
+                                                                <?= $truckLoad["poids_restant"] ?> Kg
+                                                            </td>
+                                                        </tr> 
                                                         <tr>
                                                             <td colspan="6">
+                                                                <div class="progress">
 
-                                                                <a href ="av_truck_preview.php?id_truck=<?= $truck["id_truck"] ?>&planning=<?= $_GET["planning"] ?>" class="btn btn-warning btn-lg btn-block">Aperçu</a>
+                                                                    <?
+                                                                    if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
+                                                                        ?>
+                                                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                                            <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                        </div>
+                                                                        <?
+                                                                    } else {
+                                                                        ?>
+                                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                                            <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                                        </div>
+                                                                        <?
+                                                                    }
+                                                                    ?>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                         <?
-                                                    }
-                                                    ?>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                        <hr>
-                        <?
+                                                        if ($truckLoad["truck_weight_load"] > 0) {
+                                                            ?>
+                                                            <tr>
+                                                                <td colspan="6">
+
+                                                                    <a href ="av_truck_preview.php?id_truck=<?= $truck["id_truck"] ?>&planning=<?= $_GET["planning"] ?>" class="btn btn-warning btn-lg btn-block">Aperçu</a>
+                                                                </td>
+                                                            </tr>
+                                                            <?
+                                                        }
+                                                        ?>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <hr>
+                            <?
+                        }
                     }
-                }
-                ?>
+                    ?>
 
-            </td>
-        </tr>
+                </td>
+            </tr>
 
-    </table>
-
+        </table>
+    </div>
     <?
 }
 ?>
