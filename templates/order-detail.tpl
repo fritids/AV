@@ -19,7 +19,7 @@
     {foreach key=key item=detail from=$orderDetails}
         <b>id_order_detail	        </b> : {$detail.id_order_detail}
         <b>id_order	                </b> : {$detail.id_order}
-        <b>product_id	            </b> : {$detail.product_id}
+        <b>product_id	            </b> : {$detail.id_product}
         <b>product_name	            </b> : {$detail.product_name}
         <b>product_quantity	        </b> : {$detail.product_quantity}
         <b>product_price	        </b> : {$detail.product_price}

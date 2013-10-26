@@ -29,11 +29,20 @@ switch ($page) {
         break;
     case "produit":
         $titre = 'Allovitre';
-		$meta_description = 'description meta';
+        $meta_description = 'description meta';
         $fil_ariane = '<a href="/">ACCUEIL</a> >';
+        break; 
+    case "mesdevis":
+        $titre = 'Allovitre';
+		$meta_description = 'description meta';
+        $fil_ariane = '<a href="/">ACCUEIL</a> > COMPTE PERSONNEL > ';
+        break;
+    case "moncompte":
+        $titre = 'Allovitre';
+		$meta_description = 'description meta';
+        $fil_ariane = '<a href="/">ACCUEIL</a> > COMPTE PERSONNEL > ';
         break;
 }
 if(file_exists('pages/'.$page.'.php'))
     include('pages/'.$page.'.php');
-include('footer.php');
 ?>

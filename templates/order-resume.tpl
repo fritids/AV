@@ -1,40 +1,113 @@
 {*duplication de code a revoir*}
+<div id="recapitulatif">
+    <p><img src="img/recapitulatif.png" alt=""></p>
 
-<div class="bloc-titre">Panier</div>
-<div class="bloc-bas" style="min-height:400px">
-    {foreach key=key item=product from=$cart}
-        <li style="display: block">{$product.id} 
-            name={$product.name} 
-            quantity= {$product.quantity} 
-            price = {$product.price}
-            shipping amount = {$product.shipping}
-            {if isset($product.options)}
-                <ul>
-                    {foreach key=key item=option from=$product.options}
-                        <li > 
-                            id_option = {$option.o_id} 
-                            option_name = {$option.o_name} 
-                            option_qte={$option.o_quantity} 
-                            option_price={$option.o_price} 
-                            option_shipping_amount={$option.o_shipping} 
-                        </li>
-                    {/foreach}   
-                </ul>
-            {/if}
-            <form action="?cart" method="post">
-                <input type="hidden" name="id_product" value="{$product.id}">
-                <input type="hidden" name="quantity" value="{$product.quantity}">
-                <input type="hidden" name="del">
-                <input type="submit" value="Retirer" >
-            </form> 
-        </li> 
-    {/foreach}
-    {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-        {$PAYPAL_CHECKOUT_FORM}
-        {$PAYPAL_CHECKOUT_FORM_TEST}
-    {else}
-        {include file="form_user_account.tpl"}
-    {/if}
+    <div class="infos clearfix">
+        <div class="block adr_fact">
+            <h3>adresse de facturation</h3>
+            <div class="content">
+                {$smarty.session.user.firstname} {$smarty.session.user.lastname} <br>
+                {$smarty.session.user.invoice.address1} <br>
+                {$smarty.session.user.invoice.address2} <br>                    
+                {$smarty.session.user.invoice.postcode} {$smarty.session.user.invoice.city}<br>
+                {$smarty.session.user.invoice.country}
 
+            </div>			
+
+        </div>
+        <div class="block adr_liv">
+            <h3>adresse de livraison</h3>
+            <div class="content">
+                {$smarty.session.user.firstname} {$smarty.session.user.lastname} <br>
+                {$smarty.session.user.delivery.address1} <br>
+                {$smarty.session.user.delivery.address2} <br>                    
+                {$smarty.session.user.delivery.postcode} {$smarty.session.user.delivery.city}<br>
+                {$smarty.session.user.delivery.country}
+            </div>
+
+        </div>
+        <div class="block mode_trans">
+            <h3>mode de transport</h3>
+            <div class="content">
+                <img src="img/transporteur-allovitres.png" alt="">
+            </div>            
+        </div>
+    </div>
+    <p class="clearfix">&nbsp;</p>
+    {assign var='option_price' value='0'}
+    <table class="produits">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th><span>Désignation Produit</span></th>
+                <th><span>Dimensions</span></th>
+                <th><span>Prix unitaire ttc</span></th>
+                <th><span>Quantité</span></th>
+                <th><span>Prix total ttc</span></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {foreach key=key item=product from=$cart name=cart}
+                {$option_price=0}
+                <tr>
+                    <td><img src="img/recap-prod.png" alt=""></td>
+                    <td class="designation_prd">
+                        <a href="">{$product.name} 
+                            {if isset($product.options)}
+                                option : 
+                                {foreach key=key item=option from=$product.options}
+                                    {$option_price =  $option_price+$option.o_price}
+                                {/foreach}   
+                            {/if}
+
+                        </a>
+                    </td>
+                    <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
+                    <td class="prix_unit">{$product.price} €</td>
+                    <td class="quantite">{$product.quantity}</td>
+                    <td class="total">
+                        {if $option_price !=0}
+                            {$product.quantity*$product.price*$product.surface+$option_price} 
+                        {else}
+                            {$product.quantity*$product.price*$product.surface} 
+                        {/if}
+                        €</td>
+                </tr>
+            {/foreach}               
+        </tbody>
+    </table>
+
+    <div class="promo clearfix">
+        <p class="total">Total produits : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
+    </div>
+    <div class="promo clearfix">
+        <p class="total">Frais de port: <span class="prix">{$smarty.session.cart_summary.total_shipping}€</span></p>
+    </div>
+    <div class="promo clearfix">
+        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount}€</span></p>
+    </div>
+
+
+    <div class="promo clearfix">
+        <p><span class="code_promo_label">Vous bénéficiez d’un code promotionnel :</span> <input type="text" name="" id="code_promo"><input type="button" id="ok" value="OK"></p>
+
+    </div>
+
+    <p>
+        <input type="button" value="" class="precedent">
+
+        <span style="float: right;">
+            <input type="checkbox" name="" id="" required="true">J’ai lu et j’accepte <a href="#">les conditions générales de vente</a>.
+            <input type="button" value="" class="valider-porsuivre">
+        </span>
+    </p>
 </div>
 
+
+{if isset($smarty.session.is_logged) && $smarty.session.is_logged}
+    {$PAYPAL_CHECKOUT_FORM}
+    {$PAYPAL_CHECKOUT_FORM_TEST}
+{else}
+    {include file="form_user_account.tpl"}
+{/if}

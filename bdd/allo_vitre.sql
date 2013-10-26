@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
 CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `id_order_detail` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_order` int(10) unsigned NOT NULL,
-  `product_id` int(10) unsigned NOT NULL,
+  `id_product` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned NOT NULL,
   `product_current_state` int(10) unsigned NOT NULL,
   `product_name` varchar(255) NOT NULL,

@@ -34,10 +34,11 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
             });
         </script>
         <!-- /tinyMCE -->
-        <script src="js/jquery.js"></script>
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-        <script src="js/jquery.chained.js"></script>
+        <script src="js/jquery.chained.js"></script>        
+        <script type="text/javascript" src="js/jquery.autocomplete.js"></script>
         <script>
             $(function() {
                 $("#datepicker").datepicker({
@@ -53,7 +54,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 });
                 $("#datepicker2").datepicker("option", "dateFormat", "yy-mm-dd");
 
-                $('#datepicker2').val("<?= $_GET["planning"] ?>");
+                $('#datepicker2').val("<?= @$_GET["planning"] ?>");
                 $('#datepicker').val("<?= @$_GET["invoice_date"] ?>");
             });
         </script>
@@ -72,6 +73,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="#">ADMIN</a>
+                    
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -119,6 +121,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         </li>                        
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
+                        <li><a href="av_devis.php" >Saisir un devis</a></li>                        
                         <li><a href="logout.php">Deconnexion</a></li>                        
                     </ul>
                 </div><!--/.nav-collapse -->

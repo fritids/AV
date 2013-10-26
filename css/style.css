@@ -19,6 +19,10 @@
 	color: #ff0018;
 }
 
+.orange{
+	color: #ff8d06;
+}
+
 .page_titre{
 	background: #539cf1;
 	border: solid 1px #000;
@@ -337,14 +341,8 @@
 	width: 100px;
 	color: #000;
 	border: solid 1px #000;
-}
 
-#produit #features .features .number{
-	width: 100px;
-	color: #000;
-	border: solid 1px #000;
 }
-
 
 #produit #features .features .submit{
     background: #000000;
@@ -593,3 +591,441 @@
 	color: #539cf1
 }
 /*-------------------------------*/
+
+
+/*----------Mes Devis------------*/
+#mesdevis h3#titre{
+	background: url(../img/mes-devis.png) no-repeat center center;
+	height: 37px;
+	width: 960px;
+	text-indent: -999px;
+}
+
+#mesdevis table,#mesdevis td{
+	border-collapse: collapse;
+	text-align: center;	
+}
+#mesdevis table{
+	width: 100%
+}
+
+#mesdevis table th{
+	background: #e4e4e4;
+	height: 45px;
+}
+
+#mesdevis table th.first{
+	border-radius: 35px 0px 0px 0px;
+}
+#mesdevis table th.last{
+	border-radius: 0px 35px 0px 0px;
+}
+
+#mesdevis table td{
+	border: solid 1px #a2a2a2;	
+}
+
+#mesdevis table td.numero{
+	font-weight: bold;
+}
+
+#mesdevis table td.numero span{
+	color: #1b7dec;
+}
+
+#mesdevis table td.numero,
+#mesdevis table td.client{
+	font-style: italic;
+}
+#mesdevis table td.action{
+	width: 280px;
+}
+
+#mesdevis table td.action a {
+    color: #1B7DEC;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    width: 80px;
+}
+
+
+#mesdevis table td.action a img {
+    display: block;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+#mesdevis table td.commander .valide{
+	color: #1B7DEC;
+	background: url(../img/devis-ok.png) no-repeat left center;
+	display: inline-block;
+	padding-left: 25px;
+	line-height: 20px;
+}
+
+#mesdevis table td.commander .jevalide{
+	text-indent: -9999px;
+	display: inline-block;
+	width: 192px;
+	height: 33px;
+	background: url(../img/je-valide-ce-devis.png) no-repeat center center;
+}
+
+/*-------------------------------*/
+
+
+/*--------Mon Compte--------------*/
+
+#moncompte h3#titre{
+	background: url(../img/mon-compte.png) no-repeat center center;
+	height: 37px;
+	width: 960px;
+	text-indent: -999px;
+}
+
+
+#moncompte .blocks .block{
+	float: left;
+	width: 284px;
+	height: 153px;
+	background: url(../img/compte-block-bg.png) no-repeat center center;
+	margin: 0 10px 10px 0;
+	padding: 15px;
+}
+
+#moncompte .blocks .block h3{
+	font-weight: bold;
+	font-size: 14px;
+	color: #1b7dec;
+    height: 35px;
+    line-height: 35px;
+    margin: 0;
+    padding-left: 40px;
+}
+#moncompte .blocks .block p{
+	font-size: 14px;
+	font-weight: 400;
+}
+
+#moncompte .blocks .block.avoirs h3{background: url(../img/mesavoirs.png) no-repeat left center;}
+#moncompte .blocks .block.devis h3{background: url(../img/mesdevis.png) no-repeat left center;}
+#moncompte .blocks .block.commandes h3{background: url(../img/histo-commandes.png) no-repeat left center;}
+#moncompte .blocks .block.infos h3{background: url(../img/infos-perso.png) no-repeat left center;}
+#moncompte .blocks .block.adresses h3{background: url(../img/mes-adresse.png) no-repeat left center;}
+#moncompte .blocks .block.parrainage h3{background: url(../img/parrainage.png) no-repeat left center;}
+
+#moncompte .blocks .block.devis .notif{
+	color: #fff;
+	background: #f51313;
+	padding: 5px 12px;
+	border-radius: 12px; 
+}
+/*-------------------------------*/
+
+
+/*----------Recapitualtif---------*/
+#recapitulatif .infos{
+	display: table-row;
+}
+
+
+#recapitulatif .infos .block {
+    border: 1px solid #A2A2A2;
+    border-collapse: collapse;
+    display: table-cell;
+    width: 33%;
+}
+
+
+#recapitulatif .infos .block.adr_fact {
+    border-radius: 10px 0 0 10px;
+}
+
+#recapitulatif .infos .block.adr_fact h3{
+    border-radius: 10px 0 0 0;
+
+}
+#recapitulatif .infos .block.mode_trans {
+    border-radius: 0 10px 10px 0;
+}
+
+#recapitulatif .infos .block.mode_trans h3{
+    border-radius: 0 10px 0  0;
+
+}
+
+#recapitulatif .infos .block .content {
+	color: #1b7dec;
+}
+
+#recapitulatif .infos .block h3 {
+    background: #F1F2F3;
+    border-bottom: 1px solid #A2A2A2;
+    color: #000000;
+    margin: 0;
+    padding: 15px 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#recapitulatif .infos .block a.update {
+    background-color: #FE6600;
+    border-radius: 10px 10px 10px 10px;
+    color: #FFFFFF;
+    display: block;
+    margin: 5px auto;
+    padding: 1px 20px;
+    text-align: center;
+    text-decoration: none;
+    width: 60px;
+}
+
+#recapitulatif .precedent{
+	background: url(../img/precedent.png) no-repeat center center;
+	border: none;
+	width: 106px;
+	height: 31px;
+}
+
+#recapitulatif .valider-porsuivre{
+	background: url(../img/valider-et-poursuivre.png) no-repeat center center;
+	border: none;
+	width: 192px;
+	height: 33px;
+}
+
+#recapitulatif .produits,
+#monpanier .produits
+{
+	width: 100%;
+}
+
+#recapitulatif .produits,
+#monpanier .produits,
+#recapitulatif .produits td,
+#monpanier .produits td
+{
+	border-collapse: collapse;
+}
+
+#recapitulatif .produits thead,
+#monpanier .produits thead
+{
+	background: url(../img/recap-table-head.png) repeat-x;
+	height: 41px;
+}
+#recapitulatif .produits th{
+	vertical-align: top;
+}
+
+#recapitulatif .produits th span,
+#monpanier .produits th span
+{
+	background: url(../img/recap-recta.png) no-repeat center bottom;
+	font-weight: normal;
+	font-size: 12px;
+	padding-bottom: 9px;
+}
+
+#recapitulatif .produits tbody tr,
+#monpanier .produits tbody tr
+{
+	border-bottom: solid 1px #bcbdbe;
+}
+
+#recapitulatif .produits td,
+#monpanier .produits td
+{
+	text-align: center;
+	padding-bottom: 5px;
+}
+
+#recapitulatif .produits td a,
+#monpanier .produits td a
+{
+	text-decoration: none;
+}
+
+#recapitulatif .produits td.designation_prd{
+	text-align: left;
+}
+
+#recapitulatif .produits td.total{
+	font-weight: bold;
+}
+
+#recapitulatif .promo {
+    background: #F1F2F3;
+    padding: 15px;
+}
+
+
+#recapitulatif .promo #code_promo {
+    width: 450px;
+    border: solid 1px #000;
+}
+#recapitulatif .promo #ok {
+    background: none repeat scroll 0 0 #FE6600;
+    border: medium none;
+    border-radius: 5px 5px 5px 5px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-left: 20px;
+    padding: 5px 15px;
+}
+#recapitulatif .promo .code_promo_label {
+    background: url(../img/icon-promo.png) no-repeat left center;
+    padding-left: 12px;
+}
+#recapitulatif .promo .total{
+	float: right;
+	font-weight: bold;
+}
+
+#recapitulatif .promo .prix,
+#monpanier .promo .prix
+{
+	color: #dd8303;
+	box-shadow: 1px;
+	text-shadow: 5px 5px 2px #ccc;
+}
+/*-------------------------------*/
+
+/*----------Mon panier-----------*/
+#monpanier .produits .quantite .qte{
+	width: 15px;
+}
+
+#monpanier .produits .quantite .plus,
+#monpanier .produits .quantite .moins
+{
+	width: 15px;
+	height: 16px;
+	display: inline-block;
+}
+
+#monpanier .produits .quantite .moins{
+	background: url(../img/icon-moins.png) no-repeat;
+}
+#monpanier .produits .quantite .plus{
+	background: url(../img/icon-plus.png) no-repeat;
+}
+
+#monpanier .promo{
+	background-color: #F1F2F3;
+}
+
+#monpanier .promo .total{
+	float: right;
+	padding-right: 20px;
+	font-weight: bold;	
+}
+
+/*-------------------------------*/
+
+/*-------Livraison et pose--------*/
+#livraison-pose .options{
+	display: table-row;
+}
+
+#livraison-pose .options .option3{
+	width: 30%;
+	display: table-cell;
+	border: solid 1px #ccc;
+}
+#livraison-pose .options p{
+	margin: 0;
+	border-bottom: solid 1px #ccc;
+	padding-left: 10px;
+}
+
+#livraison-pose .options label,
+#livraison-pose .options input{
+	padding: 10px;
+	display: inline-block;
+}
+#livraison-pose .options span.bd{
+    background: #CCCCCC;
+    display: inline-block;
+    height: 100%;
+    padding: 10px 0;
+    margin-left: 10px;
+    width: 1px;
+}
+#livraison-pose .options img{
+	display: block;
+	margin: 0 auto;
+}
+
+
+#livraison-pose .un,
+#livraison-pose .deu
+{
+	padding-left: 45px;
+	line-height: 30px;
+
+}
+
+#livraison-pose .un span.orange,
+#livraison-pose .deu span.orange
+{
+	font-weight: bold;
+}
+
+#livraison-pose .un{
+	background: url(../img/1.png) no-repeat left center;
+}
+
+#livraison-pose .deu{
+	background: url(../img/2.png) no-repeat left center;
+}
+
+#livraison-pose .options2 {
+	float: left;
+	width: 100%;
+}
+
+#livraison-pose .options2 .option{
+ 	border: 1px solid #CCCCCC;
+    display: inline-block;
+    float: left;
+    width: 45%;
+}
+
+#livraison-pose .options2 .ou{
+	width: 8%;
+	text-align: center;
+	border: none;
+}
+
+#livraison-pose .options2 .input{
+	float: left;
+	width: 5%;
+}
+
+#livraison-pose .options2 .text{
+	float: left;
+	width: 95%;
+}
+
+#livraison-pose .options2 .label{
+    background-color: #EFEFEF;
+	display: block;
+    padding: 10px 0 10px 5px;
+}
+
+#livraison-pose textarea{
+	width: 100%;
+	height: 170px;
+}
+#livraison-pose .submit{
+	border: none;
+	background: url(../img/valider-et-continuer.png) no-repeat;
+	width: 251px;
+	height: 38px;
+	float: right;
+}
+/*-------------------------------*/
+
+

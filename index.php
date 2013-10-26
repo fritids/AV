@@ -113,18 +113,28 @@ if (isset($_GET["p"])) {
 if (isset($_GET["register"]))
     $page = "register";
 
-if (isset($_GET["cart"]))
+if (isset($_GET["cart"])){
     $page = "cart";
-
-if (isset($_GET["my-account"]))
+    $page_type = "full";    
+}
+if (isset($_GET["my-account"])){
     $page = "my-account";
-
+    $page_type = "full";    
+}
 if (isset($_GET["identification"]))
     $page = "identification";
 
 if (isset($_GET["cms"])) {
     $page = "cms";
     $cms = getCmsInfo($_GET["id"]);
+    $page_type = "full";    
+}
+if (isset($_GET["delivery"])) {
+    $page = "delivery";
+    $page_type = "full";    
+}
+if (isset($_GET["devis"])) {
+    $page = "devis";
     $page_type = "full";    
 }
 
@@ -140,7 +150,12 @@ $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
-
+    $page_type = "full";    
+    
+    if (isset($_POST["order_comment"])) {
+        $_SESSION["cart_summary"]["order_comment"] = $_POST["order_comment"];
+        
+    }
     $settings = array(
         'business' => $paypal["email_account"], //paypal email address
         'currency' => 'EUR', //paypal currency
@@ -292,6 +307,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         "delivery_date" => date("Y-m-d h:i:s"),
         "date_add" => date("Y-m-d h:i:s"),
         "date_upd" => date("Y-m-d h:i:s"),
+        "order_comment" => $_SESSION["cart_summary"]["order_comment"],
     );
 
     $oid = $db->insert("av_orders", $order_summary);
@@ -302,7 +318,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         
         $order_detail = array(
             "id_order" => $oid,
-            "product_id" => $item["id"],
+            "id_product" => $item["id"],
             "product_name" => $item["name"],
             "product_quantity" => $item["quantity"],
             "product_price" => $item["price"],

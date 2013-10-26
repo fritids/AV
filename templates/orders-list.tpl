@@ -19,7 +19,7 @@
 
         {assign var="total_amount" value=0}
         {foreach key=key item=detail from=$order.details}
-            <b>product_id	            </b> : {$detail.product_id}<br>
+            <b>product_id	            </b> : {$detail.id_product}<br>
             <b>product_name	            </b> : {$detail.product_name}<br>
             <b>product_quantity	        </b> : {$detail.product_quantity}<br>
             <b>product_price	        </b> : {$detail.product_price}<br>
