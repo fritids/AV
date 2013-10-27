@@ -1,8 +1,9 @@
 <?php
 
-$q = strtolower($_GET["q"]);
+$q = strtolower($_REQUEST['term']);
 if (!$q)
     return;
+
 $items = array(
     "Great <em>Bittern</em>" => "Botaurus stellaris",
     "Little <em>Grebe</em>" => "Tachybaptus ruficollis",
@@ -572,7 +573,11 @@ $items = array(
 
 foreach ($items as $key => $value) {
     if (strpos(strtolower($key), $q) !== false) {
-        echo "$key|$value\n";
+        //echo "$key|$value\n";
+        $results[] = array("label" => $value);
     }
 }
+
+echo json_encode($results);
+
 ?>

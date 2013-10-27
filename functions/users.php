@@ -67,9 +67,9 @@ function checkUserLogin($email, $pwd) {
     }
 }
 
-function getUserDetail($id) {
+function getCustomerDetail($id) {
     global $db;
-    $r = $db->where("id_address", $id)
+    $r = $db->where("id_customer", $id)
             ->get("av_customer");
 
     return $r[0];

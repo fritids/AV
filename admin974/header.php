@@ -34,11 +34,11 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
             });
         </script>
         <!-- /tinyMCE -->
-        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>        
         <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
         <script src="js/jquery.chained.js"></script>        
-        <script type="text/javascript" src="js/jquery.autocomplete.js"></script>
+        <script src="js/bootstrap.min.js"></script>
         <script>
             $(function() {
                 $("#datepicker").datepicker({

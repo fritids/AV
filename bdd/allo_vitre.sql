@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
   `delivery_date` datetime NOT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
+  `order_comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_order`),
   KEY `id_customer` (`id_customer`),
   KEY `id_address_delivery` (`id_address_delivery`),
@@ -114,23 +115,84 @@ CREATE TABLE IF NOT EXISTS `av_orders` (
 CREATE TABLE IF NOT EXISTS `av_order_detail` (
   `id_order_detail` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `id_order` int(10) unsigned NOT NULL,
+  `id_supplier` int(10) unsigned NOT NULL,
   `id_product` int(10) unsigned NOT NULL,
   `product_attribute_id` int(10) unsigned NOT NULL,
-  `product_current_state` int(10) unsigned NOT NULL,
+  `product_current_state` int(10) unsigned DEFAULT '1',
   `product_name` varchar(255) NOT NULL,
-  `product_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
-  `product_price` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `product_shipping` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_price` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `product_shipping` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `produit_surface` decimal(20,2) DEFAULT NULL,
+  `product_width` int(11) DEFAULT NULL,
+  `product_height` int(11) DEFAULT NULL,
+  `product_depth` int(11) DEFAULT NULL,
+  `product_weight` int(11) DEFAULT NULL,
   `attribute_name` varchar(255) NOT NULL,
   `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
-  `attribute_price` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `attribute_shipping` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `total_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `total_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `unit_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.000000',
-  `unit_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.000000',
+  `attribute_price` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `attribute_shipping` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `attribut_surface` decimal(20,2) DEFAULT NULL,
+  `total_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `total_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `unit_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `unit_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `supplier_date_delivery` date DEFAULT NULL,
+  `nb_product_delivered` int(11) NOT NULL,
   PRIMARY KEY (`id_order_detail`),
   KEY `id_order` (`id_order`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ;
+
+
+
+CREATE TABLE IF NOT EXISTS `av_devis` (
+  `id_devis` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_customer` int(10) unsigned NOT NULL,
+  `id_address_delivery` int(10) unsigned NOT NULL,
+  `id_address_invoice` int(10) unsigned NOT NULL,
+  `current_state` int(10) unsigned NOT NULL,
+  `total_paid` decimal(17,2) NOT NULL DEFAULT '0.00',
+  `invoice_date` datetime NOT NULL,
+  `delivery_date` datetime NOT NULL,
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id_devis`),
+  KEY `id_customer` (`id_customer`),
+  KEY `id_address_delivery` (`id_address_delivery`),
+  KEY `id_address_invoice` (`id_address_invoice`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+
+--
+-- Structure de la table `av_order_detail`
+--
+
+CREATE TABLE IF NOT EXISTS `av_devis_detail` (
+  `id_devis_detail` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id_devis` int(10) unsigned NOT NULL,
+  `id_product` int(10) unsigned NOT NULL,
+  `product_attribute_id` int(10) unsigned NOT NULL,
+  `product_current_state` int(10) unsigned DEFAULT '1',
+  `product_name` varchar(255) NOT NULL,
+  `product_quantity` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_price` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `product_shipping` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `produit_surface` decimal(20,2) DEFAULT NULL,
+  `product_width` int(11) DEFAULT NULL,
+  `product_height` int(11) DEFAULT NULL,
+  `product_depth` int(11) DEFAULT NULL,
+  `product_weight` int(11) DEFAULT NULL,
+  `attribute_name` varchar(255) NOT NULL,
+  `attribute_quantity` decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
+  `attribute_price` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `attribute_shipping` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `attribut_surface` decimal(20,2) DEFAULT NULL,
+  `total_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `total_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `unit_price_tax_incl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  `unit_price_tax_excl` decimal(20,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id_devis_detail`),
+  KEY `id_devis` (`id_devis`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------

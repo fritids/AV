@@ -18,6 +18,25 @@ function getProductInfos($pid) {
     return $r[0];
 }
 
+function getProductInfosByName($name) {
+    global $db;
+    $r = $db->where("name", $name)
+            ->get("av_product");
+    $pid = $r[0]["id_product"];
+
+    $carac = getProductCaracts($pid);
+    $attributes = getProductAttributes($pid);
+    $images = getImages($pid);
+    $cover = getImageCover($pid);
+
+    $r[0]["caracteristiques"] = $carac;
+    $r[0]["attributes"] = $attributes;
+    $r[0]["images"] = $images;
+    $r[0]["cover"] = $cover;
+
+    return $r[0];
+}
+
 function getProductCaracts($pid) {
     global $db;
     $r = $db->where("id_product", $pid)
@@ -75,12 +94,12 @@ function getImageCover($pid) {
     return $r[0];
 }
 
-function getProductByCategorie($cid){
+function getProductByCategorie($cid) {
     global $db;
     $r = $db->where("id_category", $cid)
             ->get("av_product");
-    $p =array();
-    foreach ($r as $k => $product){
+    $p = array();
+    foreach ($r as $k => $product) {
         $p[$k] = getProductInfos($product["id_product"]);
     }
     return ($p);
