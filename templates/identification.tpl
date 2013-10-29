@@ -1,4 +1,4 @@
-<div id="identification" class="bloc_page_gauche clear-it">
+<div id="identification">
     <div class="page_titre">
         <span class="titre">Identification</span>
     </div>

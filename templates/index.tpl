@@ -1,7 +1,7 @@
 {include file="header.tpl"}
 {if $page_info != 'home'}
     <div class="bloc_page">
-        <p><span id="fil-ariane-page">FIL D ARIANNE <span>Produit</span></span></p>
+        <p><span id="fil-ariane-page">{$breadcrumb.parent} <span>{$breadcrumb.fils}</span></span></p>
 
         {if $page_type == 'full'}
             {include file="{$page}.tpl"}

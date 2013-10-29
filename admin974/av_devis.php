@@ -4,6 +4,7 @@ include ("header.php");
 include ("../functions/products.php");
 include ("../functions/orders.php");
 include ("../functions/users.php");
+include ("../functions/tools.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
@@ -24,19 +25,22 @@ if (isset($_POST["id_customer"])) {
     $customer_invoice = getAdresse($cid, 'invoice');
 }
 
+/*
 print_r($_POST);
 print_r($customer_info);
 print_r($customer_delivery);
 print_r($customer_invoice);
-
+*/
 
 if (isset($_POST["devis_save"])) {
+    $total_price_tax_incl = 0;
+    $total_paid = 0;
+
     $devis_summary = array(
         "id_customer" => $cid,
         "id_address_delivery" => $customer_delivery["id_address"],
         "id_address_invoice" => $customer_invoice["id_address"],
         "current_state" => 1,
-        //"total_paid" => $_SESSION["cart_summary"]["total_amount"],
         "invoice_date" => date("Y-m-d h:i:s"),
         "delivery_date" => date("Y-m-d h:i:s"),
         "date_add" => date("Y-m-d h:i:s"),
@@ -44,7 +48,7 @@ if (isset($_POST["devis_save"])) {
         "devis_comment" => $_POST["devis_comment"],
     );
 
-    $oid = $db->insert("av_devis", $devis_summary);
+    $did = $db->insert("av_devis", $devis_summary);
 
     foreach ($_POST["product_name"] as $k => $product) {
 
@@ -53,30 +57,39 @@ if (isset($_POST["devis_save"])) {
             $p_depth = $_POST["product_depth"];
             $p_width = $_POST["product_width"];
             $p_height = $_POST["product_height"];
+            $p_unit_price = $_POST["product_unit_price"];
+            $p_unit_weight = $_POST["product_unit_weight"];
 
 
             $p = getProductInfosByName($product);
 
+            if (empty($p))
+                $p = array("id_product" => 0, "name" => $product);
+
+            $fdp = getDeliveryRatio($p_unit_weight[$k]);
+
+            $shipping_amount = $p_unit_weight[$k] * $p_qte[$k] * $fdp;
+            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 10000 ;
+
+            $total_price_tax_incl = $shipping_amount + $product_amount;
+            $total_paid +=$total_price_tax_incl;
+
             $devis_detail = array(
-                "id_devis" => $oid,
+                "id_devis" => $did,
                 "id_product" => $p["id_product"],
                 "product_name" => $p["name"],
                 "product_quantity" => $p_qte[$k],
-                //"product_price" => $item["price"],
-                //"product_shipping" => $item["shipping"],
+                "product_price" => $p_unit_price[$k],
+                "product_shipping" => $shipping_amount,
                 "product_width" => $p_width[$k],
                 "product_height" => $p_height[$k],
                 "product_depth" => $p_depth[$k],
-                    //"product_weight" => $item["quantity"] * $p["weight"] * $item["surface"],
-                    //"total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
-                    //"total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
+                "product_weight" => $p_width[$k] * $p_height[$k] / 10000 * $p_unit_weight[$k] * $p_qte[$k],
+                "total_price_tax_incl" => $total_price_tax_incl,
+                "total_price_tax_excl" => $total_price_tax_incl
             );
-
             $db->insert("av_devis_detail", $devis_detail);
         }
-
-
-
         // les options
         /* if (isset($item["options"])) {
           foreach ($item["options"] as $k => $option) {
@@ -94,6 +107,12 @@ if (isset($_POST["devis_save"])) {
           $db->insert("av_devis_detail", $devis_detail);
           } */
     }
+
+    $devis_summary = array("total_paid" => $total_paid);
+    $r = $db->where("id_devis", $did)
+            ->update("av_devis", $devis_summary);
+    
+    echo '<div class="alert alert-success text-center">Devis ajouté</div>';
 }
 ?>
 
@@ -118,6 +137,10 @@ if (isset($_POST["devis_save"])) {
         $row.find('.fdp').text("");
         $row.find('.prixttc').text("");
         $row.find('.product_price').text("");
+        $row.find('.unit_price').removeAttr('readonly');
+        $row.find('.unit_weight').removeAttr('readonly');
+
+
         $table.append($row);
         bindAutoComplete($row);
         $input.focus();
@@ -133,7 +156,7 @@ if (isset($_POST["devis_save"])) {
         var p_uprice = mytr.find(".unit_price").val();
         var p_qte = mytr.find(".product_quantity").val();
 
-        
+
         mytr.find(".poids").text(p_width * p_height / 10000 * p_uweight * p_qte);
         mytr.find(".product_price").text(p_width * p_height / 10000 * p_uprice * p_qte);
 
@@ -178,9 +201,9 @@ if (isset($_POST["devis_save"])) {
                 $(this).closest('tr').find(".unit_weight").val(ui.item.weight);
                 $(this).closest('tr').find(".product_width").val(ui.item.min_width);
                 $(this).closest('tr').find(".product_height").val(ui.item.min_height);
-                
-                $(this).closest('tr').find('.unit_price').attr('disabled','disabled');
-                $(this).closest('tr').find('.unit_weight').attr('disabled','disabled');
+
+                $(this).closest('tr').find('.unit_price').attr('readonly', 'readonly');
+                $(this).closest('tr').find('.unit_weight').attr('readonly', 'readonly');
             }
         });
 
@@ -224,7 +247,9 @@ if (isset($_POST["devis_save"])) {
                     <?
                     foreach ($customers as $customer) {
                         ?>
-                        <option value="<?= $customer["id_customer"] ?>"><?= $customer["firstname"] ?> <?= $customer["lastname"] ?></option>
+                        <option value="<?= $customer["id_customer"] ?>"
+                                <? if ($customer["id_customer"] == $cid) echo "selected"; ?>
+                                ><?= $customer["firstname"] ?> <?= $customer["lastname"] ?></option>
                         <?
                     }
                     ?>
@@ -264,60 +289,65 @@ if (isset($_POST["devis_save"])) {
             <input type="submit" class="col-md-offset-3 col-md-9 btn-lg btn-warning">
         </form>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Produits</h2>
-            <form action="" method="post">
-                <input type="hidden"  value="<?= $cid ?>" name="id_customer">
-                <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
-                    <tr>
-                        <th>Produit</th>
-                        <th>Option</th>
-                        <th>Largeur (mm)</th>
-                        <th>Hauteur (mm)</th>
-                        <th>Profondeur (mm)</th>
-                        <th>Prix Unit.</th>
-                        <th>Poids Unit.</th>
-                        <th>Quantity</th>
-                        <th>Poids</th>                        
-                        <th>Prix Produit</th>
-                        <th>FdP</th>
-                        <th>Prix TTC</th>
-                        <th>Actions</th>
-                    </tr>
-                    <tr id="id0">
-                        <td><input type="text" name="product_name[]" class="product_name"></td>
-                        <td>
-                            <select name="product_option" class="pme-input-0" >
-                                <option>----</option>
-                            </select>
-                        </td>
-                        <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
-                        <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>
-                        <td><input type="text" name="product_depth[]"  class="product_depth" size="5" /></td>
-                        <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" />€</td>
-                        <td><input type="text" name="product_unit_weight[]" class="unit_weight" size="5" />Kg/m²</td>
-                        <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                    
-                        <td><span class="poids"></span>Kg</td>
-                        <td><span class="product_price"></span>€</td>
-                        <td><span class="fdp"></span>€</td>
-                        <td><span class="prixttc"></span>€</td>
-                        <td id="btn_action">
-                            <button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button>
-                            <button type="button" id="delline"><span class="glyphicon glyphicon-remove"></span></button>
-                        </td>
-                    </tr>
-                </table>
-                <div class="pull-left">
-                    <textarea name="devis_comment"></textarea>
-                </div>
-                <div class="pull-right">
-                    <input type="submit" name ="devis_save" class="btn-lg btn-warning">
-                </div>
+    <?
+    if (!empty($cid)) {
+        ?>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Produits</h2>
+                <form action="" method="post">
+                    <input type="hidden"  value="<?= $cid ?>" name="id_customer">
+                    <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
+                        <tr>
+                            <th>Produit</th>
+                            <th>Option</th>
+                            <th>Largeur (mm)</th>
+                            <th>Hauteur (mm)</th>
+                            <th>Profondeur (mm)</th>
+                            <th>Prix Unit.</th>
+                            <th>Poids Unit.</th>
+                            <th>Quantity</th>
+                            <th>Poids</th>                        
+                            <th>Prix Produit</th>
+                            <th>FdP</th>
+                            <th>Prix TTC</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr id="id0">
+                            <td><input type="text" name="product_name[]" class="product_name"></td>
+                            <td>
+                                <select name="product_option" class="pme-input-0" >
+                                    <option>----</option>
+                                </select>
+                            </td>
+                            <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
+                            <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>
+                            <td><input type="text" name="product_depth[]"  class="product_depth" size="5" /></td>
+                            <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" /> €</td>
+                            <td><input type="text" name="product_unit_weight[]" class="unit_weight" size="5" /> Kg/m²</td>
+                            <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                    
+                            <td><span class="poids"></span> Kg</td>
+                            <td><span class="product_price"></span> €</td>
+                            <td><span class="fdp"></span> €</td>
+                            <td><span class="prixttc"></span> €</td>
+                            <td id="btn_action">
+                                <button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button>
+                                <button type="button" id="delline"><span class="glyphicon glyphicon-remove"></span></button>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="pull-left">
+                        <textarea name="devis_comment"></textarea>
+                    </div>
+                    <div class="pull-right">
+                        <input type="submit" name ="devis_save" class="btn-lg btn-warning">
+                    </div>
 
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-
+        <?
+    }
+    ?>
 </div>
 

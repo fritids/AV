@@ -79,15 +79,8 @@
     </table>
 
     <div class="promo clearfix">
-        <p class="total">Total produits : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
-    </div>
-    <div class="promo clearfix">
-        <p class="total">Frais de port: <span class="prix">{$smarty.session.cart_summary.total_shipping}€</span></p>
-    </div>
-    <div class="promo clearfix">
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount}€</span></p>
     </div>
-
 
     <div class="promo clearfix">
         <p><span class="code_promo_label">Vous bénéficiez d’un code promotionnel :</span> <input type="text" name="" id="code_promo"><input type="button" id="ok" value="OK"></p>
@@ -96,7 +89,6 @@
 
     <p>
         <input type="button" value="" class="precedent">
-
         <span style="float: right;">
             <input type="checkbox" name="" id="" required="true">J’ai lu et j’accepte <a href="#">les conditions générales de vente</a>.
             <input type="button" value="" class="valider-porsuivre">

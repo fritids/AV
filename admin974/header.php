@@ -117,6 +117,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <li><a href="av_camion.php">Camions</a></li>                                
                                 <li class="divider"></li>
                                 <li><a href="av_cms_lang.php">Contenu manager</a></li>
+                                <li class="divider"></li>
+                                <li><a href="av_devis_view.php">Voir les devis</a></li>
                             </ul>
                         </li>                        
                     </ul>

@@ -16,14 +16,14 @@ require('functions/cms.php');
 
 $smarty = new Smarty;
 //$smarty->caching = 0;
-//$smarty->error_reporting = E_ALL & ~E_NOTICE;
+$smarty->error_reporting = E_ALL & ~E_NOTICE;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 /* vars */
 $nb_produits = 0;
 $page_type = "";
-
+$breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 
 
@@ -95,11 +95,10 @@ $page = "home";
 
 if (isset($_GET["c"])) {
     $page = "category";
-
     $categorie = getCategorieInfo($_GET["id"]);
-
     $products = getProductByCategorie($_GET["id"]);
     $nb_produits = count($products);
+    $breadcrumb = array("parent" => "Accueil", "fils" => $categorie["name"]);
 
     $smarty->assign('products', $products);
     $smarty->assign('categorie', $categorie);
@@ -109,39 +108,50 @@ if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
     $smarty->assign('product', $product);
+    $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
 }
-if (isset($_GET["register"]))
+if (isset($_GET["register"])) {
     $page = "register";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Inscription");
+}
 
-if (isset($_GET["cart"])){
+if (isset($_GET["cart"])) {
     $page = "cart";
-    $page_type = "full";    
+    $page_type = "full";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Panier");
 }
-if (isset($_GET["my-account"])){
+if (isset($_GET["my-account"])) {
     $page = "my-account";
-    $page_type = "full";    
+    $page_type = "full";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Mon compte");
 }
-if (isset($_GET["identification"]))
+if (isset($_GET["identification"])) {
     $page = "identification";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
+}
+
 
 if (isset($_GET["cms"])) {
     $page = "cms";
     $cms = getCmsInfo($_GET["id"]);
-    $page_type = "full";    
+    $page_type = "full";
+    $breadcrumb = array("parent" => "Accueil", "fils" => null);
 }
 if (isset($_GET["delivery"])) {
     $page = "delivery";
-    $page_type = "full";    
+    $page_type = "full";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Livraison");
 }
 if (isset($_GET["devis"])) {
     $page = "devis";
-    $page_type = "full";    
+    $page_type = "full";
 }
 
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
     $orders = getUserOrders($_SESSION["user"]["id_customer"]);
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Historique");
     $smarty->assign('orders', $orders);
 }
 
@@ -150,11 +160,10 @@ $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
-    $page_type = "full";    
-    
+    $page_type = "full";
+
     if (isset($_POST["order_comment"])) {
         $_SESSION["cart_summary"]["order_comment"] = $_POST["order_comment"];
-        
     }
     $settings = array(
         'business' => $paypal["email_account"], //paypal email address
@@ -314,8 +323,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
 
     foreach ($cartItems as $item) {
 
-        $p = getProductInfos($item["id"]) ;
-        
+        $p = getProductInfos($item["id"]);
+
         $order_detail = array(
             "id_order" => $oid,
             "id_product" => $item["id"],
@@ -360,6 +369,37 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     $smarty->assign('orders', $orders);
 }
 
+/**/
+if (isset($_SESSION["user"])) {
+    $mydevis = $db->where("id_customer", $_SESSION["user"]["id_customer"])
+            ->get("av_devis");
+}
+/**/
+
+if (isset($_GET["devis"])) {
+
+    if (isset($_GET["action"]) && $_GET["action"] == "view") {
+        $devis_id = $_GET["id"];
+
+        $mydevisdetail = $db->where("id_devis", $devis_id)
+                ->get("av_devis_detail");
+
+        $smarty->assign('mydevisdetail', $mydevisdetail);
+    }
+    if (isset($_GET["action"]) && $_GET["action"] == "del") {
+        $devis_id = $_GET["id"];
+
+        $r = $db->where("id_devis", $devis_id)
+                ->delete("av_devis_detail");
+        if ($r)
+            $r = $db->where("id_devis", $devis_id)
+                    ->delete("av_devis");
+    }
+
+    $mydevis = $db->where("id_customer", $_SESSION["user"]["id_customer"])
+            ->get("av_devis");
+    $smarty->assign('mydevis', $mydevis);
+}
 
 
 /* session */
@@ -380,6 +420,8 @@ $smarty->assign('cms', $cms);
 $smarty->assign('AllCMS', $AllCMS);
 $smarty->assign('page_info', $page);
 $smarty->assign('page_type', $page_type);
+$smarty->assign('breadcrumb', $breadcrumb);
+$smarty->assign('mydevis', $mydevis);
 
 $smarty->display('index.tpl');
 ?>

@@ -8,10 +8,11 @@
             <h3>MES AVOIRS</h3>
             <p>Vérifiez vos avoirs et/ou bons de réduction</p>
         </div>
+        
         <a href="?devis">
             <div class="block devis">
                 <h3>MES DEVIS</h3>
-                <p>Vous avez <span class="notif">1</span> devis en attente.</p>
+                <p>Vous avez <span class="notif">{$mydevis|count}</span> devis en attente.</p>
             </div>
         </a> 
 

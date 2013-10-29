@@ -9,11 +9,13 @@ function getProductInfos($pid) {
     $attributes = getProductAttributes($pid);
     $images = getImages($pid);
     $cover = getImageCover($pid);
+    $category= getProductCategory($r[0]["id_category"]);
 
     $r[0]["caracteristiques"] = $carac;
     $r[0]["attributes"] = $attributes;
     $r[0]["images"] = $images;
     $r[0]["cover"] = $cover;
+    $r[0]["category"] = $category;
 
     return $r[0];
 }
@@ -22,19 +24,23 @@ function getProductInfosByName($name) {
     global $db;
     $r = $db->where("name", $name)
             ->get("av_product");
-    $pid = $r[0]["id_product"];
 
-    $carac = getProductCaracts($pid);
-    $attributes = getProductAttributes($pid);
-    $images = getImages($pid);
-    $cover = getImageCover($pid);
+    if (!empty($r)) {
+        $pid = $r[0]["id_product"];
 
-    $r[0]["caracteristiques"] = $carac;
-    $r[0]["attributes"] = $attributes;
-    $r[0]["images"] = $images;
-    $r[0]["cover"] = $cover;
+        $carac = getProductCaracts($pid);
+        $attributes = getProductAttributes($pid);
+        $images = getImages($pid);
+        $cover = getImageCover($pid);
 
-    return $r[0];
+        $r[0]["caracteristiques"] = $carac;
+        $r[0]["attributes"] = $attributes;
+        $r[0]["images"] = $images;
+        $r[0]["cover"] = $cover;
+        return $r[0];
+    }
+    return null;
+    
 }
 
 function getProductCaracts($pid) {
@@ -46,6 +52,16 @@ function getProductCaracts($pid) {
         return (null);
 
     return $r;
+}
+function getProductCategory($cid) {
+    global $db;
+    $r = $db->where("id_category", $cid)
+            ->get("av_category");
+
+    if (empty($r))
+        return (null);
+
+    return $r[0];
 }
 
 function getProductAttributes($pid) {

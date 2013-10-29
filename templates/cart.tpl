@@ -1,7 +1,3 @@
-
-
-<div class="bloc-titre">Panier</div>
-
 <div id="monpanier">
     <p><img src="img/monpanier.png" alt=""></p>
     <p><img src="img/panier.png" alt=""></p>
@@ -20,6 +16,7 @@
                 <th><span>Prix unitaire ttc</span></th>
                 <th><span>Quantité</span></th>
                 <th><span>Prix total ttc</span></th>
+                <th>&nbsp;</th>
             </tr>
         </thead>
 
@@ -50,11 +47,7 @@
                     </td>
                     <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
                     <td class="prix_unit">{$product.price} €</td>
-                    <td class="quantite">
-                        <a href="#" class="moins"></a>
-                        <input type="text" name="" id="" value="{$product.quantity}" class="qte">
-                        <a href="#" class="plus"></a>
-                    </td>
+                    <td class="quantite">{$product.quantity}</td>
                     <td class="total">
                         {if $option_price !=0}
                             {$product.quantity*$product.price*$product.surface+$option_price} 
@@ -62,6 +55,13 @@
                             {$product.quantity*$product.price*$product.surface} 
                         {/if}
                         €</td>
+                    <td><form action="?cart" method="post">
+                            <input type="hidden" name="id_cart_item" value="{$smarty.foreach.cart.index}">
+                            <input type="hidden" name="id_product" value="{$product.id}">
+                            <input type="hidden" name="quantity" value="{$product.quantity}">
+                            <input type="hidden" name="del">
+                            <input type="submit" value="x" >
+                        </form> </td>
                 </tr>
             {/foreach}               
         </tbody>
@@ -70,7 +70,7 @@
     <div class="promo clearfix">
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
-    <a href="?delivery">livraison</a>
+    <a href="?delivery"><button>livraison</button></a>
 </div>
 
 
