@@ -69,7 +69,7 @@ if (isset($_POST["devis_save"])) {
             $fdp = getDeliveryRatio($p_unit_weight[$k]);
 
             $shipping_amount = $p_unit_weight[$k] * $p_qte[$k] * $fdp;
-            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 10000 ;
+            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000 ;
 
             $total_price_tax_incl = $shipping_amount + $product_amount;
             $total_paid +=$total_price_tax_incl;
@@ -84,7 +84,7 @@ if (isset($_POST["devis_save"])) {
                 "product_width" => $p_width[$k],
                 "product_height" => $p_height[$k],
                 "product_depth" => $p_depth[$k],
-                "product_weight" => $p_width[$k] * $p_height[$k] / 10000 * $p_unit_weight[$k] * $p_qte[$k],
+                "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
                 "total_price_tax_incl" => $total_price_tax_incl,
                 "total_price_tax_excl" => $total_price_tax_incl
             );
@@ -157,8 +157,8 @@ if (isset($_POST["devis_save"])) {
         var p_qte = mytr.find(".product_quantity").val();
 
 
-        mytr.find(".poids").text(p_width * p_height / 10000 * p_uweight * p_qte);
-        mytr.find(".product_price").text(p_width * p_height / 10000 * p_uprice * p_qte);
+        mytr.find(".poids").text(p_width * p_height / 1000000 * p_uweight * p_qte);
+        mytr.find(".product_price").text(p_width * p_height / 1000000 * p_uprice * p_qte);
 
         $.ajax({
             url: "functions/ajax_fdp.php",

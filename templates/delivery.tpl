@@ -59,10 +59,12 @@
         </div>
     </div>
     <div class="clearfix"></div>
+
     <form action="?order-resume" method="post">
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>
         <textarea name="order_comment" id="" cols="30" rows="10">{$smarty.session.cart_summary.order_comment}</textarea>
         <p>
+            <a href="?cart" ><button type="button" class="precedent">Précédent</button></a>
             <input type="submit" value="" class="submit">
         </p>
     </form>

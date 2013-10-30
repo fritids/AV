@@ -26,11 +26,12 @@
                 <tr>
                     <td><img src="img/recap-prod.png" alt=""></td>
                     <td class="designation_prd">
-                        <a href="">{$product.name} 
+                        <a href="?p&id={$product.id} ">{$product.name} 
                             {if isset($product.options)}
                                 option : 
                                 {foreach key=key item=option from=$product.options}
                                     {$option_price =  $option_price+$option.o_price}
+                                    {$option.o_name} 
                                 {/foreach}   
                             {/if}
                             {*
@@ -52,7 +53,7 @@
                         {if $option_price !=0}
                             {$product.quantity*$product.price*$product.surface+$option_price} 
                         {else}
-                            {$product.quantity*$product.price*$product.surface} 
+                            {$product.prixttc}
                         {/if}
                         €</td>
                     <td><form action="?cart" method="post">
@@ -71,6 +72,7 @@
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
     <a href="?delivery"><button>livraison</button></a>
+    
 </div>
 
 

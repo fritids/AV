@@ -17,15 +17,16 @@ class Panier {
 
     // ajouter un article $refproduit
     public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension) {
-        
-        $montant_produit_ttc = $nb * $price * $surface;
-                
+
+        $montant_produit_ttc = round($nb * $price * $surface, 2);
+
         @$this->panier[$refproduit]['quantity'] += $nb;
         @$this->panier[$refproduit]['surface'] += $surface;
         @$this->panier[$refproduit]['dimension'] = $dimension;
         @$this->panier[$refproduit]['price'] += $price;
         @$this->panier[$refproduit]['shipping'] += $shipping;
-        
+        @$this->panier[$refproduit]['prixttc'] += $montant_produit_ttc;
+
         @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
         @$this->panier_summary['total_shipping'] += $shipping;
         @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
@@ -37,13 +38,15 @@ class Panier {
 
     // ajouter un article $refproduit
     public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension) {
-        $montant_produit_ttc = $nb * $price * $surface;
+        $montant_produit_ttc = round($nb * $price * $surface, 2);
 
         @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
         @$this->panier[$refproduit]["options"][$refoption]['surface'] += $surface;
         @$this->panier[$refproduit]["options"][$refoption]['dimension'] = $dimension;
         @$this->panier[$refproduit]["options"][$refoption]['price'] += $price;
         @$this->panier[$refproduit]["options"][$refoption]['shipping'] += $shipping;
+        @$this->panier[$refproduit]["options"][$refoption]['prixttc'] += $montant_produit_ttc;
+
         @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
         @$this->panier_summary['total_shipping'] += $shipping;
         @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
@@ -131,6 +134,7 @@ class Panier {
                 $list[$i]["dimension"] = $data['dimension'];
                 $list[$i]["price"] = $data['price'];
                 $list[$i]["name"] = $data['name'];
+                $list[$i]["prixttc"] = $data['prixttc'];
 
                 //les options
                 if (!empty($this->panier[$ref]['options'])) {
@@ -142,12 +146,13 @@ class Panier {
                                 "o_price" => $option['price'],
                                 "o_name" => $option['name'],
                                 "o_shipping" => $option['shipping'],
+                                "o_prixttc" => $option['prixttc'],
                             );
                             //$list[$i]["options"][] = $option;
                         }
                     }
                 }
-              
+
                 //les contacts
                 if (!empty($this->panier[$ref]['contact'])) {
                     foreach ($this->panier[$ref]['contact'] as $key => $contact) {
