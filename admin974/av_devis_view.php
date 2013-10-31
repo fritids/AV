@@ -8,6 +8,7 @@ include ("../functions/tools.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $devis = $db->get("av_devis");
+$did ="";
 
 if (isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
@@ -23,7 +24,7 @@ if (isset($_POST["id_devis"])) {
                 foreach ($devis as $dev) {
                     ?>
                     <option value="<?= $dev["id_devis"] ?>"
-                    <? if ($dev["id_devis"] == $did) echo "selected" ?>
+                    <? if ($dev["id_devis"] == $did && !empty($did)) echo "selected" ?>
                             ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
                             <?
                         }
@@ -37,7 +38,7 @@ if (isset($_POST["id_devis"])) {
         ?>
         <div class="row">
             <div class="col-md-12">
-                <h2>Produits</h2>
+                <h2>Liste des produits</h2>
                 <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
                     <tr>
                         <th>Produit</th>

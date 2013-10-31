@@ -199,6 +199,9 @@ $opts['fdd']['product_current_state'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Détail commande</h1>
+<?
 new phpMyEdit($opts);
 ?>
 

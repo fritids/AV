@@ -121,6 +121,9 @@ $opts['fdd']['caract_value'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les caractéristiques produits</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

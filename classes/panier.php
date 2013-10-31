@@ -27,10 +27,10 @@ class Panier {
         @$this->panier[$refproduit]['shipping'] += $shipping;
         @$this->panier[$refproduit]['prixttc'] += $montant_produit_ttc;
 
-        @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
-        @$this->panier_summary['total_shipping'] += $shipping;
+        @$this->panier_summary['total_amount'] += round($montant_produit_ttc + $shipping, 2);
+        @$this->panier_summary['total_shipping'] += round($shipping, 2);
         @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
-        @$this->panier_summary['total_produits'] += $montant_produit_ttc;
+        @$this->panier_summary['total_produits'] += round($montant_produit_ttc, 2);
         @$this->panier[$refproduit]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
@@ -46,11 +46,12 @@ class Panier {
         @$this->panier[$refproduit]["options"][$refoption]['price'] += $price;
         @$this->panier[$refproduit]["options"][$refoption]['shipping'] += $shipping;
         @$this->panier[$refproduit]["options"][$refoption]['prixttc'] += $montant_produit_ttc;
+        @$this->panier[$refproduit]['prixttc'] += $montant_produit_ttc;
 
-        @$this->panier_summary['total_amount'] += $montant_produit_ttc + $shipping;
-        @$this->panier_summary['total_shipping'] += $shipping;
+        @$this->panier_summary['total_amount'] += round($montant_produit_ttc + $shipping, 2);
+        @$this->panier_summary['total_shipping'] += round($shipping, 2);
         @$this->panier_summary['total_taxes'] += round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
-        @$this->panier_summary['total_produits'] += $montant_produit_ttc;
+        @$this->panier_summary['total_produits'] += round($montant_produit_ttc, 2);
         @$this->panier[$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$refproduit]["options"][$refoption]);
@@ -69,14 +70,15 @@ class Panier {
     // supprimer un article $refproduit
     public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface) {
 
-        $montant_produit_ttc = $nb * $price * $surface;
+        $montant_produit_ttc = $price * $surface;
 
         @$this->panier[$refproduit]['quantity'] -= $nb;
         @$this->panier[$refproduit]['surface'] -= $surface;
-        @$this->panier_summary['total_amount'] -= $montant_produit_ttc + $shipping;
-        @$this->panier_summary['total_shipping'] -= $shipping;
+        @$this->panier_summary['total_amount'] -= round($montant_produit_ttc + $shipping, 2);
+        @$this->panier_summary['total_shipping'] -= round($shipping, 2);
         @$this->panier_summary['total_taxes'] -= round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
-        @$this->panier_summary['total_produits'] -= $montant_produit_ttc;
+        @$this->panier_summary['total_produits'] -= round($montant_produit_ttc, 2);
+
         if ($this->panier[$refproduit]['quantity'] <= 0) {
             //remove option
             $option_amount = 0;
@@ -86,15 +88,20 @@ class Panier {
                     $option_amount_produit += $option["quantity"] * $option["price"] * $option["surface"];
                 }
 
-            $this->panier_summary['total_amount'] -= $option_amount;
-            $this->panier_summary['total_shipping'] -= $option['shipping'];
+            $this->panier_summary['total_amount'] -= round($option_amount, 2);
+            $this->panier_summary['total_shipping'] -= round($option['shipping'], 2);
             $this->panier_summary['total_taxes'] -= round($option_amount_produit - $option_amount_produit / 1.196, 2);
-            $this->panier_summary['total_produits'] -= $option_amount_produit;
+            $this->panier_summary['total_produits'] -= round($option_amount_produit, 2);
 
             if ($this->panier_summary['total_taxes'] < 0)
                 $this->panier_summary['total_taxes'] = 0;
 
+
             unset($this->panier[$refproduit]);
+           /* $this->panier_summary['total_amount'] = 0;
+            $this->panier_summary['total_shipping'] = 0;
+            $this->panier_summary['total_taxes'] = 0;
+            $this->panier_summary['total_produits'] = 0;*/
         }
     }
 

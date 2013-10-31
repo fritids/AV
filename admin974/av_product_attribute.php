@@ -133,6 +133,9 @@ $opts['fdd']['weight'] = array(
 );
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les attributs produits</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

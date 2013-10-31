@@ -130,6 +130,9 @@ $opts['fdd']['phone_mobile'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les comptes clients</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

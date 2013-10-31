@@ -133,6 +133,9 @@ $opts['fdd']['filename'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les images produits</h1>
+<?
 new phpMyEdit($opts);
 ?>
 

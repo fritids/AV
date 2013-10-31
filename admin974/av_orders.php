@@ -162,6 +162,9 @@ $opts['fdd']['total_paid'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les ventes</h1>
+<?
 new phpMyEdit($opts);
 ?>
 <br>

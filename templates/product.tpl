@@ -37,6 +37,13 @@
             $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
             $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
         });
+
+        $('#validation').submit(function() {
+            
+            if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {
+                return false;
+            }
+        });
     });
 
 </script>
@@ -51,24 +58,24 @@
         <div class="images">
             {*
             {literal}
-                <div class="cycle-slideshow"
-                     data-cycle-timeout=0
-                     data-cycle-pager="#custom-pager"
-                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
-                     >
-                {/literal}
+            <div class="cycle-slideshow"
+            data-cycle-timeout=0
+            data-cycle-pager="#custom-pager"
+            data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
+            >
+            {/literal}
 
-                {if isset($product.images)}
-                    {foreach key=key item=image from=$product.images}
-                        <img src="img/{$image.filename}" />                    
-                    {/foreach}
-                {/if} 
+            {if isset($product.images)}
+            {foreach key=key item=image from=$product.images}
+            <img src="img/{$image.filename}" />                    
+            {/foreach}
+            {/if} 
 
             </div>
             *}
             <div id="custom-pager"></div>
         </div>	
-        <form action="?cart" method="post">
+        <form action="?cart" method="post" id="validation">
             <div class="features">
                 <div class="separ clearfix">
                     <div class="infos">
@@ -82,7 +89,7 @@
                         <input type="hidden" name="add">
                         <label for="qty">Quantité :</label>
                         <input type="text" class="qte" name="quantity" id ="quantity" value="1">
-                        <input type="submit" value="Ajouter au panier" class="indent submit">
+                        <input type="submit" value="Ajouter au panier" id="validation" class="indent submit">
 
                     </div>
                 </div>

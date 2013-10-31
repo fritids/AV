@@ -148,6 +148,9 @@ $opts['fdd']['country'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Carnet d'addresse</h1>
+<?
 new phpMyEdit($opts);
 ?>
 

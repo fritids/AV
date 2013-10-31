@@ -129,6 +129,9 @@ $opts['fdd']['date'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les utilisateurs</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

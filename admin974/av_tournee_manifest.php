@@ -17,7 +17,6 @@ $options = array(
 
 $dns = 'mysql:host='.$bdd_host.';dbname='.$bdd_name;
 $db2 = new PDO($dns, $bdd_user, $bdd_pwd, $options);
-
     
 
 $d = $db->rawQuery("select distinct date_livraison from av_tournee order by 1");
@@ -47,6 +46,7 @@ if (isset($_POST) && !(empty($_POST))) {
     $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $excel = new ExportDataExcel('file');
+    //$excel = new ExportDataExcel('string');
     $excel->filename = $filename;
 
     $excel->initialize();
@@ -66,7 +66,7 @@ if (isset($_POST) && !(empty($_POST))) {
 
 <div class="container">
     <div class="text-center">
-        <form method="post">
+        <form action="av_tournee_manifest_download.php" method="post">
             <div class="col-md-12"> 
                 <div class="col-md-3">
                     <label for="date_delivery" > Date livraison :

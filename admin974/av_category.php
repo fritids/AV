@@ -119,6 +119,9 @@ $opts['fdd']['description'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les catégories</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

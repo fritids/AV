@@ -152,6 +152,9 @@ $opts['fdd']['active'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Les employés</h1>
+<?
 new phpMyEdit($opts);
 ?>
 

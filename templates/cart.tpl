@@ -50,11 +50,7 @@
                     <td class="prix_unit">{$product.price} €</td>
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">
-                        {if $option_price !=0}
-                            {$product.quantity*$product.price*$product.surface+$option_price} 
-                        {else}
-                            {$product.prixttc}
-                        {/if}
+                        {$product.prixttc}
                         €</td>
                     <td><form action="?cart" method="post">
                             <input type="hidden" name="id_cart_item" value="{$smarty.foreach.cart.index}">
@@ -72,7 +68,7 @@
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
     <a href="?delivery"><button>livraison</button></a>
-    
+
 </div>
 
 

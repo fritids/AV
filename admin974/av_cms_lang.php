@@ -122,6 +122,9 @@ $opts['fdd']['content'] = array(
 
 // Now important call to phpMyEdit
 require_once 'extensions/phpMyEdit-mce-cal.class.php';
+?>
+<h1>Les pages de contenu</h1>
+<?
 new phpMyEdit_mce_cal($opts);
 ?>
 

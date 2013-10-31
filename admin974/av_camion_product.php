@@ -112,6 +112,9 @@ $opts['fdd']['id_camion_product'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Produits par camion</h1>
+<?
 new phpMyEdit($opts);
 
 ?>

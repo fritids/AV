@@ -141,7 +141,7 @@ $opts['fdd']['description'] = array(
     'name' => 'Description',
     'select' => 'T',
     'maxlen' => 65535,
-    'options' => 'C',
+    'options' => 'AC',
     'textarea' => array(
         'html' => true,
         'rows' => 20,
@@ -162,42 +162,42 @@ $opts['fdd']['description_short'] = array(
 );
 $opts['fdd']['video'] = array(
     'name' => 'Video.',
-    'options' => 'C',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 255
 );
 
 $opts['fdd']['min_width'] = array(
     'name' => 'Largeur Min.',
-    'options' => 'C',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['min_height'] = array(
     'name' => 'Hauteur Min.',
-    'options' => 'C',
+    'options' =>'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_surface'] = array(
     'name' => 'Surface Max.',
-    'options' => 'C',
+    'options' =>'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_width'] = array(
     'name' => 'Largeur Max',
-    'options' => 'C',
+    'options' =>'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_height'] = array(
     'name' => 'Hauteur Max',
-    'options' => 'C',
+    'options' =>'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
@@ -206,6 +206,9 @@ $opts['fdd']['max_height'] = array(
 // Now important call to phpMyEdit
 //require_once 'phpMyEdit.class.php';
 require_once 'extensions/phpMyEdit-mce-cal.class.php';
+?>
+<h1>Les produits</h1>
+<?
 new phpMyEdit_mce_cal($opts);
 ?>
 

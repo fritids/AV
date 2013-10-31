@@ -101,6 +101,9 @@ $opts['fdd']['title'] = array(
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
+?>
+<h1>Statuts des commandes</h1>
+<?
 new phpMyEdit($opts);
 
 ?>
