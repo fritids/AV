@@ -15,10 +15,14 @@
         <link rel="stylesheet" href="css/allovitres.css">
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/menu.css" type="text/css">
+        <link rel="stylesheet" href="css/menu.css" type="text/css">
+        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
         <script src="js/vendor/modernizr-2.6.2.min.js"></script>
         <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>-->
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript" src="http://malsup.github.io/jquery.cycle2.js"></script>
+        <script type="text/javascript" src="js/bootstrap.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
         <script>
             $(window).load(function() {
 

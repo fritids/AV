@@ -15,10 +15,11 @@ $customer_info = array();
 $customer_delivery = array();
 $customer_invoice = array();
 
+$btn_txt = "Ajouter";
 
-
-if (isset($_POST["id_customer"])) {
+if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
     $cid = $_POST["id_customer"];
+    $btn_txt = "Modifier";
 
     $customer_info = getCustomerDetail($cid);
     $customer_delivery = getAdresse($cid, 'delivery');
@@ -26,11 +27,91 @@ if (isset($_POST["id_customer"])) {
 }
 
 /*
-print_r($_POST);
-print_r($customer_info);
-print_r($customer_delivery);
-print_r($customer_invoice);
-*/
+  print_r($_POST);
+  print_r($customer_info);
+  print_r($customer_delivery);
+  print_r($customer_invoice);
+ */
+
+
+
+if (isset($_POST["contact"])) {
+    if ($_POST["contact"] == "Ajouter") {
+        $customer_info = array(
+            "firstname" => $_POST["firstname"],
+            "lastname" => $_POST["lastname"],
+            "email" => $_POST["email"],
+            "passwd" => md5($_POST["firstname"]),
+            "phone" => $_POST["phone"],
+            "phone_mobile" => $_POST["phone_mobile"],
+            "active" => 1,
+            "date_add" => date("Y-m-d"),
+            "date_upd" => date("Y-m-d"));
+        $cid = createNewAccount($customer_info);
+
+        $customer_invoice = array(
+            "alias" => 'invoice',
+            "id_customer" => $cid,
+            "address1" => @$_POST["invoice_address1"],
+            "postcode" => @$_POST["invoice_postcode"],
+            "city" => @$_POST["invoice_city"],
+            "country" => 'France',
+            "active" => 1,
+            "date_add" => date("Y-m-d"),
+            "date_upd" => date("Y-m-d"));
+
+        $customer_delivery = array(
+            "alias" => 'delivery',
+            "id_customer" => $cid,
+            "address1" => @$_POST["delivery_address1"],
+            "postcode" => @$_POST["delivery_postcode"],
+            "city" => @$_POST["delivery_city"],
+            "country" => 'France',
+            "active" => 1,
+            "date_add" => date("Y-m-d"),
+            "date_upd" => date("Y-m-d"));
+
+        createNewAdresse($customer_invoice);
+        createNewAdresse($customer_delivery);   
+        
+        $btn_txt = "Modifier";
+        
+    }
+    if ($_POST["contact"] == "Modifier") {
+        $customer_info = array(
+            "firstname" => $_POST["firstname"],
+            "lastname" => $_POST["lastname"],
+            "email" => $_POST["email"],
+            "phone" => $_POST["phone"],
+            "phone_mobile" => $_POST["phone_mobile"],
+        );
+        $r = $db->where("id_customer", $cid)
+                ->update("av_customer", $customer_info);
+
+        $deliveryupd = array(
+            "address1" => $_POST["delivery_address1"],
+            "address2" => $_POST["delivery_address2"],
+            "city" => $_POST["delivery_city"],
+            "postcode" => $_POST["delivery_postcode"],
+        );
+
+        $r = $db->where("id_address", $_POST["delivery_id"])
+                ->where("alias", 'delivery')
+                ->update("av_address", $deliveryupd);
+
+        $invoiceupd = array(
+            "address1" => $_POST["invoice_address1"],
+            "address2" => $_POST["invoice_address2"],
+            "city" => $_POST["invoice_city"],
+            "postcode" => $_POST["invoice_postcode"],
+        );
+
+        $r = $db->where("id_address", $_POST["invoice_id"])
+                ->where("alias", 'invoice')
+                ->update("av_address", $invoiceupd);
+    }
+}
+
 
 if (isset($_POST["devis_save"])) {
     $total_price_tax_incl = 0;
@@ -38,6 +119,7 @@ if (isset($_POST["devis_save"])) {
 
     $devis_summary = array(
         "id_customer" => $cid,
+        "id_user" => $_SESSION['user_id'],
         "id_address_delivery" => $customer_delivery["id_address"],
         "id_address_invoice" => $customer_invoice["id_address"],
         "current_state" => 1,
@@ -69,7 +151,7 @@ if (isset($_POST["devis_save"])) {
             $fdp = getDeliveryRatio($p_unit_weight[$k]);
 
             $shipping_amount = $p_unit_weight[$k] * $p_qte[$k] * $fdp;
-            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000 ;
+            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
 
             $total_price_tax_incl = $shipping_amount + $product_amount;
             $total_paid +=$total_price_tax_incl;
@@ -111,7 +193,7 @@ if (isset($_POST["devis_save"])) {
     $devis_summary = array("total_paid" => $total_paid);
     $r = $db->where("id_devis", $did)
             ->update("av_devis", $devis_summary);
-    
+
     echo '<div class="alert alert-success text-center">Devis ajouté</div>';
 }
 ?>
@@ -238,55 +320,66 @@ if (isset($_POST["devis_save"])) {
 </script>
 
 
+<script>
+    $(function() {
+        $("#ajax_customer").autocomplete({
+            source: 'functions/ajax_customer.php',
+            select: function(event, ui) {
+                $("#id_customer").val(ui.item.id_customer);
+            }
+        });
+    })
+</script>
+
+
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            <h3>Client existant</h3>
+            <h3>Recherche client existant</h3>
             <form class="form-horizontal" role="form" method="post">
-                <select  name ="id_customer" class="pme-input-0" >
-                    <?
-                    foreach ($customers as $customer) {
-                        ?>
-                        <option value="<?= $customer["id_customer"] ?>"
-                                <? if ($customer["id_customer"] == $cid) echo "selected"; ?>
-                                ><?= $customer["firstname"] ?> <?= $customer["lastname"] ?></option>
-                        <?
-                    }
-                    ?>
-                </select>
+                <input type="text" id ="ajax_customer" />
+                <input type="hidden" name ="id_customer"  id ="id_customer"/>
+
+
                 <input type="submit" >
             </form>
         </div>
-        <form class="form-horizontal" role="form">
+        <form class="form-horizontal" method="post" role="form">
+            <input type="hidden"  value="<?= $cid ?>" name="id_customer">            
             <div class="col-md-3">
                 <h3>Contact</h3>
                 <div class="form-group">
                     <input type="text" name="firstname" value="<?= @$customer_info["firstname"] ?>" class="form-control" placeholder="Nom">
                     <input type="text" name="lastname" value="<?= @$customer_info["lastname"] ?>" class="form-control" placeholder="Prénom">
                     <input type="text" name="email" value="<?= @$customer_info["email"] ?>" class="form-control" placeholder="E-mail">
+                    <input type="text" name="phone" value="<?= @$customer_info["phone"] ?>" class="form-control" placeholder="Téléphone">
+                    <input type="text" name="phone_mobile" value="<?= @$customer_info["phone_mobile"] ?>" class="form-control" placeholder="Mobile">
                 </div>
             </div>
 
             <div class="col-md-3">
                 <h3>Addresse Livraison</h3>
                 <div class="form-group">
-                    <input type="text" value="<?= @$customer_delivery["address1"] ?>" name="address1" class="form-control" placeholder="Adresse 1">
-                    <input type="text" value="<?= @$customer_delivery["address2"] ?>" name="address2" class="form-control" placeholder="Adresse 2">
-                    <input type="text" value="<?= @$customer_delivery["postcode"] ?>" name="postcode" class="form-control" placeholder="Code postal">
-                    <input type="text" value="<?= @$customer_delivery["city"] ?>" name="city" class="form-control" placeholder="Ville">                
+                    <input type="hidden" value="<?= @$customer_delivery["id_address"] ?>" name="delivery_id" >
+                    <input type="text" value="<?= @$customer_delivery["address1"] ?>" name="delivery_address1" class="form-control" placeholder="Adresse 1">
+                    <input type="text" value="<?= @$customer_delivery["address2"] ?>" name="delivery_address2" class="form-control" placeholder="Adresse 2">
+                    <input type="text" value="<?= @$customer_delivery["postcode"] ?>" name="delivery_postcode" class="form-control" placeholder="Code postal">
+                    <input type="text" value="<?= @$customer_delivery["city"] ?>" name="delivery_city" class="form-control" placeholder="Ville">                
                 </div>
 
             </div>
             <div class="col-md-3">
                 <h3>Addresse Facturation</h3>
                 <div class="form-group">
-                    <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="address1" class="form-control" placeholder="Adresse 1">
-                    <input type="text" value="<?= @$customer_invoice["address2"] ?>" name="address2" class="form-control" placeholder="Adresse 2">
-                    <input type="text" value="<?= @$customer_invoice["postcode"] ?>" name="postcode" class="form-control" placeholder="Code postal">
-                    <input type="text" value="<?= @$customer_invoice["city"] ?>" name="city" class="form-control" placeholder="Ville">                
+                    <input type="hidden" value="<?= @$customer_invoice["id_address"] ?>" name="invoice_id" >
+                    <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="invoice_address1" class="form-control" placeholder="Adresse 1">
+                    <input type="text" value="<?= @$customer_invoice["address2"] ?>" name="invoice_address2" class="form-control" placeholder="Adresse 2">
+                    <input type="text" value="<?= @$customer_invoice["postcode"] ?>" name="invoice_postcode" class="form-control" placeholder="Code postal">
+                    <input type="text" value="<?= @$customer_invoice["city"] ?>" name="invoice_city" class="form-control" placeholder="Ville">                
                 </div>
             </div>
-            <input type="submit" class="col-md-offset-3 col-md-9 btn-lg btn-warning">
+
+            <button type="submit" name="contact" value="<?= $btn_txt ?>"  id="form_submit" class="col-md-offset-3 col-md-9 btn-lg btn-warning" ><?= $btn_txt ?></button>
         </form>
     </div>
     <?
@@ -297,6 +390,7 @@ if (isset($_POST["devis_save"])) {
                 <h2>Produits</h2>
                 <form action="" method="post">
                     <input type="hidden"  value="<?= $cid ?>" name="id_customer">
+
                     <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
                         <tr>
                             <th>Produit</th>
@@ -340,7 +434,7 @@ if (isset($_POST["devis_save"])) {
                         <textarea name="devis_comment"></textarea>
                     </div>
                     <div class="pull-right">
-                        <input type="submit" name ="devis_save" class="btn-lg btn-warning">
+                        <input type="submit" name ="devis_save"  class="btn-lg btn-warning">
                     </div>
 
                 </form>
@@ -350,4 +444,3 @@ if (isset($_POST["devis_save"])) {
     }
     ?>
 </div>
-

@@ -235,7 +235,10 @@ margin-top:10px;
 	padding-right:10px;
 	line-height: 29px;
 	font-size: 0.9em;
+	color: #FFF;
 }
+#top-header-droit a { color: #FFF; }
+#top-header-droit a:hover { color: #FFF;}
 
 #header{
     background: #000;

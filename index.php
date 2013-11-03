@@ -371,8 +371,19 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
 
 /**/
 if (isset($_SESSION["user"])) {
-    $mydevis = $db->where("id_customer", $_SESSION["user"]["id_customer"])
-            ->get("av_devis");
+    $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
+         from av_devis a , admin_user b 
+         where a.id_user = b.id_admin 
+         and current_state = 1
+         and id_customer = ?", array($_SESSION["user"]["id_customer"]));
+
+    foreach ($mydevis as $k => $devis) {
+
+        $mydevisdetail = $mydevisdetail = $db->where("id_devis", $devis["id_devis"])
+                ->get("av_devis_detail");
+
+        $mydevis[$k]["detail"] = $mydevisdetail;
+    }
 }
 /**/
 
@@ -381,23 +392,30 @@ if (isset($_GET["devis"])) {
     if (isset($_GET["action"]) && $_GET["action"] == "view") {
         $devis_id = $_GET["id"];
 
-        $mydevisdetail = $db->where("id_devis", $devis_id)
-                ->get("av_devis_detail");
+        $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
+         from av_devis a , admin_user b 
+         where a.id_user = b.id_admin 
+         and current_state = 1
+         and id_devis = ?
+         and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
 
-        $smarty->assign('mydevisdetail', $mydevisdetail);
+
+        if ($mydevis) {
+            $mydevisdetail = $db->where("id_devis", $devis_id)
+                    ->get("av_devis_detail");
+
+            $smarty->assign('mydevisdetail', $mydevisdetail);
+        }
     }
     if (isset($_GET["action"]) && $_GET["action"] == "del") {
         $devis_id = $_GET["id"];
 
         $r = $db->where("id_devis", $devis_id)
-                ->delete("av_devis_detail");
-        if ($r)
-            $r = $db->where("id_devis", $devis_id)
-                    ->delete("av_devis");
+                ->where("id_customer", $_SESSION["user"]["id_customer"])
+                ->update("av_devis", array("current_state" => 2));
     }
 
-    $mydevis = $db->where("id_customer", $_SESSION["user"]["id_customer"])
-            ->get("av_devis");
+
     $smarty->assign('mydevis', $mydevis);
 }
 

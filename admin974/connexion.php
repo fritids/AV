@@ -17,9 +17,12 @@ if (isset($_POST['email']) && isset($_POST['mdp'])) {
         // dans ce cas, tout est ok, on peut d�marrer notre session
         session_start();
 
+        $r = mysql_fetch_array($result);
+                
         // on enregistre les param�tres de notre visiteur comme variables de session ($login et $pwd) (notez bien que l'on utilise pas le $ pour enregistrer ces variables)
         $_SESSION['email'] = $_POST['email'];
         $_SESSION['mdp'] = $_POST['mdp'];
+        $_SESSION['user_id'] = $r['id_admin'];
         $_SERVER['REMOTE_USER'] = $email;
 
         // on redirige notre visiteur vers une page de notre section membre
