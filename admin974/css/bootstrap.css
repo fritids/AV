@@ -5109,6 +5109,41 @@ a.thumbnail:focus {
   color: inherit;
 }
 
+
+
+.alert-1 {
+  background-color: #f0ad4e;
+  border-color: #d6e9c6;
+}
+.alert-2 {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+.alert-3 {
+  background-color: #FE6600;
+  border-color: #d6e9c6;
+}
+.alert-4 {
+  background-color: #3071a9;
+  border-color: #d6e9c6;
+}
+.alert-5 {
+  background-color:  #b94a48;
+  border-color: #d6e9c6;
+}
+.alert-6{
+  background-color: #649ED9;
+  border-color: #d6e9c6;
+}.alert-7{
+  color: #468847;
+  background-color: #5cb85c;
+  border-color: #d6e9c6;
+}
+.alert-8 {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
 .alert-success {
   color: #468847;
   background-color: #dff0d8;

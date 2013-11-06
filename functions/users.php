@@ -41,13 +41,23 @@ function getAdresse($uid, $alias) {
     $r = $db->where("alias", $alias)
             ->where("id_customer", $uid)
             ->get("av_address");
+    if ($r)
+        return $r[0];
+    
+}
+function getAdresseById($aid) {
+    global $db;
+
+    $r = $db->where("id_address", $aid)
+            ->get("av_address");
     return $r[0];
 }
 
 function checkUserLogin($email, $pwd) {
     global $db;
+    
     $user = $db->where('email', $email)
-            ->where('passwd', md5($pwd))
+            ->where('passwd', md5(_COOKIE_KEY_.$pwd))
             ->get('av_customer');
 
     if (count($user) == 1) {

@@ -11,7 +11,7 @@ mysql_select_db($bdd_name);
 
 $req = "SELECT id_customer, firstname, lastname "
         . " FROM av_customer "
-        . " WHERE (upper(firstname) LIKE upper('%" . $_REQUEST['term'] . "%') or upper(lastname) LIKE upper('%" . $_REQUEST['term'] . "%') )";
+        . " WHERE (concat(upper(firstname), ' ' , upper(lastname))) LIKE upper('%" . $_REQUEST['term'] . "%')";
 
 
 $query = mysql_query($req);

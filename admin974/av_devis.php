@@ -24,6 +24,14 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
     $customer_info = getCustomerDetail($cid);
     $customer_delivery = getAdresse($cid, 'delivery');
     $customer_invoice = getAdresse($cid, 'invoice');
+
+
+
+    if (empty($customer_delivery)) {
+        $customer_invoice["alias"] = "delivery";
+        $customer_delivery = $customer_invoice;
+        createNewAdresse($customer_invoice);
+    }
 }
 
 /*
@@ -72,10 +80,9 @@ if (isset($_POST["contact"])) {
             "date_upd" => date("Y-m-d"));
 
         createNewAdresse($customer_invoice);
-        createNewAdresse($customer_delivery);   
-        
+        createNewAdresse($customer_delivery);
+
         $btn_txt = "Modifier";
-        
     }
     if ($_POST["contact"] == "Modifier") {
         $customer_info = array(
@@ -348,34 +355,60 @@ if (isset($_POST["devis_save"])) {
             <input type="hidden"  value="<?= $cid ?>" name="id_customer">            
             <div class="col-md-3">
                 <h3>Contact</h3>
-                <div class="form-group">
-                    <input type="text" name="firstname" value="<?= @$customer_info["firstname"] ?>" class="form-control" placeholder="Nom">
-                    <input type="text" name="lastname" value="<?= @$customer_info["lastname"] ?>" class="form-control" placeholder="Prénom">
-                    <input type="text" name="email" value="<?= @$customer_info["email"] ?>" class="form-control" placeholder="E-mail">
-                    <input type="text" name="phone" value="<?= @$customer_info["phone"] ?>" class="form-control" placeholder="Téléphone">
-                    <input type="text" name="phone_mobile" value="<?= @$customer_info["phone_mobile"] ?>" class="form-control" placeholder="Mobile">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <input type="text" name="firstname" value="<?= @$customer_info["firstname"] ?>" class="form-control" placeholder="Nom">
+                        <input type="text" name="lastname" value="<?= @$customer_info["lastname"] ?>" class="form-control" placeholder="Prénom">
+                        <input type="text" name="email" value="<?= @$customer_info["email"] ?>" class="form-control" placeholder="E-mail">                    
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <h3>Addresse Livraison</h3>
+                <h3>Adresse Livraison</h3>
                 <div class="form-group">
                     <input type="hidden" value="<?= @$customer_delivery["id_address"] ?>" name="delivery_id" >
-                    <input type="text" value="<?= @$customer_delivery["address1"] ?>" name="delivery_address1" class="form-control" placeholder="Adresse 1">
-                    <input type="text" value="<?= @$customer_delivery["address2"] ?>" name="delivery_address2" class="form-control" placeholder="Adresse 2">
-                    <input type="text" value="<?= @$customer_delivery["postcode"] ?>" name="delivery_postcode" class="form-control" placeholder="Code postal">
-                    <input type="text" value="<?= @$customer_delivery["city"] ?>" name="delivery_city" class="form-control" placeholder="Ville">                
+                    <div class="col-xs-6">
+                        <input type="text" name="phone" value="<?= @$customer_delivery["phone"] ?>" class="form-control" placeholder="Téléphone">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" name="phone_mobile" value="<?= @$customer_delivery["phone_mobile"] ?>" class="form-control" placeholder="Mobile">                    
+                    </div>
+                    <div class="col-xs-12">
+                        <input type="text" value="<?= @$customer_delivery["address1"] ?>" name="delivery_address1" class="form-control" placeholder="Adresse 1">
+                        <input type="text" value="<?= @$customer_delivery["address2"] ?>" name="delivery_address2" class="form-control" placeholder="Adresse 2">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" value="<?= @$customer_delivery["postcode"] ?>" name="delivery_postcode" class="form-control" placeholder="Code postal">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" value="<?= @$customer_delivery["city"] ?>" name="delivery_city" class="form-control" placeholder="Ville">                
+
+                    </div>
                 </div>
 
             </div>
             <div class="col-md-3">
-                <h3>Addresse Facturation</h3>
+                <h3>Adresse Facturation</h3>
                 <div class="form-group">
                     <input type="hidden" value="<?= @$customer_invoice["id_address"] ?>" name="invoice_id" >
-                    <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="invoice_address1" class="form-control" placeholder="Adresse 1">
-                    <input type="text" value="<?= @$customer_invoice["address2"] ?>" name="invoice_address2" class="form-control" placeholder="Adresse 2">
-                    <input type="text" value="<?= @$customer_invoice["postcode"] ?>" name="invoice_postcode" class="form-control" placeholder="Code postal">
-                    <input type="text" value="<?= @$customer_invoice["city"] ?>" name="invoice_city" class="form-control" placeholder="Ville">                
+                    <div class="col-xs-6">
+                        <input type="text" name="phone" value="<?= @$customer_invoice["phone"] ?>" class="col-xs-06 form-control" placeholder="Téléphone">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" name="phone_mobile" value="<?= @$customer_invoice["phone_mobile"] ?>" class="col-xs-06 form-control" placeholder="Mobile">                                        
+                    </div>
+                    <div class="col-xs-12">
+                        <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="invoice_address1" class="form-control" placeholder="Adresse 1">
+                        <input type="text" value="<?= @$customer_invoice["address2"] ?>" name="invoice_address2" class="form-control" placeholder="Adresse 2">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" value="<?= @$customer_invoice["postcode"] ?>" name="invoice_postcode" class="form-control" placeholder="Code postal">
+                    </div>
+                    <div class="col-xs-6">
+                        <input type="text" value="<?= @$customer_invoice["city"] ?>" name="invoice_city" class="form-control" placeholder="Ville">                
+
+                    </div>
                 </div>
             </div>
 

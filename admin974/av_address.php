@@ -139,6 +139,18 @@ $opts['fdd']['country'] = array(
     'maxlen' => 64,
     'sort' => true
 );
+$opts['fdd']['phone'] = array(
+  'name'     => 'Tel.',
+  'select'   => 'T',
+  'maxlen'   => 32,
+  'sort'     => true
+);
+$opts['fdd']['phone_mobile'] = array(
+  'name'     => 'Tel.2',
+  'select'   => 'T',
+  'maxlen'   => 32,
+  'sort'     => true
+);
 /*$opts['fdd']['city'] = array(
     'name' => 'Ville',
     'select' => 'T',
@@ -149,7 +161,7 @@ $opts['fdd']['country'] = array(
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Carnet d'addresse</h1>
+<h1>Carnet d'adresse</h1>
 <?
 new phpMyEdit($opts);
 ?>

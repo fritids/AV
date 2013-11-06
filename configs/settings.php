@@ -15,6 +15,8 @@ $opts['un'] = $bdd_user;
 $opts['db'] = $bdd_name;
 $opts['pw'] = $bdd_pwd;
 
+@define('_COOKIE_KEY_', 'v91VNEVAhNhXtSMBDq7pZfzYgAWtohfhUonBn9KtdV5AnBnNguduBnFR');
+
 $paypal["email_account"] = "alamichel.s@free.fr";
 $paypal["returnurl"] = "http://trusttelecom.fr/allovitres/?action=order_validate";
 $paypal["cancelurl"] = "http://moka-web.net/allovitres/";

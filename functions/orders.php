@@ -11,10 +11,35 @@ function getUserOrders($id) {
     return $r;
 }
 
+function getOrderInfos($oid) {
+    global $db;
+    $r = $db->where("id_order", $oid)
+            ->get("av_orders");
+
+    return $r[0];
+}
+
 function getOrderUserDetail($id) {
     global $db;
     $r = $db->where("id_customer", $id)
             ->get("av_customer");
+
+    return $r[0];
+}
+
+function getOrderPaypalPaiement($oid) {
+    global $db;
+    $r = $db->where("id_order", $oid)
+            ->get("av_paypal_order");
+
+    return $r[0];
+}
+
+function getOrderPayment($oref) {
+    global $db;
+    $r = $db->where("order_reference", $oref)
+            ->get("av_order_payment");
+
     
     return $r[0];
 }

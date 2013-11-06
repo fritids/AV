@@ -158,7 +158,7 @@ $suppliers = $db->get("av_supplier");
                           where id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($date_livraison));
 
 
-        $queryOrder = "select a.id_order, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
+        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
                     round(sum(product_quantity * ( product_width * product_height * product_depth) / 1000000000),2) order_volume,
                     sum(product_quantity * product_weight) tot_weight
                     from av_orders a, av_order_detail b, av_address c
@@ -189,7 +189,7 @@ $suppliers = $db->get("av_supplier");
             $queryOrder .= " and a.reference like ? ";
             $params[] = "%" . $_GET["reference"] . "%";
         }
-        $queryOrder .= "group by a.id_order, a.reference, a.id_customer, total_paid, a.invoice_date
+        $queryOrder .= "group by a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, a.invoice_date
                         order by c.postcode asc";
 
         $orders = $db->rawQuery($queryOrder, @$params);
@@ -203,13 +203,13 @@ $suppliers = $db->get("av_supplier");
                         foreach ($orders as $order) {
                             if ($order)
                                 $customer = getOrderUserDetail($order["id_customer"]);
-                            $adresse = getAdresse($customer["id_customer"], 'delivery');
+                            $adresse = getAdresseById($order["id_address_delivery"]);
                             ?>
                             <tr>
                                 <th nowrap class="alert alert-info" ><?= date("d/m", strtotime($order["invoice_date"])) ?></th>
                                 <th>
                                     <? /* <a href="av_order_detail.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>                                */ ?>
-                                    <a href="av_order_detail.php?o=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>    
+                                    <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>    
 
                                 </th>
                                 <th><?= getDeliveryZone($order["postcode"]) ?></th>
@@ -244,10 +244,10 @@ $suppliers = $db->get("av_supplier");
                             if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
                                 $queryOrderDetail .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
 
-                            /*if (isset($_GET["planning"]) && !empty($_GET["planning"])) {
-                                $queryOrderDetail .= " and date(b.supplier_date_delivery) >= ? ";
-                                $params[] = $_GET["planning"];
-                            }*/
+                            /* if (isset($_GET["planning"]) && !empty($_GET["planning"])) {
+                              $queryOrderDetail .= " and date(b.supplier_date_delivery) >= ? ";
+                              $params[] = $_GET["planning"];
+                              } */
 
                             if (isset($_GET["prod_affecte"]) && !empty($_GET["prod_affecte"]))
                                 $queryOrderDetail .= " and b.id_order_detail not in (select id_order_detail from av_tournee where status = 1 )";
@@ -265,9 +265,7 @@ $suppliers = $db->get("av_supplier");
                                 $product_weight = $qte_remaining * $OrderProduct["product_weight"];
                                 ?>
                                 <tr id="<?= $OrderProduct["id_order_detail"] ?>" <? if ($OrderProduct["supplier_date_delivery"] == null) echo "class='alert alert-danger'" ?>>
-                                    <td>&nbsp;</td>
-                                    <td><?= $OrderProduct["id_order_detail"] ?></td>
-                                    <td>
+                                    <td colspan="3">
                                         <?= $OrderProduct["product_quantity"] ?> x <?= $OrderProduct["product_name"] ?>
                                         <?
                                         if ($qte_remaining < $OrderProduct["product_quantity"]) {
@@ -280,7 +278,6 @@ $suppliers = $db->get("av_supplier");
                                     <td>
                                         <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
                                         <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?>
-                                    </td>
                                     <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
                                     <td><?= $product_weight ?> kg</td>
                                     <td>
@@ -312,16 +309,16 @@ $suppliers = $db->get("av_supplier");
                                                     <?
                                                     if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"]) {
                                                         ?>
-                                                        <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
+                                                        <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                         <?
                                                     } else {
                                                         if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
                                                             ?>
-                                                            <button name="addtruck"  class="btn btn-sm btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
+                                                            <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
                                                             <?
                                                         } else {
                                                             ?>
-                                                            <button name="addtruck"  class="btn btn-primary btn-sm btn " value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?> 
+                                                            <button name="addtruck"  class="btn btn-primary btn-xs btn " value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?> 
                                                                 <?
                                                                 if ($mytruck["date_livraison"]) {
                                                                     ?>
@@ -451,7 +448,7 @@ $suppliers = $db->get("av_supplier");
                                                                 <tr>
                                                                     <td>&nbsp;</td>
                                                                     <th colspan="4">
-                                                                        <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a>
+                                                                        <a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a>
                                                                     </th>
                                                                 </tr>
                                                                 <?
@@ -519,7 +516,7 @@ $suppliers = $db->get("av_supplier");
                                                             </td>
                                                         </tr>
                                                         <?
-                                                        if ($truckLoad["truck_weight_load"] > 0) {
+                                                        if ($truckLoad["truck_weight_load"] > 0 || $nb_produits > 0) {
                                                             ?>
                                                             <tr>
                                                                 <td colspan="6">

@@ -114,18 +114,7 @@ $opts['fdd']['email'] = array(
   'maxlen'   => 128,
   'sort'     => true
 );
-$opts['fdd']['phone'] = array(
-  'name'     => 'Tel.',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
-$opts['fdd']['phone_mobile'] = array(
-  'name'     => 'Tel.2',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
-);
+
 
 
 // Now important call to phpMyEdit

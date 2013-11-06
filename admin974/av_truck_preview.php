@@ -62,6 +62,13 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
                 ->update("av_tournee", array("horaire" => $comment));
     }
 
+    $r = $db->where("id_truck", $id_truck)
+            ->where("date_livraison", $date_livraison)
+            ->where("id_order", $id)
+            ->update("av_tournee", array("status" => $updinfos["status"]));
+
+
+
     /* on bloque le camion pour la date livraison */
     $infoTruckPlanning = array(
         "id_truck" => $id_truck,
@@ -76,7 +83,7 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
 
     foreach ($orderDetails as $orderDetail) {
         $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
-                ->update("av_order_detail", array("product_current_state" => 7));
+                ->update("av_order_detail", array("product_current_state" => 14));
     }
     if ($r)
         return true;
@@ -105,6 +112,7 @@ $nb_produits = 0;
 $poids_produits = 0;
 $montant_produits = 0;
 $qte_remaining = 0;
+$upd = false;
 ?>
 
 <?
@@ -121,9 +129,11 @@ if (isset($_POST) && !empty($_POST)) {
 
     if ($r)
         echo "<div class='alert alert-success text-center' > Camion validé </div>";
+
+    $upd = true;
 }
 
-if (isset($_GET["planning"])) {
+if (isset($_GET["planning"]) && !$upd) {
 
     $date_livraison = $_GET["planning"];
 

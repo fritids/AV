@@ -4,7 +4,7 @@ include ("config/av_conf.php");
 include ("./av_utilities.php");
 include ("./securite.php");
 
-//setlocale (LC_ALL, 'fr-FR.utf8','fra'); 
+setlocale (LC_ALL, 'fr-FR.utf8','fra'); 
 
 mysql_query("SET NAMES UTF8") ;
 

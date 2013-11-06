@@ -23,6 +23,7 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 /* vars */
 $nb_produits = 0;
 $page_type = "";
+$mydevis = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 
@@ -204,7 +205,6 @@ if (isset($_GET["order-resume"])) {
   break;
   } */
 
-
 /* new user */
 if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 
@@ -212,9 +212,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "firstname" => $_POST["firstname"],
         "lastname" => $_POST["lastname"],
         "email" => $_POST["email"],
-        "passwd" => md5($_POST["passwd"]),
-        "phone" => $_POST["phone"],
-        "phone_mobile" => $_POST["phone_mobile"],
+        "passwd" => md5(_COOKIE_KEY_.$_POST["passwd"]),
         "active" => 1,
         "date_add" => date("Y-m-d"),
         "date_upd" => date("Y-m-d"));
@@ -226,16 +224,17 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "firstname" => $_POST["firstname"],
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
-            "passwd" => md5($_POST["passwd"]),
-            "phone" => $_POST["phone"],
-            "phone_mobile" => $_POST["phone_mobile"]);
+            "passwd" => md5(_COOKIE_KEY_.$_POST["passwd"]),
+        );
 
         $invoice_adresse = array(
             "id_customer" => $uid,
             "address1" => @$_POST["invoice_address1"],
             "postcode" => @$_POST["invoice_postcode"],
             "country" => "France",
-            "city" => @$_POST["invoice_city"]
+            "city" => @$_POST["invoice_city"],
+            "phone" => $_POST["invoice_phone"],
+            "phone_mobile" => $_POST["invoice_phone_mobile"]
         );
 
         $delivery_adresse = array(
@@ -243,7 +242,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "address1" => @$_POST["delivery_address1"],
             "postcode" => @$_POST["delivery_postcode"],
             "country" => "France",
-            "city" => @$_POST["delivery_city"]
+            "city" => @$_POST["delivery_city"],
+            "phone" => $_POST["delivery_phone"],
+            "phone_mobile" => $_POST["delivery_phone_mobile"]
         );
 
         updateUserAddress($invoice_adresse, "invoice", $_SESSION["user"]["invoice"]["id_address"]);
@@ -259,6 +260,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "address1" => @$_POST["invoice_address1"],
             "postcode" => @$_POST["invoice_postcode"],
             "city" => @$_POST["invoice_city"],
+            "phone" => $_POST["invoice_phone"],
+            "phone_mobile" => $_POST["invoice_phone_mobile"],
             "country" => 'France',
             "active" => 1,
             "date_add" => date("Y-m-d"),
@@ -270,6 +273,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "address1" => @$_POST["delivery_address1"],
             "postcode" => @$_POST["delivery_postcode"],
             "city" => @$_POST["delivery_city"],
+            "phone" => $_POST["delivery_phone"],
+            "phone_mobile" => $_POST["delivery_phone_mobile"],
             "country" => 'France',
             "active" => 1,
             "date_add" => date("Y-m-d"),

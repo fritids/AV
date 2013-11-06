@@ -12,15 +12,15 @@ $opts['key'] = 'id_order';
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_order');
+$opts['sort_field'] = "-id_order";
 
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-$opts['options'] = 'CDF';
+$opts['options'] = 'CF';
 
 // Number of lines to display on multiple selection filters
-$opts['multiple'] = '4';
+$opts['multiple'] = '10';
 
 // Display special page elements
 $opts['display'] = array(
@@ -96,7 +96,8 @@ $opts['fdd']['reference'] = array(
     'name' => 'Reference',
     'select' => 'T',
     'maxlen' => 9,
-    'sort' => true
+    'sort' => true,
+    'URL' => 'av_orders_view.php?id_order=$key'
 );
 $opts['fdd']['id_customer'] = array(
     'name' => 'Client',
