@@ -9,7 +9,7 @@ function getProductInfos($pid) {
     $attributes = getProductAttributes($pid);
     $images = getImages($pid);
     $cover = getImageCover($pid);
-    $category= getProductCategory($r[0]["id_category"]);
+    $category = getProductCategory($r[0]["id_category"]);
 
     $r[0]["caracteristiques"] = $carac;
     $r[0]["attributes"] = $attributes;
@@ -40,7 +40,6 @@ function getProductInfosByName($name) {
         return $r[0];
     }
     return null;
-    
 }
 
 function getProductCaracts($pid) {
@@ -53,6 +52,7 @@ function getProductCaracts($pid) {
 
     return $r;
 }
+
 function getProductCategory($cid) {
     global $db;
     $r = $db->where("id_category", $cid)

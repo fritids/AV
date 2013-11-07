@@ -27,9 +27,6 @@ $opts['inc'] = 15;
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
-// Navigation style: B - buttons (default), T - text links, G - graphic links
-// Buttons position: U - up, D - down (default)
-$opts['navigation'] = 'DB';
 
 // Display special page elements
 $opts['display'] = array(

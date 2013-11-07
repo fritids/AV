@@ -7,6 +7,13 @@
             {include file="{$page}.tpl"}
         {else}
             <div id="bloc_page_gauche">
+
+                {if $error}
+                    <div style="background-color: red;margin-bottom: 20px; padding: 10px" >
+                        {$error.txt}  
+                    </div>
+                {/if}
+
                 {include file="{$page}.tpl"}
             </div>
 

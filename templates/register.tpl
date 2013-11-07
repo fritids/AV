@@ -1,11 +1,22 @@
+<script>
+    function validatePassword() {
+        if ($("#mdp").val() != $("#mdp2").val()) {
+            alert("Le mot de passe ne correspond pas");
+            //more processing here
+            return(false);
+        }
+    }
+</script>
+
 <div id="bloc_page_gauche">
-    <form action="index.php?action=new_user" method="post">
+    <form action="index.php?action=new_user" method="post" onsubmit="return  validatePassword();">>
         <div id="titre-bloc">CREATION DE COMPTE</div>
         <h3>INFORMATION DE COMPTE</h3>
         <label for="nom">Nom</label><input id="nom" name="lastname" type="text" value="{$user.lastname}" required="true"/><br />
         <label for="prenom">Prénom</label><input id="prenom" name="firstname" type="text"  value="{$user.firstname}" required="true"/><br />
         <label for="email">Adresse mail</label><input id="email" name="email" type="email" value="{$user.email}" required="true"/><br />
-        <label for="mdp">Mot de passe</label><input id="mdp" name="passwd" type="text" required="true"/><br />
+        <label for="mdp">Mot de passe</label><input id="mdp" name="passwd" type="password" required="true"/><br />
+        <label for="mdp2">Verification mot de passe</label><input id="mdp2" name="passwd2" type="password" required="true"/><br />
         <h3 class="clear-it">INFORMATION DE FACTURATION & LIVRAISON</h3>
         <div id="facturation">
             <label for="tel">Numéro de téléphone</label>
@@ -37,7 +48,7 @@
         </div>
         <div id="creer-cpt-checking">
             <input id="liv" name="liv" type="checkbox" />Cochez si votre adresse de livraison est différente de l’adresse de facturation.<br />
-            <input id="cgv" name="cgv" type="checkbox" />J’ai lu et j’accepte les conditions générales de vente.<br />
+            <input id="cgv" name="cgv" type="checkbox" required="required" />J’ai lu et j’accepte les conditions générales de vente.<br />
         </div>
         <input type="submit" class="bouton" name="b1" />
     </form>

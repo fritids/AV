@@ -17,7 +17,7 @@ $query = mysql_query($req);
 
 while ($row = mysql_fetch_array($query)) {
     $results[] = array(
-        'label' => $row['name'],
+        'label' => utf8_encode($row['name']),
         'id_product' => $row['id_product'],
         'price' => $row['price'],
         'weight' => $row['weight'],

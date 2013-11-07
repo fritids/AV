@@ -67,8 +67,12 @@
     <div class="promo clearfix">
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
-    <a href="?delivery"><button>livraison</button></a>
+    {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
 
+        <a href="?delivery"><button>livraison</button></a>
+    {else}
+        <a href="?identification"><button>Se connecter</button></a>
+    {/if}
 </div>
 
 

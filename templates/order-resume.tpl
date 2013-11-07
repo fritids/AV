@@ -96,16 +96,12 @@
 
     <p>
         <a href="?delivery" ><button class="precedent"></button></a>
-        
+
         <span style="float: right;">
-            <input type="checkbox" name="" id="" required="true">J’ai lu et j’accepte <a href="#">les conditions générales de vente</a>.
-            <input type="button" value="" class="valider-porsuivre">
+            <form action="?order-payment" method="post">
+                <input type="checkbox" required="true">J’ai lu et j’accepte <a href="#">les conditions générales de vente</a>.        
+                <input type="submit" class="valider-porsuivre" value="">
+            </form>
         </span>
     </p>
 </div>
-
-
-{if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-    {$PAYPAL_CHECKOUT_FORM}
-    {$PAYPAL_CHECKOUT_FORM_TEST}
-{/if}

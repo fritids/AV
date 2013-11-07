@@ -218,3 +218,4 @@ pip-log.txt
 *.psd
 /templates_c
 /integration/*
+/img/p/

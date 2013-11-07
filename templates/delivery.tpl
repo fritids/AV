@@ -32,11 +32,12 @@
 
     <div class="options2 clearfix">
         <div class="option">
-            <div class="input">
+            {*<div class="input">
                 <input type="radio" name="" id="" checked="true">
             </div>
+            *}
             <div class="text">
-                <span class="label">à mon adresse de livraison</span>
+                <span class="label">à mon adresse de livraison <a href="?register">modifier</a></span>
                 <span class="info">
                     {$smarty.session.user.firstname} {$smarty.session.user.lastname} <br>
                     {$smarty.session.user.delivery.address1} <br>
@@ -46,7 +47,7 @@
                 </span>
             </div>			
         </div>
-        <div class="option ou">OU</div>
+        {*<div class="option ou">OU</div>
         <div class="option">
             <div class="input">
                 <input type="radio" name="" id=""  disabled="true" disabled="true">
@@ -57,6 +58,7 @@
             </div>			
 
         </div>
+        *}
     </div>
     <div class="clearfix"></div>
 

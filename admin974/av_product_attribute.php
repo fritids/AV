@@ -111,6 +111,18 @@ $opts['fdd']['id_product'] = array(
   ),
   'sort'     => true
 );
+$opts['fdd']['id_attribute'] = array(
+  'name'     => 'Attribut',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'values' => array(
+    'table'  => 'av_attributes',
+    'column' => 'id_attribute',
+    'description' => 'name'
+  ),
+  'sort'     => true
+);
+
 $opts['fdd']['name'] = array(
   'name'     => 'Nom',
   'select'   => 'T',

@@ -50,8 +50,6 @@ if (isset($_POST["contact"])) {
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
             "passwd" => md5($_POST["firstname"]),
-            "phone" => $_POST["phone"],
-            "phone_mobile" => $_POST["phone_mobile"],
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
@@ -64,6 +62,8 @@ if (isset($_POST["contact"])) {
             "postcode" => @$_POST["invoice_postcode"],
             "city" => @$_POST["invoice_city"],
             "country" => 'France',
+            "phone" => $_POST["invoice_phone"],
+            "phone_mobile" => $_POST["invoice_phone_mobile"],
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
@@ -75,6 +75,8 @@ if (isset($_POST["contact"])) {
             "postcode" => @$_POST["delivery_postcode"],
             "city" => @$_POST["delivery_city"],
             "country" => 'France',
+            "phone" => $_POST["delivery_phone"],
+            "phone_mobile" => $_POST["delivery_phone_mobile"],
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
@@ -88,34 +90,36 @@ if (isset($_POST["contact"])) {
         $customer_info = array(
             "firstname" => $_POST["firstname"],
             "lastname" => $_POST["lastname"],
-            "email" => $_POST["email"],
-            "phone" => $_POST["phone"],
-            "phone_mobile" => $_POST["phone_mobile"],
+            "email" => $_POST["email"]
         );
         $r = $db->where("id_customer", $cid)
                 ->update("av_customer", $customer_info);
 
-        $deliveryupd = array(
+        $customer_delivery = array(
             "address1" => $_POST["delivery_address1"],
             "address2" => $_POST["delivery_address2"],
             "city" => $_POST["delivery_city"],
             "postcode" => $_POST["delivery_postcode"],
+            "phone" => $_POST["delivery_phone"],
+            "phone_mobile" => $_POST["delivery_phone_mobile"],
         );
 
         $r = $db->where("id_address", $_POST["delivery_id"])
                 ->where("alias", 'delivery')
-                ->update("av_address", $deliveryupd);
+                ->update("av_address", $customer_delivery);
 
-        $invoiceupd = array(
+        $customer_invoice = array(
             "address1" => $_POST["invoice_address1"],
             "address2" => $_POST["invoice_address2"],
             "city" => $_POST["invoice_city"],
             "postcode" => $_POST["invoice_postcode"],
+            "phone" => $_POST["invoice_phone"],
+            "phone_mobile" => $_POST["invoice_phone_mobile"],
         );
 
         $r = $db->where("id_address", $_POST["invoice_id"])
                 ->where("alias", 'invoice')
-                ->update("av_address", $invoiceupd);
+                ->update("av_address", $customer_invoice);
     }
 }
 
@@ -324,8 +328,16 @@ if (isset($_POST["devis_save"])) {
     }
 
 
-</script>
 
+</script>
+<script>
+    $(function() {
+        $('.delline').click(function() {
+            $(this).parent().remove();
+            
+        });
+    });
+</script>
 
 <script>
     $(function() {
@@ -369,12 +381,12 @@ if (isset($_POST["devis_save"])) {
                 <div class="form-group">
                     <input type="hidden" value="<?= @$customer_delivery["id_address"] ?>" name="delivery_id" >
                     <div class="col-xs-6">
-                        <input type="text" name="phone" value="<?= @$customer_delivery["phone"] ?>" class="form-control" placeholder="Téléphone">
+                        <input type="text" name="delivery_phone" value="<?= @$customer_delivery["phone"] ?>" class="form-control" placeholder="Téléphone">
                     </div>
                     <div class="col-xs-6">
-                        <input type="text" name="phone_mobile" value="<?= @$customer_delivery["phone_mobile"] ?>" class="form-control" placeholder="Mobile">                    
+                        <input type="text" name="delivery_phone_mobile" value="<?= @$customer_delivery["phone_mobile"] ?>" class="form-control" placeholder="Mobile">                    
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <input type="text" value="<?= @$customer_delivery["address1"] ?>" name="delivery_address1" class="form-control" placeholder="Adresse 1">
                         <input type="text" value="<?= @$customer_delivery["address2"] ?>" name="delivery_address2" class="form-control" placeholder="Adresse 2">
                     </div>
@@ -393,12 +405,12 @@ if (isset($_POST["devis_save"])) {
                 <div class="form-group">
                     <input type="hidden" value="<?= @$customer_invoice["id_address"] ?>" name="invoice_id" >
                     <div class="col-xs-6">
-                        <input type="text" name="phone" value="<?= @$customer_invoice["phone"] ?>" class="col-xs-06 form-control" placeholder="Téléphone">
+                        <input type="text" name="invoice_phone" value="<?= @$customer_invoice["phone"] ?>" class="col-xs-06 form-control" placeholder="Téléphone">
                     </div>
                     <div class="col-xs-6">
-                        <input type="text" name="phone_mobile" value="<?= @$customer_invoice["phone_mobile"] ?>" class="col-xs-06 form-control" placeholder="Mobile">                                        
+                        <input type="text" name="invoice_phone_mobile" value="<?= @$customer_invoice["phone_mobile"] ?>" class="col-xs-06 form-control" placeholder="Mobile">                                        
                     </div>
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="invoice_address1" class="form-control" placeholder="Adresse 1">
                         <input type="text" value="<?= @$customer_invoice["address2"] ?>" name="invoice_address2" class="form-control" placeholder="Adresse 2">
                     </div>
@@ -459,7 +471,7 @@ if (isset($_POST["devis_save"])) {
                             <td><span class="prixttc"></span> €</td>
                             <td id="btn_action">
                                 <button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button>
-                                <button type="button" id="delline"><span class="glyphicon glyphicon-remove"></span></button>
+                                <button type="button" class="delline"><span class="glyphicon glyphicon-remove"></span></button>
                             </td>
                         </tr>
                     </table>

@@ -24,6 +24,7 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $nb_produits = 0;
 $page_type = "";
 $mydevis = array();
+$error = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 
@@ -48,7 +49,8 @@ if (isset($_GET["cart"])) {
 
         $pweight = $productInfos["weight"];
         $shipping_ratio = getDeliveryRatio($pweight);
-        $shipping_amount = $shipping_ratio * $pweight;
+        //$shipping_amount = $shipping_ratio * $pweight;
+        $shipping_amount = $conf_shipping_amount;
 
 
         if (isset($_POST["add"])) {
@@ -68,8 +70,8 @@ if (isset($_GET["cart"])) {
                 $option_name = $productInfos["attributes"][$id_option]["name"];
                 $option_weight = $productInfos["attributes"][$id_option]["weight"];
                 $shipping_ratio = getDeliveryRatio($option_weight);
-                $shipping_amount = $shipping_ratio * $option_weight;
-
+                //$shipping_amount = $shipping_ratio * $option_weight;
+                $shipping_amount = 0;
 
                 $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension);
             }
@@ -148,13 +150,13 @@ if (isset($_GET["devis"])) {
     $page_type = "full";
 }
 
-
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
     $orders = getUserOrders($_SESSION["user"]["id_customer"]);
     $breadcrumb = array("parent" => "Accueil", "fils" => "Historique");
     $smarty->assign('orders', $orders);
 }
+
 
 
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
@@ -166,6 +168,13 @@ if (isset($_GET["order-resume"])) {
     if (isset($_POST["order_comment"])) {
         $_SESSION["cart_summary"]["order_comment"] = $_POST["order_comment"];
     }
+}
+
+if (isset($_GET["order-payment"])) {
+    $page = "order-payment";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Paiement");
+    $page_type = "full";
+
     $settings = array(
         'business' => $paypal["email_account"], //paypal email address
         'currency' => 'EUR', //paypal currency
@@ -183,27 +192,10 @@ if (isset($_GET["order-resume"])) {
     //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
 
-    $CheckoutFormTest = "<form action='?action=order_validate' method='post'>
-        <input type='submit' value='Panier validé' />
-        </form>";
 
     $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
-    $smarty->assign('PAYPAL_CHECKOUT_FORM_TEST', $CheckoutFormTest);
+    ;
 }
-
-
-/* switch ($page) {
-  case "accueil":
-  $titre = 'Allovitre';
-  $meta_description = 'description meta';
-  $fil_ariane = '<a href="/">ACCUEIL</a> >';
-  break;
-  case "creer_compte":
-  $titre = 'Allovitre';
-  $meta_description = 'description meta';
-  $fil_ariane = '<a href="/">ACCUEIL</a> >';
-  break;
-  } */
 
 /* new user */
 if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
@@ -212,7 +204,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "firstname" => $_POST["firstname"],
         "lastname" => $_POST["lastname"],
         "email" => $_POST["email"],
-        "passwd" => md5(_COOKIE_KEY_.$_POST["passwd"]),
+        "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
         "active" => 1,
         "date_add" => date("Y-m-d"),
         "date_upd" => date("Y-m-d"));
@@ -224,7 +216,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "firstname" => $_POST["firstname"],
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
-            "passwd" => md5(_COOKIE_KEY_.$_POST["passwd"]),
+            "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
         );
 
         $invoice_adresse = array(
@@ -254,51 +246,57 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
     } else {
         $uid = createNewAccount($userinfos);
 
-        $invoice_adresse = array(
-            "alias" => 'invoice',
-            "id_customer" => $uid,
-            "address1" => @$_POST["invoice_address1"],
-            "postcode" => @$_POST["invoice_postcode"],
-            "city" => @$_POST["invoice_city"],
-            "phone" => $_POST["invoice_phone"],
-            "phone_mobile" => $_POST["invoice_phone_mobile"],
-            "country" => 'France',
-            "active" => 1,
-            "date_add" => date("Y-m-d"),
-            "date_upd" => date("Y-m-d"));
+        if ($uid) {
+            $invoice_adresse = array(
+                "alias" => 'invoice',
+                "id_customer" => $uid,
+                "address1" => @$_POST["invoice_address1"],
+                "postcode" => @$_POST["invoice_postcode"],
+                "city" => @$_POST["invoice_city"],
+                "phone" => $_POST["invoice_phone"],
+                "phone_mobile" => $_POST["invoice_phone_mobile"],
+                "country" => 'France',
+                "active" => 1,
+                "date_add" => date("Y-m-d"),
+                "date_upd" => date("Y-m-d"));
 
-        $delivery_adresse = array(
-            "alias" => 'delivery',
-            "id_customer" => $uid,
-            "address1" => @$_POST["delivery_address1"],
-            "postcode" => @$_POST["delivery_postcode"],
-            "city" => @$_POST["delivery_city"],
-            "phone" => $_POST["delivery_phone"],
-            "phone_mobile" => $_POST["delivery_phone_mobile"],
-            "country" => 'France',
-            "active" => 1,
-            "date_add" => date("Y-m-d"),
-            "date_upd" => date("Y-m-d"));
+            if (isset($_POST["liv"])) {
+                $delivery_adresse = array(
+                    "alias" => 'delivery',
+                    "id_customer" => $uid,
+                    "address1" => @$_POST["delivery_address1"],
+                    "postcode" => @$_POST["delivery_postcode"],
+                    "city" => @$_POST["delivery_city"],
+                    "phone" => $_POST["delivery_phone"],
+                    "phone_mobile" => $_POST["delivery_phone_mobile"],
+                    "country" => 'France',
+                    "active" => 1,
+                    "date_add" => date("Y-m-d"),
+                    "date_upd" => date("Y-m-d"));
+            } else {
+                $delivery_adresse = $invoice_adresse;
+                $delivery_adresse["alias"] = 'delivery';
+            }
 
-        createNewAdresse($invoice_adresse);
-        createNewAdresse($delivery_adresse);
+            createNewAdresse($invoice_adresse);
+            createNewAdresse($delivery_adresse);
 
-        //auto login
-        checkUserLogin($_POST["email"], $_POST["passwd"]);
+            //auto login
+            checkUserLogin($_POST["email"], $_POST["passwd"]);
+        } else { //error creation
+            $error = array("txt" => "Le compte existe déjà");
+            $page = "register";
+        }
     }
 }
-
 
 /* Login */
 if (isset($_GET["action"]) && $_GET["action"] == "login") {
     $res = checkUserLogin($_POST["email"], $_POST["passwd"]);
-
-    /* if ($res) {
-      echo "ok";
-      } else {
-      echo "ko";
-      }
-     */
+    if (!$res) {
+        $error = array("txt" => "La connexion a échoué");
+        $page = "identification";
+    }
 }
 
 /* logout */
@@ -310,12 +308,27 @@ if (isset($_GET["action"]) && $_GET["action"] == "logout") {
 
 /* Order */
 if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
+    $status = 0;
+    $page_type = "full";
+
+    if ($_POST["payment"])
+        $payment = $_POST["payment"];
+
+    if ($payment == "Chèque") {
+        $status = 1;
+    } elseif ($payment == "Virement bancaire") {
+        $status = 10;
+    } elseif ($payment == "Paypal") {
+        $status = 2;
+    }
+
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
         "reference" => RandomString(),
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
-        "current_state" => 1,
+        "payment" => $payment,
+        "current_state" => $status,
         "total_paid" => $_SESSION["cart_summary"]["total_amount"],
         "invoice_date" => date("Y-m-d h:i:s"),
         "delivery_date" => date("Y-m-d h:i:s"),
@@ -324,7 +337,21 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
     );
 
+
+
+
     $oid = $db->insert("av_orders", $order_summary);
+
+    $order_payment = array(
+        "id_order" => $oid,
+        "id_currency" => 1,
+        "amount" => $_SESSION["cart_summary"]["total_amount"],
+        "payment_method" => $payment,
+        "conversion_rate" => 1,
+        "date_add" => date("Y-m-d h:i:s"),
+    );
+
+    $db->insert("av_order_payment", $order_payment);
 
     foreach ($cartItems as $item) {
 
@@ -344,6 +371,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
             "total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
             "total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
         );
+
 
         // les options
         if (isset($item["options"])) {
@@ -369,9 +397,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     $cartItems = array();
 
 //on redirige sur la listes des commandes
-    $page = "orders-list";
-    $orders = getUserOrders($_SESSION["user"]["id_customer"]);
-    $smarty->assign('orders', $orders);
+    $page = "order-confirmation";
+    //$orders = getUserOrders($_SESSION["user"]["id_customer"]);
+    $smarty->assign('order', $order_summary);
+    $smarty->assign('payment', $payment);
 }
 
 /**/
@@ -445,6 +474,8 @@ $smarty->assign('page_info', $page);
 $smarty->assign('page_type', $page_type);
 $smarty->assign('breadcrumb', $breadcrumb);
 $smarty->assign('mydevis', $mydevis);
+$smarty->assign('error', $error);
+$smarty->assign('config', $config);
 
 $smarty->display('index.tpl');
 ?>

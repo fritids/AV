@@ -150,6 +150,13 @@ $opts['fdd']['current_state'] = array(
     "colattrs" => "name='order_state'",
     'sort' => true
 );
+$opts['fdd']['date_add'] = array(
+    'name' => 'Date Commande',
+    'options' => 'L',
+    'select' => 'D',
+    'maxlen' => 10,    
+    'sort' => true
+);
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
     'select' => 'T',

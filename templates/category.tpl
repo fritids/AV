@@ -27,7 +27,7 @@
     {foreach key=key item=product from=$products}
         <div class="item">
             <div class="img block">
-                <img src="img/{$product.cover.filename}" alt="" width="140">
+                <a href="?p&id={$product.id_product}"><img src="img/p/{$product.cover.filename}" alt="" width="140"></a>
             </div>
             <div class="desc block">
                 <h3>{$product.name}</h3>

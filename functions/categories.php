@@ -12,7 +12,8 @@ function getCategorieInfo($cid) {
 function getCategories() {
     global $db;
 
-    $r = $db->get("av_category");
+    $r = $db->where("active", 1)
+            ->get("av_category");
 
     return($r);
 }

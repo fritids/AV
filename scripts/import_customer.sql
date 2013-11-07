@@ -39,3 +39,9 @@ SELECT * FROM `ps_paypal_order` WHERE 1
 
 create table av_order_payment
 SELECT * FROM `ps_order_payment` WHERE 1
+
+
+update  `av_order_payment` set `id_order`=`order_reference`
+
+insert into av_product_images (id_image, id_product, cover, filename)
+SELECT id_image, id_product, cover, concat(id_product, '-',id_image, '.jpg' ) FROM  ps_image

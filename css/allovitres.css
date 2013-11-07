@@ -68,7 +68,7 @@ h3{
 	font-size: 0.75em;
 	color:#000;
 }
-#bloc_page_gauche input[type="text"], #bloc_page_gauche input[type="email"], #bloc_page_gauche input[type="tel"] {
+#bloc_page_gauche input[type="text"], #bloc_page_gauche input[type="email"], #bloc_page_gauche input[type="tel"], #bloc_page_gauche input[type="password"] {
 	height:22px;
 	width:250px;
 	border:1px solid #539cf1;

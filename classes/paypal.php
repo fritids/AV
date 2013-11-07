@@ -171,7 +171,7 @@ class paypalcheckout {
 
         //==> The submit button, (you can specify here your own button) <==//
         $form.='
-         <input id="ppcheckoutbtn" type="submit" value="Checkout" class="button" />
+         <input id="ppcheckoutbtn" type="submit" value="Payer avec Paypal" class="button" />
        </form>';
 
         return $form;
