@@ -49,9 +49,9 @@ if (isset($_GET["cart"])) {
 
         $pweight = $productInfos["weight"];
         $shipping_ratio = getDeliveryRatio($pweight);
-        //$shipping_amount = $shipping_ratio * $pweight;
-        $shipping_amount = $conf_shipping_amount;
-
+//$shipping_amount = $shipping_ratio * $pweight;
+//$shipping_amount = $conf_shipping_amount;
+        $shipping_amount = 0;
 
         if (isset($_POST["add"])) {
             $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
@@ -61,29 +61,35 @@ if (isset($_GET["cart"])) {
                 "depth" => $productInfos["depth"]
             );
 
-            $cart->addItem($pid, $pqte, $productInfos["price"], $productInfos["name"], $shipping_amount, $surface, $dimension);
+            $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos);
 
-            //Si option
+//Si option
             if (isset($_POST["options"])) {
-                $id_option = $_POST["options"];
-                $option_price = $productInfos["attributes"][$id_option]["price"];
-                $option_name = $productInfos["attributes"][$id_option]["name"];
-                $option_weight = $productInfos["attributes"][$id_option]["weight"];
-                $shipping_ratio = getDeliveryRatio($option_weight);
-                //$shipping_amount = $shipping_ratio * $option_weight;
-                $shipping_amount = 0;
+                if (is_array($_POST["options"])) {
+                    foreach ($_POST["options"] as $id_combination => $id_option) {
+                        $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price"];
+                        $option_name = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["name"];
+                        $option_weight = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["weight"];
+                        $shipping_ratio = getDeliveryRatio($option_weight);
+//$shipping_amount = $shipping_ratio * $option_weight;
+                        $shipping_amount = 0;
 
-                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension);
+                        $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension);
+                    }
+                }
             }
+
+
+            $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
         }
 
         if (isset($_POST["del"])) {
             $surface = $_SESSION["cart"][$pid]["surface"];
 
-            $cart->removeItem($pid, $pqte, $productInfos["price"], $shipping_amount, $surface);
-            //$cart->removeCartItem($_POST["id_cart_item"]);
+            $cart->removeItem($pid, $pqte, round($productInfos["price"], 2), $shipping_amount, $surface);
+//$cart->removeCartItem($_POST["id_cart_item"]);
         }
-        // on empecher de faire un F5
+// on empecher de faire un F5
         header("Location: index.php?cart");
     }
 }
@@ -183,13 +189,13 @@ if (isset($_GET["order-payment"])) {
         'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
         'returntxt' => 'Retour au site', //What is written on the return button in paypal
         'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
-        'shipping' => 0, //Shipping Cost
+        'shipping' => $conf_shipping_amount, //Shipping Cost
         'custom' => ''                           //Custom attribute
     );
 
     $pp = new paypalcheckout($settings); //Create an instance of the class
     $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
-    //$cartHTML = $pp->getCartContentAsHtml();
+//$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
 
 
@@ -281,7 +287,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             createNewAdresse($invoice_adresse);
             createNewAdresse($delivery_adresse);
 
-            //auto login
+//auto login
             checkUserLogin($_POST["email"], $_POST["passwd"]);
         } else { //error creation
             $error = array("txt" => "Le compte existe déjà");
@@ -322,14 +328,15 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         $status = 2;
     }
 
+    //global de la commande
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
-        "reference" => RandomString(),
+        "reference" => getLastOrderId(),
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
         "payment" => $payment,
         "current_state" => $status,
-        "total_paid" => $_SESSION["cart_summary"]["total_amount"],
+        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
         "invoice_date" => date("Y-m-d h:i:s"),
         "delivery_date" => date("Y-m-d h:i:s"),
         "date_add" => date("Y-m-d h:i:s"),
@@ -337,21 +344,20 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
     );
 
-
-
-
     $oid = $db->insert("av_orders", $order_summary);
 
+    //paiement
     $order_payment = array(
         "id_order" => $oid,
         "id_currency" => 1,
-        "amount" => $_SESSION["cart_summary"]["total_amount"],
+        "amount" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
         "payment_method" => $payment,
         "conversion_rate" => 1,
         "date_add" => date("Y-m-d h:i:s"),
     );
 
     $db->insert("av_order_payment", $order_payment);
+
 
     foreach ($cartItems as $item) {
 
@@ -373,43 +379,59 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         );
 
 
-        // les options
+        // on calcule le montant supp du aux options
         if (isset($item["options"])) {
             foreach ($item["options"] as $k => $option) {
-                $order_detail["product_attribute_id"] = $option["o_id"];
-                $order_detail["attribute_name"] = $option["o_name"];
-                $order_detail["attribute_quantity"] = $option["o_quantity"];
-                $order_detail["attribute_price"] = $option["o_price"];
-                $order_detail["attribute_shipping"] = $option["o_shipping"];
                 $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
                 $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-
-                $db->insert("av_order_detail", $order_detail);
             }
-        } else { // pas d'option
-            $db->insert("av_order_detail", $order_detail);
+        }
+        $odid = $db->insert("av_order_detail", $order_detail);
+
+        // on rajoute les options
+        if (isset($item["options"])) {
+            foreach ($item["options"] as $k => $option) {
+
+
+                $order_product_attributes = array(
+                    "id_order" => $oid,
+                    "id_order_detail" => $odid,
+                    "id_product" => $item["id"],
+                    "id_attribute" => $option["o_id"],
+                    "name" => $option["o_name"]);
+
+                /* $order_detail["product_attribute_id"] = $option["o_id"];
+                  $order_detail["attribute_name"] = $option["o_name"];
+                  $order_detail["attribute_quantity"] = $option["o_quantity"];
+                  $order_detail["attribute_price"] = $option["o_price"];
+                  $order_detail["attribute_shipping"] = $option["o_shipping"];
+                  $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
+                  $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
+                 */
+                $db->insert("av_order_product_attributes", $order_product_attributes);
+            }
         }
     }
 
-    //on flush le caddie
+//on flush le caddie
     unset($_SESSION["cart"]);
     unset($_SESSION["cart_summary"]);
     $cartItems = array();
 
 //on redirige sur la listes des commandes
     $page = "order-confirmation";
-    //$orders = getUserOrders($_SESSION["user"]["id_customer"]);
+//$orders = getUserOrders($_SESSION["user"]["id_customer"]);
     $smarty->assign('order', $order_summary);
     $smarty->assign('payment', $payment);
 }
 
-/**/
+/* */
 if (isset($_SESSION["user"])) {
     $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-         from av_devis a , admin_user b 
-         where a.id_user = b.id_admin 
-         and current_state = 1
-         and id_customer = ?", array($_SESSION["user"]["id_customer"]));
+from av_devis a , admin_user b 
+where a.id_user = b.id_admin 
+and current_state = 1
+and id_customer = ?", array($_SESSION["user"]["id_customer"]));
 
     foreach ($mydevis as $k => $devis) {
 
@@ -427,11 +449,11 @@ if (isset($_GET["devis"])) {
         $devis_id = $_GET["id"];
 
         $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-         from av_devis a , admin_user b 
-         where a.id_user = b.id_admin 
-         and current_state = 1
-         and id_devis = ?
-         and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
+from av_devis a , admin_user b 
+where a.id_user = b.id_admin 
+and current_state = 1
+and id_devis = ?
+and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
 
 
         if ($mydevis) {
@@ -447,6 +469,13 @@ if (isset($_GET["devis"])) {
         $r = $db->where("id_devis", $devis_id)
                 ->where("id_customer", $_SESSION["user"]["id_customer"])
                 ->update("av_devis", array("current_state" => 2));
+
+        $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
+from av_devis a , admin_user b 
+where a.id_user = b.id_admin 
+and current_state = 1
+and id_devis = ?
+and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
     }
 
 

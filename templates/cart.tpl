@@ -24,7 +24,7 @@
             {foreach key=key item=product from=$cart name=cart}
                 {$option_price=0}
                 <tr>
-                    <td><img src="img/recap-prod.png" alt=""></td>
+                    <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
                     <td class="designation_prd">
                         <a href="?p&id={$product.id} ">{$product.name} 
                             {if isset($product.options)}

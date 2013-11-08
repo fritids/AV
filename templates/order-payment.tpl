@@ -1,5 +1,5 @@
 <div class="bloc_paiement">
-    <div class="montant"><p>Le montant &agrave; r&eacute;gler est de <span class="orange">{$smarty.session.cart_summary.total_amount} € ttc.</span></p></div>
+    <div class="montant"><p>Le montant &agrave; r&eacute;gler est de <span class="orange">{$smarty.session.cart_summary.total_amount + $smarty.session.cart_summary.total_shipping} € ttc.</span></p></div>
     <div class="texte_paiement">
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut consequat iaculis nibh id eleifend. Sed rhoncus nunc eu est tincidunt vehicula. Praesent molestie, turpis eu tincidunt dignissim, lectus sem faucibus dolor, id dapibus ligula velit vel massa. Nunc porttitor auctor massa, at hendrerit quam lobortis ut.</p>
     </div>

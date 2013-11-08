@@ -245,7 +245,14 @@ $order_suivant = @$b[0]["id_order"];
                             <tr id="id0">
                                 <td><?= $od["id_order_detail"] ?></td>
                                 <td><?= $od["product_name"] ?></td>
-                                <td><?= $od["attribute_name"] ?></td>
+                                <td>
+                                    <?
+                                    $attributes = getOrdersDetailAttribute($od["id_order_detail"]);
+                                    foreach ($attributes as $attribute) {
+                                        echo $attribute["name"] . "<br>";
+                                    }
+                                    ?>
+                                </td>
                                 <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> x <?= $od["product_depth"] ?></td>
                                 <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>
                                 <td><?= $od["product_shipping"] + $od["attribute_shipping"] ?> €</td>
@@ -254,28 +261,28 @@ $order_suivant = @$b[0]["id_order"];
                                 <td>
                                     <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
                                         <option value="">--</option>
-                                        <?
-                                        foreach ($orderStates as $orderState) {
-                                            ?>
+        <?
+        foreach ($orderStates as $orderState) {
+            ?>
                                             <option value="<?= $orderState["id_statut"] ?>"
                                             <?= ($od["product_current_state"] == $orderState["id_statut"]) ? "selected" : "" ?>
                                                     ><?= $orderState["title"] ?> </option>
-                                                    <?
-                                                }
-                                                ?>
+                                            <?
+                                        }
+                                        ?>
                                     </select>
                                 </td>
                                 <td>
                                     <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
-                                        <?
-                                        foreach ($suppliers as $supplier) {
-                                            ?>
+        <?
+        foreach ($suppliers as $supplier) {
+            ?>
                                             <option value="<?= $supplier["id_supplier"] ?>"
                                             <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
                                                     ><?= $supplier["name"] ?> </option>
-                                                    <?
-                                                }
-                                                ?>
+                                            <?
+                                        }
+                                        ?>
                                     </select>
                                 </td>
                                 <td>
@@ -289,9 +296,9 @@ $order_suivant = @$b[0]["id_order"];
                                 <td><?= $t["comment2"] ?></td>
                                 <td><?= $t["comment3"] ?></td>
                             </tr>
-                            <?
-                        }
-                        ?>
+        <?
+    }
+    ?>
                     </table>
                 </div>
             </div>
@@ -303,7 +310,7 @@ $order_suivant = @$b[0]["id_order"];
                         <h2>Commentaire client:</h2>
                         <div class="well well-lg">
 
-                            <?= $orderinfo["order_comment"] ?>
+    <?= $orderinfo["order_comment"] ?>
                         </div>
                     </div>
                 </div>
@@ -316,22 +323,22 @@ $order_suivant = @$b[0]["id_order"];
                 </div>
 
             </div>
-            <?
-        }
-        ?>
+    <?
+}
+?>
         <div class="row">
             <div class="col-xs-2">
-                <?
-                foreach ($orderStates as $orderState) {
-                    ?>
+<?
+foreach ($orderStates as $orderState) {
+    ?>
                     <div class="row">
                         <div class="alert-<?= $orderState["id_statut"] ?>" >
-                            <?= $orderState["title"] ?> 
+    <?= $orderState["title"] ?> 
                         </div>
                     </div>
-                    <?
-                }
-                ?> 
+    <?
+}
+?> 
             </div>
         </div>
     </div>

@@ -95,7 +95,7 @@ $opts['fdd']['id_order'] = array(
 $opts['fdd']['reference'] = array(
     'name' => 'Reference',
     'select' => 'T',
-    'maxlen' => 9,
+    'maxlen' => 10,
     'sort' => true,
     'URL' => 'av_orders_view.php?id_order=$key'
 );

@@ -48,10 +48,19 @@ function getUserOrdersDetail($oid) {
     global $db;
     $params = array($oid);
 
-    $r = $db->rawQuery("SELECT a.*, b.name attribut_name
+    $r = $db->rawQuery("SELECT a.*
         FROM av_order_detail a 
-        LEFT OUTER JOIN av_product_attribute b on (a.product_attribute_id = b.id_product_attribute )
         where id_order = ? ", $params);
+
+    return $r;
+}
+function getOrdersDetailAttribute($odid) {
+    global $db;
+    $params = array($odid);
+
+    $r = $db->rawQuery("SELECT a.*
+        FROM av_order_product_attributes a 
+        where id_order_detail = ? ", $params);
 
     return $r;
 }

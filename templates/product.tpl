@@ -1,116 +1,8 @@
-<script>
 
-    $(document).ready(function($) {
-        var square = 0;
-        var weight = {$product.weight};
-        var unit_price = {$product.price};
-        var min_width = {$product.min_width};
-        var max_width = {$product.max_width};
-        var min_height = {$product.min_height};
-        var max_height = {$product.max_height};
-
-        $('.attribute').change(function() {
-
-            $.ajax({
-                url: "functions/ajax_declinaison.php",
-                type: "POST",
-                dataType: "json",
-                async: false,
-                data: {
-                    id: $('#faconnage').val()
-                },
-                success: function(result) {
-                    unit_price = result.price
-                    // console.log(unit_price);
-                    $('#total_price').text(unit_price);
-                    $('#price').val(unit_price);
-
-                }
-            });
-        });
-
-        $('#width').change(function() {
-
-            if ($('#width').val() < min_width) {
-                alert("La largeur minimal est de " + min_width + " mm.");
-                $('#width').val("");
-                return;
-            }
-            if ($('#width').val() > max_width) {
-                alert("La largeur maximal est de " + max_width + " mm.");
-                $('#width').val("");
-                return;
-            }
-
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                square = (pwidth * pheigth) / 1000000;
-                $('#surface').val(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
-
-
-        });
-        $('#heigth').change(function() {
-            
-            if ($('#heigth').val() < min_height) {
-                alert("La Longeur minimal est de " + min_height + " mm.");
-                $('#width').val("");
-                return;
-            }
-            if ($('#heigth').val() > max_height) {
-                alert("La Longeur maximal est de " + max_height + " mm.");
-                $('#width').val("");
-                return;
-            }
-
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 1000000;
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-
-
-                $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-
-            }
-        });
-        $('#quantity').change(function() {
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 1000000;
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
-
-        });
-        $('#validation').submit(function() {
-
-            if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {
-                return false;
-            }
-        });
-    });
-
-</script>
 <div id="produit" class="bloc_page_gauche clear-it">    
     <p class="rouge">Délais de livraisons entre 4 à 5 semaines concernant ce produit.</p>
     <h1>{$product.name}</h1>
+    <div id="texte"></div>
     <div id="features">
         <div class="images">
 
@@ -157,18 +49,20 @@
                 <div class="clearfix"></div>
                 <p class="ref">Réference:{$product.reference} <img src="img/sans-frais.png" style="margin-left: 25px;" alt=""></p>
 
-                {if isset($product.attributes)}
-                    <div class="row clearfix">
-                        <label for="faconnage">Façonnage</label>
-                        <select name="options" id="faconnage" class="attribute">
-                            <option>--</option>
-                            {foreach key=key item=option from=$product.attributes}
-                                <option value='{$option.id_product_attribute}'>
-                                    {$option.name} 
-                                </option>                            
-                            {/foreach}
-                        </select>
-                    </div>
+                {if isset($product.combinations)}
+                    {foreach key=key item=combination from=$product.combinations}
+                        <div class="row clearfix">
+                            <label for="{$combination.name}">{$combination.name}</label>
+
+                            <select name="options[{$key}]" id="{$combination.name}" class="attribute">
+                                <option value="0">--</option>
+                                {foreach key=key item=attribute from=$combination.attributes}
+                                    <option value='{$attribute.id_product_attribute}'>{$attribute.name}</option>                            
+                                {/foreach}
+                            </select>
+                        </div>
+                    {/foreach}
+
                 {/if}
                 <div class="row clearfix">
                     <label for="width">Largeur</label>
@@ -179,7 +73,10 @@
                     <label for="height">Longeur</label>
                     <input type="text" id ="heigth" name="height" value="" class="text">
                     <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
-                </div>                
+                </div>   
+                <div class="row clearfix">
+                    <input type="button" value="Calcuer" class="submit">						
+                </div>	
             </div>   	
         </form>
     </div>
@@ -265,3 +162,116 @@
 </div>
 *}
 </div>
+<script>
+
+    $(document).ready(function($) {
+        var square = 0;
+        var unit_price = {$product.price};
+        var unit_weight = 1;
+        var coef_weight = 2.5;
+        var min_width = {$product.min_width};
+        var max_width = {$product.max_width};
+        var min_height = {$product.min_height};
+        var max_height = {$product.max_height};
+
+        $('.attribute').change(function() {
+            myArray = $('.attribute');
+            //console.log($('.attribute').serializeArray());
+            $.ajax({
+                url: "functions/ajax_declinaison.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    id: this.value,
+                    id_product: {$product.id_product},
+                    ids: $('.attribute').serializeArray()
+                },
+                success: function(result) {
+                    unit_price = result.price;
+                    unit_weight = result.weight;
+                    // console.log(unit_price);
+                    $('#total_price').text(unit_price);
+                    //$('#total_poids').text(unit_weight);
+                    $('#price').val(unit_price);
+                    //$('#texte').text(unit_price);
+                }
+            });
+        });
+
+        $('#width').change(function() {
+
+            if ($('#width').val() < min_width) {
+                alert("La largeur minimal est de " + min_width + " mm.");
+                $('#width').val("");
+                return;
+            }
+            if ($('#width').val() > max_width) {
+                alert("La largeur maximal est de " + max_width + " mm.");
+                $('#width').val("");
+                return;
+            }
+
+            qte = $('#quantity').val();
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+
+
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+                square = (pwidth * pheigth) / 1000000;
+                $('#surface').val(square.toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
+            }
+
+
+        });
+        $('#heigth').change(function() {
+
+            if ($('#heigth').val() < min_height) {
+                alert("La Longeur minimal est de " + min_height + " mm.");
+                $('#heigth').val("");
+                return;
+            }
+            if ($('#heigth').val() > max_height) {
+                alert("La Longeur maximal est de " + max_height + " mm.");
+                $('#heigth').val("");
+                return;
+            }
+
+            qte = $('#quantity').val();
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+            square = (pwidth * pheigth) / 1000000;
+
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+                $('#surface').text(square.toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
+
+            }
+        });
+        $('#quantity').change(function() {
+            qte = $('#quantity').val();
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+            square = (pwidth * pheigth) / 1000000;
+
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+                $('#surface').text(square.toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
+            }
+        });
+        $('#validation').submit(function() {
+
+            if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {
+                return false;
+            }
+        });
+    });
+
+</script>

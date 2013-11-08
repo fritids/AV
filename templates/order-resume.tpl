@@ -51,7 +51,7 @@
             {foreach key=key item=product from=$cart name=cart}
                 {$option_price=0}
                 <tr>
-                    <td><img src="img/recap-prod.png" alt=""></td>
+                    <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
                     <td class="designation_prd">
                         <a href="">{$product.name} 
                             {if isset($product.options)}
@@ -66,13 +66,7 @@
                     <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
                     <td class="prix_unit">{$product.price} €</td>
                     <td class="quantite">{$product.quantity}</td>
-                    <td class="total">
-                        {if $option_price !=0}
-                            {$product.quantity*$product.price*$product.surface+$option_price} 
-                        {else}
-                            {$product.quantity*$product.price*$product.surface} 
-                        {/if}
-                        €</td>
+                    <td class="total">{$product.prixttc} €</td>
                 </tr>
             {/foreach}               
         </tbody>
@@ -85,7 +79,7 @@
         <p class="total">Total frais de port : <span class="prix">{$smarty.session.cart_summary.total_shipping}€</span></p>
     </div>
     <div class="promo clearfix">
-        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount}€</span></p>
+        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits + $smarty.session.cart_summary.total_shipping }€</span></p>
     </div>
 
 

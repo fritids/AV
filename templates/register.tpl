@@ -7,10 +7,13 @@
         }
     }
 </script>
-
 <div id="bloc_page_gauche">
-    <form action="index.php?action=new_user" method="post" onsubmit="return  validatePassword();">>
-        <div id="titre-bloc">CREATION DE COMPTE</div>
+    <form action="index.php?action=new_user" method="post" onsubmit="return  validatePassword();">
+        {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
+            <div id="titre-bloc">MODIFICATION DE COMPTE</div>
+        {else}
+            <div id="titre-bloc">CREATION DE COMPTE</div>
+        {/if}
         <h3>INFORMATION DE COMPTE</h3>
         <label for="nom">Nom</label><input id="nom" name="lastname" type="text" value="{$user.lastname}" required="true"/><br />
         <label for="prenom">Prénom</label><input id="prenom" name="firstname" type="text"  value="{$user.firstname}" required="true"/><br />
@@ -48,7 +51,9 @@
         </div>
         <div id="creer-cpt-checking">
             <input id="liv" name="liv" type="checkbox" />Cochez si votre adresse de livraison est différente de l’adresse de facturation.<br />
-            <input id="cgv" name="cgv" type="checkbox" required="required" />J’ai lu et j’accepte les conditions générales de vente.<br />
+            {if !isset($smarty.session.is_logged)}
+                <input id="cgv" name="cgv" type="checkbox" required="required" />J’ai lu et j’accepte les conditions générales de vente.<br />
+            {/if}
         </div>
         <input type="submit" class="bouton" name="b1" />
     </form>
