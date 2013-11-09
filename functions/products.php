@@ -137,6 +137,7 @@ function getImageCover($pid) {
 function getProductByCategorie($cid) {
     global $db;
     $r = $db->where("id_category", $cid)
+            ->where("active", 1)
             ->get("av_product");
     $p = array();
     foreach ($r as $k => $product) {

@@ -1,11 +1,10 @@
 
 <div id="produit" class="bloc_page_gauche clear-it">    
-    <p class="rouge">Délais de livraisons entre 4 à 5 semaines concernant ce produit.</p>
+    <p class="rouge">{$product.msg_dispo}</p>
     <h1>{$product.name}</h1>
     <div id="texte"></div>
     <div id="features">
         <div class="images">
-
             {literal}
                 <div class="cycle-slideshow"
                      data-cycle-timeout=0
@@ -13,17 +12,14 @@
                      data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
                      >
                 {/literal}
-
                 <img src="img/p/{$product.cover.filename}" width="325" />  
 
                 {if isset($product.images)}
                     {foreach key=key item=image from=$product.images}
                         <img src="img/p/{$image.filename}" width="325" />                    
                     {/foreach}
-                {/if} 
-
+                {/if}
             </div>
-
             <div id="custom-pager"></div>
         </div>	
         <form action="?cart" method="post" id="validation">
@@ -31,8 +27,10 @@
                 <div class="separ clearfix">
                     <div class="infos">
                         <p class="prix" ><span id="total_price">{$product.price}</span> €</p>
-                        <p><span id="surface"></span> m² calculé</p>
-                        <p><span id="total_poids"></span> kg calculés</p>
+                        {if $product.id_category !=19}
+                            <p><span id="surface"></span> m² calculé</p>
+                            <p><span id="total_poids"></span> kg calculés</p>
+                        {/if}
                     </div>
                     <div class="add_to_cart">
 
@@ -54,8 +52,7 @@
                         <div class="row clearfix">
                             <label for="{$combination.name}">{$combination.name}</label>
 
-                            <select name="options[{$key}]" id="{$combination.name}" class="attribute">
-                                <option value="0">--</option>
+                            <select name="options[{$key}]" id="{$combination.name}" class="attribute">                                
                                 {foreach key=key item=attribute from=$combination.attributes}
                                     <option value='{$attribute.id_product_attribute}'>{$attribute.name}</option>                            
                                 {/foreach}
@@ -64,19 +61,22 @@
                     {/foreach}
 
                 {/if}
-                <div class="row clearfix">
-                    <label for="width">Largeur</label>
-                    <input type="text" id ="width" name="width" value="" class="text">
-                    <span class="info">de {$product.min_width} à {$product.max_width} mm</span>
-                </div>	
-                <div class="row clearfix">
-                    <label for="height">Longeur</label>
-                    <input type="text" id ="heigth" name="height" value="" class="text">
-                    <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
-                </div>   
-                <div class="row clearfix">
-                    <input type="button" value="Calcuer" class="submit">						
-                </div>	
+
+                {if $product.id_category != 19 && !($product.width && $product.height)}
+                    <div class="row clearfix">
+                        <label for="width">Largeur</label>
+                        <input type="text" id ="width" name="width" value="" class="text">
+                        <span class="info">de {$product.min_width} à {$product.max_width} mm</span>
+                    </div>	
+                    <div class="row clearfix">
+                        <label for="height">Longeur</label>
+                        <input type="text" id ="heigth" name="height" value="" class="text">
+                        <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
+                    </div>   
+                    <div class="row clearfix">
+                        <input type="button" value="Calculer" id="calculer" class="submit">						
+                    </div>	
+                {/if}
             </div>   	
         </form>
     </div>
@@ -162,13 +162,40 @@
 </div>
 *}
 </div>
+
+<script>
+    var unit_price = {$product.price};
+
+    myArray = $('.attribute');
+
+    //console.log($('.attribute').serializeArray());
+    $.ajax({
+        url: "functions/ajax_declinaison.php",
+        type: "POST",
+        dataType: "json",
+        async: false,
+        data: {
+            id: this.value,
+            id_product: {$product.id_product},
+            ids: $('.attribute').serializeArray()
+        },
+        success: function(result) {
+            unit_price = result.price;
+            unit_weight = result.weight;
+            // console.log(unit_price);
+            $('#total_price').text(unit_price);
+            //$('#total_poids').text(unit_weight);
+            $('#price').val(unit_price);
+            //$('#texte').text(unit_price);
+        }
+    });
+</script>
 <script>
 
     $(document).ready(function($) {
         var square = 0;
-        var unit_price = {$product.price};
+
         var unit_weight = 1;
-        var coef_weight = 2.5;
         var min_width = {$product.min_width};
         var max_width = {$product.max_width};
         var min_height = {$product.min_height};
@@ -197,6 +224,14 @@
                     //$('#texte').text(unit_price);
                 }
             });
+
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+                square = (pwidth * pheigth) / 1000000;
+                $('#surface').val(square.toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
+                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
+            }
         });
 
         $('#width').change(function() {
@@ -220,7 +255,7 @@
             if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
                 square = (pwidth * pheigth) / 1000000;
                 $('#surface').val(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
                 $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
                 $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
             }
@@ -247,7 +282,7 @@
 
             if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
                 $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
                 $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
                 $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
 
@@ -261,11 +296,23 @@
 
             if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
                 $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * coef_weight * qte).toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
                 $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
                 $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
             }
         });
+
+        $('#calculer').click(function() {
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+                square = (pwidth * pheigth) / 1000000;
+                $('#surface').val(square.toFixed(2));
+                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
+                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
+                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
+            }
+        }
+        )
+
         $('#validation').submit(function() {
 
             if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {

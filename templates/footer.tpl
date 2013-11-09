@@ -13,10 +13,11 @@
                 <li><img src="img/FOOTER_devis.png"/></li>
                 <li>Devis personnalisé</li>
             </ul>
-            <ul>
-                <li><img src="img/FOOTER_nous_contacter.png"/></li>
-                <li>Nous contacter</li>
-            </ul>
+            <a href="?contact-nous"><ul>
+                    <li><img src="img/FOOTER_nous_contacter.png"/></li>
+                    <li>Nous contacter</li>
+                </ul>
+            </a>
         </div>
         <div id="footer1-right">
             <p id="footer1-right-titre"><img src="img/contact.png"/>
@@ -35,17 +36,17 @@
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">INFORMATIONS</li>
-                    {foreach key=key item=content from=$AllCMS}
+                    {*foreach key=key item=content from=$AllCMS}
                     <li><a href="?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
-                    {/foreach}
-                <li>Nous contacter</li>
-                <li>Mentions légales</li>
-                <li>CGU</li>
-                <li>FAQ</li>
+                    {/foreach*}
+                <li><a href="?contact-nous" class="lien-footer">Nous contacter</a></li>
+                <li><a href="?cms&id=2" class="lien-footer">Mentions légales</a></li>
+                <li><a href="?cms&id=3" class="lien-footer">CGU</a></li>
+                <li><a href="?cms&id=20" class="lien-footer">FAQ</a></li>
             </ul>
             <ul>
                 <li><span class="caret"></span></li>
-                <li class="titre">MON COMPTE</li>
+                <li class="titre"><a href="?my-account" class="lien-titre">MON COMPTE</a></li>
                 <li>Informations personnelles</li>
                 <li>Mes factures</li>
                 <li>Mes avoirs</li>

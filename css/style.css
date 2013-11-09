@@ -290,6 +290,10 @@
     background: url(../img/categorie_slider.png) no-repeat center center;
     margin: 20px 0 35px 0;
 }
+#categorie .categorie_slider img {
+    margin-top: 7px;
+	margin-left: 6px;
+}
 
 #categorie .verre-categorie a{
     display: block;

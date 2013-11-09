@@ -18,6 +18,10 @@ class Panier {
     // ajouter un article $refproduit
     public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension, $productInfos) {
 
+        print_r($dimension);
+        if (empty($dimension))
+            $surface = 1;
+
         $montant_produit_ttc = round($nb * $price * $surface, 2);
 
         @$this->panier[$refproduit]['quantity'] = $nb;
@@ -44,7 +48,6 @@ class Panier {
         $montant_produit_ttc = round($nb * $price * $surface, 2);
 
         @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
-        @$this->panier[$refproduit]["options"][$refoption]['surface'] += $surface;
         @$this->panier[$refproduit]["options"][$refoption]['dimension'] = $dimension;
         @$this->panier[$refproduit]["options"][$refoption]['surface'] = round($this->panier[$refproduit]["options"][$refoption]['surface'] + $surface, 2);
         @$this->panier[$refproduit]["options"][$refoption]['price'] = round($this->panier[$refproduit]["options"][$refoption]['price'] + $price, 2);

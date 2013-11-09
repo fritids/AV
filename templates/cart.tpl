@@ -46,12 +46,14 @@
                             *}
                         </a>
                     </td>
-                    <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
+                    {if $product.dimension}
+                        <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
+                    {else}
+                        <td class="dimensions"><em>N/A</em></td>
+                    {/if}
                     <td class="prix_unit">{$product.price} €</td>
                     <td class="quantite">{$product.quantity}</td>
-                    <td class="total">
-                        {$product.prixttc}
-                        €</td>
+                    <td class="total">{$product.prixttc} €</td>
                     <td><form action="?cart" method="post">
                             <input type="hidden" name="id_cart_item" value="{$smarty.foreach.cart.index}">
                             <input type="hidden" name="id_product" value="{$product.id}">
@@ -71,7 +73,7 @@
 
         <a href="?delivery"><button>livraison</button></a>
     {else}
-        <a href="?identification"><button>Se connecter</button></a>
+        <a href="?order-identification"><button>Se connecter</button></a>
     {/if}
 </div>
 

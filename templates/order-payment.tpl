@@ -6,16 +6,14 @@
 
     <div class="type_paiement">
         <div class="logo_pay"><img src="img/carte.png" alt="Paiement par carte" /></div>
-        <div class="choix_pay"><p><label><input type="radio" name="choix_paiement" class="choice" />Paiement par carte</label></p></div>
+        <div class="choix_pay">
+            {$CMCIC_CHECKOUT_FORM}
+        </div>
         <div class="clear"></div>
     </div>
     <div class="type_paiement">
         <div class="logo_pay"><img src="img/paypal.png" alt="Paiement par Paypal" /></div>
-        <div class="choix_pay">
-            {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-                {$PAYPAL_CHECKOUT_FORM}            
-            {/if}
-        </div>
+        <div class="choix_pay">{$PAYPAL_CHECKOUT_FORM}</div>
         <div class="clear"></div>
     </div>
     <div class="type_paiement">
@@ -25,7 +23,7 @@
                 <label>
                     <form action='?action=order_validate' method='post'>
                         <input type='hidden' name="payment" value='Chèque' />
-                        <input type='submit' value='Payer par chèque' />
+                        <input type='submit' value='Payer par chèque' class="pay_cheque" />
                     </form>
                 </label>
             </p>

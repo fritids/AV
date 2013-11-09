@@ -26,12 +26,16 @@ function updateUserAddress($infos, $alias, $aid) {
     global $db;
     $r = $db->where("id_address", $aid)
             ->where("alias", $alias)
-            ->update("av_address", $infos);
+            ->update("av_address", array("active" => 0));
+
+    $infos["alias"] = $alias;
+
+    createNewAdresse($infos);
 }
 
 function createNewAdresse($infos) {
     global $db;
-    $id = $db->insert("av_address", $infos);    
+    $id = $db->insert("av_address", $infos);
     return $id;
 }
 
@@ -40,11 +44,12 @@ function getAdresse($uid, $alias) {
 
     $r = $db->where("alias", $alias)
             ->where("id_customer", $uid)
+            ->where("active", 1)
             ->get("av_address");
     if ($r)
         return $r[0];
-    
 }
+
 function getAdresseById($aid) {
     global $db;
 
@@ -55,9 +60,9 @@ function getAdresseById($aid) {
 
 function checkUserLogin($email, $pwd) {
     global $db;
-    
+
     $user = $db->where('email', $email)
-            ->where('passwd', md5(_COOKIE_KEY_.$pwd))
+            ->where('passwd', md5(_COOKIE_KEY_ . $pwd))
             ->get('av_customer');
 
     if (count($user) == 1) {
@@ -70,6 +75,8 @@ function checkUserLogin($email, $pwd) {
         $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
         $_SESSION["user"]["invoice"] = getAdresse($user[0]["id_customer"], "invoice");
 
+        if (empty($_SESSION["user"]["delivery"]))
+            $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "invoice");
 
         return(true);
     } else {
@@ -84,7 +91,5 @@ function getCustomerDetail($id) {
 
     return $r[0];
 }
-
-
 
 ?>

@@ -1,8 +1,8 @@
 <?php
 define('_DB_SERVER_', 'localhost');
-define('_DB_NAME_', 'allovitre');
-define('_DB_USER_', 'allovitre');
-define('_DB_PASSWD_', 'T1pFLinOEs!');
+define('_DB_NAME_', '');
+define('_DB_USER_', '');
+define('_DB_PASSWD_', '!');
 define('_DB_PREFIX_', 'ps_');
 define('_MYSQL_ENGINE_', 'InnoDB');
 define('_PS_CACHING_SYSTEM_', 'MCached');

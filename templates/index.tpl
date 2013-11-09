@@ -43,7 +43,12 @@
                             Total : {$smarty.session.cart_summary.total_amount} € TTC<br/>                
                         </p>
                         <a class="bouton" href="?cart">Panier</a>
-                        <a class="bouton" href="?order-resume">Commander</a>
+                        
+                        {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
+                            <a class="bouton" href="?order-resume">Commander</a>
+                        {else}
+                            <a class="bouton" href="?identification">Commander</a>
+                        {/if}
                     </div>
                 {else}
                     <div id="panier">

@@ -10,7 +10,7 @@ require('functions/categories.php');
 require('functions/orders.php');
 require('functions/tools.php');
 require('functions/cms.php');
-
+require('classes/CMCIC_Tpe.inc.php');
 
 // classes declaration
 
@@ -19,6 +19,11 @@ $smarty = new Smarty;
 $smarty->error_reporting = E_ALL & ~E_NOTICE;
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+
+$promo_id = array(79, 65, 123, 124);
+foreach ($promo_id as $id) {
+    $promos[] = getProductInfos($id);
+}
 
 /* vars */
 $nb_produits = 0;
@@ -34,7 +39,6 @@ $AllCMS = getAllCmsInfo();
 $cms = array();
 /* fin */
 
-
 //Caddie
 $cart = new Panier();
 
@@ -49,17 +53,21 @@ if (isset($_GET["cart"])) {
 
         $pweight = $productInfos["weight"];
         $shipping_ratio = getDeliveryRatio($pweight);
-//$shipping_amount = $shipping_ratio * $pweight;
-//$shipping_amount = $conf_shipping_amount;
+        //$shipping_amount = $shipping_ratio * $pweight;
+        //$shipping_amount = $conf_shipping_amount;
         $shipping_amount = 0;
 
         if (isset($_POST["add"])) {
-            $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
-            $dimension = array(
-                "width" => $_POST["width"],
-                "height" => $_POST["height"],
-                "depth" => $productInfos["depth"]
-            );
+            $dimension = array();
+
+            if (isset($_POST["width"]) && !empty($_POST["width"]) && isset($_POST["height"]) && !empty($_POST["height"])) {
+                $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
+                $dimension = array(
+                    "width" => $_POST["width"],
+                    "height" => $_POST["height"],
+                    "depth" => $productInfos["depth"]
+                );
+            }
 
             $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos);
 
@@ -138,6 +146,11 @@ if (isset($_GET["identification"])) {
     $page = "identification";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
 }
+if (isset($_GET["order-identification"])) {
+    $page = "order-identification";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
+    $page_type = "full";
+}
 
 
 if (isset($_GET["cms"])) {
@@ -166,6 +179,7 @@ if (isset($_GET["orders-list"])) {
 
 
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
+$smarty->assign('CMCIC_CHECKOUT_FORM', '');
 
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
@@ -181,6 +195,9 @@ if (isset($_GET["order-payment"])) {
     $breadcrumb = array("parent" => "Accueil", "fils" => "Paiement");
     $page_type = "full";
 
+    saveorder();
+
+    // PAYPAL
     $settings = array(
         'business' => $paypal["email_account"], //paypal email address
         'currency' => 'EUR', //paypal currency
@@ -195,12 +212,71 @@ if (isset($_GET["order-payment"])) {
 
     $pp = new paypalcheckout($settings); //Create an instance of the class
     $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
-//$cartHTML = $pp->getCartContentAsHtml();
+    //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
-
-
     $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
-    ;
+    // fin paypal
+    // CMCIC
+    $sOptions = "";
+    $sReference = $_SESSION["id_order"];
+    $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"];
+    $sDevise = "EUR";
+    $sDate = date("d/m/Y:H:i:s");
+    $sLangue = "FR";
+    $sTexteLibre = "Texte";
+    $sEmail = $_SESSION["user"]["email"];
+
+    $sNbrEch = "";
+    $sDateEcheance1 = "";
+    $sMontantEcheance1 = "";
+    $sDateEcheance2 = "";
+    $sMontantEcheance2 = "";
+    $sDateEcheance3 = "";
+    $sMontantEcheance3 = "";
+    $sDateEcheance4 = "";
+    $sMontantEcheance4 = "";
+
+    $oTpe = new CMCIC_Tpe($sLangue);
+    $oHmac = new CMCIC_Hmac($oTpe);
+
+    // Data to certify
+    $PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS, $oTpe->sNumero, $sDate, $sMontant, $sDevise, $sReference, $sTexteLibre, $oTpe->sVersion, $oTpe->sLangue, $oTpe->sCodeSociete, $sEmail, $sNbrEch, $sDateEcheance1, $sMontantEcheance1, $sDateEcheance2, $sMontantEcheance2, $sDateEcheance3, $sMontantEcheance3, $sDateEcheance4, $sMontantEcheance4, $sOptions);
+
+    // MAC computation
+    $sMAC = $oHmac->computeHmac($PHP1_FIELDS);
+
+    $CMCICCheckoutForm = '
+    <form action="' . $oTpe->sUrlPaiement . '" method="post" id="PaymentRequest">
+        <p>
+            <input type="hidden" name="version"             id="version"        value="' . $oTpe->sVersion . '" />
+            <input type="hidden" name="TPE"                 id="TPE"            value="' . $oTpe->sNumero . '" />
+            <input type="hidden" name="date"                id="date"           value="' . $sDate . '" />
+            <input type="hidden" name="montant"             id="montant"        value="' . $sMontant . $sDevise . '" />
+            <input type="hidden" name="reference"           id="reference"      value="' . $sReference . '" />
+            <input type="hidden" name="MAC"                 id="MAC"            value="' . $sMAC . '" />
+            <input type="hidden" name="url_retour"          id="url_retour"     value="' . $oTpe->sUrlKO . '" />
+            <input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="' . $oTpe->sUrlOK . '" />
+            <input type="hidden" name="url_retour_err"      id="url_retour_err" value="' . $oTpe->sUrlKO . '" />
+            <input type="hidden" name="lgue"                id="lgue"           value="' . $oTpe->sLangue . '" />
+            <input type="hidden" name="societe"             id="societe"        value="' . $oTpe->sCodeSociete . '" />
+            <input type="hidden" name="texte-libre"         id="texte-libre"    value="' . HtmlEncode($sTexteLibre) . '" />
+            <input type="hidden" name="mail"                id="mail"           value="' . $sEmail . '" />
+            <!-- -->
+            <input type="hidden" name="nbrech"              id="nbrech"         value="" />
+            <input type="hidden" name="dateech1"            id="dateech1"       value="" />
+            <input type="hidden" name="montantech1"         id="montantech1"    value="" />
+            <input type="hidden" name="dateech2"            id="dateech2"       value="" />
+            <input type="hidden" name="montantech2"         id="montantech2"    value="" />
+            <input type="hidden" name="dateech3"            id="dateech3"       value="" />
+            <input type="hidden" name="montantech3"         id="montantech3"    value="" />
+            <input type="hidden" name="dateech4"            id="dateech4"       value="" />
+            <input type="hidden" name="montantech4"         id="montantech4"    value="" />
+            
+            <input type="submit" name="bouton"              id="bouton"         class ="pay_cb" value="Payer par carte bancaire" />
+        </p>
+    </form>';
+
+    $smarty->assign('CMCIC_CHECKOUT_FORM', $CMCICCheckoutForm);
 }
 
 /* new user */
@@ -328,110 +404,95 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         $status = 2;
     }
 
-    //global de la commande
-    $order_summary = array(
-        "id_customer" => $_SESSION["user"]["id_customer"],
-        "reference" => getLastOrderId(),
-        "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
-        "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
-        "payment" => $payment,
-        "current_state" => $status,
-        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
-        "invoice_date" => date("Y-m-d h:i:s"),
-        "delivery_date" => date("Y-m-d h:i:s"),
-        "date_add" => date("Y-m-d h:i:s"),
-        "date_upd" => date("Y-m-d h:i:s"),
-        "order_comment" => $_SESSION["cart_summary"]["order_comment"],
-    );
+    validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
 
-    $oid = $db->insert("av_orders", $order_summary);
+    //on redirige sur la listes des commandes
+    $page = "order-confirmation";
 
-    //paiement
-    $order_payment = array(
-        "id_order" => $oid,
-        "id_currency" => 1,
-        "amount" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
-        "payment_method" => $payment,
-        "conversion_rate" => 1,
-        "date_add" => date("Y-m-d h:i:s"),
-    );
+    $smarty->assign('reference', $_SESSION["reference"]);
+    $smarty->assign('payment', $payment);
 
-    $db->insert("av_order_payment", $order_payment);
-
-
-    foreach ($cartItems as $item) {
-
-        $p = getProductInfos($item["id"]);
-
-        $order_detail = array(
-            "id_order" => $oid,
-            "id_product" => $item["id"],
-            "product_name" => $item["name"],
-            "product_quantity" => $item["quantity"],
-            "product_price" => $item["price"],
-            "product_shipping" => $item["shipping"],
-            "product_width" => $item["dimension"]["width"],
-            "product_height" => $item["dimension"]["height"],
-            "product_depth" => $item["dimension"]["depth"],
-            "product_weight" => $item["quantity"] * $p["weight"] * $item["surface"],
-            "total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
-            "total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
-        );
-
-
-        // on calcule le montant supp du aux options
-        if (isset($item["options"])) {
-            foreach ($item["options"] as $k => $option) {
-                $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-            }
-        }
-        $odid = $db->insert("av_order_detail", $order_detail);
-
-        // on rajoute les options
-        if (isset($item["options"])) {
-            foreach ($item["options"] as $k => $option) {
-
-
-                $order_product_attributes = array(
-                    "id_order" => $oid,
-                    "id_order_detail" => $odid,
-                    "id_product" => $item["id"],
-                    "id_attribute" => $option["o_id"],
-                    "name" => $option["o_name"]);
-
-                /* $order_detail["product_attribute_id"] = $option["o_id"];
-                  $order_detail["attribute_name"] = $option["o_name"];
-                  $order_detail["attribute_quantity"] = $option["o_quantity"];
-                  $order_detail["attribute_price"] = $option["o_price"];
-                  $order_detail["attribute_shipping"] = $option["o_shipping"];
-                  $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                  $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                 */
-                $db->insert("av_order_product_attributes", $order_product_attributes);
-            }
-        }
-    }
-
-//on flush le caddie
+    //on flush le caddie
     unset($_SESSION["cart"]);
     unset($_SESSION["cart_summary"]);
+    unset($_SESSION["id_order"]);
+    unset($_SESSION["reference"]);
     $cartItems = array();
-
-//on redirige sur la listes des commandes
-    $page = "order-confirmation";
-//$orders = getUserOrders($_SESSION["user"]["id_customer"]);
-    $smarty->assign('order', $order_summary);
-    $smarty->assign('payment', $payment);
 }
 
-/* */
+/* paiement CB */
+
+if (isset($_GET["paiementko"]) || isset($_GET["paiementok"])) {
+    $status = 0;
+    $page_type = "full";
+    $payment = "Carte Credit";
+
+    $CMCIC_bruteVars = getMethode();
+
+    $oTpe = new CMCIC_Tpe();
+    $oHmac = new CMCIC_Hmac($oTpe);
+
+
+    if (isset($_GET["paiementok"])) {
+        $status = 2;
+        validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
+        $page = "order-confirmation";
+        $smarty->assign('reference', $_SESSION["reference"]);
+        
+        //on flush le caddie
+        unset($_SESSION["cart"]);
+        unset($_SESSION["cart_summary"]);
+        unset($_SESSION["id_order"]);
+        unset($_SESSION["reference"]);
+        $cartItems = array();
+    }
+
+    // Message Authentication
+    $cgi2_fields = sprintf(CMCIC_CGI2_FIELDS, $oTpe->sNumero, $CMCIC_bruteVars["date"], $CMCIC_bruteVars['montant'], $CMCIC_bruteVars['reference'], $CMCIC_bruteVars['texte-libre'], $oTpe->sVersion, $CMCIC_bruteVars['code-retour'], $CMCIC_bruteVars['cvx'], $CMCIC_bruteVars['vld'], $CMCIC_bruteVars['brand'], $CMCIC_bruteVars['status3ds'], $CMCIC_bruteVars['numauto'], $CMCIC_bruteVars['motifrefus'], $CMCIC_bruteVars['originecb'], $CMCIC_bruteVars['bincb'], $CMCIC_bruteVars['hpancb'], $CMCIC_bruteVars['ipclient'], $CMCIC_bruteVars['originetr'], $CMCIC_bruteVars['veres'], $CMCIC_bruteVars['pares']);
+
+    if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC'])) {
+        switch ($CMCIC_bruteVars['code-retour']) {
+            case "Annulation" :
+                //Erreur de paiement
+                $status = 8;
+                $page = "order-error";
+                $smarty->assign('reference', $_SESSION["reference"]);
+                break;
+            case "payetest":
+                $status = 2;
+                $page = "order-error";
+                break;
+            case "paiement":
+                $status = 2;
+                validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
+                $page = "order-confirmation";
+                $smarty->assign('reference', $_SESSION["reference"]);
+                break;
+        }
+
+        $receipt = CMCIC_CGI2_MACOK;
+
+        validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
+
+        //on flush le caddie
+        unset($_SESSION["cart"]);
+        unset($_SESSION["cart_summary"]);
+        unset($_SESSION["id_order"]);
+        unset($_SESSION["reference"]);
+        $cartItems = array();
+    } else {
+        // your code if the HMAC doesn't match
+        $receipt = CMCIC_CGI2_MACNOTOK . $cgi2_fields;
+    }
+}
+
+/* devis */
 if (isset($_SESSION["user"])) {
     $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-from av_devis a , admin_user b 
-where a.id_user = b.id_admin 
-and current_state = 1
-and id_customer = ?", array($_SESSION["user"]["id_customer"]));
+                            from av_devis a , admin_user b 
+                            where a.id_user = b.id_admin 
+                            and current_state = 1
+                            and id_customer = ?", array($_SESSION["user"]["id_customer"]));
 
     foreach ($mydevis as $k => $devis) {
 
@@ -441,7 +502,7 @@ and id_customer = ?", array($_SESSION["user"]["id_customer"]));
         $mydevis[$k]["detail"] = $mydevisdetail;
     }
 }
-/**/
+
 
 if (isset($_GET["devis"])) {
 
@@ -449,11 +510,11 @@ if (isset($_GET["devis"])) {
         $devis_id = $_GET["id"];
 
         $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-from av_devis a , admin_user b 
-where a.id_user = b.id_admin 
-and current_state = 1
-and id_devis = ?
-and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
+                                    from av_devis a , admin_user b 
+                                    where a.id_user = b.id_admin 
+                                    and current_state = 1
+                                    and id_devis = ?
+                                    and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
 
 
         if ($mydevis) {
@@ -471,14 +532,12 @@ and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
                 ->update("av_devis", array("current_state" => 2));
 
         $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-from av_devis a , admin_user b 
-where a.id_user = b.id_admin 
-and current_state = 1
-and id_devis = ?
-and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
+                                from av_devis a , admin_user b 
+                                where a.id_user = b.id_admin 
+                                and current_state = 1
+                                and id_devis = ?
+                                and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
     }
-
-
     $smarty->assign('mydevis', $mydevis);
 }
 
@@ -488,7 +547,6 @@ $smarty->assign('user', null);
 if (@$_SESSION["is_logged"]) {
     $smarty->assign('user', $_SESSION["user"]);
 }
-
 
 
 /* Smarty */
@@ -505,6 +563,8 @@ $smarty->assign('breadcrumb', $breadcrumb);
 $smarty->assign('mydevis', $mydevis);
 $smarty->assign('error', $error);
 $smarty->assign('config', $config);
+//$smarty->assign('meta', $meta);
+$smarty->assign('promos', $promos);
 
 $smarty->display('index.tpl');
 ?>
@@ -519,3 +579,4 @@ $smarty->display('index.tpl');
 <?= print_r($product); ?>
 <h1>Post</h1>
 <?= print_r($_POST); ?>
+<br>

@@ -103,6 +103,8 @@
             {include file='sub_menu.tpl'}
 
             <div id="recherche">
+			<img src="img/recherche.jpg"/>
+			{*
                 <div id="rech-conteneur-gauche" >
                     <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
                     switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
@@ -151,4 +153,6 @@
                 <div id="rech-conteneur-droit2">
 
                 </div>
-            </div>
+        
+			*}
+			</div>
