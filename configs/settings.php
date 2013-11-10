@@ -24,16 +24,22 @@ $config["payment"]["virement_infos"] = "RIB ###### <br> IBAN ############";
 
 $conf_shipping_amount = 25;
 
-$paypal["email_account"] = "alamichel.s@free.fr";
-define("returnurl", "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementok");
-define("cancelurl", "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementko");
+$paypal["email_account"] = "contact@moka-web.net";
+
+$paypal["returnurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementok";
+$paypal["cancelurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementko";
+$paypal["returnipn"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/modules/paypal/validationipn.php";
 
 
 // free texte : a bigger reference, session context for the return on the merchant website
-$sTexteLibre = "Texte Libre";
-// customer email
-$sEmail = "test@test.zz";
+$sTexteLibre = "";
 
+
+$confmail["from"] = "contact@allovitre.com";
+$confmail["welcome"] = "Bienvenue";
+        
+        
+$monitoringEmail = "stephane.alamichel@gmail.com, benoit@trusttelecom.fr";
 
 define("CMCIC_CLE", "182A5C7FB0AD605886A46193E5E97278D7A5DD9A");
 define("CMCIC_TPE", "0354284");

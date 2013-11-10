@@ -114,16 +114,16 @@ class Panier {
         }
     }
 
-    // choisir la quantitï¿½ d'article $refproduit
+    // choisir la quantit? d'article $refproduit
     public function setQuantity($refproduit = "", $toSet = "") {
         @$this->panier[$refproduit]['quantity'] = $toSet;
         if ($toSet <= 0)
             unset($this->panier[$refproduit]);
     }
 
-    // afficher la quantitï¿½ de produits dans le panier
-    // paramï¿½tre : $refproduit : permet d'afficher la quantitÃ© pour le produit de cette rï¿½fï¿½rence
-    // si le paramï¿½tre est vide, on affiche la quantitï¿½ totale de produit
+    // afficher la quantit? de produits dans le panier
+    // param?tre : $refproduit : permet d'afficher la quantité pour le produit de cette r?f?rence
+    // si le param?tre est vide, on affiche la quantit? totale de produit
     public function showQuantity($refproduit = "") {
         if ($refproduit) {
             return $this->panier[$refproduit]['quantity'];
@@ -136,7 +136,7 @@ class Panier {
         return $total;
     }
 
-    // afficher la liste des articles (et accessoirement, leur quantitï¿½)
+    // afficher la liste des articles (et accessoirement, leur quantit?)
 
     public function showCart() {
         $list = array();
@@ -177,7 +177,7 @@ class Panier {
                             $list[$i]["contact"][$key] = $contact;
                     }
                 }
-                // fichiers attachÃ©s
+                // fichiers attachés
                 if (!empty($this->panier[$ref]['files'])) {
                     foreach ($this->panier[$ref]['files'] as $key => $file) {
                         if (!empty($file))

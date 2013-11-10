@@ -1,4 +1,6 @@
+
 <div class="bloc_id">
+<img src="img/menu-connexion.jpg"/>
     <p class="intro">Cr&eacute;er votre compte vous permet de vous enregistrer comme client Allovitres. Vous n'aurez plus &agrave; renseigner vos informations lors de vos prochaines visites et cela vous permet de suivre l'&eacute;tat de vos commandes en quelques clics.</p>
     <div class="crea_compte">
         <h3 class="account_title no1">CR&Eacute;ER UN COMPTE</h3>

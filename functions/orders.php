@@ -35,9 +35,9 @@ function getOrderPaypalPaiement($oid) {
     return $r[0];
 }
 
-function getOrderPayment($oref) {
+function getOrderPayment($oid) {
     global $db;
-    $r = $db->where("order_reference", $oref)
+    $r = $db->where("id_order", $oid)
             ->get("av_order_payment");
 
 
@@ -49,8 +49,8 @@ function getUserOrdersDetail($oid) {
     $params = array($oid);
 
     $r = $db->rawQuery("SELECT a.*
-        FROM av_order_detail a 
-        where id_order = ? ", $params);
+                        FROM av_order_detail a 
+                        where id_order = ? ", $params);
 
     return $r;
 }
@@ -60,8 +60,8 @@ function getOrdersDetailAttribute($odid) {
     $params = array($odid);
 
     $r = $db->rawQuery("SELECT a.*
-        FROM av_order_product_attributes a 
-        where id_order_detail = ? ", $params);
+                        FROM av_order_product_attributes a 
+                        where id_order_detail = ? ", $params);
 
     return $r;
 }
@@ -96,8 +96,8 @@ function validateOrder($oid, $orderValidateInfo) {
 function saveOrder() {
 
     global $db, $cartItems;
-$ref = getLastOrderId();
-    
+    $ref = getLastOrderId();
+
     //global de la commande
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
@@ -166,9 +166,27 @@ $ref = getLastOrderId();
                 $db->insert("av_order_product_attributes", $order_product_attributes);
             }
         }
-        
+
         $_SESSION["id_order"] = $oid;
         $_SESSION["reference"] = getLastOrderId();
+    }
+}
+
+function checkOrderPaid() {
+    global $db;
+
+    $oid = $_SESSION["id_order"];
+
+    if ($oid) {
+        $r = $db->rawQuery("select current_state from av_orders where id_order = ? ", array($oid));
+        
+        if ($r[0]["current_state"] != '') {
+            unset($_SESSION["cart"]);
+            unset($_SESSION["cart_summary"]);
+            unset($_SESSION["id_order"]);
+            unset($_SESSION["reference"]);
+            $cartItems = array();
+        }
     }
 }
 

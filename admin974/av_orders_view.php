@@ -63,7 +63,7 @@ $orderDetail = getUserOrdersDetail($oid);
 $orderinfo = getOrderInfos($oid);
 
 //paiement
-$orderPayment = getOrderPayment($orderinfo["reference"]);
+$orderPayment = getOrderPayment($orderinfo["id_order"]);
 
 //Adresse
 $customer_delivery = getAdresseById($orderinfo["id_address_delivery"]);

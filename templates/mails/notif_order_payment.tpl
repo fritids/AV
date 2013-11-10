@@ -1,4 +1,3 @@
-
 Bonjour,
 
 Toute l’équipe Allovitres vous remercie pour votre commande !
@@ -9,6 +8,4 @@ Pour information, toute commande est livrée par nos propres transporteurs dans 
 
 Nous restons à votre disposition pour tout renseignement complémentaire au 0 892 70 11 13.
 
-Très cordialement.
-
-L’équipe Allovitres !
+{include file='footer.tpl'}

@@ -48,13 +48,13 @@
     width: 685px;
     height: 45px;
 }
-
 .promotions .produit,.complement .produit{
     border: solid 1px #000;
     float: left;
     padding: 20px 8px 3px 8px;
     margin-left: 8px;
     width: 147px;
+	height: 290px;
     position: relative;
 }
 
@@ -1030,6 +1030,26 @@
     height: 38px;
     float: right;
 }
+#btn-livraison{
+	margin-top:10px;
+    border: none;
+    background: url(../img/BTN-livraison.png) no-repeat;
+    width: 155px;
+    height: 38px;
+}
+#btn-connexion{
+	margin-top:10px;
+    border: none;
+    background: url(../img/BTN-connecter.png) no-repeat;
+    width: 188px;
+    height: 38px;
+}
+#btn-precedent{
+    border: none;
+    background: url(../img/BTN-precedent.png) no-repeat;
+    width: 188px;
+    height: 38px;
+}
 /*-------------------------------*/
 
 /* CSS Document */
@@ -1054,3 +1074,9 @@ body{font-family:Arial;font-size:14px;line-height:normal;}
 .choix_pay input.choice{margin-right:7px;}
 .back_to{margin-top:45px;}
 .back_to a img{display:block;font-size:16px;font-weight:bold;color}
+
+
+
+
+
+

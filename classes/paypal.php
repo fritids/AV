@@ -18,8 +18,10 @@ class paypalcheckout {
     public $location;
     public $returnurl;
     public $returntxt;
+    public $returnipn;
     public $cancelurl;
     public $items;
+    public $invoice;
 
 //=======================================================================//
 //==> Class constructor, with default settings that can be overridden <==//
@@ -34,8 +36,10 @@ class paypalcheckout {
             'location' => 'FR', //location code  (ex GB)
             'returnurl' => '', //where to go back when the transaction is done.
             'returntxt' => 'Retour au site', //What is written on the return button in paypal
+            'returnipn' => '', //What is written on the return button in paypal
             'cancelurl' => '', //Where to go if the user cancels.
             'shipping' => 0, //Shipping Cost
+            'invoice' => 0, //Shipping Cost
             'custom' => ''                           //Custom attribute
         );
 
@@ -55,9 +59,11 @@ class paypalcheckout {
         $this->location = $settings['location'];
         $this->returnurl = $settings['returnurl'];
         $this->returntxt = $settings['returntxt'];
+        $this->returnipn = $settings['returnipn'];
         $this->cancelurl = $settings['cancelurl'];
         $this->shipping = $settings['shipping'];
         $this->custom = $settings['custom'];
+        $this->invoice = $settings['invoice'];
         $this->items = array();
     }
 
@@ -117,6 +123,8 @@ class paypalcheckout {
     //==> Checkout Form <==//
     //=====================//
     public function getCheckoutForm() {
+//https://www.paypal.com/cgi-bin/webscr
+//https://www.sandbox.paypal.com/cgi-bin/webscr
 
         $form = '            
         <form id="paypal_checkout" action="https://www.paypal.com/cgi-bin/webscr" method="post">';
@@ -136,8 +144,10 @@ class paypalcheckout {
        <input type="hidden" name="handling_cart" value="' . $this->shipping . '" />
        <input type="hidden" name="currency_code" value="' . $this->currency . '" />
        <input type="hidden" name="lc" value="' . $this->location . '" />
-       <input type="hidden" name="return" value="' . $this->returnurl . '" />			
+       <input type="hidden" name="return" value="' . $this->returnurl . '" />
+       <input type="hidden" name="notify_url" value="' . $this->returnipn . '">
        <input type="hidden" name="cbt" value="' . $this->returntxt . '" />
+       <input type="hidden" name="invoice" value="' . $this->invoice . '" />
        <input type="hidden" name="cancel_return" value="' . $this->cancelurl . '" />			
        <input type="hidden" name="custom" value="' . $this->custom . '" />';
 
@@ -145,27 +155,24 @@ class paypalcheckout {
         $cpt = 1;
         if (!empty($this->items)) {
             foreach ($this->items as $item) {
-                $form.='
-                    <div id="item_' . $cpt . '" class="itemwrap">
-                      <input type="hidden" name="item_name_' . $cpt . '" value="' . $item['name'] . '" />
-                      <input type="hidden" name="quantity_' . $cpt . '" value="1" />
-                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['price'] * $item['quantity'] * $item['surface'], 2) . '" />
-                     <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
-                   </div>';
-                $cpt++;
+
+                $fullname = $item['name'];
+
                 if (isset($item["options"])) {
                     foreach ($item["options"] as $option) {
-                        $form.='
-                            <div id="item_' . $cpt . '" class="itemwrap">
-                              <input type="hidden" name="item_name_' . $cpt . '" value="' . $option['o_name'] . '" />
-                              <input type="hidden" name="quantity_' . $cpt . '" value="1" />
-                              <input type="hidden" name="amount_' . $cpt . '" value="' . round($option['o_price'] * $option['o_quantity'] * $item['surface'], 2) . '" />
-                             <input type="hidden" name="shipping_' . $cpt . '" value="' . $option['o_shipping'] . '" />
-                           </div>';
-
-                        $cpt++;
+                        $fullname .= " " . $option['o_name'];
                     }
                 }
+                $fullname = utf8_encode($fullname);
+                        
+                $form.='
+                    <div id="item_' . $cpt . '" class="itemwrap">
+                      <input type="hidden" name="item_name_' . $cpt . '" value="' . $fullname . '" />
+                      <input type="hidden" name="quantity_' . $cpt . '" value="1" />
+                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['prixttc'], 2) . '" />
+                     <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
+                   </div>';
+                $cpt++;               
             }
         }
 

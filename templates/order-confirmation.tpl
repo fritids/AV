@@ -1,5 +1,5 @@
 <div id="recapitulatif">
-    <h1>Merci</h1>
+    <h1>Merci pour commande</h1>
 
     <b>reference </b> : {$reference} <br>
 

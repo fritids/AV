@@ -26,7 +26,7 @@
                 <tr>
                     <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
                     <td class="designation_prd">
-                        <a href="?p&id={$product.id} ">{$product.name} 
+                        <a href="?p&id={$product.id}">{$product.name} 
                             {if isset($product.options)}
                                 option : 
                                 {foreach key=key item=option from=$product.options}

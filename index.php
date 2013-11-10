@@ -4,6 +4,7 @@ require('libs/Smarty.class.php');
 require('classes/MysqliDb.php');
 require('classes/panier.php');
 require('classes/paypal.php');
+require('classes/class.phpmailer.php');
 require('functions/users.php');
 require('functions/products.php');
 require('functions/categories.php');
@@ -17,8 +18,17 @@ require('classes/CMCIC_Tpe.inc.php');
 $smarty = new Smarty;
 //$smarty->caching = 0;
 $smarty->error_reporting = E_ALL & ~E_NOTICE;
+$smarty->setTemplateDir(array('templates', 'templates/mails'));
+
+
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+
+//Create a new PHPMailer instance
+$mail = new PHPMailer();
+//Set who the message is to be sent from
+$mail->SetFrom($confmail["from"]);
+
 
 $promo_id = array(79, 65, 123, 124);
 foreach ($promo_id as $id) {
@@ -41,6 +51,9 @@ $cms = array();
 
 //Caddie
 $cart = new Panier();
+
+//commande déjà payé on flush
+checkOrderPaid();
 
 /* action Caddie */
 if (isset($_GET["cart"])) {
@@ -143,6 +156,7 @@ if (isset($_GET["my-account"])) {
     $breadcrumb = array("parent" => "Accueil", "fils" => "Mon compte");
 }
 if (isset($_GET["identification"])) {
+    $page_type = "full";
     $page = "identification";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
 }
@@ -167,6 +181,9 @@ if (isset($_GET["delivery"])) {
 if (isset($_GET["devis"])) {
     $page = "devis";
     $page_type = "full";
+}
+if (isset($_GET["contactez-nous"])) {
+    $page = "contact";
 }
 
 if (isset($_GET["orders-list"])) {
@@ -206,7 +223,9 @@ if (isset($_GET["order-payment"])) {
         'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
         'returntxt' => 'Retour au site', //What is written on the return button in paypal
         'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
+        'returnipn' => $paypal["returnipn"], //Where to go if the user cancels.
         'shipping' => $conf_shipping_amount, //Shipping Cost
+        'invoice' => $_SESSION["id_order"], // order ref
         'custom' => ''                           //Custom attribute
     );
 
@@ -291,6 +310,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "date_add" => date("Y-m-d"),
         "date_upd" => date("Y-m-d"));
 
+    //compte existe déjà on update
     if (isset($_SESSION["user"]["id_customer"]) && $_SESSION["user"]["id_customer"] != "") {
 
         $uid = $_SESSION["user"]["id_customer"];
@@ -363,8 +383,18 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             createNewAdresse($invoice_adresse);
             createNewAdresse($delivery_adresse);
 
-//auto login
+            //auto login
             checkUserLogin($_POST["email"], $_POST["passwd"]);
+
+            //envoie mail
+            $mail->AddAddress($_POST["email"]);
+            $mail->Subject = $confmail["welcome"];
+            $smarty->assign("email", $_POST["email"]);
+            $smarty->assign("mdp", $_POST["passwd"]);
+
+            $user_mail_body = $smarty->fetch('notif_new_acccount.tpl');
+            $mail->MsgHTML($user_mail_body);
+            $mail->Send();
         } else { //error creation
             $error = array("txt" => "Le compte existe déjà");
             $page = "register";
@@ -378,6 +408,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "login") {
     if (!$res) {
         $error = array("txt" => "La connexion a échoué");
         $page = "identification";
+        $page_type = "full";
     }
 }
 
@@ -422,68 +453,20 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
 
 /* paiement CB */
 
-if (isset($_GET["paiementko"]) || isset($_GET["paiementok"])) {
+if (isset($_GET["paiementok"])) {
     $status = 0;
     $page_type = "full";
-    $payment = "Carte Credit";
 
-    $CMCIC_bruteVars = getMethode();
+    $smarty->assign('reference', $_SESSION["reference"]);
 
-    $oTpe = new CMCIC_Tpe();
-    $oHmac = new CMCIC_Hmac($oTpe);
+    $page = "order-confirmation";
 
-
-    if (isset($_GET["paiementok"])) {
-        $status = 2;
-        validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
-        $page = "order-confirmation";
-        $smarty->assign('reference', $_SESSION["reference"]);
-        
-        //on flush le caddie
-        unset($_SESSION["cart"]);
-        unset($_SESSION["cart_summary"]);
-        unset($_SESSION["id_order"]);
-        unset($_SESSION["reference"]);
-        $cartItems = array();
-    }
-
-    // Message Authentication
-    $cgi2_fields = sprintf(CMCIC_CGI2_FIELDS, $oTpe->sNumero, $CMCIC_bruteVars["date"], $CMCIC_bruteVars['montant'], $CMCIC_bruteVars['reference'], $CMCIC_bruteVars['texte-libre'], $oTpe->sVersion, $CMCIC_bruteVars['code-retour'], $CMCIC_bruteVars['cvx'], $CMCIC_bruteVars['vld'], $CMCIC_bruteVars['brand'], $CMCIC_bruteVars['status3ds'], $CMCIC_bruteVars['numauto'], $CMCIC_bruteVars['motifrefus'], $CMCIC_bruteVars['originecb'], $CMCIC_bruteVars['bincb'], $CMCIC_bruteVars['hpancb'], $CMCIC_bruteVars['ipclient'], $CMCIC_bruteVars['originetr'], $CMCIC_bruteVars['veres'], $CMCIC_bruteVars['pares']);
-
-    if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC'])) {
-        switch ($CMCIC_bruteVars['code-retour']) {
-            case "Annulation" :
-                //Erreur de paiement
-                $status = 8;
-                $page = "order-error";
-                $smarty->assign('reference', $_SESSION["reference"]);
-                break;
-            case "payetest":
-                $status = 2;
-                $page = "order-error";
-                break;
-            case "paiement":
-                $status = 2;
-                validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
-                $page = "order-confirmation";
-                $smarty->assign('reference', $_SESSION["reference"]);
-                break;
-        }
-
-        $receipt = CMCIC_CGI2_MACOK;
-
-        validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
-
-        //on flush le caddie
-        unset($_SESSION["cart"]);
-        unset($_SESSION["cart_summary"]);
-        unset($_SESSION["id_order"]);
-        unset($_SESSION["reference"]);
-        $cartItems = array();
-    } else {
-        // your code if the HMAC doesn't match
-        $receipt = CMCIC_CGI2_MACNOTOK . $cgi2_fields;
-    }
+    //on flush le caddie
+    unset($_SESSION["cart"]);
+    unset($_SESSION["cart_summary"]);
+    unset($_SESSION["id_order"]);
+    unset($_SESSION["reference"]);
+    $cartItems = array();
 }
 
 /* devis */
