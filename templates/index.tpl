@@ -42,12 +42,12 @@
                             Taxes incluses : {$smarty.session.cart_summary.total_taxes} €<br/>                
                             Total : {$smarty.session.cart_summary.total_amount} € TTC<br/>                
                         </p>
-                        <a class="bouton" href="?cart">Panier</a>
+                        <a class="bouton" href="/?cart">Panier</a>
                         
                         {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-                            <a class="bouton" href="?order-resume">Commander</a>
+                            <a class="bouton" href="/?order-resume">Commander</a>
                         {else}
-                            <a class="bouton" href="?identification">Commander</a>
+                            <a class="bouton" href="/?identification">Commander</a>
                         {/if}
                     </div>
                 {else}
@@ -62,11 +62,11 @@
                 <div class="bloc-droite">
                     <h2>NOS SERVICES</h2>
                     <ul>
-                        <li><img src="img/b1.png" />Devis Spécifique</li>
-                        <li><img src="img/b2.png" />Découpe sur mesure</li>
-                        <li><img src="img/b3.png" />Service de pose</li>
-                        <li><img src="img/b4.png" />Livraison</li>
-                        <li><img src="img/b5.png" />Nos conseils Videos</li>
+                        <li><img src="/img/b1.png" />Devis Spécifique</li>
+                        <li><img src="/img/b2.png" />Découpe sur mesure</li>
+                        <li><img src="/img/b3.png" />Service de pose</li>
+                        <li><img src="/img/b4.png" />Livraison</li>
+                        <li><img src="/img/b5.png" />Nos conseils Videos</li>
                     </ul>
                 </div>
             </div>

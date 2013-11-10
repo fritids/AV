@@ -8,4 +8,4 @@ Pour information, toute commande est livrée par nos propres transporteurs dans 
 
 Nous restons à votre disposition pour tout renseignement complémentaire au 0 892 70 11 13.
 
-{include file='footer.tpl'}
+{include file='mail_footer.tpl'}

@@ -3,7 +3,7 @@
 include ("../configs/settings.php");
 include ("header.php");
 
-$opts['tb'] = 'av_orders';
+$opts['tb'] = 'mv_orders';
 
 // Name of field which is the unique key
 $opts['key'] = 'id_order';
@@ -99,6 +99,14 @@ $opts['fdd']['reference'] = array(
     'sort' => true,
     'URL' => 'av_orders_view.php?id_order=$key'
 );
+$opts['fdd']['date_add'] = array(
+    'name' => 'Date Commande',
+    'options' => 'L',
+    'select' => 'D',
+    'maxlen' => 10,    
+    'sort' => true,
+    'strftimemask' => "%a %d %b %y %H:%M:%S"
+);
 $opts['fdd']['id_customer'] = array(
     'name' => 'Client',
     'select' => 'T',
@@ -112,7 +120,6 @@ $opts['fdd']['id_customer'] = array(
     'sort' => true
 );
 
-
 $opts['fdd']['id_address_delivery'] = array(
     'name' => 'Adresse livraison',
     'select' => 'T',
@@ -125,18 +132,7 @@ $opts['fdd']['id_address_delivery'] = array(
     ),
     'sort' => true
 );
-$opts['fdd']['id_address_invoice'] = array(
-    'name' => 'Adresse facturation',
-    'select' => 'T',
-    'maxlen' => 10,
-    'values' => array(
-        'table' => 'av_address',
-        'column' => 'id_address',
-        'description' => array("columns" => array('address1', 'address2', 'postcode', 'country'),
-            "divs" => array(' ', ' ', ' ', ' ')),
-    ),
-    'sort' => true
-);
+
 $opts['fdd']['current_state'] = array(
     'name' => 'Status',
     'options' => 'L',
@@ -150,22 +146,15 @@ $opts['fdd']['current_state'] = array(
     "colattrs" => "name='order_state'",
     'sort' => true
 );
-$opts['fdd']['date_add'] = array(
-    'name' => 'Date Commande',
-    'options' => 'L',
-    'select' => 'D',
-    'maxlen' => 10,    
-    'sort' => true
-);
+
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
     'select' => 'T',
     'maxlen' => 19,
     'default' => '0.00',
     'sort' => true,
-    'URL' => 'av_order_detail.php?o=$key'
+    'URL' => 'av_orders_view.php?id_order=$key'
 );
-
 
 
 // Now important call to phpMyEdit

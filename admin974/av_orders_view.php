@@ -182,10 +182,10 @@ $order_suivant = @$b[0]["id_order"];
             <div class="col-xs-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">Paiement</div>
-                    <div class="panel-body">
-                        Mode :  <?= $orderinfo["payment"] ?><br>                        
-                        <?= strftime("%A %d %b %Y %H:%M:%S", strtotime($orderPayment["date_add"])) ?><br>
-                        <?= $orderPayment["amount"] ?> €<br>
+                    <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
+                        Mode : <?= $orderinfo["payment"] ?><br>                        
+                        Payé le : <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) :"" ?><br>
+                        Total : <?= $orderPayment["amount"] ?> €<br>
                     </div>
                 </div> 
             </div>
@@ -194,15 +194,22 @@ $order_suivant = @$b[0]["id_order"];
                     <div class="panel-heading">Commande</div>
                     <div class="panel-body">
                         N° :  <?= $orderinfo["id_order"] ?> reference :  <?= $orderinfo["reference"] ?><br>
-                        Création :  <?= strftime("%A %d %b %Y %H:%M:%S", strtotime($orderinfo["date_add"])) ?><br>
-                        Facturation:  <?= strftime("%A %d %b %Y %H:%M:%S", strtotime($orderinfo["invoice_date"])) ?><br>
-                        Livraison :  <?= strftime("%A %d %b %Y %H:%M:%S", strtotime($orderinfo["delivery_date"])) ?><br>                        
+                        Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
                         Total :  <?= $orderinfo["total_paid"] ?>€<br>
                     </div>
                 </div> 
             </div>
 
+            <div class="col-xs-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Commentaire client</div>
+                    <div class="panel-body">
+                        <?= $orderinfo["order_comment"] ?>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <?
         if (!empty($orderDetail)) {
             ?>
@@ -220,12 +227,11 @@ $order_suivant = @$b[0]["id_order"];
                             <th colspan="6" class="text-center">LIVRAISON</th>                          
                         </tr>
                         <tr>
-                            <th>#</th>
+                            <th>#</th>                            
                             <th>Produit</th>
                             <th>Option</th>
                             <th>L x H x P (mm)</th>
                             <th>P.U.</th>
-                            <th>FdP</th>
                             <th>Qte</th>
                             <th>Prix TTC</th>
                             <th>Statuts</th>
@@ -244,7 +250,7 @@ $order_suivant = @$b[0]["id_order"];
                             ?>
                             <tr id="id0">
                                 <td><?= $od["id_order_detail"] ?></td>
-                                <td><?= $od["product_name"] ?></td>
+                                <td><?= $od["id_product"] ?> <?= $od["product_name"] ?> </td>
                                 <td>
                                     <?
                                     $attributes = getOrdersDetailAttribute($od["id_order_detail"]);
@@ -253,36 +259,35 @@ $order_suivant = @$b[0]["id_order"];
                                     }
                                     ?>
                                 </td>
-                                <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> x <?= $od["product_depth"] ?></td>
-                                <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>
-                                <td><?= $od["product_shipping"] + $od["attribute_shipping"] ?> €</td>
+                                <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
+                                <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
                                 <td><?= $od["product_quantity"] ?></td>
                                 <td><?= $od["total_price_tax_incl"] ?> €</td>
                                 <td>
                                     <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
                                         <option value="">--</option>
-        <?
-        foreach ($orderStates as $orderState) {
-            ?>
+                                        <?
+                                        foreach ($orderStates as $orderState) {
+                                            ?>
                                             <option value="<?= $orderState["id_statut"] ?>"
                                             <?= ($od["product_current_state"] == $orderState["id_statut"]) ? "selected" : "" ?>
                                                     ><?= $orderState["title"] ?> </option>
-                                            <?
-                                        }
-                                        ?>
+                                                    <?
+                                                }
+                                                ?>
                                     </select>
                                 </td>
                                 <td>
                                     <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
-        <?
-        foreach ($suppliers as $supplier) {
-            ?>
+                                        <?
+                                        foreach ($suppliers as $supplier) {
+                                            ?>
                                             <option value="<?= $supplier["id_supplier"] ?>"
                                             <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
                                                     ><?= $supplier["name"] ?> </option>
-                                            <?
-                                        }
-                                        ?>
+                                                    <?
+                                                }
+                                                ?>
                                     </select>
                                 </td>
                                 <td>
@@ -290,31 +295,19 @@ $order_suivant = @$b[0]["id_order"];
 
                                 </td>
                                 <td><?= $t["nb_product_delivered"] ?></td>
-                                <td><?= ( $t["date_livraison"]) ? strftime("%A %d %b %Y", strtotime($t["date_livraison"])) : ""; ?></td>                                
+                                <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
                                 <td><?= $t["horaire"] ?></td>
                                 <td><?= $t["comment1"] ?></td>
                                 <td><?= $t["comment2"] ?></td>
                                 <td><?= $t["comment3"] ?></td>
                             </tr>
-        <?
-    }
-    ?>
+                            <?
+                        }
+                        ?>
                     </table>
                 </div>
             </div>
-            <div class="row ">
-                <div class="col-xs-6" >
 
-
-                    <div class="pull-left">
-                        <h2>Commentaire client:</h2>
-                        <div class="well well-lg">
-
-    <?= $orderinfo["order_comment"] ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-xs-12" >
                     <div class="pull-right">
@@ -323,22 +316,22 @@ $order_suivant = @$b[0]["id_order"];
                 </div>
 
             </div>
-    <?
-}
-?>
+            <?
+        }
+        ?>
         <div class="row">
             <div class="col-xs-2">
-<?
-foreach ($orderStates as $orderState) {
-    ?>
+                <?
+                foreach ($orderStates as $orderState) {
+                    ?>
                     <div class="row">
                         <div class="alert-<?= $orderState["id_statut"] ?>" >
-    <?= $orderState["title"] ?> 
+                            <?= $orderState["title"] ?> 
                         </div>
                     </div>
-    <?
-}
-?> 
+                    <?
+                }
+                ?> 
             </div>
         </div>
     </div>

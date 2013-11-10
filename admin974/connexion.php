@@ -23,6 +23,7 @@ if (isset($_POST['email']) && isset($_POST['mdp'])) {
         $_SESSION['email'] = $_POST['email'];
         $_SESSION['mdp'] = $_POST['mdp'];
         $_SESSION['user_id'] = $r['id_admin'];
+        $_SESSION['role'] = $r['role'];
         $_SERVER['REMOTE_USER'] = $email;
 
         // on redirige notre visiteur vers une page de notre section membre

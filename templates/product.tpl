@@ -9,20 +9,20 @@
                 <div class="cycle-slideshow"
                      data-cycle-timeout=0
                      data-cycle-pager="#custom-pager"
-                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
+                     data-cycle-pager-template='<a href="#" ><img src="/{{src}}" width=95 height=95></a>'
                      >
                 {/literal}
-                <img src="img/p/{$product.cover.filename}" width="325" />  
+                <img src="/img/p/{$product.cover.filename}" width="325" />  
 
                 {if isset($product.images)}
                     {foreach key=key item=image from=$product.images}
-                        <img src="img/p/{$image.filename}" width="325" />                    
+                        <img src="/img/p/{$image.filename}" width="325" />                    
                     {/foreach}
                 {/if}
             </div>
             <div id="custom-pager"></div>
         </div>	
-        <form action="?cart" method="post" id="validation">
+        <form action="/?cart" method="post" id="validation">
             <div class="features">
                 <div class="separ clearfix">
                     <div class="infos">
@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="clearfix"></div>
-                <p class="ref">Réference:{$product.reference} <img src="img/sans-frais.png" style="margin-left: 25px;" alt=""></p>
+                <p class="ref">Réference:{$product.reference} {*<img src="/img/sans-frais.png" style="margin-left: 25px;" alt="">*}</p>
 
                 {if isset($product.combinations)}
                     {foreach key=key item=combination from=$product.combinations}
@@ -112,7 +112,7 @@
     <div class="desc">
         {$product.description}
     </div>
-
+{*
     <h3 class="paragraphe-titre">Nos conseils de pose en vidéo  <a href="#" class="top"></a></h3>
     <p class="produit-menu"><a href="">Produits complémentaires</a>
         | <a href="">Descriptif du produit</a>
@@ -120,9 +120,9 @@
         | Caractéristiques techniques</p>
 </p>
 <div style="width:560px;margin:0 auto">
-    <iframe align="middle" width="560" height="315" src="{$product.video}" frameborder="0" allowfullscreen></iframe>
+    <iframe align="middle" width="560" height="315" src="/{$product.video}" frameborder="0" allowfullscreen></iframe>
 </div>
-
+*}
 {*
 <h3 class="paragraphe-titre">Julie D’ ALLOVITRES vous conseille ces produits complémentaires  <a href="#" class="top"></a></h3>
 <p class="produit-menu"><a href="">Produits complémentaires</a>
@@ -133,7 +133,7 @@
 
 <div class="complement">
 <div class="produit first">
-<img src="img/product1.jpg" alt="">
+<img src="/img/product1.jpg" alt="">
 <h3 class="titre">Miroir argenté 3 mm</h3>
 <p class="prix">30€</p>
 <p class="liens">
@@ -142,7 +142,7 @@
 </p>
 </div>
 <div class="produit">
-<img src="img/product1.jpg" alt="">
+<img src="/img/product1.jpg" alt="">
 <h3 class="titre">Miroir argenté 3 mm</h3>
 <p class="prix">30€</p>
 <p class="liens">
@@ -151,7 +151,7 @@
 </p>
 </div>
 <div class="produit">
-<img src="img/product1.jpg" alt="">
+<img src="/img/product1.jpg" alt="">
 <h3 class="titre">Miroir argenté 3 mm</h3>
 <p class="prix">30€</p>
 <p class="liens">
@@ -170,7 +170,7 @@
 
     //console.log($('.attribute').serializeArray());
     $.ajax({
-        url: "functions/ajax_declinaison.php",
+        url: "/functions/ajax_declinaison.php",
         type: "POST",
         dataType: "json",
         async: false,
@@ -205,7 +205,7 @@
             myArray = $('.attribute');
             //console.log($('.attribute').serializeArray());
             $.ajax({
-                url: "functions/ajax_declinaison.php",
+                url: "/functions/ajax_declinaison.php",
                 type: "POST",
                 dataType: "json",
                 async: false,

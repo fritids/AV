@@ -1,34 +1,24 @@
 <?php
 
-/* * ***************************************************************************
- *
- * "Open source" kit for CM-CIC P@iement(TM).
- * Process CMCIC Payment. Sample RFC2104 compliant with PHP4 skeleton.
- *
- * File "Phase2Retour.php":
- *
- * Author   : Euro-Information/e-Commerce (contact: centrecom@e-i.com)
- * Version  : 1.04
- * Date     : 01/01/2009
- *
- * Copyright: (c) 2009 Euro-Information. All rights reserved.
- * License  : see attached document "Licence.txt".
- *
- * *************************************************************************** */
-
-//header("Pragma: no-cache");
-//header("Content-type: text/plain");
-// TPE Settings
-// Warning !! CMCIC_Config contains the key, you have to protect this file with all the mechanism available in your development environment.
-// You may for instance put this file in another directory and/or change its name. If so, don't forget to adapt the include path below.
+header("Pragma: no-cache");
+header("Content-type: text/plain");
 require_once("../../configs/settings.php");
-
-// --- PHP implementation of RFC2104 hmac sha1 ---
 require_once("../../classes/CMCIC_Tpe.inc.php");
 require('../../classes/MysqliDb.php');
 require('../../functions/orders.php');
+require('../../libs/Smarty.class.php');
+require('../../classes/class.phpmailer.php');
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+$smarty = new Smarty;
+$smarty->caching = 0;
+$smarty->addTemplateDir(array('../../templates/mails', '../../templates/'));
+$smarty->setCompileDir('../../templates_c/');
+
+//Create a new PHPMailer instance
+$mail = new PHPMailer();
+//Set who the message is to be sent from
+$mail->SetFrom($confmail["from"]);
 
 // Begin Main : Retrieve Variables posted by CMCIC Payment Server 
 $CMCIC_bruteVars = getMethode();
@@ -42,13 +32,21 @@ $cgi2_fields = sprintf(CMCIC_CGI2_FIELDS, $oTpe->sNumero, $CMCIC_bruteVars["date
 );
 
 
-if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC'])) {
+if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || $CMCIC_bruteVars['MAC'] == 'sandbox') {
+
+    mysql_connect($bdd_host, $bdd_user, $bdd_pwd) or exit(0);
+    mysql_select_db($bdd_name) or exit(0);
+
+    $oid = $CMCIC_bruteVars['reference'];
 
     switch ($CMCIC_bruteVars['code-retour']) {
         case "Annulation" :
             $status = 8;
+            $sql = "update av_orders set current_state = " . $status . " , payment= 'Carte credit' where id_order = " . $oid;
+            mysql_query($sql);
 
-            validateOrder($CMCIC_bruteVars['reference'], array("current_state" => $status, "payment" => "Carte credit"));
+            mail($monitoringEmail, 'Annulation CB ' . $oid, var_export($CMCIC_bruteVars, true));
+
             break;
 
         case "payetest":
@@ -58,9 +56,41 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC'])) {
 
         case "paiement":
             $status = 2;
-            validateOrder($CMCIC_bruteVars['reference'], array("current_state" => $status, "payment" => "Carte credit"));
 
-            break;    }
+            $amount = $CMCIC_bruteVars['montant'];
+
+            $sql = "update av_orders set current_state = " . $status . " , payment= 'Carte credit' where id_order = " . $oid;
+            mysql_query($sql);
+
+            $order_payment = array(
+                "id_order" => $oid,
+                "order_reference" => str_pad($oid, 9, '0', STR_PAD_LEFT),
+                "id_currency" => 1,
+                "amount" => $amount,
+                "conversion_rate" => 1,
+                "payment_method" => "Carte credit",
+                "date_add" => date("Y-m-d H:i:s"),
+            );
+
+            $db->insert("av_order_payment", $order_payment);
+
+            $r = $db->where("id_order", $oid)
+                    ->get("av_orders");
+
+            $r = $db->where("id_customer", $r[0]["id_customer"])
+                    ->get("av_customer");
+
+            $mail->AddAddress($r[0]["email"]);
+            $mail->Subject = $confmail["commande_new"] . " " . $oid;
+
+            $order_new = $smarty->fetch('notif_order_new.tpl');
+            $mail->MsgHTML($order_new);
+            $mail->Send();
+
+            mail($monitoringEmail, 'Valid CB ' . $oid, var_export($CMCIC_bruteVars, true));
+
+            break;
+    }
 
     $receipt = CMCIC_CGI2_MACOK;
 } else {

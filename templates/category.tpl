@@ -10,13 +10,13 @@
     </div>
 
     <div class="categorie_slider"><img src="img/categorie.jpg"/></div>
-        {*    <div class="verre-categorie">
+{*    <div class="verre-categorie">
         <a href=""><img src="img/verre-vetroceramique.png" alt=""></a>
         <a href=""><img src="img/verre-tri-feuillete.png" alt=""></a>
         <a href=""><img src="img/verre-feuille.png" alt=""></a>
         <a href=""><img src="img/verre-arme.png" alt=""></a>
-        </div>
-        *}
+    </div>
+*}
     <div class="clearfix"></div>
     {*
     <p id="pager">
@@ -27,29 +27,29 @@
 
     {foreach key=key item=product from=$products}
         <div class="item">
-            <table>
-                <tr>
-                    <td>
-                        <div class="img block" style="display:inline-block;vertical-align:middle;">
-                            <a href="?p&id={$product.id_product}"><img src="img/p/{$product.cover.filename}" alt="" width="140"></a>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="desc block">
-                            <h3>{$product.name}</h3>
-                            <p>{$product.description_short}</p>
-                        </div>
-                        <div class="prix block">
-                            <span>{$product.price} €</span>
-                            <a href="?p&id={$product.id_product}" class="indent">Voir le produit</a>
-                        </div>
-                        <div class="clearfix"></div>
-                    </td>
-                </tr>
-            </table>
-        </div>
+<table>
+		<tr>
+			<td>
+				<div class="img block" style="display:inline-block;vertical-align:middle;">
+                <a href="?p&id={$product.id_product}"><img src="img/p/{$product.cover.filename}" alt="" width="140"></a>
+				</div>
+			</td>
+			<td>
+				<div class="desc block">
+					<h3>{$product.name}</h3>
+					<p>{$product.description_short}</p>
+				</div>
+				<div class="prix block">
+					<span>{$product.price} €</span>
+					<a href="?p&id={$product.id_product}" class="indent">Voir le produit</a>
+				</div>
+				<div class="clearfix"></div>
+			</td>
+		</tr>
+</table>
+      </div>
     {/foreach}
-
+    
     {*
     <p id="pager">
     <span class="active">1</span>

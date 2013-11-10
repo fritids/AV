@@ -6,4 +6,4 @@ Vous recevrez sous 7 à 15 jours (sous réserve du produit commandé : hors dal
 
 Nous restons à votre disposition pour tout renseignement complémentaire au 0 892 70 11 13.
 
-{include file='footer.tpl'}
+{include file='mail_footer.tpl'}

@@ -37,6 +37,7 @@ $sTexteLibre = "";
 
 $confmail["from"] = "contact@allovitre.com";
 $confmail["welcome"] = "Bienvenue";
+$confmail["commande_new"] = "Nouvelle commande";
         
         
 $monitoringEmail = "stephane.alamichel@gmail.com, benoit@trusttelecom.fr";

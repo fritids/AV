@@ -1,6 +1,6 @@
 {*duplication de code a revoir*}
 <div id="recapitulatif">
-    <p><img src="img/recapitulatif.png" alt=""></p>
+    <p><img src="/img/recapitulatif.png" alt=""></p>
 <center>
     <div class="infos clearfix">
         <div class="block adr_fact">
@@ -30,7 +30,7 @@
             <h3>mode de transport</h3>
             <div class="content">
 			<br/><br/>
-                <img src="img/transporteur-allovitres.png" alt="">
+                <img src="/img/transporteur-allovitres.png" alt="">
             </div>            
         </div>
     </div>
@@ -43,7 +43,6 @@
                 <th>&nbsp;</th>
                 <th><span>Désignation Produit</span></th>
                 <th><span>Dimensions</span></th>
-                <th><span>Prix unitaire ttc</span></th>
                 <th><span>Quantité</span></th>
                 <th><span>Prix total ttc</span></th>
             </tr>
@@ -53,9 +52,9 @@
             {foreach key=key item=product from=$cart name=cart}
                 {$option_price=0}
                 <tr>
-                    <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
+                    <td><img src="/img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
                     <td class="designation_prd">
-                        <a href="?p&id={$product.id}">{$product.name} 
+                        <a href="/?p&id={$product.id}">{$product.name} 
                             {if isset($product.options)}
                                 option : 
                                 {foreach key=key item=option from=$product.options}
@@ -65,8 +64,7 @@
 
                         </a>
                     </td>
-                    <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
-                    <td class="prix_unit">{$product.price} €</td>
+                    <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>                    
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">{$product.prixttc} €</td>
                 </tr>
@@ -93,10 +91,10 @@
 	<br/>
     <table width="100%">
 	<tr>
-		<td align="left"><a href="?delivery" ><button class="precedent" style="float:left;"></button></a></td>
+		<td align="left"><a href="/?delivery" ><button class="precedent" style="float:left;"></button></a></td>
 		<td align="right"><span >
-            <form action="?order-payment" method="post">
-                <input type="checkbox" required="true">J’ai lu et j’accepte <a href="index.php?cms&id=3">les conditions générales de vente</a>.        
+            <form action="/?order-payment" method="post">
+                <input type="checkbox" required="true">J’ai lu et j’accepte <a href="/index.php?cms&id=3">les conditions générales de vente</a>.        
                 <input type="submit" class="valider-porsuivre" value="">
             </form>
         </span></td>

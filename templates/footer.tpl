@@ -13,7 +13,7 @@
                 <li><img src="img/FOOTER_devis.png"/></li>
                 <li>Devis personnalisé</li>
             </ul>
-            <a href="?contact-nous"><ul>
+            <a href="/?contact-nous"><ul>
                     <li><img src="img/FOOTER_nous_contacter.png"/></li>
                     <li>Nous contacter</li>
                 </ul>
@@ -37,16 +37,16 @@
                 <li><span class="caret"></span></li>
                 <li class="titre">INFORMATIONS</li>
                     {*foreach key=key item=content from=$AllCMS}
-                    <li><a href="?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
+                    <li><a href="/?cms&id={$content.id_cms}"> {$content.meta_title}</a></li>
                     {/foreach*}
-                <li><a href="?contact-nous" class="lien-footer">Nous contacter</a></li>
-                <li><a href="?cms&id=2" class="lien-footer">Mentions légales</a></li>
-                <li><a href="?cms&id=3" class="lien-footer">CGU</a></li>
-                <li><a href="?cms&id=20" class="lien-footer">FAQ</a></li>
+                <li><a href="/?contactez-nous" class="lien-footer">Nous contacter</a></li>
+                <li><a href="/?cms&id=2" class="lien-footer">Mentions légales</a></li>
+                <li><a href="/?cms&id=3" class="lien-footer">CGU</a></li>
+                <li><a href="/?cms&id=20" class="lien-footer">FAQ</a></li>
             </ul>
             <ul>
                 <li><span class="caret"></span></li>
-                <li class="titre"><a href="?my-account" class="lien-titre">MON COMPTE</a></li>
+                <li class="titre"><a href="/?my-account" class="lien-titre">MON COMPTE</a></li>
                 <li>Informations personnelles</li>
                 <li>Mes factures</li>
                 <li>Mes avoirs</li>
@@ -55,12 +55,12 @@
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">SUIVEZ-NOUS</li>
-                <li><img src="img/google-plus.png"/><img  class="logo_footer" src="img/facebook.png"/><img  class="logo_footer" src="img/twitter.png"/></li>
+                <li><img src="/img/google-plus.png"/><img  class="logo_footer" src="/img/facebook.png"/><img  class="logo_footer" src="/img/twitter.png"/></li>
             </ul>
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">PAIEMENT 100% SECURISE</li>
-                <li><img src="img/cb.png"/></li>
+                <li><img src="/img/cb.png"/></li>
             </ul>			
 
         </div>
@@ -74,11 +74,11 @@
      width:100%;height:100%;">
 </div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.js"><\/script>')</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.js"></script>
+<script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.js"><\/script>')</script>
 
-<script src="js/plugins.js"></script>
-<script src="js/main.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
 
 <script>
     var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];

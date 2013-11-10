@@ -9,27 +9,27 @@
             <p>Vérifiez vos avoirs et/ou bons de réduction</p>
         </div>
         
-        <a href="?devis">
+        <a href="/?devis">
             <div class="block devis">
                 <h3>MES DEVIS</h3>
                 <p>Vous avez <span class="notif">{$mydevis|count}</span> devis en attente.</p>
             </div>
         </a> 
 
-        <a href="?orders-list">
+        <a href="/?orders-list">
             <div class="block commandes">
                 <h3>HISTORIQUE DE MES COMMANDES</h3>
                 <p>Consultez l’état de vos commandes</p>
             </div>
         </a>
 
-        <a href="?register">
+        <a href="/?register">
             <div class="block infos">
                 <h3>MES INFORMATIONS PERSOS</h3>
-                <p><a href="?register">Modifiez vos informations personnelles</a></p>
+                <p><a href="/?register">Modifiez vos informations personnelles</a></p>
             </div>
         </a>
-        <a href="?register">
+        <a href="/?register">
             <div class="block adresses">
                 <h3>MES ADRESSES</h3>
                 <p>Modifiez vos adresses de livraison ou facturation</p>

@@ -23,10 +23,10 @@
                         <td class="prix">{$devis.total_paid} €</td>
                         <td class="action">
                             <button>
-                                <a href="?devis&id={$devis.id_devis}&action=del" class="supprimer"><img src="img/supprimer.png" alt=""/>Supprimer</a>
+                                <a href="/?devis&id={$devis.id_devis}&action=del" class="supprimer"><img src="/img/supprimer.png" alt=""/>Supprimer</a>
                             </button>
                             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal{$devis.id_devis}">
-                                <a href="?devis&id={$devis.id_devis}&action=view" class="afficher"><img src="img/pdf.png" alt=""/>Afficher</a>
+                                <a href="/?devis&id={$devis.id_devis}&action=view" class="afficher"><img src="/img/pdf.png" alt=""/>Afficher</a>
                             </button>
                         </td>
                         <td class="commander">
@@ -45,7 +45,8 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="myModalLabel">Devis : {$devis.id_devis}</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
                         </div>
                         <div class="modal-body">
                             <table>
@@ -86,7 +87,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Imprimer</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->

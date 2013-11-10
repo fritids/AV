@@ -9,13 +9,14 @@
             {foreach key=key item=product from=$promos name="promo"}
                 <div class="produit {if $smarty.foreach.promo.first}first{/if}">
                     <span class="promo"></span>
-                    <a href="?p&id={$product.id_product}">
-                        <img src="img/p/{$product.cover.filename}" width="147">
+                    <a href="/?p&id={$product.id_product}">
+                        <img src="/img/p/{$product.cover.filename}" width="147">
                     </a>
                     <h3 class="titre">{$product.name}</h3>
                     <p class="prix">{$product.price} €</p>
                     <p class="liens">
-                        <a href="?p&id={$product.id_product}" class="voir indent">Voir</a>
+                        <a href="" class="panier indent">Panier</a>
+                        <a href="/?p&id={$product.id_product}" class="voir indent">Voir</a>
                     </p>
                 </div>                
             {/foreach}
@@ -25,12 +26,12 @@
             <h3 class="indent">Produit du mois</h3>
             <div class="produit">
                 <div class="infos">
-                    <img src="img/zoom.png" alt="">
+                    <img src="/img/zoom.png" alt="">
                     <p class="desc"><span class="blue">DOUBLE VITRAGE</span><br>avec gaz argon</p>
                     <p class="prix">à partir de <span class="blue">67,91 €</span></p>
-                    <img src="img/thermique.png" alt="" style="text-align: left;float: left;">
+                    <img src="/img/thermique.png" alt="" style="text-align: left;float: left;">
                 </div>
-                <img src="img/miroir.png" alt="">
+                <img src="/img/miroir.png" alt="">
                 <p class="therme clearfix">Avantages thermiques</p>
             </div>
         </div>
@@ -40,24 +41,26 @@
 <div class="largeur">
 
     <div class="bloc-bas">
-        <img src="img/Livraison-partout-en-France.png" alt="" style="margin-right: 15px;">
-        <img src="img/Service-de-pose.png" alt="">
-        <p class="clearfix"></p>
+        {*
+		<img src="/img/Livraison-partout-en-France.png" alt="" style="margin-right: 15px;">
+        <img src="/img/Service-de-pose.png" alt="">
+        *}
+		<p class="clearfix"></p>
         <div class="blocks">
 
             <div class="partenaires">
-                <img src="img/bohle.png" alt="" style="margin: 0px auto; display: block;">
+                <img src="/img/bohle.png" alt="" style="margin: 0px auto; display: block;">
             </div>
             <div class="videos">
                 <p class="center">Suivez étapes par étapes le montage de vos vitres et miroirs grâce à de <span class="blue">vrais conseils de pros !</span></p>
 
-                <img src="img/youtube-thumb.png" alt="" style="margin: 0px auto; display: block;">
+                <img src="/img/youtube-thumb.png" alt="" style="margin: 0px auto; display: block;">
 
-                <p style="margin-top: 0;"><a href="" class="plus">Voir toutes nos vidéos</a> <img src="img/youtube-logo.png" style="float: right; position: relative; right: 10px;" alt=""></p>
+                <p style="margin-top: 0;"><a href="" class="plus">Voir toutes nos vidéos</a> <img src="/img/youtube-logo.png" style="float: right; position: relative; right: 10px;" alt=""></p>
             </div>
             <div class="formes">
                 <p>Votre vitrage n’est pas rectangulaire ?</p>
-                <img src="img/formes.png" alt="" style="margin: 0px auto; display: block;">
+                <img src="/img/formes.png" alt="" style="margin: 0px auto; display: block;">
                 <p style="margin-top: 0;"><a href="">Cliquez ici pour renseigner votre forme spécifique</a></p>
             </div>
         </div>
@@ -69,7 +72,7 @@
 
         <div id="editorial_block_center" class="editorial_block">
             <a href="http://www.allovitres.com" title="AlloVitres, vitrage sur mesure, vitres et miroirs en ligne pas cher">		</a>		<h1>AlloVitres, vitrage sur mesure, vitres et miroirs en ligne pas cher</h1>	<h2>Leader de la vente de verres sur-mesure sur internet</h2>	<div class="rte"><p><span style="color: #3366ff;"><strong>ALLOVITRES, SPECIALISTE DE LA VENTE EN LIGNE DE VERRE, VITRES ET MIROIRS</strong></span></p>
-                <p style="text-align: justify;"><br /><span style="color: #333333;">Acheter des vitres, du verre et des mliroirs en ligne sur internet, c'est avant tout une question de confiance.</span><span style="color: #333333;"><img style="float: right;" src="img/vehicule.png" alt="vehicule allovitres" width="600" height="249" /></span></p>
+                <p style="text-align: justify;"><br /><span style="color: #333333;">Acheter des vitres, du verre et des mliroirs en ligne sur internet, c'est avant tout une question de confiance.</span><span style="color: #333333;"><img style="float: right;" src="/img/vehicule.png" alt="vehicule allovitres" width="600" height="249" /></span></p>
                 <p style="text-align: justify;"><span style="color: #333333;"><strong>Acheter des vitres</strong>, des <strong>baies vitrée</strong>s et des <strong>miroirs</strong> sur le site internet </span><span style="color: #888888;"><strong>Allovitres</strong></span><span style="color: #333333;">, c'est acheter son verre beaucoup moins cher et en toute simplicité. Installer soi-même ses vitres ou changer une baie vitrée ou vitre cassée en toute sécurité, c'est possible avec l'aide de l'assistance technique du <strong>miroitier <strong>vitrier </strong>Allovitres</strong>.<br /><br /><strong></strong></span></p>
                 <p style="text-align: justify;"><span style="color: #333333;"><strong>Le site internet Allovitres est le </strong>spécialiste de la <strong>vente en ligne de verre, de vitrages </strong>et de<strong> miroirs pas chers. A</strong>vec un large choix de produits verriers comme les vitres <strong>simple vitrage</strong>, le <strong>double vitrage</strong>, le <strong>verre feuilleté</strong>, le verre armé, le <strong>verre trempé sécurit</strong>, le <strong>miroir</strong> sans tain, le verre teinté, le <strong>verre laqué</strong> mais aussi tous les verres décoratifs pour les <strong>crédences de cuisine,</strong> les <strong>parois et portes de douche</strong> en verre et les vitres vitrocéramiques pour inserts et cheminées, Allovitres se positionne aujourd'hui comme le l<span>eader <span>en France</span> des ventes de <strong>verre et vitrage sur mesure</strong> sur Internet</span>.</span></p>
                 <p style="text-align: justify;"><span style="color: #333333;"><br />Profitez du meilleur prix et de nos promos sur le verre laqué en couleur, les <strong>miroirs avec film anti-éclats et le double vittrage avec ou sans gaz argon</strong>. </span></p>

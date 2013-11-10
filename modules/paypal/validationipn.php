@@ -88,7 +88,7 @@ if ($verified) {
         mysql_query($sql);
 
         $oid = $_POST['invoice'];
-        $amount = $_POST['mc_gross_1'];
+        $amount = $_POST['mc_gross'];
         $shipping = $_POST['mc_shipping'];
         $pd = $_POST['payment_date'];
 
@@ -103,7 +103,7 @@ if ($verified) {
             "amount" => $amount,
             "conversion_rate" => 1,
             "payment_method" => "Paypal",
-            "date_add" => date("Y-m-d h:i:s"),
+            "date_add" => date("Y-m-d H:i:s"),
         );
 
         $db->insert("av_order_payment", $order_payment);

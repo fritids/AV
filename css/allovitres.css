@@ -166,7 +166,7 @@ margin-top:10px;
 }
 .bloc-droite h2{
 
-	background: url("../img/titre-fond.png") repeat-x scroll left top transparent;
+	background: url("/img/titre-fond.png") repeat-x scroll left top transparent;
     border-bottom: 1px solid #FFFFFF;
     border-radius: 8px 8px 0 0;
     color: #FFFFFF;
@@ -320,7 +320,7 @@ nav{
 	height:2px;
 	width:100%;
 	background:#000;
-	background-image:url(../img/menu_gradient.png);
+	background-image:url(/img/menu_gradient.png);
 	background-position:center top;
 	background-repeat: no-repeat;
 }
@@ -329,7 +329,7 @@ nav{
 	height:2px;
 	width:100%;
 	background:#70b1fa;
-	background-image:url(../img/menu_gradient.png);
+	background-image:url(/img/menu_gradient.png);
 	background-position:center top;
 	background-repeat: no-repeat;
 }
@@ -435,7 +435,7 @@ padding:10px;
 .bloc-bas {
 
 	background: #FFF;
-	border-image: url(../img/shadow_bottom.png) 44 0 fill;
+	border-image: url(/img/shadow_bottom.png) 44 0 fill;
 	padding:15px;
 
 }
@@ -444,7 +444,7 @@ padding:10px;
 /*	box-shadow: 0 10px 10px -10px #5a5e6b;*/
 	border-style: solid;
 	border-width: 0px 0px 44px;
-    border-image: url(../img/shadow_bottom.png) 44 0 fill;
+    border-image: url(/img/shadow_bottom.png) 44 0 fill;
 	
 }
 footer {
@@ -656,21 +656,21 @@ background:#456;
 .crea_compte{width:564px;padding:12px;float:left;border:1px solid #a2a2a2;border-radius:5px;margin:20px 0;min-height:175px;}
 .identification{width:304px;padding:12px;float:right;border:1px solid #a2a2a2;border-radius:5px;margin:20px 0;min-height:175px;}
 h3.account_title{font-size:16px;font-weight:bold;color:#ff6600;padding-left:50px;height:24px;padding-top:5px;}
-.no1{background:url("../img/no1.png") no-repeat left;margin-bottom:10px;}
-.no2{background:url("../img/no2.png") no-repeat left;margin-bottom:30px;}
-.part_account{width:48%;float:left;height:133px;background:url("../img/sep_bloc.png") no-repeat right;}
+.no1{background:url("/img/no1.png") no-repeat left;margin-bottom:10px;}
+.no2{background:url("/img/no2.png") no-repeat left;margin-bottom:30px;}
+.part_account{width:48%;float:left;height:133px;background:url("/img/sep_bloc.png") no-repeat right;}
 .pro_account{width:48%;float:right;height:133px;}
 
 .part_account p{color:#a7a7a7;font-size:14px;font-weight:bold;text-align:center;margin-top:25px;}
-.go_part{color:#ffffff;font-size:14px;font-weight:bold;text-align:center;display:block;background:url("../img/go_part.png") no-repeat;width:217px;height:25px;margin:35px auto 0;text-transform:uppercase;padding-top:5px;}
+.go_part{color:#ffffff;font-size:14px;font-weight:bold;text-align:center;display:block;background:url("/img/go_part.png") no-repeat;width:217px;height:25px;margin:35px auto 0;text-transform:uppercase;padding-top:5px;}
 
 .pro_account p{color:#a7a7a7;font-size:14px;font-weight:bold;text-align:center;margin-top:25px;}
-.go_pro{color:#fb8800;font-size:14px;font-weight:bold;text-align:center;display:block;background:url("../img/go_pro.png") no-repeat;width:217px;height:25px;margin:17px auto 0;text-transform:uppercase;padding-top:5px;}
+.go_pro{color:#fb8800;font-size:14px;font-weight:bold;text-align:center;display:block;background:url("/img/go_pro.png") no-repeat;width:217px;height:25px;margin:17px auto 0;text-transform:uppercase;padding-top:5px;}
 
 .box_chmp{margin-top:15px;}
 .box_chmp label{display:block;width:100px;height:20px;float:left;font-size:14px;font-family:Arial;}
 .txt_account{float:right;height:18px;width:190px;padding:0 5px;border:1px solid #fb8800;font-size:14px;}
 
 a.forget_pass{display:block;float:left;font-size:14px;color:#0053b4;text-decoration:underline;padding-top:5px;}
-.submit_account{width:146px;height:28px;float:right;background:url("../img/btn_connect.png") no-repeat;border:none;cursor:pointer;}
+.submit_account{width:146px;height:28px;float:right;background:url("/img/btn_connect.png") no-repeat;border:none;cursor:pointer;}
     

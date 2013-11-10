@@ -1,5 +1,5 @@
 <div id="livraison-pose">
-    <p><img src="img/livraison-pose.png" style="width: 100%"></p>
+    <p><img src="/img/livraison-pose.png" style="width: 100%"></p>
 
     <div class="options">
         <div class="option option3">
@@ -8,7 +8,7 @@
                 <span class="bd">&nbsp;</span>
                 <label for="">Livraison SEULE</label>	
             </p>
-            <img src="img/camion.png" alt="">
+            <img src="/img/camion.png" alt="">
         </div>
         <div class="option option3">
             <p>
@@ -16,7 +16,7 @@
                 <span class="bd">&nbsp;</span>
                 <label for="">Retrait chez un partenaire</label>
             </p>
-            <img src="img/service-indispo.png" alt="">
+            <img src="/img/service-indispo.png" alt="">
         </div>
         <div class="option option3">
             <p>
@@ -24,7 +24,7 @@
                 <span class="bd">&nbsp;</span>
                 <label for="">Livraison et pose</label>
             </p>
-            <img src="img/service-indispo.png" alt="">
+            <img src="/img/service-indispo.png" alt="">
         </div>
     </div>
 
@@ -37,7 +37,7 @@
             </div>
             *}
             <div class="text">
-                <span class="label">à mon adresse de livraison <a href="?register">modifier</a></span>
+                <span class="label">à mon adresse de livraison <a href="/?register">modifier</a></span>
                 <span class="info">
                     {$smarty.session.user.firstname} {$smarty.session.user.lastname} <br>
                     {$smarty.session.user.delivery.address1} <br>
@@ -66,7 +66,7 @@
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>
         <textarea name="order_comment" id="" cols="30" rows="10">{$smarty.session.cart_summary.order_comment}</textarea>
         <p>
-            <a href="?cart" ><button type="button" class="precedent">Précédent</button></a>
+            <a href="/?cart" ><button type="button" id="btn-precedent" class="precedent"></button></a>
             <input type="submit" value="" class="submit">
         </p>
     </form>

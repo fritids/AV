@@ -44,7 +44,7 @@
     float: left;
 }
 #promotions{
-    background: url(../img/promotions.png);
+    background: url(/img/promotions.png);
     width: 685px;
     height: 45px;
 }
@@ -65,7 +65,7 @@
 
 .complement .produit .promo,
 .promotions .produit .promo{
-    background: url(../img/promo.png);
+    background: url(/img/promo.png);
     width: 59px;
     height: 58px;
     display: inline-block;
@@ -112,11 +112,11 @@
 
 .complement .produit .panier,
 .promotions .produit .panier
-{background: url(../img/bg-panier.png);}
+{background: url(/img/bg-panier.png);}
 
 .complement .produit  .voir,
 .promotions .produit .voir
-{background: url(../img/bg-voir.png);}
+{background: url(/img/bg-voir.png);}
 
 .produit-du-mois{
     padding: 15px 0;
@@ -124,7 +124,7 @@
 }
 
 .produit-du-mois h3{
-    background: url(../img/produit-du-mois.png);
+    background: url(/img/produit-du-mois.png);
     width: 269px;
     height: 45px;
     margin-bottom: 0;
@@ -133,7 +133,7 @@
 }
 
 .produit-du-mois .produit{
-    background: url(../img/bg-produit-du-mois.png) no-repeat;
+    background: url(/img/bg-produit-du-mois.png) no-repeat;
     max-height: 332px;
     min-height: 332px;
     padding-top: 10px;
@@ -186,16 +186,16 @@
 
 
 .blocks .partenaires{
-    background: url(../img/Nos-Partenaires.png) no-repeat;
+    background: url(/img/Nos-Partenaires.png) no-repeat;
 }
 
 .blocks .videos{
-    background: url(../img/Nos-conseils-video.png) no-repeat;
+    background: url(/img/Nos-conseils-video.png) no-repeat;
     margin: 0 11px;
 }
 
 .blocks .videos a{
-    background: url(../img/video-plus.png) no-repeat left center;
+    background: url(/img/video-plus.png) no-repeat left center;
     padding-left: 20px;
     margin-left: 5px;
     display: inline-block;
@@ -204,7 +204,7 @@
 
 .blocks .formes{
     font-weight: bold;
-    background: url(../img/Formes-et-decoupes-specifiques.png) no-repeat;
+    background: url(/img/Formes-et-decoupes-specifiques.png) no-repeat;
     text-align: center;
     color: #4193ef;
     font-size: inherit;
@@ -216,17 +216,17 @@
 }
 
 .carre-orange{
-    background: url(../img/carre-orange.png) no-repeat left top;
+    background: url(/img/carre-orange.png) no-repeat left top;
 }
 .carre-blue{
-    background: url(../img/carre-blue.png) no-repeat left top;
+    background: url(/img/carre-blue.png) no-repeat left top;
 }
 .carre-vert{
-    background: url(../img/carre-vert.png) no-repeat left top;
+    background: url(/img/carre-vert.png) no-repeat left top;
 }
 
 .separ{
-    background: url(../img/separation.png) no-repeat center top;
+    background: url(/img/separation.png) no-repeat center top;
     height: 13px
 }
 
@@ -248,7 +248,7 @@
 }
 
 #categorie .item .desc{
-    background: url(../img/separ-vertical.png) no-repeat right center;
+    background: url(/img/separ-vertical.png) no-repeat right center;
     width: 405px;
 }
 
@@ -264,7 +264,7 @@
 }
 #categorie .item .prix a{
     text-decoration: none;
-    background: url(../img/voir-produit.png) no-repeat;
+    background: url(/img/voir-produit.png) no-repeat;
     width: 102px;
     height: 28px;
     display: block;
@@ -287,7 +287,7 @@
 #categorie .categorie_slider{
     width: 686px;
     height: 273px;
-    background: url(../img/categorie_slider.png) no-repeat center center;
+    background: url(/img/categorie_slider.png) no-repeat center center;
     margin: 20px 0 35px 0;
 }
 #categorie .categorie_slider img {
@@ -306,14 +306,14 @@
 /*-----------------Page Produit----------------*/
 
 #produit #features .features{
-    background: url(../img/bg-fetaures.png) no-repeat center top;
+    background: url(/img/bg-fetaures.png) no-repeat center top;
     width: 350px;
     float: left;
     margin-left: 10px;
 }
 
 #produit #features .features .separ{
-    background: url(../img/bg-features.png) no-repeat center top;
+    background: url(/img/bg-features.png) no-repeat center top;
     height: 1px;
     padding-top: 15px;
 }
@@ -397,7 +397,7 @@
 
 #produit #features .features .add_to_cart .submit{
     display: block;
-    background: url(../img/ajouter-au-panier.png) no-repeat center center;
+    background: url(/img/ajouter-au-panier.png) no-repeat center center;
     width: 143px;
     height: 30px;
     border: none;
@@ -433,7 +433,7 @@
 }
 
 #produit .share .imprimer{
-    background: url(../img/imprimer.png) no-repeat left center;
+    background: url(/img/imprimer.png) no-repeat left center;
     width: 80px;
     height: 37px;
     line-height: 37px;
@@ -444,7 +444,7 @@
 }
 
 #produit .share .envoyer-a-un-ami{
-    background: url(../img/envoyer-a-un-ami.png) no-repeat left center;
+    background: url(/img/envoyer-a-un-ami.png) no-repeat left center;
     width: 125px;
     height: 37px;
     line-height: 37px;
@@ -460,7 +460,7 @@
 }
 
 #produit h3.paragraphe-titre .top{
-    background: url(../img/produit-top.png) no-repeat center center;
+    background: url(/img/produit-top.png) no-repeat center center;
     display: inline-block;
     width: 21px;
     height: 11px;
@@ -475,7 +475,7 @@
 }
 
 #produit .caracteristique .row{
-    background: url(../img/carre.png) no-repeat 5px center;
+    background: url(/img/carre.png) no-repeat 5px center;
     min-height: 32px;
     line-height: 32px;
     padding-left: 20px;
@@ -488,7 +488,7 @@
 
 /*-----------------Page Identification-----------*/
 #identification{
-    background: url(../img/bg-identification.png) no-repeat right 80px;
+    background: url(/img/bg-identification.png) no-repeat right 80px;
 }
 
 #identification .forms{
@@ -509,12 +509,12 @@
 }
 
 #identification .forms .creation {
-    background: url(../img/form-blue.png) no-repeat center center;
+    background: url(/img/form-blue.png) no-repeat center center;
     color: #539cf1;
 }
 
 #identification .forms .creation h3{
-    background: url(../img/creer-un-compte.png) no-repeat center center;
+    background: url(/img/creer-un-compte.png) no-repeat center center;
     width: 183px;
     height: 24px
 
@@ -536,11 +536,11 @@
 }
 
 #identification .forms .login{
-    background: url(../img/form-orange.png) no-repeat center center;
+    background: url(/img/form-orange.png) no-repeat center center;
 }
 
 #identification .forms .login h3{
-    background: url(../img/deja-un-compte.png) no-repeat center center;
+    background: url(/img/deja-un-compte.png) no-repeat center center;
     width: 202px;
     height: 24px;
     margin-bottom: 35px;
@@ -599,7 +599,7 @@
 
 /*----------Mes Devis------------*/
 #mesdevis h3#titre{
-    background: url(../img/mes-devis.png) no-repeat center center;
+    background: url(/img/mes-devis.png) no-repeat center center;
     height: 37px;
     width: 960px;
     text-indent: -999px;
@@ -662,7 +662,7 @@
 
 #mesdevis table td.commander .valide{
     color: #1B7DEC;
-    background: url(../img/devis-ok.png) no-repeat left center;
+    background: url(/img/devis-ok.png) no-repeat left center;
     display: inline-block;
     padding-left: 25px;
     line-height: 20px;
@@ -673,7 +673,7 @@
     display: inline-block;
     width: 192px;
     height: 33px;
-    background: url(../img/je-valide-ce-devis.png) no-repeat center center;
+    background: url(/img/je-valide-ce-devis.png) no-repeat center center;
 }
 
 /*-------------------------------*/
@@ -682,7 +682,7 @@
 /*--------Mon Compte--------------*/
 
 #moncompte h3#titre{
-    background: url(../img/mon-compte.png) no-repeat center center;
+    background: url(/img/mon-compte.png) no-repeat center center;
     height: 37px;
     width: 960px;
     text-indent: -999px;
@@ -693,7 +693,7 @@
     float: left;
     width: 284px;
     height: 153px;
-    background: url(../img/compte-block-bg.png) no-repeat center center;
+    background: url(/img/compte-block-bg.png) no-repeat center center;
     margin: 0 10px 10px 0;
     padding: 15px;
 }
@@ -712,12 +712,12 @@
     font-weight: 400;
 }
 
-#moncompte .blocks .block.avoirs h3{background: url(../img/mesavoirs.png) no-repeat left center;}
-#moncompte .blocks .block.devis h3{background: url(../img/mesdevis.png) no-repeat left center;}
-#moncompte .blocks .block.commandes h3{background: url(../img/histo-commandes.png) no-repeat left center;}
-#moncompte .blocks .block.infos h3{background: url(../img/infos-perso.png) no-repeat left center;}
-#moncompte .blocks .block.adresses h3{background: url(../img/mes-adresse.png) no-repeat left center;}
-#moncompte .blocks .block.parrainage h3{background: url(../img/parrainage.png) no-repeat left center;}
+#moncompte .blocks .block.avoirs h3{background: url(/img/mesavoirs.png) no-repeat left center;}
+#moncompte .blocks .block.devis h3{background: url(/img/mesdevis.png) no-repeat left center;}
+#moncompte .blocks .block.commandes h3{background: url(/img/histo-commandes.png) no-repeat left center;}
+#moncompte .blocks .block.infos h3{background: url(/img/infos-perso.png) no-repeat left center;}
+#moncompte .blocks .block.adresses h3{background: url(/img/mes-adresse.png) no-repeat left center;}
+#moncompte .blocks .block.parrainage h3{background: url(/img/parrainage.png) no-repeat left center;}
 
 #moncompte .blocks .block.devis .notif{
     color: #fff;
@@ -786,14 +786,14 @@
 }
 
 #recapitulatif .precedent{
-    background: url(../img/precedent.png) no-repeat center center;
+    background: url(/img/precedent.png) no-repeat center center;
     border: none;
     width: 106px;
     height: 31px;
 }
 
 #recapitulatif .valider-porsuivre{
-    background: url(../img/valider-et-poursuivre.png) no-repeat center center;
+    background: url(/img/valider-et-poursuivre.png) no-repeat center center;
     border: none;
     width: 192px;
     height: 33px;
@@ -816,7 +816,7 @@
 #recapitulatif .produits thead,
 #monpanier .produits thead
 {
-    background: url(../img/recap-table-head.png) repeat-x;
+    background: url(/img/recap-table-head.png) repeat-x;
     height: 41px;
 }
 #recapitulatif .produits th{
@@ -826,7 +826,7 @@
 #recapitulatif .produits th span,
 #monpanier .produits th span
 {
-    background: url(../img/recap-recta.png) no-repeat center bottom;
+    background: url(/img/recap-recta.png) no-repeat center bottom;
     font-weight: normal;
     font-size: 12px;
     padding-bottom: 9px;
@@ -879,7 +879,7 @@
     padding: 5px 15px;
 }
 #recapitulatif .promo .code_promo_label {
-    background: url(../img/icon-promo.png) no-repeat left center;
+    background: url(/img/icon-promo.png) no-repeat left center;
     padding-left: 12px;
 }
 #recapitulatif .promo .total{
@@ -910,10 +910,10 @@
 }
 
 #monpanier .produits .quantite .moins{
-    background: url(../img/icon-moins.png) no-repeat;
+    background: url(/img/icon-moins.png) no-repeat;
 }
 #monpanier .produits .quantite .plus{
-    background: url(../img/icon-plus.png) no-repeat;
+    background: url(/img/icon-plus.png) no-repeat;
 }
 
 #monpanier .promo{
@@ -978,11 +978,11 @@
 }
 
 #livraison-pose .un{
-    background: url(../img/1.png) no-repeat left center;
+    background: url(/img/1.png) no-repeat left center;
 }
 
 #livraison-pose .deu{
-    background: url(../img/2.png) no-repeat left center;
+    background: url(/img/2.png) no-repeat left center;
 }
 
 #livraison-pose .options2 {
@@ -1025,28 +1025,30 @@
 }
 #livraison-pose .submit{
     border: none;
-    background: url(../img/valider-et-continuer.png) no-repeat;
+    background: url(/img/valider-et-continuer.png) no-repeat;
     width: 251px;
     height: 38px;
     float: right;
 }
 #btn-livraison{
+	float:right;
 	margin-top:10px;
     border: none;
-    background: url(../img/BTN-livraison.png) no-repeat;
+    background: url(/img/BTN-livraison.png) no-repeat;
     width: 155px;
     height: 38px;
 }
 #btn-connexion{
+	float:right;
 	margin-top:10px;
     border: none;
-    background: url(../img/BTN-connecter.png) no-repeat;
+    background: url(/img/BTN-connecter.png) no-repeat;
     width: 188px;
     height: 38px;
 }
 #btn-precedent{
     border: none;
-    background: url(../img/BTN-precedent.png) no-repeat;
+    background: url(/img/BTN-precedent.png) no-repeat;
     width: 188px;
     height: 38px;
 }
@@ -1065,8 +1067,8 @@ body{font-family:Arial;font-size:14px;line-height:normal;}
 .bloc_paiement{width:950px;padding:25px;}
 .montant{border-bottom:1px solid #BFBFBF;padding:10px 0;}
 .orange{color:#fd7625;}
-.texte_paiement{padding:20px 0;background:url("images/trait.jpg") repeat-x bottom;}
-.type_paiement{background:url("images/trait.jpg") repeat-x bottom;}
+.texte_paiement{padding:20px 0;background:url("/images/trait.jpg") repeat-x bottom;}
+.type_paiement{background:url("/images/trait.jpg") repeat-x bottom;}
 .logo_pay{float:left;width:420px;text-align:center;padding:20px 0 0;}
 .logo_pay img{font-size:16px;font-weight:bold;color:#010101;}
 .choix_pay{width:530px;float:left;}

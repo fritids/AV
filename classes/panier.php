@@ -22,13 +22,13 @@ class Panier {
         if (empty($dimension))
             $surface = 1;
 
-        $montant_produit_ttc = round($nb * $price * $surface, 2);
+        $montant_produit_ttc =  $nb * round($price, 2) * round($surface, 2);
 
-        @$this->panier[$refproduit]['quantity'] = $nb;
+        @$this->panier[$refproduit]['quantity'] += $nb;
         @$this->panier[$refproduit]['dimension'] = $dimension;
         @$this->panier[$refproduit]['productinfos'] = $productInfos;
-        @$this->panier[$refproduit]['surface'] = round($this->panier[$refproduit]['surface'] + $surface, 2);
-        @$this->panier[$refproduit]['price'] = round($this->panier[$refproduit]['price'] + $price, 2);
+        @$this->panier[$refproduit]['surface'] = round($surface, 2);
+        @$this->panier[$refproduit]['price'] = round( $price, 2);
         @$this->panier[$refproduit]['shipping'] = round($this->panier[$refproduit]['shipping'] + $shipping, 2);
         @$this->panier[$refproduit]['prixttc'] = round($this->panier[$refproduit]['prixttc'] + $montant_produit_ttc, 2);
 
@@ -45,20 +45,20 @@ class Panier {
 
     // ajouter un article $refproduit
     public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension) {
-        $montant_produit_ttc = round($nb * $price * $surface, 2);
+        $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2);
 
         @$this->panier[$refproduit]["options"][$refoption]['quantity'] += $nb;
         @$this->panier[$refproduit]["options"][$refoption]['dimension'] = $dimension;
-        @$this->panier[$refproduit]["options"][$refoption]['surface'] = round($this->panier[$refproduit]["options"][$refoption]['surface'] + $surface, 2);
-        @$this->panier[$refproduit]["options"][$refoption]['price'] = round($this->panier[$refproduit]["options"][$refoption]['price'] + $price, 2);
+        @$this->panier[$refproduit]["options"][$refoption]['surface'] = round($surface, 2);
+        @$this->panier[$refproduit]["options"][$refoption]['price'] = round($price, 2);
         @$this->panier[$refproduit]["options"][$refoption]['shipping'] = round($this->panier[$refproduit]["options"][$refoption]['shipping'] + $shipping, 2);
         @$this->panier[$refproduit]["options"][$refoption]['prixttc'] = round($this->panier[$refproduit]["options"][$refoption]['prixttc'] + $montant_produit_ttc, 2);
         @$this->panier[$refproduit]['prixttc'] = round($this->panier[$refproduit]['prixttc'] + $montant_produit_ttc, 2);
 
-        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'] + $shipping, 2);
-        @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'] + $montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
-        @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'] + $montant_produit_ttc, 2);
-        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'] + $shipping, 2);
+        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) + round($shipping, 2);
+        @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) + round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
+        @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) + round($montant_produit_ttc, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
 
         @$this->panier[$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
@@ -78,14 +78,14 @@ class Panier {
     // supprimer un article $refproduit
     public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface) {
 
-        $montant_produit_ttc = round($nb * $price * $surface, 2);
+        $montant_produit_ttc =  $nb * round($price, 2) * round($surface, 2);
 
         @$this->panier[$refproduit]['quantity'] -= $nb;
         @$this->panier[$refproduit]['surface'] = round($surface, 2);
-        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'] - $shipping, 2);
-        @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'] - $montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
-        @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'] - $montant_produit_ttc, 2);
-        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'] + $shipping, 2);
+        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) - round($shipping, 2);
+        @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) - round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
+        @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($montant_produit_ttc, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
 
         if ($this->panier[$refproduit]['quantity'] <= 0) {
             //remove option
@@ -96,10 +96,10 @@ class Panier {
                     $option_amount_produit += $option["quantity"] * $option["price"] * $option["surface"];
                 }
 
-            $this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'] - $option['shipping'], 2);
-            $this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'] - $option_amount_produit - $option_amount_produit / 1.196, 2);
-            $this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'] - $option_amount_produit, 2);
-            $this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'] + $option['shipping'], 2);
+            $this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) - round($option['shipping'], 2);
+            $this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) - round($option_amount_produit - $option_amount_produit / 1.196, 2);
+            $this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($option_amount_produit, 2);
+            $this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($option['shipping'], 2);
 
 
             if ($this->panier_summary['total_taxes'] < 0)
@@ -122,7 +122,7 @@ class Panier {
     }
 
     // afficher la quantit? de produits dans le panier
-    // param?tre : $refproduit : permet d'afficher la quantité pour le produit de cette r?f?rence
+    // param?tre : $refproduit : permet d'afficher la quantitï¿½ pour le produit de cette r?f?rence
     // si le param?tre est vide, on affiche la quantit? totale de produit
     public function showQuantity($refproduit = "") {
         if ($refproduit) {
@@ -177,7 +177,7 @@ class Panier {
                             $list[$i]["contact"][$key] = $contact;
                     }
                 }
-                // fichiers attachés
+                // fichiers attachï¿½s
                 if (!empty($this->panier[$ref]['files'])) {
                     foreach ($this->panier[$ref]['files'] as $key => $file) {
                         if (!empty($file))

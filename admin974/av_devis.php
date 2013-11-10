@@ -134,10 +134,10 @@ if (isset($_POST["devis_save"])) {
         "id_address_delivery" => $customer_delivery["id_address"],
         "id_address_invoice" => $customer_invoice["id_address"],
         "current_state" => 1,
-        "invoice_date" => date("Y-m-d h:i:s"),
-        "delivery_date" => date("Y-m-d h:i:s"),
-        "date_add" => date("Y-m-d h:i:s"),
-        "date_upd" => date("Y-m-d h:i:s"),
+        "invoice_date" => date("Y-m-d H:i:s"),
+        "delivery_date" => date("Y-m-d H:i:s"),
+        "date_add" => date("Y-m-d H:i:s"),
+        "date_upd" => date("Y-m-d H:i:s"),
         "devis_comment" => $_POST["devis_comment"],
     );
 

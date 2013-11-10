@@ -14,4 +14,4 @@ En cas d’anomalie ou de non-conformité de ce verre, il faut IMPERATIVEMENT é
 
 En vous remerciant pour la confiance que vous nous avez accordée, nous vous souhaitons une bonne réception.
 
-{include file='footer.tpl'}
+{include file='mail_footer.tpl'}

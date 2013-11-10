@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include ('configs/settings.php');
 require('libs/Smarty.class.php');
 require('classes/MysqliDb.php');
@@ -17,7 +17,7 @@ require('classes/CMCIC_Tpe.inc.php');
 
 $smarty = new Smarty;
 //$smarty->caching = 0;
-$smarty->error_reporting = E_ALL & ~E_NOTICE;
+//$smarty->error_reporting = E_ALL & ~E_NOTICE;
 $smarty->setTemplateDir(array('templates', 'templates/mails'));
 
 
@@ -61,6 +61,7 @@ if (isset($_GET["cart"])) {
     if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
         $pid = $_POST["id_product"];
         $pqte = $_POST["quantity"];
+        $prixttc = $_POST["prixttc"];
 
         $productInfos = getProductInfos($_POST["id_product"]);
 
@@ -106,8 +107,10 @@ if (isset($_GET["cart"])) {
 
         if (isset($_POST["del"])) {
             $surface = $_SESSION["cart"][$pid]["surface"];
+            $pqte = $_SESSION["cart"][$pid]["quantity"];
+            $price = $_SESSION["cart"][$pid]["price"];
 
-            $cart->removeItem($pid, $pqte, round($productInfos["price"], 2), $shipping_amount, $surface);
+            $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface);
 //$cart->removeCartItem($_POST["id_cart_item"]);
         }
 // on empecher de faire un F5
@@ -164,6 +167,11 @@ if (isset($_GET["order-identification"])) {
     $page = "order-identification";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
     $page_type = "full";
+}
+
+if (isset($_GET["contact-devis"])) {
+    $page = "contact-devis";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Demande de devis");
 }
 
 
@@ -551,15 +559,21 @@ $smarty->assign('promos', $promos);
 
 $smarty->display('index.tpl');
 ?>
+<?
+if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com") {
+    ?>
 
-<h1>Session</h1>
-<?= print_r($_SESSION) ?>
-<h1>Cart item</h1>
-<?= print_r($cartItems); ?>
-<h1>Orders</h1>
-<?= print_r($orders); ?>
-<h1>Product</h1>
-<?= print_r($product); ?>
-<h1>Post</h1>
-<?= print_r($_POST); ?>
-<br>
+    <h1>Session</h1>
+    <?= print_r($_SESSION) ?>
+    <h1>Cart item</h1>
+    <?= print_r($cartItems); ?>
+    <h1>Orders</h1>
+    <?= print_r($orders); ?>
+    <h1>Product</h1>
+    <?= print_r($product); ?>
+    <h1>Post</h1>
+    <?= print_r($_POST); ?>
+    <br>
+    <?
+}
+?>

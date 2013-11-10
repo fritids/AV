@@ -1,5 +1,5 @@
 <div id="monpanier">
-    <p><img src="img/monpanier.png" alt=""></p>
+    {*<p><img src="img/monpanier.png" alt=""></p>*}
     <p><img src="img/panier.png" alt=""></p>
     <p style="font-weight: bold;">
         Bonjour <span class="blue">{$smarty.session.user.firstname} {$smarty.session.user.lastname}</span><br/>
@@ -13,7 +13,6 @@
                 <th>&nbsp;</th>
                 <th><span>Désignation Produit</span></th>
                 <th><span>Dimensions</span></th>
-                <th><span>Prix unitaire ttc</span></th>
                 <th><span>Quantité</span></th>
                 <th><span>Prix total ttc</span></th>
                 <th>&nbsp;</th>
@@ -26,7 +25,7 @@
                 <tr>
                     <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
                     <td class="designation_prd">
-                        <a href="?p&id={$product.id}">{$product.name} 
+                        <a href="?p&id={$product.id} ">{$product.name} 
                             {if isset($product.options)}
                                 option : 
                                 {foreach key=key item=option from=$product.options}
@@ -50,8 +49,7 @@
                         <td class="dimensions">{$product.dimension.width}x{$product.dimension.height} mm</td>
                     {else}
                         <td class="dimensions"><em>N/A</em></td>
-                    {/if}
-                    <td class="prix_unit">{$product.price} €</td>
+                    {/if}                                        
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">{$product.prixttc} €</td>
                     <td><form action="?cart" method="post">
@@ -71,10 +69,11 @@
     </div>
     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
 
-        <a href="?delivery"><button>livraison</button></a>
+        <a href="?delivery"><button id="btn-livraison"></button></a>
     {else}
-        <a href="?order-identification"><button>Se connecter</button></a>
+        <a href="?order-identification"><button id="btn-connexion"></button></a>
     {/if}
+	<div class="clearfix"></div>
 </div>
 
 

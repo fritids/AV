@@ -75,7 +75,7 @@ function saveOrderPayment($oid, $payment) {
         "amount" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
         "conversion_rate" => 1,
         "payment_method" => $payment,
-        "date_add" => date("Y-m-d h:i:s"),
+        "date_add" => date("Y-m-d H:i:s"),
     );
 
     $db->insert("av_order_payment", $order_payment);
@@ -105,10 +105,10 @@ function saveOrder() {
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
         "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
-        "invoice_date" => date("Y-m-d h:i:s"),
-        "delivery_date" => date("Y-m-d h:i:s"),
-        "date_add" => date("Y-m-d h:i:s"),
-        "date_upd" => date("Y-m-d h:i:s"),
+        "invoice_date" => date("Y-m-d H:i:s"),
+        "delivery_date" => date("Y-m-d H:i:s"),
+        "date_add" => date("Y-m-d H:i:s"),
+        "date_upd" => date("Y-m-d H:i:s"),
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
     );
 
@@ -129,18 +129,18 @@ function saveOrder() {
             "product_height" => $item["dimension"]["height"],
             "product_depth" => $item["dimension"]["depth"],
             "product_weight" => $item["quantity"] * $p["weight"] * $item["surface"],
-            "total_price_tax_incl" => $item["quantity"] * $item["price"] + $item["shipping"],
-            "total_price_tax_excl" => $item["quantity"] * $item["price"] + $item["shipping"]
+            "total_price_tax_incl" => $item["prixttc"] + $item["shipping"],
+            "total_price_tax_excl" => $item["prixttc"] + $item["shipping"]
         );
 
 
         // on calcule le montant supp du aux options
-        if (isset($item["options"])) {
+        /*if (isset($item["options"])) {
             foreach ($item["options"] as $k => $option) {
                 $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
                 $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
             }
-        }
+        }*/
         $odid = $db->insert("av_order_detail", $order_detail);
 
         // on rajoute les options
@@ -153,6 +153,7 @@ function saveOrder() {
                     "id_order_detail" => $odid,
                     "id_product" => $item["id"],
                     "id_attribute" => $option["o_id"],
+                    "prixttc" => $option["o_price"],
                     "name" => $option["o_name"]);
 
                 /* $order_detail["product_attribute_id"] = $option["o_id"];
@@ -168,7 +169,7 @@ function saveOrder() {
         }
 
         $_SESSION["id_order"] = $oid;
-        $_SESSION["reference"] = getLastOrderId();
+        $_SESSION["reference"] = $ref;
     }
 }
 

@@ -8,7 +8,7 @@
     }
 </script>
 <div id="bloc_page_gauche">
-    <form action="index.php?action=new_user" method="post" onsubmit="return  validatePassword();">
+    <form action="/index.php?action=new_user" method="post" onsubmit="return  validatePassword();">
         {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
             <div id="titre-bloc">MODIFICATION DE COMPTE</div>
         {else}

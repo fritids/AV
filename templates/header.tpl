@@ -10,26 +10,26 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=1200">
 
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="css/allovitres.css">
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/menu.css" type="text/css">
-        <link rel="stylesheet" href="css/menu.css" type="text/css">
-        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+        <link rel="stylesheet" href="/css/normalize.css">
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/css/allovitres.css">
+        <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/menu.css" type="text/css">
+        <link rel="stylesheet" href="/css/menu.css" type="text/css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+        <script src="/js/vendor/modernizr-2.6.2.min.js"></script>
         <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>-->
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript" src="http://malsup.github.io/jquery.cycle2.js"></script>
-        <script type="text/javascript" src="js/bootstrap.js"></script>
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.min.js"></script>
         <script>
             $(window).load(function() {
 
                 var initialBg = $('#test123').css("background-image"); // added
 
                 var firstTime = true;
-                var arr = [initialBg, "url(bg/2.png)", "url(bg/1.png)", "url(bg/2.png)", "url(bg/1.png)"]; // changed
+                var arr = [initialBg, "url(/img/bg/2.png)", "url(/img/bg/1.png)", "url(/img/bg/2.png)", "url(/img/bg/1.png)"]; // changed
                 (function recurse(counter) {
                     var bgImage = arr[counter];
                     if (firstTime == false) {
@@ -74,27 +74,27 @@
                 <div id="top-header">
                     <div id="top-header-centre">
                         <span id="top-header-texte" >Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</span>
-                        <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="?cart"><img src="img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="/?cart"><img src="/img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
                                     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-                                Bonjour <a href="?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
-                                <a href="?action=logout">deconnexion</a>
+                                Bonjour <a href="/?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
+                                <a href="/?action=logout">deconnexion</a>
                             {else}
-                                <a href="?identification" title="connexion">SE CONNECTER</a>
+                                <a href="/?identification" title="connexion">SE CONNECTER</a>
                             {/if}
                         </div>
                     </div>
                 </div>
 
                 <div id="header">
-                    <a href='index.php'><img id="logo" src="img/logo.png" /></a>
+                    <a href="/index.php"><img id="logo" src="/img/logo.png" /></a>
                     <div id="header-droit">
-                        <div><img id="img-contactez-nous" src="img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></div>
+                        <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
                         <span id="telephone">0 892 72 11 13</span>
                         <span id="telephone2">(0,34€TT/min)</span>
                     </div>
                     <div id="reseau-sociaux">
-                        <img class="rs-icon" src="img/RS-twitter.png" />
-                        <img class="rs-icon" src="img/RS-facebook.png" />
+                        <img class="rs-icon" src="/img/RS-twitter.png" />
+                        <img class="rs-icon" src="/img/RS-facebook.png" />
                         <div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
             {include file='sub_menu.tpl'}
 
             <div id="recherche">
-			<img src="img/recherche.jpg"/>
+			<img src="/img/recherche.jpg"/>
 			{*
                 <div id="rech-conteneur-gauche" >
                     <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
@@ -148,7 +148,7 @@
                             </select>
                         </li>
                     </ul>
-                    <img id="btn-rechercher" src="img/rechercher.png" />
+                    <img id="btn-rechercher" src="/img/rechercher.png" />
                 </div>
                 <div id="rech-conteneur-droit2">
 
