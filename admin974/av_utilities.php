@@ -1,6 +1,6 @@
 <?php
 
-include ("../configs/settings.php");
+require_once "../configs/settings.php";
 include ("../classes/MysqliDb.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);

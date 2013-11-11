@@ -35,7 +35,7 @@ $paypal["returnipn"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["R
 $sTexteLibre = "";
 
 
-$confmail["from"] = "contact@allovitre.com";
+$confmail["from"] = "contact@allovitres.com";
 $confmail["welcome"] = "Bienvenue";
 $confmail["commande_new"] = "Nouvelle commande";
 $confmail["devis_contact"] = "stephane.alamichel@gmail.com";
@@ -43,6 +43,7 @@ $confmail["devis_subject"] = "Nouvelle demande de devis";
         
         
 $monitoringEmail = "stephane.alamichel@gmail.com, benoit@trusttelecom.fr";
+$monitoringEmails = array("stephane.alamichel@gmail.com");
 
 define("CMCIC_CLE", "182A5C7FB0AD605886A46193E5E97278D7A5DD9A");
 define("CMCIC_TPE", "0354284");

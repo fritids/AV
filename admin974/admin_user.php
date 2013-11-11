@@ -96,6 +96,12 @@ $opts['fdd']['id_admin'] = array(
   'default'  => '0',
   'sort'     => true
 );
+$opts['fdd']['date'] = array(
+  'name'     => 'Date',
+  'select'   => 'T',
+  'maxlen'   => 19,
+  'sort'     => true
+);
 $opts['fdd']['email'] = array(
   'name'     => 'Email',
   'select'   => 'T',
@@ -120,12 +126,14 @@ $opts['fdd']['prenom'] = array(
   'maxlen'   => 100,
   'sort'     => true
 );
-$opts['fdd']['date'] = array(
-  'name'     => 'Date',
+$opts['fdd']['role'] = array(
+  'name'     => 'Roles',
   'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
+  'maxlen'   => 100,
+  'sort'     => true,
+  'values' => array("ADMIN","COMMANDE","LIVRAISON")
 );
+
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

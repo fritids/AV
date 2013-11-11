@@ -19,3 +19,8 @@ define('_RIJNDAEL_IV_', 'YBEa8Q9QiaDh6F8LBT53Ig==');
 define('_DB_TYPE_', 'MySQL');
 define('__PS_BASE_URI__', '/');
 define('_THEME_NAME_', 'allovitres');
+
+$bdd_host = "localhost";
+$bdd_user = "";
+$bdd_pwd = "T1pFLinOEs!";
+$bdd_name = "allovitre";

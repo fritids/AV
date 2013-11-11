@@ -16,6 +16,11 @@ function getOrderInfos($oid) {
     $r = $db->where("id_order", $oid)
             ->get("av_orders");
 
+    foreach ($r as $k => $order) {
+        $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
+        $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);        
+        $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);        
+    }
     return $r[0];
 }
 
@@ -39,18 +44,63 @@ function getOrderPayment($oid) {
     global $db;
     $r = $db->where("id_order", $oid)
             ->get("av_order_payment");
-
-
+    if($r)
     return $r[0];
 }
 
-function getUserOrdersDetail($oid) {
+function getUserOrdersDetail($oid, $id_supplier = null) {
+    global $db;
+    $params = array($oid, $id_supplier, $id_supplier);
+
+    $r = $db->rawQuery("SELECT a.*, b.name supplier_name
+                        FROM av_order_detail a LEFT OUTER JOIN av_supplier b 
+                        on (a.id_supplier = b.id_supplier)
+                        where id_order = ? 
+                        and (IFNULL(?,0) = 0 OR a.id_supplier = ?)
+                        ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["attributes"] = getOrdersDetailAttribute($od["id_order_detail"]);
+    }
+    return $r;
+}
+
+function getUserOrdersDetailHistory($oid) {
+    global $db;
+    $params = array($oid);
+    $r = $db->rawQuery("SELECT a.id_order_detail, a.id_product, a.id_order, a.product_name,c.title product_current_state_label, b.date_add, a.id_supplier, b.supplier_name, b.bdc_filename, d.prenom
+                        FROM av_order_detail a, av_order_bdc b, av_order_status c, admin_user d
+                        where a.id_order_detail = b.id_order_detail
+                        and  d.id_admin = b.id_user
+                        and a.product_current_state = c.id_statut
+                        and  a.id_order = ?
+                        order by b.id_bdc desc", $params);
+
+    return $r;
+}
+function getUserOrdersDetailNotes($oid) {
+    global $db;
+    $params = array($oid);
+    
+    $r = $db->rawQuery("SELECT a.id_order, b.date_add , c.prenom, b.message
+                        FROM av_orders a, av_order_note b, admin_user c
+                        where a.id_order = b.id_order
+                        and c.id_admin = b.id_admin
+                        and a.id_order = ?
+                        order by b.id_message desc", $params);
+
+    return $r;
+}
+
+function getOrdersDetailSupplier($oid) {
     global $db;
     $params = array($oid);
 
-    $r = $db->rawQuery("SELECT a.*
-                        FROM av_order_detail a 
-                        where id_order = ? ", $params);
+    $r = $db->rawQuery("SELECT distinct a.id_supplier, b.name, b.email
+                        FROM av_order_detail a, av_supplier b 
+                        where a.id_supplier = b.id_supplier 
+                        and id_order = ?                         
+                        ", $params);
 
     return $r;
 }
@@ -135,12 +185,12 @@ function saveOrder() {
 
 
         // on calcule le montant supp du aux options
-        /*if (isset($item["options"])) {
-            foreach ($item["options"] as $k => $option) {
-                $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-            }
-        }*/
+        /* if (isset($item["options"])) {
+          foreach ($item["options"] as $k => $option) {
+          $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
+          $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
+          }
+          } */
         $odid = $db->insert("av_order_detail", $order_detail);
 
         // on rajoute les options
@@ -164,6 +214,7 @@ function saveOrder() {
                   $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
                   $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
                  */
+
                 $db->insert("av_order_product_attributes", $order_product_attributes);
             }
         }
@@ -180,7 +231,7 @@ function checkOrderPaid() {
 
     if ($oid) {
         $r = $db->rawQuery("select current_state from av_orders where id_order = ? ", array($oid));
-        
+
         if ($r[0]["current_state"] != '') {
             unset($_SESSION["cart"]);
             unset($_SESSION["cart_summary"]);

@@ -558,12 +558,18 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
     $contact_infos = array("lastname" => $_POST["lastname"],
         "firstname" => $_POST["firstname"],
         "tel" => $_POST["tel"],
+        "phone" => $_POST["tel"],
         "email" => $_POST["email"],
-        "demande" => $_POST["demande"]);
+        "demande" => $_POST["demande"],
+        "request" => $_POST["demande"],
+        "id_customer" => @$_SESSION["user"]["id_customer"]
+    );
 
     //envoie mail
     $mail->AddAddress($confmail["devis_contact"]);
-    $mail->AddBCC($monitoringEmail);
+    foreach ($monitoringEmails as $bccer) {
+        $mail->AddBCC($bccer);
+    }
     $mail->SetFrom($_POST["email"]);
 
     $mail->Subject = $confmail["devis_subject"];
@@ -571,8 +577,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
     $mail_body = $smarty->fetch('notif_demande_devis.tpl');
 
     $mail->MsgHTML($mail_body);
-    if ($mail->Send())
+    if ($mail->Send()) {
         $okmsg = array("txt" => "Votre demande de devis a été envoyé");
+        $r = $db->insert("av_devis_request", $contact_infos);
+    }
 }
 
 

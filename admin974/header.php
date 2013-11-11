@@ -1,9 +1,10 @@
 <?
 @session_start();
-include ("config/av_conf.php");
+require_once 'config/av_conf.php';
 include ("./av_utilities.php");
 include ("./securite.php");
 
+//echo setlocale(LC_ALL, 0);
 setlocale(LC_ALL, 'fr_FR.utf8', 'fr');
 
 mysql_query("SET NAMES UTF8");

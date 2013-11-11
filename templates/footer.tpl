@@ -5,19 +5,23 @@
                 <li><img src="img/FOOTER_choisir_verre.png"/></li>
                 <li>Choisir son verre</li>
             </ul>
+<a href="/content/1-livraison-dans-toute-la-france-allovitres">			
             <ul>
                 <li><img src="img/FOOTER_transport.png"/></li>
                 <li>Livraison</li>
             </ul>
+</a>
+<a href="/?contact-devis">				
             <ul>
                 <li><img src="img/FOOTER_devis.png"/></li>
                 <li>Devis personnalisé</li>
             </ul>
-            <a href="/?contact-nous"><ul>
+</a>			
+<a href="/?contact-nous"><ul>
                     <li><img src="img/FOOTER_nous_contacter.png"/></li>
                     <li>Nous contacter</li>
                 </ul>
-            </a>
+</a>
         </div>
         <div id="footer1-right">
             <p id="footer1-right-titre"><img src="img/contact.png"/>

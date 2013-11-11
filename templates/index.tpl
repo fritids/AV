@@ -67,10 +67,10 @@
                 <div class="bloc-droite">
                     <h2>NOS SERVICES</h2>
                     <ul>
-                        <li><img src="/img/b1.png" />Devis Spécifique</li>
-                        <li><img src="/img/b2.png" />Découpe sur mesure</li>
-                        <li><img src="/img/b3.png" />Service de pose</li>
-                        <li><img src="/img/b4.png" />Livraison</li>
+                        <a href="/?contact-devis"><li><img src="/img/b1.png" />Devis Spécifique</li></a>
+                        <a href="/content/16-prise-de-mesure-et-pose-d-un-vitrage-sur-fenetre-pvc"><li><img src="/img/b2.png" />Prise de mesures</li></a>
+                        <a href="/content/13-service-de-pose"><li><img src="/img/b3.png" />Service de pose</li></a>
+                        <a href="/content/1-livraison-dans-toute-la-france-allovitres"><li><img src="/img/b4.png" />Livraison</li></a>
                         <li><img src="/img/b5.png" />Nos conseils Videos</li>
                     </ul>
                 </div>
