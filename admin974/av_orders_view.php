@@ -70,7 +70,7 @@ $customer_delivery = getAdresseById($orderinfo["id_address_delivery"]);
 $customer_invoice = getAdresseById($orderinfo["id_address_invoice"]);
 
 
-$a = $db->rawQuery("select id_order from av_orders where ? > id_order order by id_order desc", array($oid));
+$a = $db->rawQuery("select id_order from av_orders where ? > id_order  order by id_order desc", array($oid));
 $b = $db->rawQuery("select id_order from av_orders where id_order > ? order by id_order asc", array($oid));
 
 $order_precedent = @$a[0]["id_order"];
@@ -230,7 +230,7 @@ $order_suivant = @$b[0]["id_order"];
                             <th>#</th>                            
                             <th>Produit</th>
                             <th>Option</th>
-                            <th>L x H x P (mm)</th>
+                            <th>Long x Larg </th>
                             <th>P.U.</th>
                             <th>Qte</th>
                             <th>Prix TTC</th>

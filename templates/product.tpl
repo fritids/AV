@@ -30,6 +30,7 @@
                         {if $product.id_category !=19}
                             <p><span id="surface"></span> m² calculé</p>
                             <p><span id="total_poids"></span> kg calculés</p>
+                            <p><span id=""></span> min facturé {$product.min_area_invoiced} m²</p>
                         {/if}
                     </div>
                     <div class="add_to_cart">
@@ -112,55 +113,55 @@
     <div class="desc">
         {$product.description}
     </div>
-{*
+    {*
     <h3 class="paragraphe-titre">Nos conseils de pose en vidéo  <a href="#" class="top"></a></h3>
     <p class="produit-menu"><a href="">Produits complémentaires</a>
-        | <a href="">Descriptif du produit</a>
-        | <a href=""> Nos conseils de pose en vidéo</a>
-        | Caractéristiques techniques</p>
-</p>
-<div style="width:560px;margin:0 auto">
+    | <a href="">Descriptif du produit</a>
+    | <a href=""> Nos conseils de pose en vidéo</a>
+    | Caractéristiques techniques</p>
+    </p>
+    <div style="width:560px;margin:0 auto">
     <iframe align="middle" width="560" height="315" src="/{$product.video}" frameborder="0" allowfullscreen></iframe>
-</div>
-*}
-{*
-<h3 class="paragraphe-titre">Julie D’ ALLOVITRES vous conseille ces produits complémentaires  <a href="#" class="top"></a></h3>
-<p class="produit-menu"><a href="">Produits complémentaires</a>
-| <a href="">Descriptif du produit</a>
-| <a href=""> Nos conseils de pose en vidéo</a>
-| Caractéristiques techniques</p>
-</p>
-
-<div class="complement">
-<div class="produit first">
-<img src="/img/product1.jpg" alt="">
-<h3 class="titre">Miroir argenté 3 mm</h3>
-<p class="prix">30€</p>
-<p class="liens">
-<a href="" class="panier indent">Panier</a>
-<a href="" class="voir indent">Voir</a>
-</p>
-</div>
-<div class="produit">
-<img src="/img/product1.jpg" alt="">
-<h3 class="titre">Miroir argenté 3 mm</h3>
-<p class="prix">30€</p>
-<p class="liens">
-<a href="" class="panier indent">Panier</a>
-<a href="" class="voir indent">Voir</a>
-</p>
-</div>
-<div class="produit">
-<img src="/img/product1.jpg" alt="">
-<h3 class="titre">Miroir argenté 3 mm</h3>
-<p class="prix">30€</p>
-<p class="liens">
-<a href="" class="panier indent">Panier</a>
-<a href="" class="voir indent">Voir</a>
-</p>
-</div>			
-</div>
-*}
+    </div>
+    *}
+    {*
+    <h3 class="paragraphe-titre">Julie D’ ALLOVITRES vous conseille ces produits complémentaires  <a href="#" class="top"></a></h3>
+    <p class="produit-menu"><a href="">Produits complémentaires</a>
+    | <a href="">Descriptif du produit</a>
+    | <a href=""> Nos conseils de pose en vidéo</a>
+    | Caractéristiques techniques</p>
+    </p>
+    
+    <div class="complement">
+    <div class="produit first">
+    <img src="/img/product1.jpg" alt="">
+    <h3 class="titre">Miroir argenté 3 mm</h3>
+    <p class="prix">30€</p>
+    <p class="liens">
+    <a href="" class="panier indent">Panier</a>
+    <a href="" class="voir indent">Voir</a>
+    </p>
+    </div>
+    <div class="produit">
+    <img src="/img/product1.jpg" alt="">
+    <h3 class="titre">Miroir argenté 3 mm</h3>
+    <p class="prix">30€</p>
+    <p class="liens">
+    <a href="" class="panier indent">Panier</a>
+    <a href="" class="voir indent">Voir</a>
+    </p>
+    </div>
+    <div class="produit">
+    <img src="/img/product1.jpg" alt="">
+    <h3 class="titre">Miroir argenté 3 mm</h3>
+    <p class="prix">30€</p>
+    <p class="liens">
+    <a href="" class="panier indent">Panier</a>
+    <a href="" class="voir indent">Voir</a>
+    </p>
+    </div>			
+    </div>
+    *}
 </div>
 
 <script>
@@ -200,6 +201,34 @@
         var max_width = {$product.max_width};
         var min_height = {$product.min_height};
         var max_height = {$product.max_height};
+        var min_area_invoiced = {$product.min_area_invoiced};
+        var max_area_invoiced = {$product.max_area_invoiced};
+
+
+
+        function calculateprice() {
+            qte = $('#quantity').val();
+            pwidth = $('#width').val();
+            pheigth = $('#heigth').val();
+
+            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
+
+                area = (pwidth * pheigth) / 1000000;
+                coef = 1;
+
+                if (area < min_area_invoiced) {
+                    area = min_area_invoiced;
+                }
+                if (area > max_area_invoiced) {
+                    coef = 1.5;
+                }
+
+                $('#surface').text(area.toFixed(2));
+                $('#total_poids').text((area.toFixed(2) * unit_weight * qte * coef).toFixed(2));
+                $('#total_price').text((area.toFixed(2) * unit_price * qte * coef).toFixed(2));
+                $('#price').val((area.toFixed(2) * unit_price * qte * coef).toFixed(2));
+            }
+        }
 
         $('.attribute').change(function() {
             myArray = $('.attribute');
@@ -225,13 +254,8 @@
                 }
             });
 
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                square = (pwidth * pheigth) / 1000000;
-                $('#surface').val(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
+            calculateprice();
+
         });
 
         $('#width').change(function() {
@@ -247,19 +271,7 @@
                 return;
             }
 
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                square = (pwidth * pheigth) / 1000000;
-                $('#surface').val(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
-
+            calculateprice();
 
         });
         $('#heigth').change(function() {
@@ -275,46 +287,17 @@
                 return;
             }
 
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 1000000;
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-
-            }
+            calculateprice();
         });
         $('#quantity').change(function() {
-            qte = $('#quantity').val();
-            pwidth = $('#width').val();
-            pheigth = $('#heigth').val();
-            square = (pwidth * pheigth) / 1000000;
-
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                $('#surface').text(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
+            calculateprice();
         });
 
         $('#calculer').click(function() {
-            if (pheigth > 0 && pwidth > 0 && pwidth > 0) {
-                square = (pwidth * pheigth) / 1000000;
-                $('#surface').val(square.toFixed(2));
-                $('#total_poids').text((square.toFixed(2) * unit_weight * qte).toFixed(2));
-                $('#total_price').text((square.toFixed(2) * unit_price * qte).toFixed(2));
-                $('#price').val((square.toFixed(2) * unit_price * qte).toFixed(2));
-            }
-        }
-        )
+            calculateprice();
+        });
 
         $('#validation').submit(function() {
-
             if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {
                 return false;
             }

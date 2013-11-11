@@ -28,7 +28,7 @@ label {
 	font-size: 0.75em;
 	color:#000;
 }
-input[type="text"], input[type="email"] {
+input[type="text"], input[type="email"], input[type="password"] {
 	height:22px;
 	width:150px;
 	border:1px solid #111;

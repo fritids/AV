@@ -3,7 +3,7 @@
     <p><img src="img/panier.png" alt=""></p>
     <p style="font-weight: bold;">
         Bonjour <span class="blue">{$smarty.session.user.firstname} {$smarty.session.user.lastname}</span><br/>
-        Votre panier contient <span class="blue">{$smarty.session.cart|count}</span> article(s) :        
+        Votre panier contient <span class="blue">{$cart_nb_items}</span> article(s) :        
     </p>
 
     {assign var='option_price' value='0'}
@@ -20,7 +20,7 @@
         </thead>
 
         <tbody>
-            {foreach key=key item=product from=$cart name=cart}
+            {foreach key=array_key item=product from=$cart name=cart}
                 {$option_price=0}
                 <tr>
                     <td><img src="img/p/{$product.productinfos.cover.filename}" alt="" width="90"></td>
@@ -53,9 +53,10 @@
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">{$product.prixttc} €</td>
                     <td><form action="?cart" method="post">
-                            <input type="hidden" name="id_cart_item" value="{$smarty.foreach.cart.index}">
+                            <input type="hidden" name="id_cart_item" value="{$array_key}">
                             <input type="hidden" name="id_product" value="{$product.id}">
                             <input type="hidden" name="quantity" value="{$product.quantity}">
+                            <input type="hidden" name="nitem" value="{$smarty.foreach.cart.iteration}">
                             <input type="hidden" name="del">
                             <input type="submit" value="x" >
                         </form> </td>

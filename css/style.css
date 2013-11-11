@@ -678,6 +678,86 @@
 
 /*-------------------------------*/
 
+/*----------Mes commandes------------*/
+#mescommandes h3#titre{
+    background: url(/img/mes-commandes.png) no-repeat center center;
+    height: 37px;
+    width: 960px;
+    text-indent: -999px;
+}
+
+#mescommandes table,#mescommandes td{
+    border-collapse: collapse;
+    text-align: center;	
+}
+#mescommandes table{
+    width: 100%
+}
+
+#mescommandes table th{
+    background: #e4e4e4;
+    height: 45px;
+}
+
+#mescommandes table th.first{
+    border-radius: 35px 0px 0px 0px;
+}
+#mescommandes table th.last{
+    border-radius: 0px 35px 0px 0px;
+}
+
+#mescommandes table td{
+    border: solid 1px #a2a2a2;	
+}
+
+#mescommandes table td.numero{
+    font-weight: bold;
+}
+
+#mescommandes table td.numero span{
+    color: #1b7dec;
+}
+
+#mescommandes table td.numero,
+#mescommandes table td.client{
+    font-style: italic;
+}
+#mescommandes table td.action{
+    width: 280px;
+}
+
+#mescommandes table td.action a {
+    color: #1B7DEC;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    width: 80px;
+}
+
+
+#mescommandes table td.action a img {
+    display: block;
+    margin: 0 auto;
+    padding: 5px;
+}
+
+#mescommandes table td.commander .valide{
+    color: #1B7DEC;
+    background: url(/img/devis-ok.png) no-repeat left center;
+    display: inline-block;
+    padding-left: 25px;
+    line-height: 20px;
+}
+
+#mescommandes table td.commander .jevalide{
+    text-indent: -9999px;
+    display: inline-block;
+    width: 192px;
+    height: 33px;
+    background: url(/img/je-valide-ce-devis.png) no-repeat center center;
+}
+
+/*-------------------------------*/
 
 /*--------Mon Compte--------------*/
 

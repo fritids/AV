@@ -13,6 +13,11 @@
                         {$error.txt}  
                     </div>
                 {/if}
+                {if $okmsg}
+                    <div style="background-color: #7aba7b;margin-bottom: 20px; padding: 10px" >
+                        {$okmsg.txt}  
+                    </div>
+                {/if}
 
                 {include file="{$page}.tpl"}
             </div>
@@ -29,7 +34,7 @@
                                 option :
                                 {foreach key=key item=option from=$product.options}
                                     {$option.o_name}
-                                {/foreach}   
+                                {/foreach}  
 
                             {/if} 
 
@@ -38,12 +43,12 @@
 
                         <p>
                             Total produit : {$smarty.session.cart_summary.total_produits} € TTC<br/>
-                            Expédition : {$smarty.session.cart_summary.total_shipping} € TTC<br/>
+                            {*Expédition : {$smarty.session.cart_summary.total_shipping} € TTC<br/>*}
                             Taxes incluses : {$smarty.session.cart_summary.total_taxes} €<br/>                
                             Total : {$smarty.session.cart_summary.total_amount} € TTC<br/>                
                         </p>
                         <a class="bouton" href="/?cart">Panier</a>
-                        
+
                         {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
                             <a class="bouton" href="/?order-resume">Commander</a>
                         {else}

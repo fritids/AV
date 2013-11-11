@@ -55,13 +55,15 @@ $cart = new Panier();
 //commande déjà payé on flush
 checkOrderPaid();
 
+
+
 /* action Caddie */
 if (isset($_GET["cart"])) {
 
     if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
         $pid = $_POST["id_product"];
         $pqte = $_POST["quantity"];
-        $prixttc = $_POST["prixttc"];
+
 
         $productInfos = getProductInfos($_POST["id_product"]);
 
@@ -76,6 +78,12 @@ if (isset($_GET["cart"])) {
 
             if (isset($_POST["width"]) && !empty($_POST["width"]) && isset($_POST["height"]) && !empty($_POST["height"])) {
                 $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
+
+                if ($surface < $productInfos["min_area_invoiced"])
+                    $surface = $productInfos["min_area_invoiced"];
+                if ($surface > $productInfos["max_area_invoiced"])
+                    $productInfos["price"] = $productInfos["price"] * 1.5;
+
                 $dimension = array(
                     "width" => $_POST["width"],
                     "height" => $_POST["height"],
@@ -83,9 +91,11 @@ if (isset($_GET["cart"])) {
                 );
             }
 
-            $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos);
+            $nbItem = $cart->getNbItems() + 1;
 
-//Si option
+            $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+
+            //Si option
             if (isset($_POST["options"])) {
                 if (is_array($_POST["options"])) {
                     foreach ($_POST["options"] as $id_combination => $id_option) {
@@ -93,33 +103,38 @@ if (isset($_GET["cart"])) {
                         $option_name = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["name"];
                         $option_weight = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["weight"];
                         $shipping_ratio = getDeliveryRatio($option_weight);
-//$shipping_amount = $shipping_ratio * $option_weight;
+                        //$shipping_amount = $shipping_ratio * $option_weight;
                         $shipping_amount = 0;
 
-                        $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension);
+                        $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
                     }
                 }
             }
-
-
             $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
         }
 
         if (isset($_POST["del"])) {
-            $surface = $_SESSION["cart"][$pid]["surface"];
-            $pqte = $_SESSION["cart"][$pid]["quantity"];
-            $price = $_SESSION["cart"][$pid]["price"];
+            $nitem = $_POST["id_cart_item"];
 
-            $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface);
-//$cart->removeCartItem($_POST["id_cart_item"]);
+            $surface = $_SESSION["cart"][$nitem][$pid]["surface"];
+            $pqte = $_SESSION["cart"][$nitem][$pid]["quantity"];
+            $price = $_SESSION["cart"][$nitem][$pid]["price"];
+
+            $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface, $nitem);
+            //$cart->removeCartItem($_POST["id_cart_item"]);
         }
-// on empecher de faire un F5
+        // on empecher de faire un F5
         header("Location: index.php?cart");
     }
 }
 
 $cartItems = $cart->showCart();
 $cart_nb_items = count($cartItems);
+
+if (isset($_GET["p"])) {
+    //array_splice($_SESSION["cart"],$_GET["p"]);
+    unset($_SESSION["cart"][$_GET["p"]]);
+}
 
 
 
@@ -196,6 +211,7 @@ if (isset($_GET["contactez-nous"])) {
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
+    $page_type = "full";
     $orders = getUserOrders($_SESSION["user"]["id_customer"]);
     $breadcrumb = array("parent" => "Accueil", "fils" => "Historique");
     $smarty->assign('orders', $orders);
@@ -533,6 +549,33 @@ if (isset($_GET["devis"])) {
 }
 
 
+if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
+
+    $page = "contact-devis";
+
+    $mail->ClearAllRecipients();
+
+    $contact_infos = array("lastname" => $_POST["lastname"],
+        "firstname" => $_POST["firstname"],
+        "tel" => $_POST["tel"],
+        "email" => $_POST["email"],
+        "demande" => $_POST["demande"]);
+
+    //envoie mail
+    $mail->AddAddress($confmail["devis_contact"]);
+    $mail->AddBCC($monitoringEmail);
+    $mail->SetFrom($_POST["email"]);
+
+    $mail->Subject = $confmail["devis_subject"];
+    $smarty->assign("contact", $contact_infos);
+    $mail_body = $smarty->fetch('notif_demande_devis.tpl');
+
+    $mail->MsgHTML($mail_body);
+    if ($mail->Send())
+        $okmsg = array("txt" => "Votre demande de devis a été envoyé");
+}
+
+
 /* session */
 $smarty->assign('user', null);
 if (@$_SESSION["is_logged"]) {
@@ -553,6 +596,7 @@ $smarty->assign('page_type', $page_type);
 $smarty->assign('breadcrumb', $breadcrumb);
 $smarty->assign('mydevis', $mydevis);
 $smarty->assign('error', $error);
+$smarty->assign('okmsg', $okmsg);
 $smarty->assign('config', $config);
 //$smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);

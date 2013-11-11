@@ -17,7 +17,7 @@
                 <label for="email">Email</label>
                 <input id="email" name="email" type="email" /><br />
                 <label for="mdp">Mot de passe</label>
-                <input id="mdp" name="mdp" type="text" /><br />
+                <input id="mdp" name="mdp" type="password" /><br />
                 <input type="submit" name="b1" value="S'identifier" />
             </form>
 
