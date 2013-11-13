@@ -201,6 +201,7 @@ $suppliers = $db->get("av_supplier");
                     <table border="1" class="table-bordered">  
                         <?
                         foreach ($orders as $order) {
+
                             if ($order)
                                 $customer = getOrderUserDetail($order["id_customer"]);
                             $adresse = getAdresseById($order["id_address_delivery"]);
@@ -270,7 +271,7 @@ $suppliers = $db->get("av_supplier");
                                         <?
                                         if ($qte_remaining < $OrderProduct["product_quantity"]) {
                                             ?>
-                                            <br/>qte restante : <?= $qte_remaining ?>
+                                            <br/>qte restante à planifier: <?= $qte_remaining ?>
                                             <?
                                         }
                                         ?>
@@ -278,7 +279,7 @@ $suppliers = $db->get("av_supplier");
                                     <td>
                                         <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
                                         <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?>
-                                    <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                    <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                     <td><?= $product_weight ?> kg</td>
                                     <td>
                                         <?
@@ -380,8 +381,15 @@ $suppliers = $db->get("av_supplier");
                                         ?>
                                     </td>
                                 </tr>
+
                                 <?
                             }
+                            ?>
+
+                            <tr>
+                                <td colspan="9" style="height: 30px"></td>
+                            </tr>
+                            <?
                         }
                         ?>
                     </table>
@@ -392,14 +400,18 @@ $suppliers = $db->get("av_supplier");
                     <?
                     if ($orders) {
 // on recupère les camions
+
                         foreach ($trucks as $truck) {
 
                             $nb_produits = 0;
                             $montant_produits = 0;
                             $poids_produits = 0;
-                            $montant_transport = 0;
                             $volume_produit = 0;
+                            $montant_transport = 0;
                             $tmpRef = "";
+
+
+
                             $truckLoad = getTruckLoad(array($truck["id_truck"], $date_livraison));
                             ?>
                             <table>
@@ -434,16 +446,15 @@ $suppliers = $db->get("av_supplier");
                                                         <?
                                                         //on boucle sur les produits
                                                         foreach ($listOrderProduct as $OrderProduct) {
-                                                            $p = getProductInfos($OrderProduct["id_product"]);
-
                                                             $p_qty = $OrderProduct["nb_product_delivered"];
 
                                                             $montant_produits += $OrderProduct["product_price"];
                                                             $nb_produits += $OrderProduct["nb_product_delivered"];
                                                             $poids_produits += $p_qty * $OrderProduct["product_weight"];
-                                                            $montant_transport += $OrderProduct["product_shipping"];
+                                                            //$montant_transport += $OrderProduct["product_shipping"];
 
                                                             if ($tmpRef != $OrderProduct["reference"]) {
+                                                                $montant_transport += $conf_shipping_amount;
                                                                 ?>
                                                                 <tr>
                                                                     <td>&nbsp;</td>
@@ -457,8 +468,8 @@ $suppliers = $db->get("av_supplier");
                                                             ?>
                                                             <tr>
                                                                 <td><?= $p_qty ?></td>
-                                                                <td nowrap><?= $p["name"] ?></td>
-                                                                <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                                                <td><?= $OrderProduct["product_name"] ?></td>
+                                                                <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                                                 <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                        
                                                                 <td>
                                                                     <button name="delProduitTruck" value="<?= $OrderProduct["id_order_detail"] ?>" ><span class="glyphicon glyphicon-remove"></span></button>

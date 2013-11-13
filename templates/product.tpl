@@ -9,7 +9,7 @@
                 <div class="cycle-slideshow"
                      data-cycle-timeout=0
                      data-cycle-pager="#custom-pager"
-                     data-cycle-pager-template='<a href="#" ><img src="/{{src}}" width=95 height=95></a>'
+                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
                      >
                 {/literal}
                 <img src="/img/p/{$product.cover.filename}" width="325" />  
@@ -70,7 +70,7 @@
                         <span class="info">de {$product.min_width} à {$product.max_width} mm</span>
                     </div>	
                     <div class="row clearfix">
-                        <label for="height">Longeur</label>
+                        <label for="height">longueur</label>
                         <input type="text" id ="heigth" name="height" value="" class="text">
                         <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
                     </div>   

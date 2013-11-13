@@ -2,7 +2,10 @@
 
 include ("../../configs/settings.php");
 include ("../../classes/MysqliDb.php");
+
+$db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 mysql_query("SET NAMES UTF8");
+
 mysql_connect($bdd_host, $bdd_user, $bdd_pwd);
 mysql_select_db($bdd_name);
 

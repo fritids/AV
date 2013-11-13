@@ -22,15 +22,29 @@ function getUserDevis($cid) {
     return $r;
 }
 
-
 function getUserDevisDetail($oid) {
     global $db;
     $params = array($oid);
 
-    $r = $db->rawQuery("SELECT a.*, b.name attribut_name
-        FROM av_devis_detail a 
-        LEFT OUTER JOIN av_product_attribute b on (a.product_attribute_id = b.id_product_attribute )
+    $r = $db->rawQuery("SELECT a.*
+        FROM av_devis_detail a         
         where id_devis = ? ", $params);
+    
+    foreach ($r as $k => $devisdetail) {
+        $r[$k]["combinations"] = getUserDevisProductAttributs($devisdetail["id_devis_detail"]);
+    }
+
+    return $r;
+}
+
+function getUserDevisProductAttributs($ddid) {
+    global $db;
+    $params = array($ddid);
+
+    $r = $db->rawQuery("SELECT a.*
+        FROM  av_devis_product_attributes a         
+        where id_devis_detail = ? ", $params);
+
 
     return $r;
 }

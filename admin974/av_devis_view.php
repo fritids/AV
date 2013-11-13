@@ -10,8 +10,12 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $devis = $db->get("av_devis");
 $did = "";
 
-if (isset($_POST["id_devis"])) {
-    $did = $_POST["id_devis"];
+if (isset($_POST["id_devis"]) || isset($_GET["id_devis"])) {
+    if (isset($_POST["id_devis"]))
+        $did = $_POST["id_devis"];
+    if (isset($_GET["id_devis"]))
+        $did = $_GET["id_devis"];
+
     $r = $db->rawQuery("select * from av_devis_detail where id_devis = ?", array($did));
 
     $deviss = getDevis($did);
@@ -95,9 +99,9 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
                 <?
                 foreach ($devis as $dev) {
                     ?>
-                                                                    <option value="<?= $dev["id_devis"] ?>"
+                                                                                    <option value="<?= $dev["id_devis"] ?>"
                     <? if ($dev["id_devis"] == $did && !empty($did)) echo "selected" ?>
-                                                                            ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
+                                                                                            ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
                     <?
                 }
                 ?>
@@ -188,14 +192,11 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
                                     <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
                                         <tr>
                                             <th>Produit</th>
-                                            <th>Option</th>
-                                            <th>Largeur (mm)</th>
-                                            <th>Hauteur (mm)</th>
-                                            <th>Profondeur (mm)</th>
+                                            <th>Attributs</th>
+                                            <th>Larg x Long</th>
                                             <th>Prix Unit.</th>
                                             <th>Poids Unit.</th>
                                             <th>Quantity</th>
-                                            <th>Fdp</th>                        
                                             <th>Prix ttc</th>                        
                                         </tr>
                                         <?
@@ -204,16 +205,20 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
 
                                             <tr id="id0">
                                                 <td><?= $line["product_name"] ?></td>
-                                                <td>&nbsp;</td>
-                                                <td><?= $line["product_width"] ?></td>
-                                                <td><?= $line["product_height"] ?></td>
-                                                <td><?= $line["product_depth"] ?></td>
+                                                <td>
+                                                    <?
+                                                    foreach ($line["combinations"] as $attribute) {
+                                                        ?>
+                                                        <?= $attribute["name"] ?><br>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
                                                 <td><?= $line["product_price"] ?></td>
                                                 <td><?= $line["product_weight"] ?></td>
                                                 <td><?= $line["product_quantity"] ?></td>                                                             
-                                                <td><?= $line["product_shipping"] ?></td>                    
                                                 <td><?= $line["total_price_tax_incl"] ?></td>                    
-
                                             </tr>
                                             <?
                                         }

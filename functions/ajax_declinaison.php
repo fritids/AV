@@ -7,16 +7,6 @@ mysql_query("SET NAMES UTF8");
 mysql_connect($bdd_host, $bdd_user, $bdd_pwd);
 mysql_select_db($bdd_name);
 
-/*
-  //foreach (explode("&", $_POST["ids"]) as $val) {
-  foreach (explode("&", $_POST["ids"]) as $val) {
-
-  $opt[] = str_replace("options=", "", $val);
-  }
-
-
- */
-
 $priceAttribut = 0;
 $weightAttribut = 0;
 

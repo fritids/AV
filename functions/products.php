@@ -1,5 +1,16 @@
 <?php
 
+function getAllProductInfo() {
+    global $db;
+    
+    $r = $db->rawQuery("select * from av_product where active = 1 order by name asc");
+
+    foreach ($r as $k => $p) {
+        $t[$k] = getProductInfos($p["id_product"]);
+    }
+    return ($t);
+}
+
 function getProductInfos($pid) {
     global $db;
     $r = $db->where("id_product", $pid)
@@ -77,8 +88,11 @@ function getProductCombination($pid) {
 
 
     foreach ($r as $k => $attribut) {
-        $o[$attribut["id_attribute"]]["name"] = $attribut["name"];
-        $o[$attribut["id_attribute"]]["attributes"] = getProductAttributes($pid, $attribut["id_attribute"]);
+        //print_r($attribut);
+        if (is_array($attribut) && $attribut["id_attribute"] != "") {
+            $o[$attribut["id_attribute"]]["name"] = $attribut["name"];
+            $o[$attribut["id_attribute"]]["attributes"] = getProductAttributes($pid, $attribut["id_attribute"]);
+        }
     }
 
     if (empty($o))
@@ -136,13 +150,13 @@ function getImageCover($pid) {
 
 function getProductByCategorie($cid) {
     global $db;
-        
-    $r = $db->rawQuery ("select * 
+
+    $r = $db->rawQuery("select * 
                         from av_product 
                         where active=1 
                         and id_category = ? 
                         order by position asc", array($cid));
-            
+
     $p = array();
     foreach ($r as $k => $product) {
         $p[$k] = getProductInfos($product["id_product"]);

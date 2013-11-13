@@ -4,6 +4,17 @@
         <p><span id="fil-ariane-page">{$breadcrumb.parent} <span>{$breadcrumb.fils}</span></span></p>
 
         {if $page_type == 'full'}
+            {if $error}
+                <div style="background-color: red;margin-bottom: 20px; padding: 10px" >
+                    {$error.txt}  
+                </div>
+            {/if}
+            {if $okmsg}
+                <div style="background-color: #7aba7b;margin-bottom: 20px; padding: 10px" >
+                    {$okmsg.txt}  
+                </div>
+            {/if}
+
             {include file="{$page}.tpl"}
         {else}
             <div id="bloc_page_gauche">

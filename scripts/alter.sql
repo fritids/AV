@@ -26,3 +26,50 @@ CREATE TABLE `av_message` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=0;
 
 --
+
+SELECT concat("'update av_product set`link_rewrite` ='",`link_rewrite`,"',`meta_description`='",`meta_description`,"',`meta_keywords` ='",`meta_keywords`,"', `meta_title` ='",`meta_title`,"' where `id_cms` = ",`id_cms`, ";") qsql
+FROM  `ps_product_lang` 
+where id_lang=2;
+
+SELECT concat("'update av_cms_lang set`link_rewrite` ='",`link_rewrite`,"where `id_cms` = ",`id_cms`, ";") qsql
+FROM  `ps_cms_lang` 
+where id_lang=2;
+
+SELECT concat("'update av_category set`link_rewrite` ='",`link_rewrite`,"',`meta_description`='",`meta_description`,"',`meta_keywords` ='",`meta_keywords`,"', `meta_title` ='",`meta_title`,"' where `id_category` = ",`id_category`, ";") qsql
+FROM  `ps_category_lang` 
+where id_lang=2;
+
+INSERT INTO `av_attributes` (`id_attribute`, `name`) VALUES (NULL, 'Traitement du verre');
+
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '2', 'Coupe Brute', '0.00', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '2', 'biseaux 10 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '2', 'Biseaux 25 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '2', 'Joints polis autour', '16.74', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '7', 'Sans film anti éclat', '0','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '58', '7', 'Avec film anti éclat', '23.92', '0.00', '0.00', '0');
+
+
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '2', 'Coupe Brute', '0.00', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '2', 'biseaux 10 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '2', 'Biseaux 25 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '2', 'Joints polis autour', '16.74', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '7', 'Sans film anti éclat', '0','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '59', '7', 'Avec film anti éclat', '23.92', '0.00', '0.00', '0');
+
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '2', 'Coupe Brute', '0.00', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '2', 'biseaux 10 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '2', 'Biseaux 25 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '2', 'Joints polis autour', '16.74', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '7', 'Sans film anti éclat', '0','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '60', '7', 'Avec film anti éclat', '23.92', '0.00', '0.00', '0');
+
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '2', 'Coupe Brute', '0.00', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '2', 'biseaux 10 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '2', 'Biseaux 25 mm et Bords Polis', '59.8','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '2', 'Joints polis autour', '16.74', '0.00', '0.00', '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '7', 'Sans film anti éclat', '0','0.00', '0.00',  '0');
+INSERT INTO `av_product_attribute` (`id_product_attribute`, `id_product`, `id_attribute`, `name`, `price`, `weight`, `unit_price_impact`, `default_on`) VALUES (NULL, '61', '7', 'Avec film anti éclat', '23.92', '0.00', '0.00', '0');
+
+
+
+

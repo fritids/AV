@@ -1,9 +1,15 @@
 <?php
 
-function getUserOrders($id) {
+function getUserOrders($cid) {
     global $db;
-    $r = $db->where("id_customer", $id)
-            ->get("av_orders");
+    $params = array($cid);
+
+    $r = $db->rawQuery("select a.* , b.title statut_label
+                    from av_orders a, av_order_status b
+                    where a.current_state = b.id_statut 
+                    and a.id_customer= ?
+                    and ifnull(current_state,0) >0
+                    ", $params);
 
     foreach ($r as $k => $order) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
@@ -18,8 +24,8 @@ function getOrderInfos($oid) {
 
     foreach ($r as $k => $order) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
-        $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);        
-        $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);        
+        $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
+        $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
     }
     return $r[0];
 }
@@ -44,8 +50,8 @@ function getOrderPayment($oid) {
     global $db;
     $r = $db->where("id_order", $oid)
             ->get("av_order_payment");
-    if($r)
-    return $r[0];
+    if ($r)
+        return $r[0];
 }
 
 function getUserOrdersDetail($oid, $id_supplier = null) {
@@ -78,10 +84,11 @@ function getUserOrdersDetailHistory($oid) {
 
     return $r;
 }
+
 function getUserOrdersDetailNotes($oid) {
     global $db;
     $params = array($oid);
-    
+
     $r = $db->rawQuery("SELECT a.id_order, b.date_add , c.prenom, b.message
                         FROM av_orders a, av_order_note b, admin_user c
                         where a.id_order = b.id_order
@@ -183,14 +190,6 @@ function saveOrder() {
             "total_price_tax_excl" => $item["prixttc"] + $item["shipping"]
         );
 
-
-        // on calcule le montant supp du aux options
-        /* if (isset($item["options"])) {
-          foreach ($item["options"] as $k => $option) {
-          $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-          $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-          }
-          } */
         $odid = $db->insert("av_order_detail", $order_detail);
 
         // on rajoute les options

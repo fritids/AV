@@ -69,12 +69,16 @@
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-
-        <a href="?delivery"><button id="btn-livraison"></button></a>
-    {else}
+        {if empty($smarty.session.user.delivery.address1)}
+            <p>Merci de renseigner votre adresse complète de livraison.</p>
+            <a href="?register"><button>Mon compte</button></a>
+            {else}
+            <a href="?delivery"><button id="btn-livraison"></button></a>
+            {/if}
+        {else}
         <a href="?order-identification"><button id="btn-connexion"></button></a>
-    {/if}
-	<div class="clearfix"></div>
+        {/if}
+    <div class="clearfix"></div>
 </div>
 
 

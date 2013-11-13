@@ -103,9 +103,9 @@ $opts['fdd']['date_add'] = array(
     'name' => 'Date Commande',
     'options' => 'L',
     'select' => 'D',
-    'maxlen' => 10,    
+    'maxlen' => 10,
     'sort' => true,
-    'strftimemask' => "%a %d %b %y %H:%M:%S"
+    'strftimemask' => "%d %b %y %H:%M:%S"
 );
 $opts['fdd']['id_customer'] = array(
     'name' => 'Client',
@@ -114,11 +114,12 @@ $opts['fdd']['id_customer'] = array(
     'values' => array(
         'table' => 'av_customer',
         'column' => 'id_customer',
-        'description' => array("columns" => array('lastname', 'firstname'),
-            "divs" => array(' ', ' ')),
+        'description' => array("columns" => array('lastname', 'firstname', 'email'),
+            "divs" => array(' ', ' - ')),
     ),
     'sort' => true
 );
+
 
 $opts['fdd']['id_address_delivery'] = array(
     'name' => 'Adresse livraison',
@@ -161,9 +162,11 @@ $opts['fdd']['total_paid'] = array(
 require_once 'phpMyEdit.class.php';
 ?>
 <h1>Les ventes</h1>
+<button class="btn btn-primary modif">Modifier les statuts</button>
 <?
 new phpMyEdit($opts);
 ?>
+
 <br>
 
 <?
@@ -171,7 +174,7 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
 <script>
-    $().ready(function() {
+    $(".modif").click(function() {
         var i = 0;
         $('td[name=order_state]').each(function(index) {
             dat = "";

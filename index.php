@@ -11,6 +11,7 @@ require('functions/categories.php');
 require('functions/orders.php');
 require('functions/tools.php');
 require('functions/cms.php');
+require('functions/devis.php');
 require('classes/CMCIC_Tpe.inc.php');
 
 // classes declaration
@@ -76,6 +77,18 @@ if (isset($_GET["cart"])) {
         if (isset($_POST["add"])) {
             $dimension = array();
 
+            if ($_POST["width"] < $productInfos["min_width"] && $productInfos["min_width"] > 0)
+                $tmperr.= "Largeur minimum requise " . $productInfos["min_width"] . " mm <br>";
+            if ($_POST["height"] < $productInfos["min_height"] && $productInfos["min_height"] > 0)
+                $tmperr.= "Longueur minimum requise " . $productInfos["min_height"] . " mm<br>";
+            if ($_POST["width"] > $productInfos["max_width"] && $productInfos["max_width"] > 0)
+                $tmperr.= "Largeur maximum autorisé " . $productInfos["max_width"] . " mm<br>";
+            if ($_POST["height"] > $productInfos["max_height"] && $productInfos["max_height"] > 0)
+                $tmperr.= "Taille maximum autorisé " . $productInfos["max_height"] . " mm<br>";
+
+            if ($tmperr)
+                $error = array("txt" => $tmperr);
+
             if (isset($_POST["width"]) && !empty($_POST["width"]) && isset($_POST["height"]) && !empty($_POST["height"])) {
                 $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
 
@@ -93,10 +106,11 @@ if (isset($_GET["cart"])) {
 
             $nbItem = $cart->getNbItems() + 1;
 
-            $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+            if (empty($error))
+                $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
-            if (isset($_POST["options"])) {
+            if (empty($error) && isset($_POST["options"])) {
                 if (is_array($_POST["options"])) {
                     foreach ($_POST["options"] as $id_combination => $id_option) {
                         $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price"];
@@ -124,7 +138,8 @@ if (isset($_GET["cart"])) {
             //$cart->removeCartItem($_POST["id_cart_item"]);
         }
         // on empecher de faire un F5
-        header("Location: index.php?cart");
+        if (empty($error))
+            header("Location: index.php?cart");
     }
 }
 
@@ -548,11 +563,8 @@ if (isset($_GET["devis"])) {
     $smarty->assign('mydevis', $mydevis);
 }
 
-
 if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
-
     $page = "contact-devis";
-
     $mail->ClearAllRecipients();
 
     $contact_infos = array("lastname" => $_POST["lastname"],
@@ -581,6 +593,26 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
         $okmsg = array("txt" => "Votre demande de devis a été envoyé");
         $r = $db->insert("av_devis_request", $contact_infos);
     }
+}
+
+if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
+    //$page = "order-confirmation";
+    //order_validate
+
+    $orderDevis = getDevis($_POST["id_devis"]);
+    $shipping_amount = 0;
+    $surface = 0;
+    $dimension = array();
+    $productInfos = array();
+
+    foreach ($orderDevis[0]["details"] as $k => $odd) {
+        $nbItem = $cart->getNbItems() + 1;
+        $cart->addItem($odd["id_devis_detail"], $odd["product_quantity"], $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+    }
+
+    $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
+
+    header("Location: index.php?cart");
 }
 
 
@@ -612,7 +644,7 @@ $smarty->assign('promos', $promos);
 $smarty->display('index.tpl');
 ?>
 <?
-if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com") {
+if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["user"]["email"] == "alamichel.s@free.fr") {
     ?>
 
     <h1>Session</h1>

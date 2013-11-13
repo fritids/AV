@@ -8,6 +8,8 @@ include ("../functions/tools.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
+$pAll = getAllProductInfo();
+$a = $db->get("av_attributes");
 
 $customers = $db->get("av_customer");
 $cid = "";
@@ -24,8 +26,6 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
     $customer_info = getCustomerDetail($cid);
     $customer_delivery = getAdresse($cid, 'delivery');
     $customer_invoice = getAdresse($cid, 'invoice');
-
-
 
     if (empty($customer_delivery)) {
         $customer_invoice["alias"] = "delivery";
@@ -49,7 +49,7 @@ if (isset($_POST["contact"])) {
             "firstname" => $_POST["firstname"],
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
-            "passwd" => md5($_POST["firstname"]),
+            "passwd" => md5(_COOKIE_KEY_ . $_POST["firstname"]),
             "active" => 1,
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
@@ -143,157 +143,275 @@ if (isset($_POST["devis_save"])) {
 
     $did = $db->insert("av_devis", $devis_summary);
 
-    foreach ($_POST["product_name"] as $k => $product) {
-
+    //produit standard
+    foreach ($_POST["product_id"] as $k => $product) {
         if (!empty($product)) {
             $p_qte = $_POST["product_quantity"];
-            $p_depth = $_POST["product_depth"];
             $p_width = $_POST["product_width"];
             $p_height = $_POST["product_height"];
             $p_unit_price = $_POST["product_unit_price"];
             $p_unit_weight = $_POST["product_unit_weight"];
+            $attributes_amount = 0;
+            $devis_product_attributes = array();
+
+            // la quantité de la ligne est présent
+            if (!empty($p_qte[$k])) {
+                $p = getProductInfos($product);
+
+                $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
+
+                $devis_detail = array(
+                    "id_devis" => $did,
+                    "id_product" => $product,
+                    "product_name" => $p["name"],
+                    "product_quantity" => $p_qte[$k],
+                    "product_price" => $p_unit_price[$k],
+                    "product_width" => $p_width[$k],
+                    "product_height" => $p_height[$k],
+                    "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
+                );
+
+                $ddid = $db->insert("av_devis_detail", $devis_detail);
+
+                foreach ($_POST["product_attribut"] as $k => $attributes) {
+                    $arr = explode("|", $attributes);
+
+                    if ($arr[0] == $product) {
+                        $devis_product_attributes = array(
+                            "id_devis" => $did,
+                            "id_devis_detail" => $ddid,
+                            "id_product" => $arr[0],
+                            "id_attribute" => $arr[1],
+                            "prixttc" => $arr[2],
+                            "name" => $arr[3]);
+
+                        $db->insert("av_devis_product_attributes", $devis_product_attributes);
+
+                        $attributes_amount += $arr[2];
+                    }
+                }
+
+                $total_price_tax_incl = $product_amount + $attributes_amount;
+                $total_paid += $total_price_tax_incl;
 
 
-            $p = getProductInfosByName($product);
+                $r = $db->where("id_devis_detail", $ddid)
+                        ->update("av_devis_detail", array(
+                    "total_price_tax_incl" => $total_price_tax_incl,
+                    "total_price_tax_excl" => $total_price_tax_incl)
+                );
+            }
+        }
+    }
+    // prodiot exotique
+    foreach ($_POST["exo_product_name"] as $k => $product) {
+        if (!empty($product)) {
+            $p_qte = $_POST["exo_product_quantity"];
+            $p_unit_price = $_POST["exo_product_unit_price"];
+            $p_unit_weight = $_POST["exo_product_unit_weight"];
 
-            if (empty($p))
-                $p = array("id_product" => 0, "name" => $product);
-
-            $fdp = getDeliveryRatio($p_unit_weight[$k]);
-
-            $shipping_amount = $p_unit_weight[$k] * $p_qte[$k] * $fdp;
-            $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
+            $shipping_amount = 0;
+            $product_amount = $p_unit_price[$k] * $p_qte[$k];
 
             $total_price_tax_incl = $shipping_amount + $product_amount;
-            $total_paid +=$total_price_tax_incl;
+            $total_paid += $total_price_tax_incl;
 
             $devis_detail = array(
                 "id_devis" => $did,
-                "id_product" => $p["id_product"],
-                "product_name" => $p["name"],
+                "id_product" => 0,
+                "product_name" => $product,
                 "product_quantity" => $p_qte[$k],
                 "product_price" => $p_unit_price[$k],
-                "product_shipping" => $shipping_amount,
-                "product_width" => $p_width[$k],
-                "product_height" => $p_height[$k],
-                "product_depth" => $p_depth[$k],
-                "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
+                "product_weight" => $p_unit_weight[$k],
                 "total_price_tax_incl" => $total_price_tax_incl,
                 "total_price_tax_excl" => $total_price_tax_incl
             );
             $db->insert("av_devis_detail", $devis_detail);
         }
-        // les options
-        /* if (isset($item["options"])) {
-          foreach ($item["options"] as $k => $option) {
-          $devis_detail["product_attribute_id"] = $option["o_id"];
-          $devis_detail["attribute_name"] = $option["o_name"];
-          $devis_detail["attribute_quantity"] = $option["o_quantity"];
-          $devis_detail["attribute_price"] = $option["o_price"];
-          $devis_detail["attribute_shipping"] = $option["o_shipping"];
-          $devis_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-          $devis_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-
-          $db->insert("av_devis_detail", $devis_detail);
-          }
-          } else { // pas d'option
-          $db->insert("av_devis_detail", $devis_detail);
-          } */
     }
 
     $devis_summary = array("total_paid" => $total_paid);
     $r = $db->where("id_devis", $did)
             ->update("av_devis", $devis_summary);
 
-    echo '<div class="alert alert-success text-center">Devis ajouté</div>';
+    echo '<div class="alert alert-success text-center">Devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
 }
 ?>
 
 <script>
     var $table;
+    var totaldevis = 0;
+
     var c = 0;
     $(function() {
-        $table = $('#tab_devis');
+        $table = $('#tab_devis2');
+        $table_exo = $('#tab_exotique');
+
         var $existRow = $table.find('tr').eq(1);
         /* bind to existing elements on page load*/
         bindAutoComplete($existRow);
     });
 
     function addRow() {
-        var $row = $table.find('tr:last').clone();
+        var $row = $table.find('#template2').clone();
         var $input = $row.find('input').val("");
         $row.attr('id', 'id' + (++c));
 
         $row.find('.unit_price').text("");
         $row.find('.unit_weight').text("");
         $row.find('.poids').text("");
-        $row.find('.fdp').text("");
         $row.find('.prixttc').text("");
         $row.find('.product_price').text("");
-        $row.find('.unit_price').removeAttr('readonly');
-        $row.find('.unit_weight').removeAttr('readonly');
+        /*$row.find('.unit_price').removeAttr('readonly');
+         $row.find('.unit_weight').removeAttr('readonly');
+         */
+        $row.find('.attr1_price').val(0);
+        $row.find('.attr2_price').val(0);
+        $row.find('.attr3_price').val(0);
+        $row.find('.attr4_price').val(0);
+        $row.find('.attr5_price').val(0);
+        $row.find('.attr6_price').val(0);
+        $row.find('.attr7_price').val(0);
+        $row.find('.prod_price').val();
 
+        //$row.addClass('dupe');
+        //$row.attr('id', 'duplicate' + $('#tab_devis tr.dupe').length);
 
-        $table.append($row);
+        $("#tab_devis").append($row);
         bindAutoComplete($row);
+
+        //console.log($row.find(".product").text());
+        //console.log($row.find(".attributes1").text());
+
+        $row.find(".attributes1").chained($row.find(".product"));
+        $row.find(".attributes2").chained($row.find(".product"));
+        $row.find(".attributes3").chained($row.find(".product"));
+        $row.find(".attributes4").chained($row.find(".product"));
+        $row.find(".attributes5").chained($row.find(".product"));
+        $row.find(".attributes6").chained($row.find(".product"));
+        $row.find(".attributes7").chained($row.find(".product"));
+        $row.show();
+
+        //.find(".product_width").val();
+
         $input.focus();
 
     }
 
+    function addExoRow() {
+        var $row = $table_exo.find('tr:last').clone();
+        var $input = $row.find('input').val("");
+        $row.attr('id', 'id' + (++c));
+
+        $row.find('.unit_price').text("");
+        $row.find('.unit_weight').text("");
+        $row.find('.poids').text("");
+        $row.find('.prixttc').text("");
+        $row.find('.unit_price').removeAttr('readonly');
+        $row.find('.unit_weight').removeAttr('readonly');
+
+
+        $table_exo.append($row);
+
+        bindAutoComplete($row);
+
+        $input.focus();
+    }
+
+    function updUnitPrice(mytr) {
+        var p_prod_price = mytr.find(".prod_price").val();
+        var p_attr1_price = mytr.find(".attr1_price").val();
+        var p_attr2_price = mytr.find(".attr2_price").val();
+        var p_attr3_price = mytr.find(".attr3_price").val();
+        var p_attr4_price = mytr.find(".attr4_price").val();
+        var p_attr5_price = mytr.find(".attr5_price").val();
+        var p_attr6_price = mytr.find(".attr6_price").val();
+        var p_attr7_price = mytr.find(".attr7_price").val();
+
+        console.log(p_prod_price + p_attr1_price);
+
+        mytr.find(".unit_price").val(parseFloat(p_prod_price)
+                + parseFloat(p_attr1_price)
+                + parseFloat(p_attr2_price)
+                + parseFloat(p_attr3_price)
+                + parseFloat(p_attr4_price)
+                + parseFloat(p_attr5_price)
+                + parseFloat(p_attr6_price)
+                + parseFloat(p_attr7_price)
+                );
+
+
+    }
     function updatePrice(mytr) {
         //mytr.find(".prixttc").text($(this).val());
         var p_width = mytr.find(".product_width").val();
         var p_height = mytr.find(".product_height").val();
-        var p_depth = mytr.find(".product_depth").val();
         var p_uweight = mytr.find(".unit_weight").val();
         var p_uprice = mytr.find(".unit_price").val();
         var p_qte = mytr.find(".product_quantity").val();
 
 
-        mytr.find(".poids").text(p_width * p_height / 1000000 * p_uweight * p_qte);
-        mytr.find(".product_price").text(p_width * p_height / 1000000 * p_uprice * p_qte);
 
-        $.ajax({
-            url: "functions/ajax_fdp.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                p_weight: p_uweight,
-            },
-            success: function(data) {
-                mytr.find(".fdp").text(mytr.find(".poids").text() * data);
-                //console.log(data);
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
+        var p_min_area_invoiced = mytr.find(".min_area_invoiced").val();
+        var p_max_area_invoiced = mytr.find(".max_area_invoiced").val();
+
+
+        area = (p_width * p_height) / 1000000;
+        coef = 1;
+
+        if (area < p_min_area_invoiced) {
+            area = p_min_area_invoiced;
+        }
+        if (area > p_max_area_invoiced) {
+            coef = 1.5;
+        }
+
+        if (p_qte != "") {
+            if (typeof p_width === "undefined" && typeof p_height === "undefined") {
+                pprice = parseFloat(p_uprice) * parseInt(p_qte);
+
+                mytr.find(".prixttc").text(pprice.toFixed(2));
+                mytr.find(".poids").text(parseFloat(p_uweight) * parseInt(p_qte));
+
+                totaldevis = parseFloat(totaldevis) + parseFloat(pprice);
+
+            } else {
+                pprice = p_width * p_height / 1000000 * p_uprice * p_qte;
+                totaldevis = parseFloat(totaldevis) + parseFloat(pprice);
+
+                mytr.find(".prixttc").text(pprice.toFixed(2));
+                mytr.find(".poids").text(p_width * p_height / 1000000 * p_uweight * p_qte);
             }
-        });
+        }
 
-        mytr.find(".prixttc").text(parseFloat(mytr.find(".product_price").text()) + parseFloat(mytr.find(".fdp").text()));
-
+        $(".totaldevis").text(totaldevis.toFixed(2));
 
         console.log("p_width " + p_width);
         console.log("p_height " + p_height);
-        console.log("p_depth " + p_depth);
         console.log("p_uweight " + p_uweight);
         console.log("p_uprice " + p_uprice);
         console.log("p_qte " + p_qte);
+        console.log("totaldevis " + totaldevis);
+        console.log($(".prixttc").text());
 
     }
 
     function bindAutoComplete($row) {
         /* use row as main element to save traversing back up from input*/
-        $row.find(".product_name").autocomplete({
+        $row.find(".product_name_disable").autocomplete({
             source: 'functions/ajax_devis.php',
+            success: function(data) {
+
+            },
             select: function(event, ui) {
+                console.log(ui);
 
                 $(this).closest('tr').find('.unit_price').val(ui.item.price);
                 $(this).closest('tr').find(".unit_weight").val(ui.item.weight);
                 $(this).closest('tr').find(".product_width").val(ui.item.min_width);
                 $(this).closest('tr').find(".product_height").val(ui.item.min_height);
+                $(this).closest('tr').find(".min_area_invoiced").val(ui.item.min_area_invoiced);
+                $(this).closest('tr').find(".max_area_invoiced").val(ui.item.max_area_invoiced);
 
                 $(this).closest('tr').find('.unit_price').attr('readonly', 'readonly');
                 $(this).closest('tr').find('.unit_weight').attr('readonly', 'readonly');
@@ -321,10 +439,217 @@ if (isset($_POST["devis_save"])) {
             var mytr = $(this).closest('tr');
             updatePrice(mytr);
         })
+
+
+        $(".product").change(function() {
+            //console.log($(this).val());
+        })
+
+        $(".attributes1").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr1_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes1").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr1_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes2").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr2_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes3").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr3_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes3").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr3_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes4").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr4_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes5").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr5_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes6").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr6_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+        $(".attributes7").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr7_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
+
         $(".unit_price").change(function() {
             var mytr = $(this).closest('tr');
             updatePrice(mytr);
         })
+
+
     }
 
 
@@ -334,7 +659,7 @@ if (isset($_POST["devis_save"])) {
     $(function() {
         $('.delline').click(function() {
             $(this).parent().remove();
-            
+
         });
     });
 </script>
@@ -349,7 +674,6 @@ if (isset($_POST["devis_save"])) {
         });
     })
 </script>
-
 
 <div class="container">
     <div class="row">
@@ -423,7 +747,6 @@ if (isset($_POST["devis_save"])) {
                     </div>
                 </div>
             </div>
-
             <button type="submit" name="contact" value="<?= $btn_txt ?>"  id="form_submit" class="col-md-offset-3 col-md-9 btn-lg btn-warning" ><?= $btn_txt ?></button>
         </form>
     </div>
@@ -433,52 +756,138 @@ if (isset($_POST["devis_save"])) {
         <div class="row">
             <div class="col-md-12">
                 <h2>Produits</h2>
+
+
+                <table id="tab_devis2" style="display: none ">
+                    <tr id="template2" >
+                    <input type="hidden" name="min_area_invoiced[]" class="min_area_invoiced" size="2" />
+                    <input type="hidden" name="min_area_invoiced[]" class="min_area_invoiced" size="2" />
+
+                    <td>
+
+                        <select name="product_id[]" class="product" id="product">
+                            <?
+                            foreach ($pAll as $product) {
+                                ?>
+                                <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?></option>
+                                <?
+                            }
+                            ?>
+                        </select>
+                    </td>
+
+                    <td>
+                        <?
+                        $a = $db->get("av_attributes");
+                        foreach ($a as $attribute) {
+                            ?>
+                            <select name = "product_attribut[]" class = "attributes<?= $attribute["id_attribute"] ?>" id="attributes<?= $attribute["id_attribute"] ?>">
+                                <?
+                                foreach ($pAll as $product) {
+                                    if (is_array($product["combinations"])) {
+                                        foreach ($product["combinations"] as $idc => $combination) {
+                                            if ($idc == $attribute["id_attribute"]) {
+
+                                                foreach ($combination["attributes"] as $ida => $attribute) {
+                                                    ?>
+                                                    <option value = "<?= $product["id_product"] ?>|<?= $ida ?>|<?= $attribute["price"] ?>|<?= $attribute["name"] ?>" class="<?= $product["id_product"] ?>"><?= $attribute["name"] ?></option>
+                                                    <?
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                ?>
+                            </select><br>
+                            <?
+                        }
+                        ?>
+
+                    </td>
+                    <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
+                    <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>                                    
+                    <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" readonly="readonly" /> €/m²</td>
+                    <td><input type="text" name="product_unit_weight[]" class="unit_weight" size="5" /> Kg/m²</td>
+                    <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                                                        
+                    <td>
+                        <input type="text" name="" value="0" class="prod_price" size="2" />
+                        <input type="text" name="" value="0" class="attr1_price" size="2" />
+                        <input type="text" name="" value="0" class="attr2_price" size="2" />
+                        <input type="text" name="" value="0" class="attr3_price" size="2" />
+                        <input type="text" name="" value="0" class="attr4_price" size="2" />
+                        <input type="text" name="" value="0" class="attr5_price" size="2" />
+                        <input type="text" name="" value="0" class="attr6_price" size="2" />
+                        <input type="text" name="" value="0" class="attr7_price" size="2" />
+                    </td>                                                                                        
+                    <td><span class="poids"></span> Kg</td>                            
+                    <td><span class="prixttc"></span> €</td>
+                    </tr>
+
+                </table>
+
+
                 <form action="" method="post">
                     <input type="hidden"  value="<?= $cid ?>" name="id_customer">
 
-                    <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
-                        <tr>
-                            <th>Produit</th>
-                            <th>Option</th>
-                            <th>Largeur (mm)</th>
-                            <th>Hauteur (mm)</th>
-                            <th>Profondeur (mm)</th>
-                            <th>Prix Unit.</th>
-                            <th>Poids Unit.</th>
-                            <th>Quantity</th>
-                            <th>Poids</th>                        
-                            <th>Prix Produit</th>
-                            <th>FdP</th>
-                            <th>Prix TTC</th>
-                            <th>Actions</th>
-                        </tr>
-                        <tr id="id0">
-                            <td><input type="text" name="product_name[]" class="product_name"></td>
-                            <td>
-                                <select name="product_option" class="pme-input-0" >
-                                    <option>----</option>
-                                </select>
-                            </td>
-                            <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
-                            <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>
-                            <td><input type="text" name="product_depth[]"  class="product_depth" size="5" /></td>
-                            <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" /> €</td>
-                            <td><input type="text" name="product_unit_weight[]" class="unit_weight" size="5" /> Kg/m²</td>
-                            <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                    
-                            <td><span class="poids"></span> Kg</td>
-                            <td><span class="product_price"></span> €</td>
-                            <td><span class="fdp"></span> €</td>
-                            <td><span class="prixttc"></span> €</td>
-                            <td id="btn_action">
-                                <button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button>
-                                <button type="button" class="delline"><span class="glyphicon glyphicon-remove"></span></button>
-                            </td>
-                        </tr>
-                    </table>
+                    <ul class="nav nav-tabs">
+                        <li><a href="#classique" data-toggle="tab">Classique</a></li>
+                        <li><a href="#exotique" data-toggle="tab">Exotique</a></li>
+                    </ul>
+
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="classique">
+
+                            <table class="table table-bordered table-condensed col-md-12" id="tab_devis">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Option</th>
+                                    <th>Largeur (mm)</th>
+                                    <th>Hauteur (mm)</th>
+                                    <th>Prix Unit.</th>
+                                    <th>Poids</th>
+                                    <th>Quantity</th>
+                                    <th>Prix attributs</th>
+                                    <th>Poids</th>                        
+                                    <th>Prix TTC</th>
+                                </tr>
+                                <tr>
+                                    <td><button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="tab-pane" id="exotique">
+                            <table class="table table-bordered table-condensed col-md-12" id="tab_exotique">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Prix Unit.</th>
+                                    <th>Poids Unit.</th>
+                                    <th>Quantity</th>
+                                    <th>Poids</th>                        
+                                    <th>Prix TTC</th>
+                                    <th>Actions</th>
+                                </tr>
+                                <tr id="id0">
+                                    <td><input type="text" name="exo_product_name[]" class="product_name col-xs-12"></td>
+                                    <td><input type="text" name="exo_product_unit_price[]" class="unit_price" size="5" /> €</td>
+                                    <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" /> Kg</td>
+                                    <td><input type="text" name="exo_product_quantity[]" class="product_quantity" size="2" /></td>                    
+                                    <td><span class="poids"></span> Kg</td>                            
+                                    <td><span class="prixttc"></span> €</td>
+                                    <td id="btn_action">
+                                        <button type="button" id="newlines" onclick="javascript:addExoRow()"><span class="glyphicon glyphicon-plus"></span></button>
+                                        <? /* <button type="button" class="delline"><span class="glyphicon glyphicon-remove"></span></button> */ ?>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
                     <div class="pull-left">
                         <textarea name="devis_comment"></textarea>
                     </div>
-                    <div class="pull-right">
+                    <div class="pull-right">                        
+                        Total ttc hors frais de port : <span class="totaldevis"></span> €
                         <input type="submit" name ="devis_save"  class="btn-lg btn-warning">
                     </div>
 
@@ -489,3 +898,6 @@ if (isset($_POST["devis_save"])) {
     }
     ?>
 </div>
+<?
+print_r($_POST);
+?>

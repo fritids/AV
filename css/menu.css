@@ -18,6 +18,7 @@
 }
 #cssmenu ul {
   zoom: 1;
+  width: 1000px;
   background: #6a6b6c;
   /*
   -webkit-border-radius: 4px;
@@ -41,7 +42,7 @@
 #cssmenu a,
 #cssmenu a:link,
 #cssmenu a:visited {
-  padding: 10px 20px; 
+  padding: 10px 10px; 
   display: block;
   text-decoration: none;
   color: #ffffff;
@@ -55,6 +56,8 @@
 #cssmenu li {
   float: left;
  /* border-right: 1px solid #777879; */
+  width:142px;
+  text-align:center;
 }
 #cssmenu li:hover {
   background: #1b7dec;

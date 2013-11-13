@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -89,7 +89,7 @@
                     <a href="/index.php"><img id="logo" src="/img/logo.png" /></a>
                     <div id="header-droit">
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
-                        <span id="telephone">0 892 72 11 13</span>
+                        <span id="telephone">0 892 70 11 13</span>
                         <span id="telephone2">(0,34€TT/min)</span>
                     </div>
                     <div id="reseau-sociaux">

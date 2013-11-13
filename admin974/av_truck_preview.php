@@ -61,13 +61,14 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
                 ->where("id_order", $id)
                 ->update("av_tournee", array("horaire" => $comment));
     }
-
-    $r = $db->where("id_truck", $id_truck)
+    foreach ($updinfos["order"] as $id => $order) {
+        
+        $r = $db->where("id_truck", $id_truck)
             ->where("date_livraison", $date_livraison)
             ->where("id_order", $id)
-            ->update("av_tournee", array("status" => $updinfos["status"]));
-
-
+            ->update("av_tournee", array("status" => 2));       
+       
+    }
 
     /* on bloque le camion pour la date livraison */
     $infoTruckPlanning = array(
@@ -124,6 +125,7 @@ if (isset($_POST) && !empty($_POST)) {
         "comment2" => $_POST["comment2"],
         "comment3" => $_POST["comment3"],
         "horaire" => $_POST["horaire"],
+        "order" => $_POST["order"],
     );
     $r = updValidTruck($_POST["id_truck"], $_POST["date_livraison"], $updinfos);
 
@@ -184,7 +186,6 @@ if (isset($_GET["planning"]) && !$upd) {
                                 <li id="votre_id_1" class="sortable_item">
                                     <table >
                                         <?
-                                        $p = getProductInfos($OrderProduct["id_product"]);
                                         $customer = getOrderUserDetail($OrderProduct["id_customer"]);
                                         $adresse = getAdresse($OrderProduct["id_customer"], 'delivery');
 
@@ -193,7 +194,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                         $montant_produits += $OrderProduct["product_price"];
                                         $nb_produits += $OrderProduct["nb_product_delivered"];
                                         $poids_produits += $p_qty * $OrderProduct["product_weight"];
-                                        $montant_transport += $OrderProduct["product_shipping"];
+
 
 
                                         $addrs = $adresse["address1"] . "<br>";
@@ -205,7 +206,9 @@ if (isset($_GET["planning"]) && !$upd) {
 
 
                                         if ($tmpRef != $OrderProduct["reference"]) {
+                                            $montant_transport += $conf_shipping_amount;
                                             ?>
+                                            <input type="hidden" value="" name="order[<?= $OrderProduct["id_order"] ?>]">
                                             <tr>
                                                 <td>&nbsp;</td>
                                                 <th colspan="2"><?= $OrderProduct["reference"] ?></th>
@@ -224,8 +227,8 @@ if (isset($_GET["planning"]) && !$upd) {
                                         ?>
                                         <tr>
                                             <td><?= $p_qty ?></td>
-                                            <td nowrap><?= $p["name"] ?></td>
-                                            <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?> x <?= $OrderProduct["product_depth"] ?></td>
+                                            <td><?= $OrderProduct["product_name"] ?></td>
+                                            <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                             <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
 
                                         </tr>
