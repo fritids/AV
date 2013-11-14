@@ -83,7 +83,7 @@ if (isset($_GET["cart"])) {
 
         if (isset($_POST["add"])) {
             $dimension = array();
-
+/*
             if ($_POST["width"] < $productInfos["min_width"] && $productInfos["min_width"] > 0)
                 $tmperr.= "Largeur minimum requise " . $productInfos["min_width"] . " mm <br>";
             if ($_POST["height"] < $productInfos["min_height"] && $productInfos["min_height"] > 0)
@@ -92,7 +92,7 @@ if (isset($_GET["cart"])) {
                 $tmperr.= "Largeur maximum autorisé " . $productInfos["max_width"] . " mm<br>";
             if ($_POST["height"] > $productInfos["max_height"] && $productInfos["max_height"] > 0)
                 $tmperr.= "Taille maximum autorisé " . $productInfos["max_height"] . " mm<br>";
-
+*/
             if ($tmperr)
                 $error = array("txt" => $tmperr);
 
@@ -172,7 +172,7 @@ if (isset($_GET["c"])) {
 
     $meta["title"] = $categorie["meta_title"];
     $meta["description"] = $categorie["meta_description"];
-    $meta["keyword"] = $categorie["meta_keyword"];
+    $meta["keywords"] = $categorie["meta_keywords"];
     
     $smarty->assign('products', $products);
     $smarty->assign('categorie', $categorie);
@@ -184,7 +184,7 @@ if (isset($_GET["p"])) {
     
     $meta["title"] = $product["meta_title"];
     $meta["description"] = $product["meta_description"];
-    $meta["keyword"] = $product["meta_keyword"];
+    $meta["keywords"] = $product["meta_keywords"];
     
     $smarty->assign('product', $product);
     $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
@@ -226,7 +226,7 @@ if (isset($_GET["cms"])) {
     
     $meta["title"] = $cms["meta_title"];
     $meta["description"] = $cms["meta_description"];
-    $meta["keyword"] = $cms["meta_keyword"];
+    $meta["keywords"] = $cms["meta_keywords"];
     $breadcrumb = array("parent" => "Accueil", "fils" => null);
 }
 if (isset($_GET["delivery"])) {

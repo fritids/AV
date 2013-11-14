@@ -4,7 +4,6 @@ require_once 'config/av_conf.php';
 include ("./av_utilities.php");
 include ("./securite.php");
 
-//echo setlocale(LC_ALL, 0);
 setlocale(LC_ALL, 'fr_FR.utf8', 'fr');
 
 mysql_query("SET NAMES UTF8");
@@ -29,6 +28,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <link rel="stylesheet" href="css/date-picker.css" type="text/css" media="screen"/>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
         <link href="css/bootstrap.css" rel="stylesheet">
+		<link rel="stylesheet" href="css/dragdrop.css">
         <!-- tinyMCE -->
         <script language="javascript" type="text/javascript" src="tinymce/tinymce.min.js"></script>
         <script language="javascript" type="text/javascript">
@@ -117,7 +117,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livraison <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="av_tournee.php?planning=<?= date("Y-m-d") ?>">La tournée</a></li>                                
-                                    <li><a href="av_tournee_manifest.php">Manifest</a></li>                                
+                                    <li><a href="av_bon_livraison.php">Bon livraison</a></li>                                
+                                    <li><a href="av_roadmap.php">Feuille de route</a></li>                                
                                 </ul>
                             </li>  <?
                         }

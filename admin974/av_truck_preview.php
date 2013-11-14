@@ -177,13 +177,14 @@ if (isset($_GET["planning"]) && !$upd) {
             <table class="col-md-12 table-condensed">    
                 <tr>
                     <td>
-                        <ul id="sortlist" class="list-unstyled">
-                            <?
-                            //on boucle sur les produits
-                            foreach ($listOrderProduct as $OrderProduct) {
-                                ?>
-                                <li id="votre_id_1" class="sortable_item">
-                                    <table >
+                        <ul id="list-cmd" class="sortable list">
+                            <li id="cmd_<?php echo $OrderProduct["id_order"]; ?>">
+                                <table >
+                                    <?
+                                    //on boucle sur les produits
+                                    foreach ($listOrderProduct as $OrderProduct) {
+                                        ?>
+
                                         <?
                                         $customer = getOrderUserDetail($OrderProduct["id_customer"]);
                                         $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
@@ -207,6 +208,10 @@ if (isset($_GET["planning"]) && !$upd) {
                                         if ($tmpRef != $OrderProduct["reference"]) {
                                             $montant_transport += $conf_shipping_amount;
                                             ?>
+                                        </table>
+                                    </li>
+                                    <li id="cmd_<?php echo $OrderProduct["id_order"]; ?>">
+                                        <table >
                                             <input type="hidden" value="" name="order[<?= $OrderProduct["id_order"] ?>]">
                                             <tr>
                                                 <td>&nbsp;</td>
@@ -220,6 +225,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                                 <th>Informations <br><input type="text" value="" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                 <th>Horaire indiqué au client<br><input type="text" value="" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
                                             </tr>
+
                                             <?
                                             $tmpRef = $OrderProduct["reference"];
                                         }
@@ -231,156 +237,212 @@ if (isset($_GET["planning"]) && !$upd) {
                                             <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
 
                                         </tr>
+
+                                        <?
+                                    }
+                                    ?>
+                                    <table class="col-md-6">
+                                        <tr>
+                                            <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
+                                        </tr>                   
+                                        <tr>
+                                            <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
+                                        </tr>                   
+                                        <tr>
+                                            <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
+                                        </tr>                   
+                                        <tr>
+                                            <td colspan="2">Poids. produits</td>
+                                            <td nowrap><?= $poids_produits ?> Kg</td>
+                                            <td colspan="2">Poids. restant</td>
+                                            <td nowrap
+                                            <?
+                                            if ($truckLoad["poids_restant"] >= 100) {
+                                                echo 'class = "danger" ';
+                                            }
+                                            ?>
+                                                >
+                                                <?= $truckLoad["poids_restant"] ?> Kg
+                                            </td>
+                                        </tr> 
+                                        <tr>
+                                            <td colspan="9">
+                                                <div class="progress">
+
+                                                    <?
+                                                    if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
+                                                        ?>
+                                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                            <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                        </div>
+                                                        <?
+                                                    } else {
+                                                        ?>
+                                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
+                                                            <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
+                                                        </div>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="9">
+                                                <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Valider</button>
+                                            </td>
+                                        </tr>
                                     </table>
-                                </li>
+                                    </td>
+                                    </tr>
+                                </table>
+
+                                </form>
+                                </div>
                                 <?
                             }
                             ?>
-                            <table class="col-md-6">
-                                <tr>
-                                    <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
-                                </tr>                   
-                                <tr>
-                                    <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>
-                                </tr>                   
-                                <tr>
-                                    <td colspan="3">Transport facturé</td><td colspan="3"><?= $montant_transport ?> €</td>
-                                </tr>                   
-                                <tr>
-                                    <td colspan="2">Poids. produits</td>
-                                    <td nowrap><?= $poids_produits ?> Kg</td>
-                                    <td colspan="2">Poids. restant</td>
-                                    <td nowrap
-                                    <?
-                                    if ($truckLoad["poids_restant"] >= 100) {
-                                        echo 'class = "danger" ';
+
+                            <?
+                            $i = 0;
+
+// on recupère les produits affectés au camion
+                            $listOrderProduct = $db->rawQuery("select distinct a.id_customer, a.id_address_delivery
+                        from av_orders a, av_order_detail b , av_tournee c, av_address d
+                        where a.id_order = b.id_order
+                        and b.id_order_detail = c.id_order_detail    
+                        and a.id_address_delivery = d.id_address
+                        and c.id_truck = ? 
+                        and c.date_livraison = ?                                                                     
+                        order by d.postcode asc
+                        ", array($truck["id_truck"], $date_livraison));
+
+                            foreach ($listOrderProduct as $OrderProduct) {
+                                $customer = getOrderUserDetail($OrderProduct["id_customer"]);
+                                $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
+
+                                $addrs = $adresse["address1"] . "<br>";
+                                if ($adresse["address2"])
+                                    $addrs .= $adresse["address2"] . "<br>";
+                                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                                $addrs_link = str_replace(' ', '+', $addrs);
+                                $addrs_link = str_replace('<br>', '+', $addrs_link);
+
+                                $i++;
+
+                                $addrs_link = $addrs_link;
+
+                                if ($i == 1) {
+                                    echo '<br><br><a target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
+                                } else {
+
+                                    if ($i == 20) {
+                                        echo '+to:+' . $addrs_link . '">Lien GG map</a><br><br><a  target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
+                                    } else {
+                                        echo '+to:+' . $addrs_link;
                                     }
-                                    ?>
-                                        >
-                                        <?= $truckLoad["poids_restant"] ?> Kg
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td colspan="9">
-                                        <div class="progress">
+                                }
+                            }
+                            echo '">Lien GG map</a>';
+                            ?>
+                            <script>
 
-                                            <?
-                                            if ($truckLoad["truck_weight_load"] > TRUCK_OVER_LOAD) {
-                                                ?>
-                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                </div>
-                                                <?
-                                            } else {
-                                                ?>
-                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $truckLoad["truck_weight_load"] ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $truckLoad["truck_weight_load"] ?>%">
-                                                    <span class="sr-only"><?= $truckLoad["truck_weight_load"] ?>% Complete</span>
-                                                </div>
-                                                <?
+                                $("button[name='validTruck']").click(function() {
+                                    var p = $(this).val();
+                                    var action = "upd";
+                                    var module = "ValidTruck";
+
+                                    var func = action + module;
+
+                                    console.log(p + " " + func);
+
+                                    $.ajax({
+                                        url: "functions/ajax_trucks.php",
+                                        type: "POST",
+                                        dataType: "json",
+                                        async: false,
+                                        data: {
+                                            func: func,
+                                            id: p,
+                                        },
+                                        success: function(data) {
+                                            console.log(data);
+                                        },
+                                        error: function(xhr, textStatus, error) {
+                                            console.log(xhr.statusText);
+                                            console.log(textStatus);
+                                            console.log(error);
+                                        }
+                                    });
+                                    location.reload();
+                                });
+
+
+                                jQuery(function($) {
+                                    $.datepicker.regional['fr'] = {
+                                        closeText: 'Fermer',
+                                        prevText: '<Préc',
+                                        nextText: 'Suiv>',
+                                        currentText: 'Courant',
+                                        monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                                            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                                        monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+                                            'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                                        dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+                                        dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                                        dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+                                        weekHeader: 'Sm',
+                                        //dateFormat: 'dd/mm/yy',
+                                        dateFormat: 'yyyy-mm-dd',
+                                        firstDay: 1,
+                                        isRTL: false,
+                                        showMonthAfterYear: false,
+                                        yearSuffix: ''};
+
+                                    $.datepicker.setDefaults($.datepicker.regional['fr']);
+                                });
+
+                                $("#datepicker").datepicker(
+                                        {
+                                            //minDate: 0,
+                                            onSelect: function() {
+                                                var day1 = $("#datepicker").datepicker('getDate').getDate();
+                                                var month1 = $("#datepicker").datepicker('getDate').getMonth() + 1;
+                                                var year1 = $("#datepicker").datepicker('getDate ').getFullYear();
+                                                var fullDate = year1 + "-" + month1 + "-" + day1;
+                                                var str_output = "<h1><center>" + day1 + "-" + month1 + "-" + year1 + "</center></h1>";
+                                                $("#planning").val(fullDate);
+                                                page_output.innerHTML = str_output;
                                             }
-                                            ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9">
-                                        <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Valider</button>
-                                    </td>
-                                </tr>
-                            </table>
-                    </td>
-                </tr>
-            </table>
-
-        </form>
-    </div>
-    <?
-}
-?>
-
-<?
-foreach ($listOrderProduct as $OrderProduct) {
-
-    $customer = getOrderUserDetail($OrderProduct["id_customer"]);
-    $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
-
-    $addrs = $adresse["address1"] . "<br>";
-    if ($adresse["address2"])
-        $addrs .= $adresse["address2"] . "<br>";
-    $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-    $addrs_link = str_replace(' ', '+', $addrs);
-    $addrs_link = str_replace('<br>', '+', $addrs);
-    echo $addrs_link . "<br>";
-}
-?>
-<script>
-
-    $("button[name='validTruck']").click(function() {
-        var p = $(this).val();
-        var action = "upd";
-        var module = "ValidTruck";
-
-        var func = action + module;
-
-        console.log(p + " " + func);
-
-        $.ajax({
-            url: "functions/ajax_trucks.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                func: func,
-                id: p,
-            },
-            success: function(data) {
-                console.log(data);
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
-            }
-        });
-        location.reload();
-    });
-
-
-    jQuery(function($) {
-        $.datepicker.regional['fr'] = {
-            closeText: 'Fermer',
-            prevText: '<Préc',
-            nextText: 'Suiv>',
-            currentText: 'Courant',
-            monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-            monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
-                'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
-            dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-            dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-            dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-            weekHeader: 'Sm',
-            //dateFormat: 'dd/mm/yy',
-            dateFormat: 'yyyy-mm-dd',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: ''};
-
-        $.datepicker.setDefaults($.datepicker.regional['fr']);
-    });
-
-    $("#datepicker").datepicker(
-            {
-                //minDate: 0,
-                onSelect: function() {
-                    var day1 = $("#datepicker").datepicker('getDate').getDate();
-                    var month1 = $("#datepicker").datepicker('getDate').getMonth() + 1;
-                    var year1 = $("#datepicker").datepicker('getDate ').getFullYear();
-                    var fullDate = year1 + "-" + month1 + "-" + day1;
-                    var str_output = "<h1><center>" + day1 + "-" + month1 + "-" + year1 + "</center></h1>";
-                    $("#planning").val(fullDate);
-                    page_output.innerHTML = str_output;
-                }
-            });
-</script>
+                                        });
+                            </script>
+                            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+                            <script src="js/jquery.sortable.js"></script>
+                            <!--	<script>
+                                    $(function() {
+                                            $('.sortable').sortable();
+                                            $('.handles').sortable({
+                                                    handle: 'span'
+                                            });
+                                            $('.connected').sortable({
+                                                    connectWith: '.connected'
+                                            });
+                                            $('.exclude').sortable({
+                                                    items: ':not(.disabled)'
+                                            });
+                                    });
+                                    
+                            </script>
+                            -->
+                            <script>
+                                $(document).ready(function() { // quand la page a fini de se charger
+                                    $("#list-cmd").sortable({// initialisation de Sortable sur #list-photos
+                                        placeholder: 'highlight', // classe à ajouter à l'élément fantome
+                                        update: function() {  // callback quand l'ordre de la liste est changé
+                                            var order = $('#list-cmd').sortable('serialize'); // récupération des données à envoyer
+                                            $.post('ajax.php', order); // appel ajax au fichier ajax.php avec l'ordre des photos
+                                        }
+                                    });
+                                    $("#list-cmd").disableSelection(); // on désactive la possibilité au navigateur de faire des sélections
+                                });
+                            </script>

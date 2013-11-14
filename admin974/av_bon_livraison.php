@@ -5,7 +5,6 @@ include ("header.php");
 include ("../functions/products.php");
 include ("../functions/orders.php");
 include ("../functions/users.php");
-require "../classes/php-export-data.class.php";
 require('../libs/Smarty.class.php');
 require('../classes/tcpdf.php');
 
@@ -15,7 +14,7 @@ $smarty->caching = 0;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
 $smarty->setTemplateDir(array('../templates', '../templates/mails/', '../templates/mails/admin', '../templates/pdf', '../templates/pdf/admin'));
 $bl_pdf_body = "";
-
+$order_path = "";
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 
@@ -30,8 +29,9 @@ $db2 = new PDO($dns, $bdd_user, $bdd_pwd, $options);
 
 $d = $db->rawQuery("select distinct date_livraison from av_tournee order by 1");
 $t = $db->rawQuery("select distinct date_livraison, a.id_truck, b.name from av_tournee a, av_truck b where a.id_truck = b.id_truck order by 1,2");
-$date_delivery="";
-$id_truck="";
+$date_delivery = "";
+$id_truck = "";
+$bl_commande_filename = "";
 if (isset($_POST) && !(empty($_POST))) {
     $date_delivery = $_POST["date_delivery"];
     $id_truck = $_POST["id_truck"];
@@ -95,17 +95,18 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
     $pdf->SetFont('times', '', 11);
     $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-  
+    $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
+
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
     $bl_commande_filename = md5(rand());
 
     foreach ($r as $order) {
         $pdf->AddPage();
-        
+
         $orderinfo = getOrderInfos($order["id_order"]);
         $oid = $order["id_order"];
-// print_r($orderinfo);                
+        // print_r($orderinfo);                
 
         $stmtOrderDetail->execute(array($date_delivery, $id_truck, $oid));
         $OrderDetails = $stmtOrderDetail->fetchAll(PDO::FETCH_ASSOC);
@@ -124,13 +125,11 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                 "id_order" => $oid,
                 "id_user" => $_SESSION["user_id"],
                 "id_order_detail" => $ods["id_order_detail"],
-                "supplier_name" => "",
+                "category" => "bl",
                 "bdc_filename" => $bl_commande_filename
             );
             $r = $db->insert("av_order_bdc", $param);
         }
-
-        
     }
 
     $pdf->lastPage();
@@ -141,10 +140,12 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
     @mkdir($order_path);
     $pdf->Output($order_path . "/" . $bl_commande_filename . ".pdf", 'F');
+    ?>
+
+    <a href = "<?= $order_path ?>/<?= $bl_commande_filename ?>.pdf" target = "_blank">télécharger</a>
+    <?
 }
 ?>
-
-<a href="<?= $order_path ?>/<?= $bl_commande_filename ?>.pdf" target="_blank">télécharger</a>
 
 <div class="container">
     <div class="text-center">
