@@ -9,6 +9,9 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 define("TRUCK_OVER_LOAD", 95);
 
+$productStates = $db->where("id_level", 1)
+        ->get("av_order_status");
+
 function getDeliveryZone($postcode) {
     global $db;
 
@@ -74,26 +77,22 @@ $suppliers = $db->get("av_supplier");
 ?>
 
 <div class="container">
-
-
-
     <form method="get">
         <input type="hidden" id="planning" value="<?= @$_GET["planning"] ?>">
 
-        <table>
+        <table class="table table-bordered">
             <tr>
-                <td>References</td>
-                <td>Zones</td>
-                <td>Founisseur </td>
-                <td>Date paiement</td>
-                <td>Date tournée</td>
-                <td>Produits affectés (O/N)</td>            
-                <td></td>
+                <th>Organiser la tournée du</th>
+                <th>Références</th>
+                <th>Zones</th>
+                <th>Founisseur </th>
+                <th>Nom client</th>                
+                <th>Voulez vous retirer les produits actuellement dans le camion</th>                            
+                <th></th>
             </tr>
             <tr>
-                <td>
-                    <input type="text" name="reference" value="<?= @$_GET["reference"] ?>" >
-                </td>
+                <td><input type="text" id="datepicker2" value="" name="planning"></td>
+                <td><input type="text" name="reference" value="<?= @$_GET["reference"] ?>" ></td>
                 <td>
                     <select name="id_zone[]" class="pme-input-1" multiple="" >
                         <?
@@ -121,8 +120,9 @@ $suppliers = $db->get("av_supplier");
                                 ?>
                     </select>
                 </td>
-                <td><input type="text" id="datepicker" value="<?= @$_GET["invoice_date"] ?>" name="invoice_date"></td>
-                <td><input type="text" id="datepicker2" value="" name="planning"></td>
+                <? /* <td><input type="text" id="datepicker" value="<?= @$_GET["invoice_date"] ?>" name="invoice_date"></td> */ ?>
+                <td><input type="text" value="<?= @$_GET["customer_name"] ?>" name="customer_name"></td>
+
                 <td class="text-center">
                     <input type="checkbox" value="1" name="prod_affecte" <? if (isset($_GET["prod_affecte"])) echo "checked"; ?> /> 
                 </td>
@@ -131,24 +131,40 @@ $suppliers = $db->get("av_supplier");
         </table>
     </form>
 
+    <div class = "col-xs-3">
+        <?
+        foreach ($productStates as $pState) {
+            ?>
+            <div class="row">
+                <div class="alert-<?= $pState["id_statut"] ?>" >
+                    <?= $pState["title"] ?>
+                </div>
+            </div>
+            <?
+        }
+        ?>
+    </div>
 
-
-    <h5>Critères :</h5>
+    <div class = "col-xs-7">
+        <h5>Critères :</h5>
+        <?
+        if (!empty($_GET["reference"]))
+            echo "<li> Reference = " . $_GET["reference"] . "</li>";
+        if (!empty($_GET["planning"]))
+            echo "<li> date tournée = " . $_GET["planning"] . "</li>";
+        if (!empty($_GET["invoice_date"]))
+            echo "<li> date facturation >= " . $_GET["invoice_date"] . "</li>";
+        if (!empty($_GET["id_supplier"]))
+            echo "<li> Fournisseur = " . $_GET["id_supplier"] . "</li>";
+        if (!empty($_GET["prod_affecte"]))
+            echo "<li> hors produits affectés </li>";
+        if (!empty($_GET["id_zone"]))
+            echo "<li> Zone = " . implode(",", $_GET["id_zone"]) . "</li>";
+        if (!empty($_GET["customer_name"]))
+            echo "<li> Client = " . $_GET["customer_name"] . "</li>";
+        ?>
+    </div>
     <?
-    if (!empty($_GET["reference"]))
-        echo "<li> Reference = " . $_GET["reference"] . "</li>";
-    if (!empty($_GET["planning"]))
-        echo "<li> date tournée = " . $_GET["planning"] . "</li>";
-    if (!empty($_GET["invoice_date"]))
-        echo "<li> date facturation >= " . $_GET["invoice_date"] . "</li>";
-    if (!empty($_GET["id_supplier"]))
-        echo "<li> Fournisseur = " . $_GET["id_supplier"] . "</li>";
-    if (!empty($_GET["prod_affecte"]))
-        echo "<li> hors produits affectés </li>";
-    if (!empty($_GET["id_zone"]))
-        echo "<li> Zone = " . implode(",", $_GET["id_zone"]) . "</li>";
-
-
     if (isset($_GET["planning"])) {
 
         $date_livraison = $_GET["planning"];
@@ -158,13 +174,15 @@ $suppliers = $db->get("av_supplier");
                           where id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($date_livraison));
 
 
-        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
+        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date, 
                     round(sum(product_quantity * ( product_width * product_height * product_depth) / 1000000000),2) order_volume,
                     sum(product_quantity * product_weight) tot_weight
-                    from av_orders a, av_order_detail b, av_address c
+                    from av_orders a, av_order_detail b, av_address c, av_customer d
                     where a.id_order = b.id_order                   
                     and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2 )
-                    and a.id_address_delivery =  c.id_address ";
+                    and a.id_address_delivery = c.id_address 
+                    and d.id_customer = d.id_customer
+                    ";
 
         if (isset($_GET["id_zone"]) && !empty($_GET["id_zone"])) {
             $z = implode(",", $_GET["id_zone"]);
@@ -189,13 +207,17 @@ $suppliers = $db->get("av_supplier");
             $queryOrder .= " and a.reference like ? ";
             $params[] = "%" . $_GET["reference"] . "%";
         }
+        if (isset($_GET["customer_name"]) && !empty($_GET["customer_name"])) {
+            $queryOrder .= " and concat(lower(d.firstname),lower(d.lastname)) like ? ";
+            $params[] = "%" . $_GET["customer_name"] . "%";
+        }
         $queryOrder .= "group by a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, a.invoice_date
                         order by c.postcode asc";
 
         $orders = $db->rawQuery($queryOrder, @$params);
         ?>
 
-        <table >
+        <table>
             <tr>
                 <td valign="top">
                     <table border="1" class="table-bordered">  
@@ -207,10 +229,9 @@ $suppliers = $db->get("av_supplier");
                             $adresse = getAdresseById($order["id_address_delivery"]);
                             ?>
                             <tr>
-                                <th nowrap class="alert alert-info" ><?= date("d/m", strtotime($order["invoice_date"])) ?></th>
-                                <th>
-                                    <? /* <a href="av_order_detail.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>                                */ ?>
-                                    <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a>    
+                                <th nowrap class="alert alert-info" >
+                                    <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a> <br>
+                                    <?= date("d/m", strtotime($order["invoice_date"])) ?>
 
                                 </th>
                                 <th><?= getDeliveryZone($order["postcode"]) ?></th>
@@ -224,10 +245,11 @@ $suppliers = $db->get("av_supplier");
                                     $addrs_link = str_replace('<br>', '+', $addrs);
                                     ?>
 
-                                    <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
+                                    <?= $customer["firstname"] . " " . $customer["lastname"] . " <a href='mailto:" . $customer["email"] . "' target='_blank'>" . $customer["email"] ?></a><br>
                                     <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
                                 </th>        
                                 <th><?= $order["total_paid"] ?> €</th>        
+                                <th>&nbsp; </th>        
                                 <th><?= $order["tot_weight"] ?> Kg</th>        
                                 <th colspan="3">Actions</th>        
                             </tr>
@@ -265,7 +287,11 @@ $suppliers = $db->get("av_supplier");
 
                                 $product_weight = $qte_remaining * $OrderProduct["product_weight"];
                                 ?>
-                                <tr id="<?= $OrderProduct["id_order_detail"] ?>" <? if ($OrderProduct["supplier_date_delivery"] == null) echo "class='alert alert-danger'" ?>>
+                                <tr id="<?= $OrderProduct["id_order_detail"] ?>"
+                                <?= ($OrderProduct["supplier_date_delivery"] == null) ? "class='alert alert-danger'" : "class='alert alert-" . $OrderProduct["product_current_state"] . "'" ?>
+
+                                    >
+
                                     <td colspan="3">
                                         <?= $OrderProduct["product_quantity"] ?> x <?= $OrderProduct["product_name"] ?>
                                         <?
@@ -308,7 +334,7 @@ $suppliers = $db->get("av_supplier");
                                                 ?>
                                                 <li>
                                                     <?
-                                                    if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"]) {
+                                                    if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"] ||  $OrderProduct["product_current_state"] == 19) {
                                                         ?>
                                                         <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                         <?
@@ -319,14 +345,14 @@ $suppliers = $db->get("av_supplier");
                                                             <?
                                                         } else {
                                                             ?>
-                                                            <button name="addtruck"  class="btn btn-primary btn-xs btn " value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?> 
-                                                                <?
-                                                                if ($mytruck["date_livraison"]) {
-                                                                    ?>
-                                                                    <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
-                                                                    <?
-                                                                }
+                                                            <button name="addtruck"  class="<?= ($mytruck["date_livraison"]) ? "btn btn-xs alert-success" : "btn btn-primary btn-xs btn" ?>" value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?>                                                             
+                                                            <?
+                                                            if ($mytruck["date_livraison"]) {
                                                                 ?>
+                                                                        <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
+                                                                            <?
+                                                                        }
+                                                                        ?>
                                                             </button>
                                                             <?
                                                         }
@@ -387,13 +413,13 @@ $suppliers = $db->get("av_supplier");
                             ?>
 
                             <tr>
-                                <td colspan="9" style="height: 30px"></td>
+                                <td colspan="9" style="height: 30px;border-left: 0px;border-right:none;"></td>
                             </tr>
                             <?
                         }
                         ?>
                     </table>
-                    <hr>
+                    <hr>                    
                 </td>
                 <td valign="top">
 
@@ -408,6 +434,7 @@ $suppliers = $db->get("av_supplier");
                             $poids_produits = 0;
                             $volume_produit = 0;
                             $montant_transport = 0;
+                            $nb_commandes =0;
                             $tmpRef = "";
 
 
@@ -455,6 +482,7 @@ $suppliers = $db->get("av_supplier");
 
                                                             if ($tmpRef != $OrderProduct["reference"]) {
                                                                 $montant_transport += $conf_shipping_amount;
+                                                                $nb_commandes ++;
                                                                 ?>
                                                                 <tr>
                                                                     <td>&nbsp;</td>
@@ -483,6 +511,9 @@ $suppliers = $db->get("av_supplier");
                                                         </tr>
                                                         <tr>
                                                             <td colspan="3">Nb produits</td><td colspan="3"><?= $nb_produits ?></td>
+                                                        </tr>                   
+                                                        <tr>
+                                                            <td colspan="3">Nb Commandes</td><td colspan="3"><?= $nb_commandes ?></td>
                                                         </tr>                   
                                                         <tr>
                                                             <td colspan="3">Montant produits</td><td colspan="3"><?= $montant_produits ?> €</td>

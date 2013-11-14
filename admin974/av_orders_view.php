@@ -184,7 +184,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
 
 
-        $mail->addAttachment($order_path . "/" . $bdc_commande_filename. ".pdf");
+        $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
         $mail->MsgHTML($mail_body);
 
         if ($mail->Send()) {
@@ -588,24 +588,22 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     }
     ?>
 
-    <?
-    /* <div class="row">
-      <div class="col-xs-2">
-      <?
-      foreach ($orderStates as $orderState) {
-      ?>
-      <div class="row">
-      <div class="alert-<?= $orderState["id_statut"] ?>" >
-      <?= $orderState["title"] ?>
-      </div>
-      </div>
-      <?
-      }
-      ?>
-      </div>
-      </div>
-     */
-    ?>
+
+    <div class = "row">
+        <div class = "col-xs-2">
+            <?
+            foreach ($orderStates as $orderState) {
+                ?>
+                <div class="row">
+                    <div class="alert-<?= $orderState["id_statut"] ?>" >
+                        <?= $orderState["title"] ?>
+                    </div>
+                </div>
+                <?
+            }
+            ?>
+        </div>
+    </div>
 
 </div>
 

@@ -26,6 +26,11 @@ function getOrderInfos($oid) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
         $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
+        $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);
+        if ($order["id_address_invoice"])
+            $r[$k]["address"]["invoice"] = getUserOrdersAddress($order["id_address_invoice"]);
+        if ($order["id_address_delivery"])
+            $r[$k]["address"]["delivery"] = getUserOrdersAddress($order["id_address_delivery"]);
     }
     return $r[0];
 }
@@ -50,6 +55,24 @@ function getOrderPayment($oid) {
     global $db;
     $r = $db->where("id_order", $oid)
             ->get("av_order_payment");
+    if ($r)
+        return $r[0];
+
+
+    return $r[0];
+}
+
+function getUserOrdersCustomer($cid) {
+    global $db;
+    $r = $db->where("id_customer", $cid)
+            ->get("av_customer");
+    return $r[0];
+}
+
+function getUserOrdersAddress($iaid) {
+    global $db;
+    $r = $db->where("id_address", $iaid)
+            ->get("av_address");
     if ($r)
         return $r[0];
 }

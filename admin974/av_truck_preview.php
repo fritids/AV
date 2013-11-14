@@ -62,12 +62,11 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
                 ->update("av_tournee", array("horaire" => $comment));
     }
     foreach ($updinfos["order"] as $id => $order) {
-        
+
         $r = $db->where("id_truck", $id_truck)
-            ->where("date_livraison", $date_livraison)
-            ->where("id_order", $id)
-            ->update("av_tournee", array("status" => 2));       
-       
+                ->where("date_livraison", $date_livraison)
+                ->where("id_order", $id)
+                ->update("av_tournee", array("status" => 2));
     }
 
     /* on bloque le camion pour la date livraison */
@@ -84,7 +83,7 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
 
     foreach ($orderDetails as $orderDetail) {
         $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
-                ->update("av_order_detail", array("product_current_state" => 14));
+                ->update("av_order_detail", array("product_current_state" => 19));
     }
     if ($r)
         return true;
@@ -130,7 +129,7 @@ if (isset($_POST) && !empty($_POST)) {
     $r = updValidTruck($_POST["id_truck"], $_POST["date_livraison"], $updinfos);
 
     if ($r)
-        echo "<div class='alert alert-success text-center' > Camion validé </div>";
+        echo "<div class='alert alert-success text-center' > Camion validé <a href='av_tournee_manifest.php?date_livraison=" . $_POST["date_livraison"] . "&id_truck=" . $_POST["id_truck"] . "'>bon livraison  </a></div>";
 
     $upd = true;
 }
@@ -163,7 +162,7 @@ if (isset($_GET["planning"]) && !$upd) {
 
             <?
             // on recupère les produits affectés au camion
-            $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, d.postcode, a.id_customer, b.*, c.*
+            $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_order, a.reference, d.postcode, a.id_customer, b.*, c.*
                         from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
@@ -187,7 +186,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                     <table >
                                         <?
                                         $customer = getOrderUserDetail($OrderProduct["id_customer"]);
-                                        $adresse = getAdresse($OrderProduct["id_customer"], 'delivery');
+                                        $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
 
                                         $p_qty = $OrderProduct["nb_product_delivered"];
 
@@ -299,7 +298,21 @@ if (isset($_GET["planning"]) && !$upd) {
 }
 ?>
 
+<?
+foreach ($listOrderProduct as $OrderProduct) {
 
+    $customer = getOrderUserDetail($OrderProduct["id_customer"]);
+    $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
+
+    $addrs = $adresse["address1"] . "<br>";
+    if ($adresse["address2"])
+        $addrs .= $adresse["address2"] . "<br>";
+    $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+    $addrs_link = str_replace(' ', '+', $addrs);
+    $addrs_link = str_replace('<br>', '+', $addrs);
+    echo $addrs_link . "<br>";
+}
+?>
 <script>
 
     $("button[name='validTruck']").click(function() {

@@ -50,6 +50,14 @@ $AllCMS = getAllCmsInfo();
 $cms = array();
 /* fin */
 
+/* Meta */
+$meta = array(
+    "title" => "ALLOVITRES : verre pas cher, tout type de vitrage sur mesure. - Allovitres.com",
+    "description" => "Allovitres propose la vente en ligne de vitres pas chers. Simple vitrage, double vitrage, verre décoratifs ou autres verres spécifiques, toutes nos offres de vitres sont à tarif discount.",
+    "keyword" => "simple vitrage, double vitrage, verre décoratifs, verre spécifique, verre feuilleté, miroir, verre surmesure, allovitres"
+);
+/**/
+
 //Caddie
 $cart = new Panier();
 
@@ -64,7 +72,6 @@ if (isset($_GET["cart"])) {
     if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
         $pid = $_POST["id_product"];
         $pqte = $_POST["quantity"];
-
 
         $productInfos = getProductInfos($_POST["id_product"]);
 
@@ -163,6 +170,10 @@ if (isset($_GET["c"])) {
     $nb_produits = count($products);
     $breadcrumb = array("parent" => "Accueil", "fils" => $categorie["name"]);
 
+    $meta["title"] = $categorie["meta_title"];
+    $meta["description"] = $categorie["meta_description"];
+    $meta["keyword"] = $categorie["meta_keyword"];
+    
     $smarty->assign('products', $products);
     $smarty->assign('categorie', $categorie);
 }
@@ -170,6 +181,11 @@ if (isset($_GET["c"])) {
 if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
+    
+    $meta["title"] = $product["meta_title"];
+    $meta["description"] = $product["meta_description"];
+    $meta["keyword"] = $product["meta_keyword"];
+    
     $smarty->assign('product', $product);
     $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
 }
@@ -177,7 +193,6 @@ if (isset($_GET["register"])) {
     $page = "register";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Inscription");
 }
-
 if (isset($_GET["cart"])) {
     $page = "cart";
     $page_type = "full";
@@ -203,12 +218,15 @@ if (isset($_GET["contact-devis"])) {
     $page = "contact-devis";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Demande de devis");
 }
-
-
 if (isset($_GET["cms"])) {
     $page = "cms";
-    $cms = getCmsInfo($_GET["id"]);
     $page_type = "full";
+    
+    $cms = getCmsInfo($_GET["id"]);
+    
+    $meta["title"] = $cms["meta_title"];
+    $meta["description"] = $cms["meta_description"];
+    $meta["keyword"] = $cms["meta_keyword"];
     $breadcrumb = array("parent" => "Accueil", "fils" => null);
 }
 if (isset($_GET["delivery"])) {
@@ -638,7 +656,7 @@ $smarty->assign('mydevis', $mydevis);
 $smarty->assign('error', $error);
 $smarty->assign('okmsg', $okmsg);
 $smarty->assign('config', $config);
-//$smarty->assign('meta', $meta);
+$smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
 
 $smarty->display('index.tpl');
@@ -655,9 +673,10 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= print_r($orders); ?>
     <h1>Product</h1>
     <?= print_r($product); ?>
+    <h1>meta</h1>
+    <?= print_r($meta); ?>
     <h1>Post</h1>
     <?= print_r($_POST); ?>
-    <br>
     <?
 }
 ?>
