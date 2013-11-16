@@ -1,5 +1,4 @@
 <?PHP
-
 class Panier {
 
     private $panier = array();
@@ -80,7 +79,7 @@ class Panier {
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($montant_produit_ttc, 2);
         @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
 
-                
+
         if ($this->panier[$n][$refproduit]['quantity'] <= 0) {
             //remove option
             $option_amount = 0;
@@ -117,7 +116,7 @@ class Panier {
     }
 
     // afficher la quantit? de produits dans le panier
-    // param?tre : $refproduit : permet d'afficher la quantit� pour le produit de cette r?f?rence
+    // param?tre : $refproduit : permet d'afficher la quantit? pour le produit de cette r?f?rence
     // si le param?tre est vide, on affiche la quantit? totale de produit
     public function showQuantity($refproduit = "") {
         if ($refproduit) {
@@ -129,6 +128,29 @@ class Panier {
             }
         }
         return $total;
+    }
+
+    public function addVoucher($voucher = "") {
+        $total_discount = 0;
+        $discount = 0;
+        $reduction = $voucher["reduction"];
+
+        foreach ($_SESSION["cart"] as $i => $items) {
+            foreach ($items as $ref => $item) {
+                if (!empty($ref)) {
+                    if ($item["productinfos"]["id_category"] == $voucher["value"]) {
+                        $discount = round($_SESSION["cart"][$i][$ref]["prixttc"] * $reduction / 100, 2);
+                        $total_discount = $discount;
+                        $_SESSION["cart"][$i][$ref]["discount"] = $discount;
+                        $_SESSION["cart"][$i][$ref]["voucher_code"] = $voucher["code"];
+                    }
+                }
+            }
+        }
+        if ($total_discount >= 0) {
+            $_SESSION["cart_summary"]["total_discount"] = $total_discount;
+            $_SESSION["cart_summary"]["discount_title"] = $voucher["title"];
+        }
     }
 
     // afficher la liste des articles (et accessoirement, leur quantit?)
@@ -148,6 +170,8 @@ class Panier {
                     $list[$i]["price"] = $data['price'];
                     $list[$i]["name"] = $data['name'];
                     $list[$i]["prixttc"] = $data['prixttc'];
+                    $list[$i]["discount"] = $data['discount'];
+                    $list[$i]["voucher_code"] = $data['voucher_code'];
 
                     //les options
                     if (!empty($this->panier[$i][$ref]['options'])) {
@@ -184,6 +208,5 @@ class Panier {
     }
 
 }
-
 // fin de la classe
 ?>

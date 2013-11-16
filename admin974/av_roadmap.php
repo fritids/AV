@@ -19,51 +19,8 @@ $db2 = new PDO($dns, $bdd_user, $bdd_pwd, $options);
 
 $d = $db->rawQuery("select distinct date_livraison from av_tournee order by 1");
 $t = $db->rawQuery("select distinct date_livraison, a.id_truck, b.name from av_tournee a, av_truck b where a.id_truck = b.id_truck order by 1,2");
-?>
 
 
-<div class="container">
-    <div class="text-center">
-        <form action="" method="post">
-            <div class="col-md-12"> 
-                <div class="col-md-3">
-                    <label for="date_delivery" > Date livraison :
-                        <select id="date_delivery" class="pme-input-0" name="date_delivery">
-                            <option value="--"  >--</option>
-                            <?
-                            foreach ($d as $rec) {
-                                ?>
-                                <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
-                                <?
-                            }
-                            ?>
-                        </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label for="truck" > Camion :
-                        <select id="truck" class="pme-input-0" name="id_truck">
-                            <option value="--"  >--</option>
-                            <?
-                            foreach ($t as $rec) {
-                                ?>
-                                <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
-                                <?
-                            }
-                            ?>
-                        </select>
-                </div>
-
-                <div class="col-md-2">
-                    <input type="submit" class="btn btn-primary" value="Télécharger"  />
-
-                </div>
-            </div>
-    </div>
-</form>
-</div>
-
-<?
 if (isset($_POST) && !(empty($_POST))) {
     $date_delivery = $_POST["date_delivery"];
     $id_truck = $_POST["id_truck"];
@@ -80,15 +37,17 @@ $pdf->SetAuthor('Allovitre');
 $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
-$pdf->SetFont('times', '', 11);
+
+$pdf->SetFont('times', '', 10);
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
+$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 $pdf->AddPage('L', 'A4');
 
 if (!empty($date_delivery) && !empty($id_truck)) {
+
+
 
     $roadmap_filename = md5(rand());
 
@@ -107,8 +66,15 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     ?>
 
     <?
-    $pdf_roadmap = '<table class="col-md-12 table-condensed"><tr><td><table >';
+    $camion = $db->where("id_truck", $id_truck)
+            ->get("av_truck");
 
+    $pdf_roadmap = 'TOURNEE : ' . $date_delivery . ' // ' . strtoupper($camion[0]["name"]) . '<br> 
+    <table class = "col-md-12 table-condensed">
+    <tr>
+    <td>
+    <table>';
+    $tmpRef = "";
     foreach ($listOrderProduct as $OrderProduct) {
 
         $customer = getOrderUserDetail($OrderProduct["id_customer"]);
@@ -120,31 +86,33 @@ if (!empty($date_delivery) && !empty($id_truck)) {
         if ($adresse["address2"])
             $addrs .= $adresse["address2"] . "<br>";
         $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-        $tmpRef = "";
+
 
         if ($tmpRef != $OrderProduct["reference"]) {
 
             $pdf_roadmap .= '
-                    <tr>
-                        <th bgcolor="#cccccc" align="center" >' . $OrderProduct["reference"] . '</th>
-                        <th bgcolor="#cccccc" align="center" >' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
-                        <th bgcolor="#cccccc" align="center" >' . $OrderProduct["comment1"] . '</th>
-                        <th bgcolor="#cccccc" align="center" >' . $OrderProduct["comment2"] . '</th>                                                                                                        
-                        <th bgcolor="#cccccc" align="center" >' . $OrderProduct["comment3"] . '</th>                                                                                                
-                        <th bgcolor="#cccccc" align="center" >' . $OrderProduct["horaire"] . '</th>
-                        <th bgcolor="#cccccc" align="center" >comm client: ' . $OrderProduct["order_comment"] . '</th></tr>';
+                            <tr>
+                            <th bgcolor = "#cccccc" >' . $OrderProduct["reference"] . '</th>
+                            <th bgcolor = "#cccccc" >' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
+                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment1"] . '</th>
+                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment2"] . '</th>
+                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment3"] . '</th>
+                            <th bgcolor = "#cccccc" >' . $OrderProduct["horaire"] . '</th>
+                            <th bgcolor = "#cccccc" >Comm. client: ' . $OrderProduct["order_comment"] . '</th></tr>';
 
             $tmpRef = $OrderProduct["reference"];
         }
         $pdf_roadmap .= '
-                    <tr>
-                        <td>' . $p_qty . '</td>
-                        <td colspan="2">' . $OrderProduct["product_name"] . '</td>
-                        <td>' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>
-                        <td>' . $OrderProduct["product_width"] . ' x ' . $OrderProduct["product_height"] . '</td>
-                        <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>                                                                                                                          
-                        <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td> 
-                    </tr>';
+                        <tr>
+                        <td >' . $p_qty . '</td>
+                        <td colspan = "3">' . $OrderProduct["product_name"] . ' <br> ' .
+                ($OrderProduct["product_width"] != "" ? ' Largeur (mm) :' . $OrderProduct["product_width"] : '') .
+                ($OrderProduct["product_height"] != "" ? ', Longueur (mm) :' . $OrderProduct["product_height"] : '') .
+                '</td>
+                        <td>' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>    
+                        <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
+                        <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td>
+                        </tr>';
 
 
         $param = array(
@@ -156,7 +124,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
         );
         $r = $db->insert("av_order_bdc", $param);
     }
-    
+
     $pdf_roadmap .= '</table></td></tr></table>';
 
     $pdf->writeHTML($pdf_roadmap, true, false, true, false, '');
@@ -165,10 +133,59 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
     $path = "./ressources/roadmap";
     $pdf_path = $path;
-    @mkdir($pdf_path);   
+    @mkdir($pdf_path);
 
     $pdf->Output($pdf_path . "/" . $roadmap_filename . ".pdf", 'F');
-    
-    echo '<a href="'.$pdf_path . '/' . $roadmap_filename . '.pdf" target = "_blank">Télécharger</a>';
+
+    echo '<a href = "' . $pdf_path . '/' . $roadmap_filename . '.pdf" target = "_blank">Télécharger</a>';
+} else {
+    ?>
+
+    <div class="container">
+        <div class="text-center">
+            <form action="" method="post">
+                <div class="col-md-12"> 
+                    <div class="col-md-3">
+                        <label for="date_delivery" > Date livraison :
+                            <select id="date_delivery" class="pme-input-0" name="date_delivery">
+                                <option value="--"  >--</option>
+                                <?
+                                foreach ($d as $rec) {
+                                    ?>
+                                    <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
+                                    <?
+                                }
+                                ?>
+                            </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="truck" > Camion :
+                            <select id="truck" class="pme-input-0" name="id_truck">
+                                <option value="--"  >--</option>
+                                <?
+                                foreach ($t as $rec) {
+                                    ?>
+                                    <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
+                                    <?
+                                }
+                                ?>
+                            </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="submit" class="btn btn-primary" value="Télécharger"  />
+
+                    </div>
+                </div>
+        </div>
+    </form>
+    </div>
+    <script>
+        $("#truck").chained("#date_delivery");
+    </script>
+
+    <?
 }
 ?>
+

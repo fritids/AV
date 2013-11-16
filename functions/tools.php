@@ -38,8 +38,16 @@ function getLastOrderId() {
     $r = $db->rawQuery("select max(id_order)+1 id from av_orders");
 
     $id = str_pad($r[0]["id"], 9, '0', STR_PAD_LEFT);
-    
+
     return($id);
+}
+
+function getVoucherInfo($code) {
+    global $db;
+    $r = $db->where("voucher_code", $code)
+            ->get("av_voucher");
+    if ($r)
+        return($r[0]);
 }
 
 ?>

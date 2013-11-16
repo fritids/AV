@@ -152,7 +152,7 @@ function saveOrderPayment($oid, $payment) {
     $order_payment = array(
         "id_order" => $oid,
         "id_currency" => 1,
-        "amount" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
+        "amount" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"],
         "conversion_rate" => 1,
         "payment_method" => $payment,
         "date_add" => date("Y-m-d H:i:s"),
@@ -213,12 +213,20 @@ function saveOrder() {
             "total_price_tax_excl" => $item["prixttc"] + $item["shipping"]
         );
 
+        if (isset($item["discount"])) {
+            $order_detail["discount"] = $item["discount"];
+            $order_detail["voucher_code"] = $item["voucher_code"];
+            $order_detail["total_price_tax_incl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
+            $order_detail["total_price_tax_excl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
+        }
+
+
+
         $odid = $db->insert("av_order_detail", $order_detail);
 
         // on rajoute les options
         if (isset($item["options"])) {
             foreach ($item["options"] as $k => $option) {
-
 
                 $order_product_attributes = array(
                     "id_order" => $oid,

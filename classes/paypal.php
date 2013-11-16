@@ -154,6 +154,7 @@ class paypalcheckout {
         //==> The items of the cart <==//
         $cpt = 1;
         if (!empty($this->items)) {
+            $total_amount = 0;
             foreach ($this->items as $item) {
 
                 $fullname = $item['name'];
@@ -164,15 +165,17 @@ class paypalcheckout {
                     }
                 }
                 $fullname = utf8_encode($fullname);
-                        
+
+                $total_amount = round($item['prixttc'], 2) - round($item['discount'], 2);
+
                 $form.='
                     <div id="item_' . $cpt . '" class="itemwrap">
                       <input type="hidden" name="item_name_' . $cpt . '" value="' . $fullname . '" />
                       <input type="hidden" name="quantity_' . $cpt . '" value="1" />
-                      <input type="hidden" name="amount_' . $cpt . '" value="' . round($item['prixttc'], 2) . '" />
+                      <input type="hidden" name="amount_' . $cpt . '" value="' . $total_amount . '" />
                      <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
                    </div>';
-                $cpt++;               
+                $cpt++;
             }
         }
 

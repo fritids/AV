@@ -109,6 +109,7 @@ if ($verified) {
         $db->insert("av_order_payment", $order_payment);
 
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
+        mail("stef.eugene@wanadoo.fr", 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
     }
 } else {
     // manually investigate the invalid IPN

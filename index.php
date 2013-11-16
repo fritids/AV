@@ -40,7 +40,7 @@ foreach ($promo_id as $id) {
 $nb_produits = 0;
 $page_type = "";
 $mydevis = array();
-$error = array();
+$ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 
@@ -83,7 +83,7 @@ if (isset($_GET["cart"])) {
 
         if (isset($_POST["add"])) {
             $dimension = array();
-/*
+
             if ($_POST["width"] < $productInfos["min_width"] && $productInfos["min_width"] > 0)
                 $tmperr.= "Largeur minimum requise " . $productInfos["min_width"] . " mm <br>";
             if ($_POST["height"] < $productInfos["min_height"] && $productInfos["min_height"] > 0)
@@ -92,9 +92,9 @@ if (isset($_GET["cart"])) {
                 $tmperr.= "Largeur maximum autorisé " . $productInfos["max_width"] . " mm<br>";
             if ($_POST["height"] > $productInfos["max_height"] && $productInfos["max_height"] > 0)
                 $tmperr.= "Taille maximum autorisé " . $productInfos["max_height"] . " mm<br>";
-*/
+
             if ($tmperr)
-                $error = array("txt" => $tmperr);
+                $ko_msg = array("txt" => $tmperr);
 
             if (isset($_POST["width"]) && !empty($_POST["width"]) && isset($_POST["height"]) && !empty($_POST["height"])) {
                 $surface = ($_POST["width"] * $_POST["height"]) / 1000000;
@@ -113,11 +113,11 @@ if (isset($_GET["cart"])) {
 
             $nbItem = $cart->getNbItems() + 1;
 
-            if (empty($error))
+            if (empty($ko_msg))
                 $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
-            if (empty($error) && isset($_POST["options"])) {
+            if (empty($ko_msg) && isset($_POST["options"])) {
                 if (is_array($_POST["options"])) {
                     foreach ($_POST["options"] as $id_combination => $id_option) {
                         $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price"];
@@ -145,7 +145,7 @@ if (isset($_GET["cart"])) {
             //$cart->removeCartItem($_POST["id_cart_item"]);
         }
         // on empecher de faire un F5
-        if (empty($error))
+        if (empty($ko_msg))
             header("Location: index.php?cart");
     }
 }
@@ -173,7 +173,7 @@ if (isset($_GET["c"])) {
     $meta["title"] = $categorie["meta_title"];
     $meta["description"] = $categorie["meta_description"];
     $meta["keywords"] = $categorie["meta_keywords"];
-    
+
     $smarty->assign('products', $products);
     $smarty->assign('categorie', $categorie);
 }
@@ -181,11 +181,11 @@ if (isset($_GET["c"])) {
 if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
-    
+
     $meta["title"] = $product["meta_title"];
     $meta["description"] = $product["meta_description"];
     $meta["keywords"] = $product["meta_keywords"];
-    
+
     $smarty->assign('product', $product);
     $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
 }
@@ -221,9 +221,9 @@ if (isset($_GET["contact-devis"])) {
 if (isset($_GET["cms"])) {
     $page = "cms";
     $page_type = "full";
-    
+
     $cms = getCmsInfo($_GET["id"]);
-    
+
     $meta["title"] = $cms["meta_title"];
     $meta["description"] = $cms["meta_description"];
     $meta["keywords"] = $cms["meta_keywords"];
@@ -295,7 +295,7 @@ if (isset($_GET["order-payment"])) {
     // CMCIC
     $sOptions = "";
     $sReference = $_SESSION["id_order"];
-    $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"];
+    $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
     $sDevise = "EUR";
     $sDate = date("d/m/Y:H:i:s");
     $sLangue = "FR";
@@ -453,7 +453,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             $mail->MsgHTML($user_mail_body);
             $mail->Send();
         } else { //error creation
-            $error = array("txt" => "Le compte existe déjà");
+            $ko_msg = array("txt" => "Le compte existe déjà");
             $page = "register";
         }
     }
@@ -463,7 +463,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 if (isset($_GET["action"]) && $_GET["action"] == "login") {
     $res = checkUserLogin($_POST["email"], $_POST["passwd"]);
     if (!$res) {
-        $error = array("txt" => "La connexion a échoué");
+        $ko_msg = array("txt" => "La connexion a échoué");
         $page = "identification";
         $page_type = "full";
     }
@@ -545,7 +545,6 @@ if (isset($_SESSION["user"])) {
 
 
 if (isset($_GET["devis"])) {
-
     if (isset($_GET["action"]) && $_GET["action"] == "view") {
         $devis_id = $_GET["id"];
 
@@ -608,31 +607,46 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
 
     $mail->MsgHTML($mail_body);
     if ($mail->Send()) {
-        $okmsg = array("txt" => "Votre demande de devis a été envoyé");
+        $ok_msg = array("txt" => "Votre demande de devis a été envoyé");
         $r = $db->insert("av_devis_request", $contact_infos);
     }
 }
 
 if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
-    //$page = "order-confirmation";
-    //order_validate
-
     $orderDevis = getDevis($_POST["id_devis"]);
     $shipping_amount = 0;
     $surface = 0;
     $dimension = array();
     $productInfos = array();
-
     foreach ($orderDevis[0]["details"] as $k => $odd) {
         $nbItem = $cart->getNbItems() + 1;
         $cart->addItem($odd["id_devis_detail"], $odd["product_quantity"], $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
     }
-
     $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
 
     header("Location: index.php?cart");
 }
 
+if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
+    $code = $_POST["voucher_code"];
+
+    /* if(isset($_POST["voucher_code"]))
+      $code = getVoucherInfo($_POST["voucher_code"]);
+     */
+
+    if ($code == "VICTOIREPAUC") {
+        $cart->addVoucher(array(
+            "code" => "VICTOIREPAUC",
+            "title" => "VICTOIREPAUC",
+            "group" => "category",
+            "value" => 12,
+            "reduction" => 10)
+        );
+        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+    } else {
+        $ko_msg = array("txt" => "Ce bon de réduction est erroné");
+    }
+}
 
 /* session */
 $smarty->assign('user', null);
@@ -653,8 +667,8 @@ $smarty->assign('page_info', $page);
 $smarty->assign('page_type', $page_type);
 $smarty->assign('breadcrumb', $breadcrumb);
 $smarty->assign('mydevis', $mydevis);
-$smarty->assign('error', $error);
-$smarty->assign('okmsg', $okmsg);
+$smarty->assign('error', $ko_msg);
+$smarty->assign('okmsg', $ok_msg);
 $smarty->assign('config', $config);
 $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
@@ -666,17 +680,17 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     ?>
 
     <h1>Session</h1>
-    <?= print_r($_SESSION) ?>
+    <?= @print_r($_SESSION) ?>
     <h1>Cart item</h1>
-    <?= print_r($cartItems); ?>
+    <?= @ print_r($cartItems); ?>
     <h1>Orders</h1>
-    <?= print_r($orders); ?>
+    <?= @print_r($orders); ?>
     <h1>Product</h1>
-    <?= print_r($product); ?>
+    <?= @print_r($product); ?>
     <h1>meta</h1>
-    <?= print_r($meta); ?>
+    <?= @print_r($meta); ?>
     <h1>Post</h1>
-    <?= print_r($_POST); ?>
+    <?= @print_r($_POST); ?>
     <?
 }
 ?>

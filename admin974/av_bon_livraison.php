@@ -144,50 +144,53 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
     <a href = "<?= $order_path ?>/<?= $bl_commande_filename ?>.pdf" target = "_blank">télécharger</a>
     <?
+} else {
+    ?>
+
+    <div class="container">
+        <div class="text-center">
+            <form action="" method="post">
+                <div class="col-md-12"> 
+                    <div class="col-md-3">
+                        <label for="date_delivery" > Date livraison :
+                            <select id="date_delivery" class="pme-input-0" name="date_delivery">
+                                <option value="--"  >--</option>
+                                <?
+                                foreach ($d as $rec) {
+                                    ?>
+                                    <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
+                                    <?
+                                }
+                                ?>
+                            </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="truck" > Camion :
+                            <select id="truck" class="pme-input-0" name="id_truck">
+                                <option value="--"  >--</option>
+                                <?
+                                foreach ($t as $rec) {
+                                    ?>
+                                    <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
+                                    <?
+                                }
+                                ?>
+                            </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="submit" class="btn btn-primary" value="Télécharger"  />
+
+                    </div>
+                </div>
+        </div>
+    </form>
+    </div>
+    </div>
+    <script>
+        $("#truck").chained("#date_delivery");
+    </script>
+    <?
 }
 ?>
-
-<div class="container">
-    <div class="text-center">
-        <form action="" method="post">
-            <div class="col-md-12"> 
-                <div class="col-md-3">
-                    <label for="date_delivery" > Date livraison :
-                        <select id="date_delivery" class="pme-input-0" name="date_delivery">
-                            <option value="--"  >--</option>
-                            <?
-                            foreach ($d as $rec) {
-                                ?>
-                                <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
-                                <?
-                            }
-                            ?>
-                        </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label for="truck" > Camion :
-                        <select id="truck" class="pme-input-0" name="id_truck">
-                            <option value="--"  >--</option>
-                            <?
-                            foreach ($t as $rec) {
-                                ?>
-                                <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
-                                <?
-                            }
-                            ?>
-                        </select>
-                </div>
-
-                <div class="col-md-2">
-                    <input type="submit" class="btn btn-primary" value="Télécharger"  />
-
-                </div>
-            </div>
-    </div>
-</form>
-</div>
-</div>
-<script>
-    $("#truck").chained("#date_delivery");
-</script>
