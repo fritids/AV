@@ -181,8 +181,10 @@ if (isset($_GET["c"])) {
 if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
-
-    $meta["title"] = $product["meta_title"];
+	if (empty($product["meta_title"])) { $meta["title"] = $product["name"]; }
+	else {
+		$meta["title"] = $product["meta_title"];
+	}
     $meta["description"] = $product["meta_description"];
     $meta["keywords"] = $product["meta_keywords"];
 
