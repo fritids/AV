@@ -52,6 +52,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         and a.date_livraison = ?
                         and a.id_truck = ?
                         AND d.id_customer = f.id_customer
+                        order by a.position
                         ");
 
     $stmtOrderDetail = $db2->prepare(" select c.*
@@ -69,24 +70,6 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     $stmtOrder->execute(array($date_delivery, $id_truck));
 
     $r = $stmtOrder->fetchAll(PDO::FETCH_ASSOC);
-
-// Extend the TCPDF class to create custom Header and Footer
-    class MYPDF extends TCPDF {
-
-        
-        // Page footer
-        public function Footer() {
-            // Position at 15 mm from bottom
-            $this->SetY(-15);
-            // Set font
-            $this->SetFont('helvetica', 'I', 8);
-            // Page number
-            //$this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() .'', 0, true, 'C', 0, '', 0, false, 'T', 'M');
-            $this->Cell(0, 5, 'ALLOVITRES.COM - Siège social ALLOVITRES BP 30016 13181 Aix-en-Provence France', 0, false, 'C', 0, '', 0, false, 'T', 'M');
-            
-        }
-
-    }
 
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     $pdf->SetCreator(PDF_CREATOR);

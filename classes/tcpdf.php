@@ -131,6 +131,25 @@ require_once(dirname(__FILE__).'/include/tcpdf_static.php');
  * @version 6.0.042
  * @author Nicola Asuni - info@tecnick.com
  */
+
+// Extend the TCPDF class to create custom Header and Footer
+class MYPDF extends TCPDF {
+
+
+    // Page footer
+    public function Footer() {
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
+        // Set font
+        $this->SetFont('helvetica', 'I', 8);
+        // Page number
+        //$this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() .'', 0, true, 'C', 0, '', 0, false, 'T', 'M');
+        $this->Cell(0, 5, 'ALLOVITRES.COM - Siège social ALLOVITRES BP 30016 13181 Aix-en-Provence France', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+
+    }
+
+}
+    
 class TCPDF {
 
 	// Protected properties

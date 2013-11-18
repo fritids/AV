@@ -55,7 +55,6 @@ $customer_info = getCustomerDetail($cid);
 //commande 
 $orderinfo = getOrderInfos($oid);
 $orderDetail = getUserOrdersDetail($oid);
-$orderDetailHistory = getUserOrdersDetailHistory($oid);
 
 
 //paiement
@@ -157,7 +156,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         $orderDetailSupplier = getUserOrdersDetail($oid, $orderSupplier["id_supplier"]);
 
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+        $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
         $pdf->SetAuthor('Allovitre');
         $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -167,8 +166,12 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
+        
+        $smarty->assign("supplier", $orderSupplier);
         $smarty->assign("orderinfo", $orderinfo);
+        $smarty->assign("user_email", $_SESSION["email"]);
         $smarty->assign("orderdetail", $orderDetailSupplier);
         $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
         $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
@@ -208,6 +211,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                 );
                 $r = $db->insert("av_order_bdc", $param);
             }
+            
+            $orderinfo = getOrderInfos($oid);
         }
     }
     $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s) : <ul>" . $tmp . "</ul>";
@@ -517,8 +522,6 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                             <div class="row">
                                 <table>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Produits</th>
                                         <th>Utilisateur</th>                                        
                                         <th>Date envoi</th>
                                         <th>Fournisseur</th>
@@ -530,8 +533,6 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                         foreach ($orderinfo["history"] as $odh) {
                                             ?>
                                             <tr>
-                                                <td><?= $odh["id_order_detail"] ?></td>
-                                                <td><?= $odh["id_product"] ?> - <?= $odh["product_name"] ?> </td>                                            
                                                 <td><?= $odh["prenom"] ?></td>
                                                 <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
                                                 <td><?= $odh["supplier_name"] ?></td>

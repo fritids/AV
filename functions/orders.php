@@ -1,4 +1,17 @@
 <?php
+function getPostCodeZone($postcode) {
+    global $db;
+
+    $query = "select b.nom 
+            from av_departements a , av_zone b
+            where  a.id_zone = b.id_zone
+            and  a.id_departement = " . substr($postcode, 0, 2);
+
+    $z = $db->rawQuery($query);
+
+    if ($z)
+        return ($z[0]["nom"]);
+}
 
 function getUserOrders($cid) {
     global $db;
@@ -73,6 +86,9 @@ function getUserOrdersAddress($iaid) {
     global $db;
     $r = $db->where("id_address", $iaid)
             ->get("av_address");
+    
+    $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
+    
     if ($r)
         return $r[0];
 }
@@ -97,12 +113,10 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
 function getUserOrdersDetailHistory($oid) {
     global $db;
     $params = array($oid);
-    $r = $db->rawQuery("SELECT a.id_order_detail, a.id_product, a.id_order, a.product_name,c.title product_current_state_label, b.date_add, a.id_supplier, b.supplier_name, b.bdc_filename, d.prenom
-                        FROM av_order_detail a, av_order_bdc b, av_order_status c, admin_user d
-                        where a.id_order_detail = b.id_order_detail
-                        and  d.id_admin = b.id_user
-                        and a.product_current_state = c.id_statut
-                        and  a.id_order = ?
+    $r = $db->rawQuery("SELECT distinct b.date_add, b.id_order, b.supplier_name, b.bdc_filename, d.prenom
+                        FROM av_order_bdc b, admin_user d
+                        where d.id_admin = b.id_user
+                        and  b.id_order = ?
                         order by b.id_bdc desc", $params);
 
     return $r;

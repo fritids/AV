@@ -447,11 +447,11 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 
             //envoie mail
             $mail->AddAddress($_POST["email"]);
-            $mail->Subject = $confmail["welcome"];
+            $mail->Subject = notif_new_account;
             $smarty->assign("email", $_POST["email"]);
             $smarty->assign("mdp", $_POST["passwd"]);
 
-            $user_mail_body = $smarty->fetch('notif_new_acccount.tpl');
+            $user_mail_body = $smarty->fetch('notif_new_account.tpl');
             $mail->MsgHTML($user_mail_body);
             $mail->Send();
         } else { //error creation

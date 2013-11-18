@@ -6,8 +6,22 @@ include ("../functions/orders.php");
 include ("../functions/users.php");
 include ("../functions/tools.php");
 
+require('../libs/Smarty.class.php');
+require('../classes/class.phpmailer.php');
+require('../classes/tcpdf.php');
+
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
+$smarty = new Smarty;
+$smarty->setTemplateDir(array('../templates', '../templates/mails'));
+
+//Create a new PHPMailer instance
+$mail = new PHPMailer();
+//Set who the message is to be sent from
+$mail->SetFrom($confmail["from"]);
+$mail->CharSet = 'UTF-8';
+
+//---------
 $pAll = getAllProductInfo();
 $a = $db->get("av_attributes");
 
@@ -18,6 +32,7 @@ $customer_delivery = array();
 $customer_invoice = array();
 
 $btn_txt = "Ajouter";
+$isNewCustomer = 0;
 
 if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
     $cid = $_POST["id_customer"];
@@ -40,7 +55,6 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
   print_r($customer_delivery);
   print_r($customer_invoice);
  */
-
 
 
 if (isset($_POST["contact"])) {
@@ -85,6 +99,8 @@ if (isset($_POST["contact"])) {
         createNewAdresse($customer_delivery);
 
         $btn_txt = "Modifier";
+
+        $isNewCustomer = 1;
     }
     if ($_POST["contact"] == "Modifier") {
         $customer_info = array(
@@ -128,6 +144,8 @@ if (isset($_POST["devis_save"])) {
     $total_price_tax_incl = 0;
     $total_paid = 0;
 
+    $isNewCustomer = $_POST["isNewCustomer"];
+
     $devis_summary = array(
         "id_customer" => $cid,
         "id_user" => $_SESSION['user_id'],
@@ -144,66 +162,70 @@ if (isset($_POST["devis_save"])) {
     $did = $db->insert("av_devis", $devis_summary);
 
     //produit standard
-    foreach ($_POST["product_id"] as $k => $product) {
-        if (!empty($product)) {
-            $p_qte = $_POST["product_quantity"];
-            $p_width = $_POST["product_width"];
-            $p_height = $_POST["product_height"];
-            $p_unit_price = $_POST["product_unit_price"];
-            $p_unit_weight = $_POST["product_unit_weight"];
-            $attributes_amount = 0;
-            $devis_product_attributes = array();
+    if (!empty($_POST["product_id"])) {
+        foreach ($_POST["product_id"] as $k => $product) {
+            if (!empty($product)) {
+                $p_qte = $_POST["product_quantity"];
+                $p_width = $_POST["product_width"];
+                $p_height = $_POST["product_height"];
 
-            // la quantité de la ligne est présent
-            if (!empty($p_qte[$k])) {
-                $p = getProductInfos($product);
+                $attributes_amount = 0;
+                $devis_product_attributes = array();
 
-                $product_amount = $p_unit_price[$k] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
+                // la quantité de la ligne est présent
+                if (!empty($p_qte[$k])) {
+                    $p = getProductInfos($product);
 
-                $devis_detail = array(
-                    "id_devis" => $did,
-                    "id_product" => $product,
-                    "product_name" => $p["name"],
-                    "product_quantity" => $p_qte[$k],
-                    "product_price" => $p_unit_price[$k],
-                    "product_width" => $p_width[$k],
-                    "product_height" => $p_height[$k],
-                    "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
-                );
+                    $p_unit_price = $p["price"];
+                    $p_unit_weight = $p["weight"];
 
-                $ddid = $db->insert("av_devis_detail", $devis_detail);
+                    $product_amount = $p["price"] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
 
-                foreach ($_POST["product_attribut"] as $k => $attributes) {
-                    $arr = explode("|", $attributes);
+                    $devis_detail = array(
+                        "id_devis" => $did,
+                        "id_product" => $product,
+                        "product_name" => $p["name"],
+                        "product_quantity" => $p_qte[$k],
+                        "product_price" => $p_unit_price,
+                        "product_width" => $p_width[$k],
+                        "product_height" => $p_height[$k],
+                        "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
+                    );
 
-                    if ($arr[0] == $product) {
-                        $devis_product_attributes = array(
-                            "id_devis" => $did,
-                            "id_devis_detail" => $ddid,
-                            "id_product" => $arr[0],
-                            "id_attribute" => $arr[1],
-                            "prixttc" => $arr[2],
-                            "name" => $arr[3]);
+                    $ddid = $db->insert("av_devis_detail", $devis_detail);
 
-                        $db->insert("av_devis_product_attributes", $devis_product_attributes);
+                    foreach ($_POST["product_attribut"] as $k => $attributes) {
+                        $arr = explode("|", $attributes);
 
-                        $attributes_amount += $arr[2];
+                        if ($arr[0] == $product) {
+                            $devis_product_attributes = array(
+                                "id_devis" => $did,
+                                "id_devis_detail" => $ddid,
+                                "id_product" => $arr[0],
+                                "id_attribute" => $arr[1],
+                                "prixttc" => $arr[2],
+                                "name" => $arr[3]);
+
+                            $db->insert("av_devis_product_attributes", $devis_product_attributes);
+
+                            $attributes_amount += $arr[2];
+                        }
                     }
+
+                    $total_price_tax_incl = $product_amount + $attributes_amount;
+                    $total_paid += $total_price_tax_incl;
+
+
+                    $r = $db->where("id_devis_detail", $ddid)
+                            ->update("av_devis_detail", array(
+                        "total_price_tax_incl" => $total_price_tax_incl,
+                        "total_price_tax_excl" => $total_price_tax_incl)
+                    );
                 }
-
-                $total_price_tax_incl = $product_amount + $attributes_amount;
-                $total_paid += $total_price_tax_incl;
-
-
-                $r = $db->where("id_devis_detail", $ddid)
-                        ->update("av_devis_detail", array(
-                    "total_price_tax_incl" => $total_price_tax_incl,
-                    "total_price_tax_excl" => $total_price_tax_incl)
-                );
             }
         }
     }
-    // prodiot exotique
+// prodiot exotique
     foreach ($_POST["exo_product_name"] as $k => $product) {
         if (!empty($product)) {
             $p_qte = $_POST["exo_product_quantity"];
@@ -234,13 +256,48 @@ if (isset($_POST["devis_save"])) {
     $r = $db->where("id_devis", $did)
             ->update("av_devis", $devis_summary);
 
-    echo '<div class="alert alert-success text-center">Devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
+
+    if ($did) {
+
+
+        $customer_info = getCustomerDetail($cid);
+
+        //$mail->AddAddress($customer_info["email"]);
+        $mail->AddAddress("stephane.alamichel@gmail.com");
+
+
+        //creation de compte
+        if ($isNewCustomer == 1) {
+
+            $mail->Subject = $confmail["welcome"];
+            $smarty->assign("email", $customer_info["email"]);
+            $smarty->assign("mdp", $customer_info["firstname"]);
+            $mail_body = $smarty->fetch('notif_new_account.tpl');
+            foreach ($monitoringEmails as $bccer) {
+                $mail->AddbCC($bccer);
+            }
+            $mail->MsgHTML($mail_body);
+            $mail->Send();
+        }
+
+        $mail->Subject = "Allovitres - vous avez reéu un devis";
+
+        foreach ($monitoringEmails as $bccer) {
+            $mail->AddbCC($bccer);
+        }
+
+        $mail_body = $smarty->fetch('notif_new_devis.tpl');
+        $mail->MsgHTML($mail_body);
+
+        if ($mail->Send()) {
+            echo '<div class="alert alert-success text-center">Email envoyé et devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
+        }
+    }
 }
 ?>
 
 <script>
     var $table;
-    var totaldevis = 0;
 
     var c = 0;
     $(function() {
@@ -260,7 +317,7 @@ if (isset($_POST["devis_save"])) {
         $row.find('.unit_price').text("");
         $row.find('.unit_weight').text("");
         $row.find('.poids').text("");
-        $row.find('.prixttc').text("");
+        $row.find('.prixttc').val("");
         $row.find('.product_price').text("");
         /*$row.find('.unit_price').removeAttr('readonly');
          $row.find('.unit_weight').removeAttr('readonly');
@@ -306,7 +363,7 @@ if (isset($_POST["devis_save"])) {
         $row.find('.unit_price').text("");
         $row.find('.unit_weight').text("");
         $row.find('.poids').text("");
-        $row.find('.prixttc').text("");
+        $row.find('.prixttc').val("");
         $row.find('.unit_price').removeAttr('readonly');
         $row.find('.unit_weight').removeAttr('readonly');
 
@@ -328,7 +385,6 @@ if (isset($_POST["devis_save"])) {
         var p_attr6_price = mytr.find(".attr6_price").val();
         var p_attr7_price = mytr.find(".attr7_price").val();
 
-        console.log(p_prod_price + p_attr1_price);
 
         mytr.find(".unit_price").val(parseFloat(p_prod_price)
                 + parseFloat(p_attr1_price)
@@ -340,6 +396,7 @@ if (isset($_POST["devis_save"])) {
                 + parseFloat(p_attr7_price)
                 );
 
+        updatePrice(mytr);
 
     }
     function updatePrice(mytr) {
@@ -349,7 +406,6 @@ if (isset($_POST["devis_save"])) {
         var p_uweight = mytr.find(".unit_weight").val();
         var p_uprice = mytr.find(".unit_price").val();
         var p_qte = mytr.find(".product_quantity").val();
-
 
 
         var p_min_area_invoiced = mytr.find(".min_area_invoiced").val();
@@ -366,33 +422,27 @@ if (isset($_POST["devis_save"])) {
             coef = 1.5;
         }
 
-        if (p_qte != "") {
+        if (p_qte !== "") {
             if (typeof p_width === "undefined" && typeof p_height === "undefined") {
                 pprice = parseFloat(p_uprice) * parseInt(p_qte);
 
-                mytr.find(".prixttc").text(pprice.toFixed(2));
+                mytr.find(".prixttc").val(pprice.toFixed(2));
                 mytr.find(".poids").text(parseFloat(p_uweight) * parseInt(p_qte));
-
-                totaldevis = parseFloat(totaldevis) + parseFloat(pprice);
 
             } else {
                 pprice = p_width * p_height / 1000000 * p_uprice * p_qte;
-                totaldevis = parseFloat(totaldevis) + parseFloat(pprice);
 
-                mytr.find(".prixttc").text(pprice.toFixed(2));
+                mytr.find(".prixttc").val(pprice.toFixed(2));
                 mytr.find(".poids").text(p_width * p_height / 1000000 * p_uweight * p_qte);
             }
         }
 
-        $(".totaldevis").text(totaldevis.toFixed(2));
-
-        console.log("p_width " + p_width);
-        console.log("p_height " + p_height);
-        console.log("p_uweight " + p_uweight);
-        console.log("p_uprice " + p_uprice);
-        console.log("p_qte " + p_qte);
-        console.log("totaldevis " + totaldevis);
-        console.log($(".prixttc").text());
+        /*console.log("p_width " + p_width);
+         console.log("p_height " + p_height);
+         console.log("p_uweight " + p_uweight);
+         console.log("p_uprice " + p_uprice);
+         console.log("p_qte " + p_qte);*/
+        //console.log($(".prixttc").val());
 
     }
 
@@ -404,7 +454,7 @@ if (isset($_POST["devis_save"])) {
 
             },
             select: function(event, ui) {
-                console.log(ui);
+                //console.log(ui);
 
                 $(this).closest('tr').find('.unit_price').val(ui.item.price);
                 $(this).closest('tr').find(".unit_weight").val(ui.item.weight);
@@ -415,6 +465,9 @@ if (isset($_POST["devis_save"])) {
 
                 $(this).closest('tr').find('.unit_price').attr('readonly', 'readonly');
                 $(this).closest('tr').find('.unit_weight').attr('readonly', 'readonly');
+
+                var mytr = $(this).closest('tr');
+                updatePrice(mytr);
             }
         });
 
@@ -458,7 +511,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr1_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -480,7 +533,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr1_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -502,7 +555,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr2_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -524,7 +577,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr3_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -546,7 +599,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr3_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -590,7 +643,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr5_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -612,7 +665,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr6_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -634,7 +687,7 @@ if (isset($_POST["devis_save"])) {
                         value: $attr
                     },
                     success: function(result) {
-                        console.log(result.productPrice + " " + result.priceAttribut);
+                        //console.log(result.productPrice + " " + result.priceAttribut);
                         mytr.find('.prod_price').val(result.productPrice);
                         mytr.find('.attr7_price').val(result.priceAttribut);
                         updUnitPrice(mytr);
@@ -682,6 +735,7 @@ if (isset($_POST["devis_save"])) {
             <form class="form-horizontal" role="form" method="post">
                 <input type="text" id ="ajax_customer" />
                 <input type="hidden" name ="id_customer"  id ="id_customer"/>
+
 
 
                 <input type="submit" >
@@ -760,17 +814,26 @@ if (isset($_POST["devis_save"])) {
 
                 <table id="tab_devis2" style="display: none ">
                     <tr id="template2" >
-                    <input type="hidden" name="min_area_invoiced[]" class="min_area_invoiced" size="2" />
-                    <input type="hidden" name="min_area_invoiced[]" class="min_area_invoiced" size="2" />
 
+                    <input type="hidden" name="min_area_invoiced[]" class="min_area_invoiced" size="2" />
+                    <input type="hidden" name="max_area_invoiced[]" class="max_area_invoiced" size="2" />
+                    <input type="hidden" name="" value="0" class="prod_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr1_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr2_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr3_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr4_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr5_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr6_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr7_price" size="2" />
                     <td>
-
                         <select name="product_id[]" class="product" id="product">
                             <?
                             foreach ($pAll as $product) {
-                                ?>
-                                <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?></option>
-                                <?
+                                if ($product["min_width"] > 0 && $product["min_height"] > 0) {
+                                    ?>
+                                    <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?> <?= $product["min_height"] ?></option>
+                                    <?
+                                }
                             }
                             ?>
                         </select>
@@ -807,20 +870,9 @@ if (isset($_POST["devis_save"])) {
                     <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
                     <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>                                    
                     <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" readonly="readonly" /> €/m²</td>
-                    <td><input type="text" name="product_unit_weight[]" class="unit_weight" size="5" /> Kg/m²</td>
                     <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                                                        
-                    <td>
-                        <input type="text" name="" value="0" class="prod_price" size="2" />
-                        <input type="text" name="" value="0" class="attr1_price" size="2" />
-                        <input type="text" name="" value="0" class="attr2_price" size="2" />
-                        <input type="text" name="" value="0" class="attr3_price" size="2" />
-                        <input type="text" name="" value="0" class="attr4_price" size="2" />
-                        <input type="text" name="" value="0" class="attr5_price" size="2" />
-                        <input type="text" name="" value="0" class="attr6_price" size="2" />
-                        <input type="text" name="" value="0" class="attr7_price" size="2" />
-                    </td>                                                                                        
-                    <td><span class="poids"></span> Kg</td>                            
-                    <td><span class="prixttc"></span> €</td>
+
+                    <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
                     </tr>
 
                 </table>
@@ -828,6 +880,7 @@ if (isset($_POST["devis_save"])) {
 
                 <form action="" method="post">
                     <input type="hidden"  value="<?= $cid ?>" name="id_customer">
+                    <input type="hidden" name ="isNewCustomer"  value="<?= $isNewCustomer ?>"/>
 
                     <ul class="nav nav-tabs">
                         <li><a href="#classique" data-toggle="tab">Classique</a></li>
@@ -844,15 +897,12 @@ if (isset($_POST["devis_save"])) {
                                     <th>Option</th>
                                     <th>Largeur (mm)</th>
                                     <th>Hauteur (mm)</th>
-                                    <th>Prix Unit.</th>
-                                    <th>Poids</th>
-                                    <th>Quantity</th>
-                                    <th>Prix attributs</th>
-                                    <th>Poids</th>                        
+                                    <th>Prix Unit.</th>                                    
+                                    <th>Quantity</th>                                    
                                     <th>Prix TTC</th>
                                 </tr>
                                 <tr>
-                                    <td><button type="button" id="newlines" onclick="javascript:addRow()"><span class="glyphicon glyphicon-plus"></span></button></td>
+                                    <td><button type="button" id="newlines" onclick="javascript:addRow();"><span class="glyphicon glyphicon-plus"></span></button></td>
                                 </tr>
                             </table>
                         </div>
@@ -872,23 +922,30 @@ if (isset($_POST["devis_save"])) {
                                     <td><input type="text" name="exo_product_unit_price[]" class="unit_price" size="5" /> €</td>
                                     <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" /> Kg</td>
                                     <td><input type="text" name="exo_product_quantity[]" class="product_quantity" size="2" /></td>                    
-                                    <td><span class="poids"></span> Kg</td>                            
-                                    <td><span class="prixttc"></span> €</td>
+                                    <td><span class="poids"></span> Kg</td>  
+                                    <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
                                     <td id="btn_action">
-                                        <button type="button" id="newlines" onclick="javascript:addExoRow()"><span class="glyphicon glyphicon-plus"></span></button>
+                                        <button type="button" id="newlines" onclick="javascript:addExoRow();"><span class="glyphicon glyphicon-plus"></span></button>
                                         <? /* <button type="button" class="delline"><span class="glyphicon glyphicon-remove"></span></button> */ ?>
                                     </td>
                                 </tr>
                             </table>
-
-                        </div>
+                        </div>                       
                     </div>
                     <div class="pull-left">
                         <textarea name="devis_comment"></textarea>
                     </div>
-                    <div class="pull-right">                        
-                        Total ttc hors frais de port : <span class="totaldevis"></span> €
-                        <input type="submit" name ="devis_save"  class="btn-lg btn-warning">
+                    <div class=" col-xs-6 pull-right">    
+                        <div class="alert alert-info"> 
+                            Les majorations de prix unitaires lorsque la surface < 0.35m² ou > 3.5m² ne sont pas prises en compte dans le montant calculé.
+                        </div>
+                        <button type="button" id='calculate_total'>Calculer : prix total</button>
+                        Total ttc <b>hors frais de port</b> : <h1><span class="totaldevis"></span></h1> €
+
+
+                        Valider le devis <input type="checkbox" required="required"> 
+                        <input type="submit" name ="devis_save"  class="btn-lg btn-warning pull-right">
+
                     </div>
 
                 </form>
@@ -898,6 +955,18 @@ if (isset($_POST["devis_save"])) {
     }
     ?>
 </div>
-<?
-print_r($_POST);
-?>
+
+<script>
+    $("#calculate_total").click(function() {
+        var totaldevis = 0;
+        $(".prixttc").each(function(index) {
+
+            if ($(this).val().length !== 0) {
+                //console.log($(this).val());
+                totaldevis = parseFloat(totaldevis) + parseFloat($(this).val());
+            }
+        })
+
+        $(".totaldevis").text(totaldevis);
+    })
+</script>

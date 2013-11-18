@@ -1,3 +1,4 @@
+{include file='mail_header.tpl'}
 Bonjour,<br><br>
 
 Toute l’équipe Allovitres vous remercie pour votre commande !<br><br>

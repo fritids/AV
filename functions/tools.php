@@ -50,4 +50,19 @@ function getVoucherInfo($code) {
         return($r[0]);
 }
 
+function getDeliveryZone($postcode) {
+    global $db;
+
+    $query = "select b.nom 
+            from av_departements a , av_zone b
+            where  a.id_zone = b.id_zone
+            and  a.id_departement = " . substr($postcode, 0, 2);
+
+    $z = $db->rawQuery($query);
+
+    if ($z)
+        return ($z[0]["nom"]);
+}
+
+
 ?>

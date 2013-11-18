@@ -94,8 +94,8 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                             <tr>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["reference"] . '</th>
                             <th bgcolor = "#cccccc" >' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
+                            <th bgcolor = "#cccccc" >' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '</th>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["comment1"] . '</th>
-                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment2"] . '</th>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["comment3"] . '</th>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["horaire"] . '</th>
                             <th bgcolor = "#cccccc" >Comm. client: ' . $OrderProduct["order_comment"] . '</th></tr>';
@@ -103,9 +103,8 @@ if (!empty($date_delivery) && !empty($id_truck)) {
             $tmpRef = $OrderProduct["reference"];
         }
         $pdf_roadmap .= '
-                        <tr>
-                        <td >' . $p_qty . '</td>
-                        <td colspan = "3">' . $OrderProduct["product_name"] . ' <br> ' .
+                        <tr>                        
+                        <td colspan = "4"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
                 ($OrderProduct["product_width"] != "" ? ' Largeur (mm) :' . $OrderProduct["product_width"] : '') .
                 ($OrderProduct["product_height"] != "" ? ', Longueur (mm) :' . $OrderProduct["product_height"] : '') .
                 '</td>
