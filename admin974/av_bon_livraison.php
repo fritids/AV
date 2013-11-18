@@ -70,29 +70,31 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
     $r = $stmtOrder->fetchAll(PDO::FETCH_ASSOC);
 
-    /* $excel = new ExportDataExcel('file');
-      //$excel = new ExportDataExcel('string');
-      $excel->filename = $filename;
+// Extend the TCPDF class to create custom Header and Footer
+    class MYPDF extends TCPDF {
 
-      $excel->initialize();
+        
+        // Page footer
+        public function Footer() {
+            // Position at 15 mm from bottom
+            $this->SetY(-15);
+            // Set font
+            $this->SetFont('helvetica', 'I', 8);
+            // Page number
+            //$this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() .'', 0, true, 'C', 0, '', 0, false, 'T', 'M');
+            $this->Cell(0, 5, 'ALLOVITRES.COM - Siège social ALLOVITRES BP 30016 13181 Aix-en-Provence France', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+            
+        }
 
-      $header = array_keys($r[0]);
-      $excel->addRow($header);
+    }
 
-      foreach ($r as $record) {
-      $excel->addRow($record);
-      }
-
-      $excel->finalize();
-
-      header("Location: " . $filename); */
-
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     $pdf->SetCreator(PDF_CREATOR);
     $pdf->SetAuthor('Allovitre');
     $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
     $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
     $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+    
     $pdf->SetFont('times', '', 11);
     $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
     $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
