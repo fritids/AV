@@ -189,7 +189,7 @@ if (isset($_POST["devis_save"])) {
                         "product_price" => $p_unit_price,
                         "product_width" => $p_width[$k],
                         "product_height" => $p_height[$k],
-                        "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight[$k] * $p_qte[$k],
+                        "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight * $p_qte[$k],
                     );
 
                     $ddid = $db->insert("av_devis_detail", $devis_detail);
@@ -244,7 +244,7 @@ if (isset($_POST["devis_save"])) {
                 "product_name" => $product,
                 "product_quantity" => $p_qte[$k],
                 "product_price" => $p_unit_price[$k],
-                "product_weight" => $p_unit_weight[$k],
+                "product_weight" => $p_unit_weight[$k] * $p_qte[$k],
                 "total_price_tax_incl" => $total_price_tax_incl,
                 "total_price_tax_excl" => $total_price_tax_incl
             );
@@ -262,8 +262,8 @@ if (isset($_POST["devis_save"])) {
 
         $customer_info = getCustomerDetail($cid);
 
-        //$mail->AddAddress($customer_info["email"]);
-        $mail->AddAddress("stephane.alamichel@gmail.com");
+        $mail->AddAddress($customer_info["email"]);
+        //$mail->AddAddress("stephane.alamichel@gmail.com");
 
 
         //creation de compte
@@ -747,9 +747,9 @@ if (isset($_POST["devis_save"])) {
                 <h3>Contact</h3>
                 <div class="col-xs-12">
                     <div class="form-group">
-                        <input type="text" name="firstname" value="<?= @$customer_info["firstname"] ?>" class="form-control" placeholder="Nom">
-                        <input type="text" name="lastname" value="<?= @$customer_info["lastname"] ?>" class="form-control" placeholder="Prénom">
-                        <input type="text" name="email" value="<?= @$customer_info["email"] ?>" class="form-control" placeholder="E-mail">                    
+                        <input type="text" required="required" name="firstname" value="<?= @$customer_info["firstname"] ?>" class="form-control" placeholder="Nom">
+                        <input type="text" required="required" name="lastname" value="<?= @$customer_info["lastname"] ?>" class="form-control" placeholder="Prénom">
+                        <input type="text" required="required" name="email" value="<?= @$customer_info["email"] ?>" class="form-control" placeholder="E-mail">                    
                     </div>
                 </div>
             </div>
@@ -940,7 +940,7 @@ if (isset($_POST["devis_save"])) {
                             Les majorations de prix unitaires lorsque la surface < 0.35m² ou > 3.5m² ne sont pas prises en compte dans le montant calculé.
                         </div>
                         <button type="button" id='calculate_total'>Calculer : prix total</button>
-                        Total ttc <b>hors frais de port</b> : <h1><span class="totaldevis"></span></h1> €
+                        Total ttc <b>hors frais de port</b> : <h1><span class="totaldevis">0</span> €</h1> 
 
 
                         Valider le devis <input type="checkbox" required="required"> 
@@ -965,8 +965,7 @@ if (isset($_POST["devis_save"])) {
                 //console.log($(this).val());
                 totaldevis = parseFloat(totaldevis) + parseFloat($(this).val());
             }
-        })
-
-        $(".totaldevis").text(totaldevis);
-    })
+        });
+        $(".totaldevis").text(totaldevis.toFixed(2));
+    });
 </script>

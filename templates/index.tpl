@@ -14,11 +14,9 @@
                     {$okmsg.txt}  
                 </div>
             {/if}
-
             {include file="{$page}.tpl"}
         {else}
             <div id="bloc_page_gauche">
-
                 {if $error}
                     <div style="background-color: red;margin-bottom: 20px; padding: 10px" >
                         {$error.txt}  
@@ -29,7 +27,6 @@
                         {$okmsg.txt}  
                     </div>
                 {/if}
-
                 {include file="{$page}.tpl"}
             </div>
 
@@ -46,25 +43,16 @@
                                 {foreach key=key item=option from=$product.options}
                                     {$option.o_name}
                                 {/foreach}  
-
                             {/if} 
-
                         {/foreach}
-                        <hr />
-
+                        <hr/>
                         <p>
                             Total produit : {$smarty.session.cart_summary.total_produits} € TTC<br/>
                             {*Expédition : {$smarty.session.cart_summary.total_shipping} € TTC<br/>*}
                             Taxes incluses : {$smarty.session.cart_summary.total_taxes} €<br/>                
                             Total : {$smarty.session.cart_summary.total_amount} € TTC<br/>                
                         </p>
-                        <a class="bouton" href="/?cart">Panier</a>
-
-                        {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-                            <a class="bouton" href="/?order-resume">Commander</a>
-                        {else}
-                            <a class="bouton" href="/?identification">Commander</a>
-                        {/if}
+                        <a class="bouton" href="/?cart">Panier</a>                        
                     </div>
                 {else}
                     <div id="panier">

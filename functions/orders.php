@@ -1,4 +1,5 @@
 <?php
+
 function getPostCodeZone($postcode) {
     global $db;
 
@@ -86,9 +87,9 @@ function getUserOrdersAddress($iaid) {
     global $db;
     $r = $db->where("id_address", $iaid)
             ->get("av_address");
-    
+
     $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
-    
+
     if ($r)
         return $r[0];
 }
@@ -190,12 +191,10 @@ function validateOrder($oid, $orderValidateInfo) {
 function saveOrder() {
 
     global $db, $cartItems;
-    $ref = getLastOrderId();
-
+    //$ref = getLastOrderId();
     //global de la commande
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
-        "reference" => $ref,
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
         "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
@@ -207,6 +206,9 @@ function saveOrder() {
     );
 
     $oid = $db->insert("av_orders", $order_summary);
+    
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", array("reference" => str_pad($oid, 9, '0', STR_PAD_LEFT)));
 
     foreach ($cartItems as $item) {
 
@@ -233,8 +235,6 @@ function saveOrder() {
             $order_detail["total_price_tax_incl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
             $order_detail["total_price_tax_excl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
         }
-
-
 
         $odid = $db->insert("av_order_detail", $order_detail);
 
@@ -264,7 +264,7 @@ function saveOrder() {
         }
 
         $_SESSION["id_order"] = $oid;
-        $_SESSION["reference"] = $ref;
+        $_SESSION["reference"] = str_pad($oid, 9, '0', STR_PAD_LEFT);
     }
 }
 

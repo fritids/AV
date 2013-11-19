@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include ('configs/settings.php');
 require('libs/Smarty.class.php');
 require('classes/MysqliDb.php');
@@ -13,14 +13,28 @@ require('functions/tools.php');
 require('functions/cms.php');
 require('functions/devis.php');
 require('classes/CMCIC_Tpe.inc.php');
+require('classes/tcpdf.php');
 
 // classes declaration
 
 $smarty = new Smarty;
 //$smarty->caching = 0;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
-$smarty->setTemplateDir(array('templates', 'templates/mails'));
+$smarty->setTemplateDir(array('templates', 'templates/mails', 'templates/pdf/front'));
 
+/* init pdf */
+$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Allovitre');
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+$pdf->SetFont('times', '', 10);
+$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
 //connexion base de données
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
@@ -650,8 +664,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ko_msg = array("txt" => "Ce bon de réduction est erroné");
     }
 }
-if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
 
+// mot de passe oublié
+if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
     $email = $_POST["email"];
     $passwd = RandomString();
 
@@ -659,25 +674,19 @@ if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
         "passwd" => md5(_COOKIE_KEY_ . $passwd),
         "date_upd" => date("y-m-d H:i:s")
     );
-
-
     $r = $db->where("email", $email)
             ->update(("av_customer"), $params);
-
     if ($r) {
         $page = "identification";
         $page_type = "full";
-        
         //envoie mail
         $mail->AddAddress($_POST["email"]);
         $mail->Subject = "Allovitres - nouveau mot de passe";
         $smarty->assign("email", $email);
         $smarty->assign("mdp", $passwd);
-
         foreach ($monitoringEmails as $bccer) {
             $mail->AddBCC($bccer);
         }
-
         $user_mail_body = $smarty->fetch('notif_send_pwd.tpl');
         $mail->MsgHTML($user_mail_body);
         if ($mail->Send()) {
@@ -685,6 +694,37 @@ if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
         }
     }
 }
+
+/* Fichier pdf */
+if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
+
+    if ($_POST["id_order"]) {
+
+        $mail->ClearAllRecipients();
+
+        $oid = $_POST["id_order"];
+        $now = date("d-m-y");
+        $orderinfo = getOrderInfos($oid);
+        if (!empty($orderinfo)) {
+            $smarty->assign("orderinfo", $orderinfo);
+            $content_body = $smarty->fetch('front_order.tpl');
+            $pdf->AddPage('P', 'A4');
+            $pdf->writeHTML($content_body, true, false, true, false, '');
+            $pdf->lastPage();
+            $pdf->Output("AV_" . $oid . "_" . $now . ".pdf", 'D');
+
+            foreach ($monitoringEmails as $bccer) {
+                $mail->AddBCC($bccer);
+            }
+            $mail->CharSet = 'UTF-8';
+            $mail->Subject = "monitoring - demande download facture #" . $oid;
+            $mail->MsgHTML($content_body);
+            $mail->Send();
+        }
+    }
+}
+
+/* Fichier pdf */
 
 /* session */
 $smarty->assign('user', null);

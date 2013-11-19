@@ -29,9 +29,7 @@
                 <div class="clear"></div>
             </div>
             <div class="box_chmp">
-                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#LostPwd">
-                    Mot de passe oubli&eacute;
-                </button>
+                <button type="button" class="submit_mdp_oublie" data-toggle="modal" data-target="#LostPwd"></button>
                 <input type="submit" class="submit_account" value="&nbsp;" />
                 <div class="clear"></div>
             </div>
@@ -50,6 +48,7 @@
                             <input class="txt_account" type="text" name="email">
                             <div class="clear"></div>
                         </div>
+                        <br/>
                         <input class="submit_generer_mdp" type="submit" value=" ">
                     </form>
                 </div>

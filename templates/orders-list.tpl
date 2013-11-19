@@ -63,9 +63,9 @@ TOTAL COMMANDE = {$total_amount} € TTC<br>
                             <td class="prix">{$order.total_paid} € TTC</td>
                             <td class="action">{$order.statut_label}</td>
                             <td>
-                                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal{$order.id_order}">
-                                    Afficher
-                                </button>
+                                <form action="/index.php?action=dl_facture" method="post">
+                                    <button type="submit" name="id_order" value="{$order.id_order}">Afficher</button>
+                                </form>
                             </td>
                         </tr>
                     {/if}
@@ -104,7 +104,7 @@ TOTAL COMMANDE = {$total_amount} € TTC<br>
                                             <td>{$detail.product_weight} kg</td>                                            
                                             <td>{$detail.total_price_tax_incl} €</td>
                                         </tr>
-                                    {/foreach}
+                                        {/foreach}
                                     <tr>
                                         <td colspan="4">Total : </td>
                                         <td>{$totalttc+ 25} €</td>
@@ -118,11 +118,11 @@ TOTAL COMMANDE = {$total_amount} € TTC<br>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
-        {/foreach}
+                                            {/foreach}
 
-    {else}
+                                                {else}
         <p>Aucune commande n'a été trouvée</p>
-    {/if}
+                                                    {/if}
 </div>
 
 <div class="clearfix"></div>

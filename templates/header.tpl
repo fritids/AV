@@ -33,7 +33,7 @@
                 var initialBg = $('#test123').css("background-image"); // added
 
                 var firstTime = true;
-                var arr = [initialBg, "url(/bg/2.png)", "url(/bg/1.png)", "url(/img/bg/2.png)", "url(/bg/1.png)"]; // changed
+                var arr = [initialBg, "url(/bg/2.png)", "url(/bg/1.png)", "url(/bg/2.png)", "url(/bg/1.png)"]; // changed
                 (function recurse(counter) {
                     var bgImage = arr[counter];
                     if (firstTime == false) {
