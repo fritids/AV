@@ -164,7 +164,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
         $pdf->SetFont('times', '', 11);
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        $pdf->AddPage();
+        $pdf->AddPage("L","A4");
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
         $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
@@ -175,7 +175,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $smarty->assign("orderdetail", $orderDetailSupplier);
         $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
         $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
-
+        
         $pdf->writeHTML($bdc_pdf_body, true, false, true, false, '');
         $pdf->lastPage();
 

@@ -2,52 +2,67 @@
 
 <table>
     <tr height="100">
-        <th>
-            <strong>Allovitres</strong><br>
-            {$user_email}
-        </th>
-        <th><strong>{$supplier.name}</strong></th>
+        <td>MERCI DE REGROUPER <br>LES VERRES PAR ZONES<br>SUR LES CHARIOTS</td>
+        <td>SAS ALLOVITRES<br>1900 Avenue Paul Julien RN7<br>13100 Le Tholonet<br>email : contact@miroiteriedupaysdaix.com<br>SARL Miroiterie du Pays d'Aix - RC5522928845</td>
     </tr>
 </table>
 <br>
 <br>
-<br>
-<table  border="1">
-    <tr height="100">
-        <td>{$orderinfo.customer.lastname}_AV</td>
-        <td>{$orderinfo.address.delivery.zone}<br>
-            Allovitres<br>
-            1900 RN 7<br>
-            Quartier langesse<br>
-            13100 Le Tholonet<br>
-        </td>        
-        <td>{$smarty.now|date_format:"%d/%m/%y %R:%S"}</td>
-    </tr>    
+<table>
+    <tr>
+        <td height="50">
+            <table border="1" width="450" >
+                <tr>
+                    <td  height="30"><h1>BON DE COMMANDE {$supplier.name}</h1></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="30" width="650"  align="right">
+            <table border="1" width="150">
+                <tr>
+                    <td>Date : {$smarty.now|date_format:"%d/%m/%y"}</td>
+                </tr>
+            </table> 
+        </td>
+    </tr>
+    <tr>
+        <td height="30">
+            <table border="1" width="350">
+                <tr>
+                    <td>Interlocuteur : {$user_email}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 </table>
-<br>
+
 <br>
 <br>
 <table border="1">
     <tr>
-        <th width="50">Id</th>
-        <th width="250">Designation</th>
-        <th width="70">Largeur</th>
-        <th width="70">Longueur</th>
-        <th>Attribut</th>
-        <th width="50">Quantité</th>
+        <th width="50">Zone</th>
+        <th width="150">Réference Client</th>
+        <th width="50">Qte</th>
+        <th width="250">Designation</th>        
+        <th width="70">Dimension</th>
+        <th width="70">&nbsp;</th>
+        <th width="70">&nbsp;</th>
+        <th width="70">&nbsp;</th>
+        <th width="70">&nbsp;</th>
     </tr>
+    
     {foreach key=key item=detail from=$orderdetail name=orderdetail}
         <tr>
-            <td>{$detail.id_product}</td>
-            <td>{$detail.product_name}</td>
-            <td>{$detail.product_width} </td>
-            <td>{$detail.product_height} </td>
-            <td>
-                {foreach key=key2 item=attribut from=$detail.attributes}
-                    {$attribut.name}<br>
-                {/foreach}
-            </td>
+            <td>{$orderinfo.address.delivery.zone}</td>
+            <td>{$orderinfo.customer.lastname} AV</td>
             <td>{$detail.product_quantity}</td>
+            <td>{$detail.product_name}</td>
+            <td>{$detail.product_width} x {$detail.product_height}</td>
+            {foreach key=key2 item=attribut from=$detail.attributes}
+                <td>{$attribut.name}</td>
+            {/foreach}            
         </tr>
     {/foreach}
 </table>
