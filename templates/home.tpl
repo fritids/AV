@@ -1,7 +1,7 @@
 <div id="slider">
 </div>
 <div class="largeur">
-    <div class="bloc-titre">ALLOVITRES : Spécialiste de la miroiterie</div>
+    <div class="bloc-titre"><h1 style="font-family: Arial;font-size: 14px;display:inline;">ALLOVITRES : Spécialiste de la miroiterie</h1></div>
     <div style="float: left;background: #fff;width: 100%">
         <div class="bloc-bas promotions">
             <h3 id="promotions" class="indent">Promotions</h3>
@@ -22,7 +22,8 @@
             {/foreach}
         </div>
 
-        <div class="bloc-bas produit-du-mois">
+        <a href="/double-vitrage-sur-mesure/54-double-vitrage-avec-gaz-argon.html">
+		<div class="bloc-bas produit-du-mois">
             <h3 class="indent">Produit du mois</h3>
             <div class="produit">
                 <div class="infos">
@@ -35,6 +36,7 @@
                 <p class="therme clearfix">Avantages thermiques</p>
             </div>
         </div>
+		</a>
     </div>
 </div>
 <div class="clearfix">&nbsp;</div>

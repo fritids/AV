@@ -1,7 +1,7 @@
 
 <div id="produit" class="bloc_page_gauche clear-it">    
     <p class="rouge">{$product.msg_dispo}</p>
-    <h1>{$product.name}</h1>
+    <h2>{$product.name|lower|ucfirst}</h2>
     <div id="texte"></div>
     <div id="features">
         <div class="images">
@@ -29,7 +29,7 @@
                         <p class="prix" ><span id="total_price">{$product.price}</span> €</p>
                         {if $product.id_category !=19}
                             <p><span id="surface"></span> m² calculé</p>
-                            <p><span id="total_poids"></span> kg calculés</p>
+                            {*<p><span id="total_poids"></span> kg calculés</p>*}
                             <p><span id=""></span> min facturé {$product.min_area_invoiced} m²</p>
                         {/if}
                     </div>

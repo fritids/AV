@@ -1,4 +1,10 @@
 <div id="bloc_page_gauche">
+    {if $error}
+        <div style="background-color: #7aba7b;margin-bottom: 20px; padding: 10px" >
+            {$error.txt}  
+        </div>
+    {/if}
+
     <form action="/index.php?action=send_devis" method="post">
         <div id="titre-bloc">DEMANDE DE DEVIS</div>
         <h3>VOS INFORMATIONS</h3>

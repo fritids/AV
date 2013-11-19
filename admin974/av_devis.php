@@ -280,7 +280,7 @@ if (isset($_POST["devis_save"])) {
             $mail->Send();
         }
 
-        $mail->Subject = "Allovitres - vous avez reéu un devis";
+        $mail->Subject = "Allovitres - vous avez reçu un devis";
 
         foreach ($monitoringEmails as $bccer) {
             $mail->AddbCC($bccer);

@@ -29,11 +29,35 @@
                 <div class="clear"></div>
             </div>
             <div class="box_chmp">
-                <a hre="#" title="Mot de passe oubli&eacute;" class="forget_pass">Mot de passe oubli&eacute;</a>
+                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#LostPwd">
+                    Mot de passe oubli&eacute;
+                </button>
                 <input type="submit" class="submit_account" value="&nbsp;" />
                 <div class="clear"></div>
             </div>
         </form>
     </div>
+    <div class="modal fade" id="LostPwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Mot de passe oublié</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/index.php?action=lost_pwd">
+                        <div class="box_chmp">
+                            <label>email :</label>
+                            <input class="txt_account" type="text" name="email">
+                            <div class="clear"></div>
+                        </div>
+                        <input class="submit_generer_mdp" type="submit" value=" ">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>                            
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
     <div class="clear"></div>
 </div>

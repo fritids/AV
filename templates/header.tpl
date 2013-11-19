@@ -6,8 +6,12 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
-        <meta name="description" content="">
+        <title>{$meta.title|lower|ucfirst}</title>
+        <meta name="description" content="{$meta.description}">
+		<meta name="keywords" content="{$meta.keywords}">
+		<meta name="robots" content="index,follow" />
+		<link rel="icon" type="image/vnd.microsoft.icon" href="/img/favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
         <meta name="viewport" content="width=1200">
 
         <link rel="stylesheet" href="/css/normalize.css">
@@ -29,7 +33,7 @@
                 var initialBg = $('#test123').css("background-image"); // added
 
                 var firstTime = true;
-                var arr = [initialBg, "url(/img/bg/2.png)", "url(/img/bg/1.png)", "url(/img/bg/2.png)", "url(/img/bg/1.png)"]; // changed
+                var arr = [initialBg, "url(/bg/2.png)", "url(/bg/1.png)", "url(/img/bg/2.png)", "url(/bg/1.png)"]; // changed
                 (function recurse(counter) {
                     var bgImage = arr[counter];
                     if (firstTime == false) {
@@ -73,7 +77,7 @@
             <header>
                 <div id="top-header">
                     <div id="top-header-centre">
-                        <span id="top-header-texte" >Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</span>
+                        <span id="top-header-texte" ><h1 style="font-size: 0.9em;line-height: 29px;display:inline;">Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</h1></span>
                         <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="/?cart"><img src="/img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
                                     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
                                 Bonjour <a href="/?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
@@ -86,7 +90,7 @@
                 </div>
 
                 <div id="header">
-                    <a href="/index.php"><img id="logo" src="/img/logo.png" /></a>
+                    <a href="/"><img id="logo" src="/img/logo.png" /></a>
                     <div id="header-droit">
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
                         <span id="telephone">0 892 70 11 13</span>
@@ -94,7 +98,7 @@
                     </div>
                     <div id="reseau-sociaux">
                         <img class="rs-icon" src="/img/RS-twitter.png" />
-                        <img class="rs-icon" src="/img/RS-facebook.png" />
+                        <a target="_blank" href="https://www.facebook.com/Allovitres"><img class="rs-icon" src="/img/RS-facebook.png" /></a>
                         <div>
                         </div>
                     </div>

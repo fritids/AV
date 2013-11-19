@@ -181,10 +181,11 @@ if (isset($_GET["c"])) {
 if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
-	if (empty($product["meta_title"])) { $meta["title"] = $product["name"]; }
-	else {
-		$meta["title"] = $product["meta_title"];
-	}
+    if (empty($product["meta_title"])) {
+        $meta["title"] = $product["name"];
+    } else {
+        $meta["title"] = $product["meta_title"];
+    }
     $meta["description"] = $product["meta_description"];
     $meta["keywords"] = $product["meta_keywords"];
 
@@ -647,6 +648,41 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
     } else {
         $ko_msg = array("txt" => "Ce bon de réduction est erroné");
+    }
+}
+if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
+
+    $email = $_POST["email"];
+    $passwd = RandomString();
+
+    $params = array(
+        "passwd" => md5(_COOKIE_KEY_ . $passwd),
+        "date_upd" => date("y-m-d H:i:s")
+    );
+
+
+    $r = $db->where("email", $email)
+            ->update(("av_customer"), $params);
+
+    if ($r) {
+        $page = "identification";
+        $page_type = "full";
+        
+        //envoie mail
+        $mail->AddAddress($_POST["email"]);
+        $mail->Subject = "Allovitres - nouveau mot de passe";
+        $smarty->assign("email", $email);
+        $smarty->assign("mdp", $passwd);
+
+        foreach ($monitoringEmails as $bccer) {
+            $mail->AddBCC($bccer);
+        }
+
+        $user_mail_body = $smarty->fetch('notif_send_pwd.tpl');
+        $mail->MsgHTML($user_mail_body);
+        if ($mail->Send()) {
+            $ok_msg = array("txt" => "Un nouveau mot de passe vous a été envoyé");
+        }
     }
 }
 

@@ -2,30 +2,30 @@
     <div id="footer1">
         <div id="footer1-left">
             <ul>
-                <li><img src="img/FOOTER_choisir_verre.png"/></li>
-                <li>Choisir son verre</li>
+                <li><img src="/img/FOOTER_choisir_verre.png"/></li>
+                <li><h2 style="font-family: Arial;font-size: 0.875em; font-weight: bold;display:inline;">Choisir son verre</h2></li>
             </ul>
 <a href="/content/1-livraison-dans-toute-la-france-allovitres">			
             <ul>
-                <li><img src="img/FOOTER_transport.png"/></li>
-                <li>Livraison</li>
+                <li><img src="/img/FOOTER_transport.png"/></li>
+                <li><h2 style="font-family: Arial;font-size: 0.875em; font-weight: bold;display:inline;">Livraison</h2></li>
             </ul>
 </a>
 <a href="/?contact-devis">				
             <ul>
-                <li><img src="img/FOOTER_devis.png"/></li>
-                <li>Devis personnalisé</li>
+                <li><img src="/img/FOOTER_devis.png"/></li>
+                <li><h2 style="font-family: Arial;font-size: 0.875em; font-weight: bold;display:inline;">Devis personnalisé</h2></li>
             </ul>
 </a>			
-<a href="/?contact-nous"><ul>
-                    <li><img src="img/FOOTER_nous_contacter.png"/></li>
-                    <li>Nous contacter</li>
+<a href="/?contactez-nous"><ul>
+                    <li><img src="/img/FOOTER_nous_contacter.png"/></li>
+                    <li><h2 style="font-family: Arial;font-size: 0.875em; font-weight: bold;display:inline;">Nous contacter</h2></li>
                 </ul>
 </a>
         </div>
         <div id="footer1-right">
-            <p id="footer1-right-titre"><img src="img/contact.png"/>
-                NEWSLETTER</p>
+            <p id="footer1-right-titre"><img src="/img/contact.png"/ style="float:left;">
+                <h2 style="color: #367FBD;font-family: Arial;font-size: 1.125em;font-weight: bold;margin: 10px 0 0 2px; vertical-align: text-bottom;">NEWSLETTER</h2></p>
             <p id="footer1-right-texte">
                 Pour recevoir toute l’actualité, les nouveautés et les promotions allovitres,
                 inscrivez-vous.
@@ -59,7 +59,7 @@
             <ul>
                 <li><span class="caret"></span></li>
                 <li class="titre">SUIVEZ-NOUS</li>
-                <li><img src="/img/google-plus.png"/><img  class="logo_footer" src="/img/facebook.png"/><img  class="logo_footer" src="/img/twitter.png"/></li>
+                <li><a href="https://plus.google.com/b/117282875950258035705/+Allovitres/posts"><img src="/img/google-plus.png"/></a><a href="https://www.facebook.com/Allovitres"><img  class="logo_footer" src="/img/facebook.png"/><a></li>
             </ul>
             <ul>
                 <li><span class="caret"></span></li>
@@ -72,7 +72,7 @@
 </footer>
 </div>
 <div id="test123" style="position:absolute;top:0px;z-index:-100;	background: #539cf1;
-     background-image:url(bg/1.png);
+     background-image:url(/bg/1.png);
      background-position:center top;
      background-repeat: no-repeat;
      width:100%;height:100%;">
