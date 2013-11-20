@@ -99,9 +99,9 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
                 <?
                 foreach ($devis as $dev) {
                     ?>
-                                                                                    <option value="<?= $dev["id_devis"] ?>"
+                         <option value="<?= $dev["id_devis"] ?>"
                     <? if ($dev["id_devis"] == $did && !empty($did)) echo "selected" ?>
-                                                                                            ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
+                         ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
                     <?
                 }
                 ?>

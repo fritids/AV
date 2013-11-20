@@ -43,7 +43,7 @@ $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $mail = new PHPMailer();
 //Set who the message is to be sent from
 $mail->SetFrom($confmail["from"]);
-
+$mail->CharSet = 'UTF-8';
 
 $promo_id = array(79, 65, 123, 124);
 foreach ($promo_id as $id) {
@@ -544,55 +544,13 @@ if (isset($_GET["paiementok"])) {
 }
 
 /* devis */
-if (isset($_SESSION["user"])) {
-    $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-                            from av_devis a , admin_user b 
-                            where a.id_user = b.id_admin 
-                            and current_state = 1
-                            and id_customer = ?", array($_SESSION["user"]["id_customer"]));
-
-    foreach ($mydevis as $k => $devis) {
-
-        $mydevisdetail = $mydevisdetail = $db->where("id_devis", $devis["id_devis"])
-                ->get("av_devis_detail");
-
-        $mydevis[$k]["detail"] = $mydevisdetail;
-    }
-}
-
-
 if (isset($_GET["devis"])) {
-    if (isset($_GET["action"]) && $_GET["action"] == "view") {
-        $devis_id = $_GET["id"];
-
-        $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-                                    from av_devis a , admin_user b 
-                                    where a.id_user = b.id_admin 
-                                    and current_state = 1
-                                    and id_devis = ?
-                                    and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
-
-
-        if ($mydevis) {
-            $mydevisdetail = $db->where("id_devis", $devis_id)
-                    ->get("av_devis_detail");
-
-            $smarty->assign('mydevisdetail', $mydevisdetail);
-        }
-    }
     if (isset($_GET["action"]) && $_GET["action"] == "del") {
         $devis_id = $_GET["id"];
 
         $r = $db->where("id_devis", $devis_id)
                 ->where("id_customer", $_SESSION["user"]["id_customer"])
                 ->update("av_devis", array("current_state" => 2));
-
-        $mydevis = $db->rawQuery("select a.*, b.nom, b.prenom 
-                                from av_devis a , admin_user b 
-                                where a.id_user = b.id_admin 
-                                and current_state = 1
-                                and id_devis = ?
-                                and id_customer = ?", array($devis_id, $_SESSION["user"]["id_customer"]));
     }
     $smarty->assign('mydevis', $mydevis);
 }
@@ -635,10 +593,45 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
     $surface = 0;
     $dimension = array();
     $productInfos = array();
+
+
     foreach ($orderDevis[0]["details"] as $k => $odd) {
         $nbItem = $cart->getNbItems() + 1;
-        $cart->addItem($odd["id_devis_detail"], $odd["product_quantity"], $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+        $pqte = $odd["product_quantity"];
+
+
+        //produit standard
+        if ($odd["id_product"] > 0) {
+            $pid = $odd["id_product"];
+            $productInfos = getProductInfos($pid);
+            $surface = ($odd["product_width"] * $odd["product_height"]) / 1000000;
+
+            $dimension = array(
+                "width" => $odd["product_width"],
+                "height" => $odd["product_height"]
+            );
+
+            $cart->addItem($pid, $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+
+            foreach ($odd["combinations"] as $i => $attribute) {
+                $option_price = $attribute["prixttc"];
+                $option_name = $attribute["name"];
+                $option_weight = $attribute["weight"];
+                //$shipping_amount = $shipping_ratio * $option_weight;
+                $shipping_amount = 0;
+
+                echo $option_name . "<br>";
+                $cart->addItemOption($pid, $i, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+            }
+        } else {
+            $surface = 0;
+            $dimension = array();
+            $productInfos = array();
+
+            $cart->addItem($odd["id_devis_detail"], $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+        }
     }
+
     $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
 
     header("Location: index.php?cart");
@@ -711,13 +704,40 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($content_body, true, false, true, false, '');
             $pdf->lastPage();
-            $pdf->Output("AV_" . $oid . "_" . $now . ".pdf", 'D');
+            $pdf->Output("AV_FA_" . $oid . "_" . $now . ".pdf", 'D');
 
             foreach ($monitoringEmails as $bccer) {
                 $mail->AddBCC($bccer);
             }
             $mail->CharSet = 'UTF-8';
             $mail->Subject = "monitoring - demande download facture #" . $oid;
+            $mail->MsgHTML($content_body);
+            $mail->Send();
+        }
+    }
+}
+if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
+
+    if ($_POST["id_devis"]) {
+
+        $mail->ClearAllRecipients();
+
+        $did = $_POST["id_devis"];
+        $now = date("d-m-y");
+        $devisinfo = getDevis($did);
+        if (!empty($devisinfo[0])) {
+            $smarty->assign("devisinfo", $devisinfo[0]);
+            $content_body = $smarty->fetch('front_devis.tpl');
+
+            $pdf->AddPage('P', 'A4');
+            $pdf->writeHTML($content_body, true, false, true, false, '');
+            $pdf->lastPage();
+            $pdf->Output("AV_DE_" . $did . "_" . $now . ".pdf", 'D');
+            foreach ($monitoringEmails as $bccer) {
+                $mail->AddBCC($bccer);
+            }
+            $mail->CharSet = 'UTF-8';
+            $mail->Subject = "monitoring - demande download devis #" . $did;
             $mail->MsgHTML($content_body);
             $mail->Send();
         }
@@ -732,6 +752,8 @@ if (@$_SESSION["is_logged"]) {
     $smarty->assign('user', $_SESSION["user"]);
 }
 
+
+$mydevis = getUserDevis($_SESSION["user"]["id_customer"]);
 
 /* Smarty */
 $smarty->assign('sub_menu', $sub_menu);
@@ -767,6 +789,8 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= @print_r($product); ?>
     <h1>meta</h1>
     <?= @print_r($meta); ?>
+    <h1>devisinfo</h1>
+    <?= @print_r($devisinfo); ?>
     <h1>Post</h1>
     <?= @print_r($_POST); ?>
     <?

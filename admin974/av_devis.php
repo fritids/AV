@@ -194,9 +194,8 @@ if (isset($_POST["devis_save"])) {
 
                     $ddid = $db->insert("av_devis_detail", $devis_detail);
 
-                    foreach ($_POST["product_attribut"] as $k => $attributes) {
+                    foreach ($_POST["product_attribut"] as $attributes) {
                         $arr = explode("|", $attributes);
-
                         if ($arr[0] == $product) {
                             $devis_product_attributes = array(
                                 "id_devis" => $did,
@@ -205,10 +204,8 @@ if (isset($_POST["devis_save"])) {
                                 "id_attribute" => $arr[1],
                                 "prixttc" => $arr[2],
                                 "name" => $arr[3]);
-
                             $db->insert("av_devis_product_attributes", $devis_product_attributes);
-
-                            $attributes_amount += $arr[2];
+                            $attributes_amount += $arr[2] * $p_width[$k] * $p_height[$k] / 1000000 * $p_qte[$k];
                         }
                     }
 

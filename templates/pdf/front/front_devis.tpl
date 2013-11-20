@@ -5,19 +5,19 @@
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                         <td height="87">&nbsp;</td>
-                        <td width=""><h2>Facture FA{$orderinfo.reference}</h2></td>
+                        <td width=""><h2>Devis DE{$devisinfo.id_devis}</h2><br> le {$devisinfo.date_add|date_format:"%d/%m/%y"}</td>
                     </tr>
                     <tr>
                         <td>
-                            {$orderinfo.customer.lastname} {$orderinfo.customer.firstname}<br>
-                            {$orderinfo.address.delivery.address1}<br>
-                            {$orderinfo.address.delivery.address2}<br>
-                            {$orderinfo.address.delivery.postcode} {$orderinfo.address.delivery.city}
+                            {$devisinfo.customer.lastname} {$devisinfo.customer.firstname}<br>
+                            {$devisinfo.address.delivery.address1}<br>
+                            {$devisinfo.address.delivery.address2}<br>
+                            {$devisinfo.address.delivery.postcode} {$devisinfo.address.delivery.city}
                         </td>
-                        <td width="">{$orderinfo.customer.lastname} {$orderinfo.customer.firstname}<br>
-                            {$orderinfo.address.invoice.address1}<br>
-                            {$orderinfo.address.invoice.address2}<br>
-                            {$orderinfo.address.invoice.postcode} {$orderinfo.address.invoice.city}
+                        <td width="">{$devisinfo.customer.lastname} {$devisinfo.customer.firstname}<br>
+                            {$devisinfo.address.invoice.address1}<br>
+                            {$devisinfo.address.invoice.address2}<br>
+                            {$devisinfo.address.invoice.postcode} {$devisinfo.address.invoice.city}
                         </td>
                     </tr>
                     <tr>
@@ -28,12 +28,11 @@
                         <td colspan="2">
                             <table width="640" border="0" cellspacing="0" cellpadding="0" style="border:1px solid #000;" >
                                 <tr>
-                                    <td colspan="3" bgcolor="#f5f5f5" style="padding:5px; border:1px solid #000;">Bon de livraison n°{$orderinfo.reference}</td>
+                                    <td colspan="2" bgcolor="#f5f5f5" style="padding:5px; border:1px solid #000;">Devis n°{$devisinfo.id_devis}</td>
                                 </tr>
                                 <tr>
-                                    <td style="border:1px solid #000;padding:2px; ">Commande n° {$orderinfo.reference}</td>
-                                    <td style="border:1px solid #000;padding:2px; ">LIVRAISON A DOMICILE ALLOVITRES</td>
-                                    <td style="border:1px solid #000;padding:2px; ">Méthode de paiement :<br>{$orderinfo.payment}</td>
+                                    <td style="border:1px solid #000;padding:2px; ">Devis n° {$devisinfo.id_devis}</td>
+                                    <td style="border:1px solid #000;padding:2px; ">LIVRAISON A DOMICILE ALLOVITRES</td>                                    
                                 </tr>
                             </table>
                         </td>
@@ -53,12 +52,12 @@
                                     <td width="10%" bgcolor="#f5f5f5">Prix TTc</td>
                                 </tr>
 
-                                {foreach key=key item=detail from=$orderinfo.details}
+                                {foreach key=key item=detail from=$devisinfo.details}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}
                                             {if $detail.attributes}
-                                                {foreach key=key item=attribute from=$detail.attributes}
+                                                {foreach key=key item=attribute from=$detail.combinations}
                                                     {$attribute.name}
                                                 {/foreach}
                                             {/if}
@@ -69,7 +68,7 @@
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_price}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_excl}</td>
                                     </tr>
                                 {/foreach}
                             </table>
@@ -77,9 +76,9 @@
                             <br>
                             <br>
 
-                            Total produits TTc :{$orderinfo.total_paid - 25} €<br>
+                            Total produits TTc :{$devisinfo.total_paid} €<br>
                             Frais de transport : 25€ <br>
-                            Total TTc :{$orderinfo.total_paid} €<br>
+                            Total TTc :{$devisinfo.total_paid+25} €<br>
                         </td>
                     </tr>
                 </table>

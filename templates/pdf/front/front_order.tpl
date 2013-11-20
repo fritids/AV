@@ -5,7 +5,7 @@
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                         <td height="87">&nbsp;</td>
-                        <td width=""><h2>Facture FA{$orderinfo.reference}</h2></td>
+                        <td width=""><h2>Facture FA{$orderinfo.reference}</h2><br> le {$orderinfo.date_add|date_format:"%d/%m/%y"}</td>
                     </tr>
                     <tr>
                         <td>
@@ -69,7 +69,7 @@
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_price}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_incl}</td>
                                     </tr>
                                 {/foreach}
                             </table>
