@@ -1,18 +1,15 @@
 <?php
 session_start();
-include ("../configs/settings.php");
+require_once ("../configs/settings.php");
 mysql_connect($bdserv, $bduser, $bdpass);
 mysql_select_db($bdname);
 include('securite.php');
 ?>
 
 <?php
-
 include ("header.php");
-
-
 // MySQL host name, user name, password, database, and table
-include ("../configs/settings.php");
+
 
 $opts['tb'] = 'av_employee';
 

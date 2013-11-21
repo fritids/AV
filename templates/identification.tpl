@@ -11,7 +11,7 @@
         </div>
         <div class="pro_account">
             <p>B&eacute;n&eacute;ficiez d'offres et d’avantages r&eacute;serv&eacute;s aux professionnels.</p>
-            <a href="/?register" class="go_pro">compte professionnel</a>
+            <a href="/?registerpro" class="go_pro">compte professionnel</a>
         </div>
         <div class="clear"></div>
     </div>

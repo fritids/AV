@@ -210,6 +210,10 @@ if (isset($_GET["register"])) {
     $page = "register";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Inscription");
 }
+if (isset($_GET["registerpro"])) {
+    $page = "register-pro";
+    $breadcrumb = array("parent" => "Accueil", "fils" => "Inscription Pro");
+}
 if (isset($_GET["cart"])) {
     $page = "cart";
     $page_type = "full";
@@ -374,6 +378,11 @@ if (isset($_GET["order-payment"])) {
 
 /* new user */
 if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
+    $isPro = 0;
+
+    if (isset($_POST["is_pro"])) {
+        $group = 1;
+    }
 
     $userinfos = array(
         "firstname" => $_POST["firstname"],
@@ -382,7 +391,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
         "active" => 1,
         "date_add" => date("Y-m-d"),
-        "date_upd" => date("Y-m-d"));
+        "date_upd" => date("Y-m-d"),
+        "customer_goup" => $group
+    );
 
     //compte existe déjà on update
     if (isset($_SESSION["user"]["id_customer"]) && $_SESSION["user"]["id_customer"] != "") {
@@ -393,6 +404,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
             "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
+            "customer_goup" => $group
         );
 
         $invoice_adresse = array(
@@ -402,7 +414,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "country" => "France",
             "city" => @$_POST["invoice_city"],
             "phone" => $_POST["invoice_phone"],
-            "phone_mobile" => $_POST["invoice_phone_mobile"]
+            "phone_mobile" => $_POST["invoice_phone_mobile"],
         );
 
         $delivery_adresse = array(
@@ -471,7 +483,11 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             $mail->Send();
         } else { //error creation
             $ko_msg = array("txt" => "Le compte existe déjà");
+            
             $page = "register";
+
+            if ($group == 1)
+                $page = "register-pro";
         }
     }
 }
@@ -594,7 +610,6 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
     $dimension = array();
     $productInfos = array();
 
-
     foreach ($orderDevis[0]["details"] as $k => $odd) {
         $nbItem = $cart->getNbItems() + 1;
         $pqte = $odd["product_quantity"];
@@ -630,7 +645,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
 
             $cart->addItem($odd["id_devis_detail"], $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
         }
-    }
+    }   
 
     $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
 
@@ -717,9 +732,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
     }
 }
 if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
-    
+
     if ($_POST["id_devis"]) {
-        
+
         $mail->ClearAllRecipients();
 
         $did = $_POST["id_devis"];
@@ -774,6 +789,7 @@ $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
 
 $smarty->display('index.tpl');
+
 ?>
 <?
 if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["user"]["email"] == "alamichel.s@free.fr") {
@@ -793,6 +809,7 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= @print_r($devisinfo); ?>
     <h1>Post</h1>
     <?= @print_r($_POST); ?>
+    
     <?
 }
 ?>

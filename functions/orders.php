@@ -71,9 +71,7 @@ function getOrderPayment($oid) {
             ->get("av_order_payment");
     if ($r)
         return $r[0];
-
-
-    return $r[0];
+    return null;
 }
 
 function getUserOrdersCustomer($cid) {
@@ -197,7 +195,7 @@ function saveOrder() {
         "id_customer" => $_SESSION["user"]["id_customer"],
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
-        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"],
+        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"] ,
         "invoice_date" => date("Y-m-d H:i:s"),
         "delivery_date" => date("Y-m-d H:i:s"),
         "date_add" => date("Y-m-d H:i:s"),

@@ -1,4 +1,5 @@
 <?PHP
+
 class Panier {
 
     private $panier = array();
@@ -37,9 +38,12 @@ class Panier {
         @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) + round($montant_produit_ttc - $montant_produit_ttc / 1.196, 2);
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) + round($montant_produit_ttc, 2);
         @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
-
-
         @$this->panier[$n][$refproduit]['name'] = $name;
+
+        if ($_SESSION["user"]["customer_group"] == 1) {
+            $this->applyProDiscount();
+        }
+
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
     }
@@ -153,6 +157,28 @@ class Panier {
         }
     }
 
+    public function applyProDiscount() {
+        $total_discount = 0;
+        $discount = 0;
+        $reduction = 5;
+
+        foreach ($_SESSION["cart"] as $i => $items) {
+            foreach ($items as $ref => $item) {
+                if (!empty($ref)) {
+                    if (empty($item["pro_discounted"])) {
+                        $discount = round($_SESSION["cart"][$i][$ref]["prixttc"] * $reduction / 100, 2);
+                        $total_discount = $discount;
+                        $_SESSION["cart"][$i][$ref]["discount"] = $discount;
+                        $_SESSION["cart"][$i][$ref]["pro_discounted"] = 1;
+                    }
+                }
+            }
+        }
+        if ($total_discount >= 0) {
+            $_SESSION["cart_summary"]["total_discount"] = $total_discount;
+        }
+    }
+
     // afficher la liste des articles (et accessoirement, leur quantit?)
 
     public function showCart() {
@@ -172,6 +198,7 @@ class Panier {
                     $list[$i]["prixttc"] = $data['prixttc'];
                     $list[$i]["discount"] = $data['discount'];
                     $list[$i]["voucher_code"] = $data['voucher_code'];
+                    $list[$i]["pro_discounted"] = $data['pro_discounted'];
 
                     //les options
                     if (!empty($this->panier[$i][$ref]['options'])) {
@@ -208,5 +235,6 @@ class Panier {
     }
 
 }
+
 // fin de la classe
 ?>

@@ -51,7 +51,11 @@
                         <td class="dimensions"><em>N/A</em></td>
                     {/if}                                        
                     <td class="quantite">{$product.quantity}</td>
-                    <td class="total">{$product.prixttc} €</td>
+                    <td class="total">{$product.prixttc - $product.discount} €
+                        {if $product.pro_discounted}
+                            <em>dont remise pro ({$product.discount})</em>
+                        {/if}
+                    </td>
                     <td><form action="?cart" method="post">
                             <input type="hidden" name="id_cart_item" value="{$array_key}">
                             <input type="hidden" name="id_product" value="{$product.id}">
@@ -66,13 +70,13 @@
     </table>
 
     <div class="promo clearfix">
-        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
+        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits-$smarty.session.cart_summary.total_discount}€</span></p>
     </div>
     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
         {if empty($smarty.session.user.delivery.address1)}
             <p>Merci de renseigner votre adresse complète de livraison.</p>
             <a href="?register"><button>Mon compte</button></a>
-            {else}
+        {else}
             <a href="?delivery"><button id="btn-livraison"></button></a>
             {/if}
         {else}

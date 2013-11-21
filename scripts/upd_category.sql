@@ -1,0 +1,2 @@
+update `av_product` set `min_width`=null, `min_height`=null, `max_width`=null, `max_height`=null where `id_category` = 19;
+update `av_product` set `min_width`=null, `min_height`=null, `max_width`=null, `max_height`=null where `id_category` = 17;

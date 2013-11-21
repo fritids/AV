@@ -24,14 +24,7 @@ $mail->CharSet = 'UTF-8';
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
-function getItemTourneeinfo($odetail) {
-    global $db;
-    $r = $db->where("id_order_detail", $odetail)
-            ->where("status", 2)
-            ->get("av_tournee");
-    if ($r)
-        return($r[0]);
-}
+
 
 if (isset($_GET["id_order"]))
     $oid = $_GET["id_order"];
@@ -287,19 +280,23 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     <div class="row">
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Contact</div>
+                <div class="panel-heading">Contact <div class="pull-right">
+                        <a href="av_customer_view.php?id_customer=<?=$customer_info["id_customer"]?>"><span class="glyphicon glyphicon-user"></span></a>
+                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=$customer_info["id_customer"]?>"><span class="glyphicon glyphicon-edit"></span></a>
+                    </div>
+                </div>
                 <div class="panel-body">
                     Nom : <?= @$customer_info["firstname"] ?> <br>
                     Prénom :<?= @$customer_info["lastname"] ?> <br>
                     Email : <?= @$customer_info["email"] ?> <br>                        
-
+                    
                 </div>
             </div>            
         </div>
 
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Livraison</div>
+                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=@$customer_delivery["id_address"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_delivery["phone"] ?><br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_delivery["phone_mobile"] ?> <br>
@@ -311,7 +308,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         </div>
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Facturation</div>
+                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=@$customer_invoice["id_address"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_invoice["phone"] ?> <br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_invoice["phone_mobile"] ?> <br>
@@ -327,7 +324,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     <div class="row">
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Paiement</div>
+                <div class="panel-heading">Paiement </div>
                 <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
                     Mode : <?= $orderinfo["payment"] ?><br>                        
                     Payé le : <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
@@ -337,7 +334,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         </div>
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Commande</div>
+                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=$orderinfo["id_order"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     N° :  <?= $orderinfo["id_order"] ?> reference :  <?= $orderinfo["reference"] ?><br>
                     Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
@@ -403,8 +400,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         <div class="row">
             <div class="col-xs-12">
                 <h2>Produits</h2>
-                <ul class="nav nav-tabs ">
-                    <li><a href="#Produits" data-toggle="tab">Produits</a></li>
+                <ul class="nav nav-pills">
+                    <li class="active"><a href="#Produits" data-toggle="tab">Produits</a></li>
                     <li><a href="#bdc" data-toggle="tab">Bon de commande</a></li>
                 </ul>
                 <form method="post">

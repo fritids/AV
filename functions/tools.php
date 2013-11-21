@@ -64,5 +64,13 @@ function getDeliveryZone($postcode) {
         return ($z[0]["nom"]);
 }
 
+function getItemTourneeinfo($odetail) {
+    global $db;
+    $r = $db->where("id_order_detail", $odetail)
+            ->where("status", 2)
+            ->get("av_tournee");
+    if ($r)
+        return($r[0]);
+}
 
 ?>

@@ -1,7 +1,9 @@
 <?php
 // MySQL host name, user name, password, database, and table
-include ("../configs/settings.php");
+
 include ("header.php");
+require_once ("../configs/settings.php");
+
 $opts['tb'] = 'av_truck';
 
 // Name of field which is the unique key

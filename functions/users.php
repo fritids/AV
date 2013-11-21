@@ -89,6 +89,9 @@ function getCustomerDetail($id) {
     $r = $db->where("id_customer", $id)
             ->get("av_customer");
 
+    $r[0]["delivery"] = getAdresse($id, "delivery");
+    $r[0]["invoice"] = getAdresse($id, "invoice");
+
     return $r[0];
 }
 

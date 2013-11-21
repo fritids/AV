@@ -70,15 +70,17 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
     }
 
     /* on bloque le camion pour la date livraison */
-    $infoTruckPlanning = array(
-        "id_truck" => $id_truck,
-        "date_delivery" => $date_livraison,
-        "date_add" => date("Y-m-d H:i:s"),
-        "status" => 1
-    );
+    /* $infoTruckPlanning = array(
+      "id_truck" => $id_truck,
+      "date_delivery" => $date_livraison,
+      "date_add" => date("Y-m-d H:i:s"),
+      "status" => 1
+      );
 
-    $r = $db->insert("av_truck_planning", $infoTruckPlanning);
 
+      $r = $db->insert("av_truck_planning", $infoTruckPlanning);
+     */
+    
     /* on passe les produits en livraison prévu */
     $orderDetails = $db->rawQuery("select id_order_detail from av_tournee where id_truck = ? and date_livraison = ? and status = 2", array($id_truck, $date_livraison));
 
@@ -292,7 +294,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                 </tr>
                                 <tr>
                                     <td colspan="9">
-                                        <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Valider</button>
+                                        <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Sauvegarder</button>
                                     </td>
                                 </tr>
                             </table>
@@ -331,8 +333,8 @@ foreach ($listOrderProduct as $OrderProduct) {
     $addrs_link = str_replace(' ', '+', $addrs);
     $addrs_link = str_replace('<br>', '+', $addrs_link);
     $addrs_link = str_replace('"', '', $addrs_link);
-	    $addrs_link = str_replace('\'', '', $addrs_link);
-		
+    $addrs_link = str_replace('\'', '', $addrs_link);
+
     $i++;
 
     $addrs_link = $addrs_link;

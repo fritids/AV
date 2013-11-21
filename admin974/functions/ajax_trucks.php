@@ -21,7 +21,6 @@ function addtruckTournee($id) {
         "date_livraison" => $imp[3],
         "nb_product_delivered" => $imp[4],
         "status" => 1,
-        "position" => 21,
     );
 
     $r = $db->insert("av_tournee", $info);

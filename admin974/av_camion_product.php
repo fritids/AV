@@ -1,6 +1,7 @@
 <?php
-include ("../configs/settings.php");
+
 include ("header.php");
+require_once ("../configs/settings.php");
 
 $opts['tb'] = 'av_camion_product';
 

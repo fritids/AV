@@ -1,7 +1,7 @@
 <?php
 include ("header.php");
 // MySQL host name, user name, password, database, and table
-include ("../configs/settings.php");
+require_once ("../configs/settings.php");
 
 
 $opts['tb'] = 'admin_user';

@@ -1,5 +1,5 @@
 <?php
-include ("../configs/settings.php");
+require_once ("../configs/settings.php");
 include ("header.php");
 include ("../functions/products.php");
 include ("../functions/orders.php");

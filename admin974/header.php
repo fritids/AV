@@ -105,12 +105,12 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogues <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_product.php">Produits</a></li>
-                                    <li><a href="av_category.php">Categories</a></li>
+                                    <li><a href="av_product.php">Produits</a></li>                                    
                                     <li><a href="av_product_attribute.php">Caracteristiques</a></li>
                                     <li><a href="av_product_caract.php">Options</a></li>
                                     <li><a href="av_product_images.php">Images</a></li>     
                                     <li class="divider"></li>
+                                    <li><a href="av_category.php">Categories</a></li>
                                     <li><a href="av_attributes.php">Attributs</a></li>                                    
                                 </ul>
                             </li>     
@@ -123,8 +123,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php">Commandes</a></li>
-                                    <li><a href="av_customer.php">Clients</a></li>
+                                    <li><a href="av_orders.php">Commandes</a></li>                                    
                                     <li><a href="av_address.php">Adresses</a></li>
                                 </ul>
                             </li>  
@@ -153,7 +152,6 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <ul class="dropdown-menu">
                                     <li><a href="admin_user.php">Utilisateurs</a></li>
                                     <li class="divider"></li>
-                                    <li><a href="av_range_weight.php">Frais de port</a></li>
                                     <li><a href="av_zone.php">Zones</a></li>
                                     <li><a href="av_departements.php">Departement / Zones </a></li>
                                     <li class="divider"></li>

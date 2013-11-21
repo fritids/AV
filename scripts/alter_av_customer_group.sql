@@ -1,1 +1,1 @@
-ALTER TABLE  `av_customer` ADD  `group` INT NULL DEFAULT  '0';
+ALTER TABLE  `av_customer` ADD  `customer_group` INT NULL DEFAULT  '0';
