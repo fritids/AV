@@ -28,13 +28,31 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <link rel="stylesheet" href="css/date-picker.css" type="text/css" media="screen"/>
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
         <link href="css/bootstrap.css" rel="stylesheet">
-		<link rel="stylesheet" href="css/dragdrop.css">
+        <link rel="stylesheet" href="css/dragdrop.css">
         <!-- tinyMCE -->
         <script language="javascript" type="text/javascript" src="tinymce/tinymce.min.js"></script>
         <script language="javascript" type="text/javascript">
             tinyMCE.init({
                 mode: "specific_textareas",
-                auto_reset_designmode: true
+                auto_reset_designmode: true,
+                theme: "modern",
+                width: "800",
+                height: "200",
+                plugins: "table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image, fullscreen",
+                theme_advanced_buttons1_add_before: "save,separator",
+                theme_advanced_buttons1_add: "fontselect,fontsizeselect",
+                theme_advanced_buttons2_add: "separator,insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",
+                theme_advanced_buttons2_add_before: "cut,copy,paste,separator,search,replace,separator",
+                theme_advanced_buttons3_add_before: "tablecontrols,separator",
+                theme_advanced_buttons3_add: "emotions,iespell,flash,advhr,separator,print",
+                theme_advanced_toolbar_location: "top",
+                theme_advanced_toolbar_align: "left",
+                theme_advanced_path_location: "bottom",
+                content_css: "example_full.css",
+                plugin_insertdate_dateFormat: "%Y-%m-%d",
+                plugin_insertdate_timeFormat: "%H:%M:%S",
+                extended_valid_elements: "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+
             });
         </script>
         <!-- /tinyMCE -->
@@ -82,15 +100,18 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">                        
                         <?
-                        if ($_SESSION['role'] == "ADMIN" ) {
+                        if ($_SESSION['role'] == "ADMIN") {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogues <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="av_product.php">Produits</a></li>
+                                    <li><a href="av_category.php">Categories</a></li>
                                     <li><a href="av_product_attribute.php">Caracteristiques</a></li>
                                     <li><a href="av_product_caract.php">Options</a></li>
-                                    <li><a href="av_product_images.php">Images</a></li>                                
+                                    <li><a href="av_product_images.php">Images</a></li>     
+                                    <li class="divider"></li>
+                                    <li><a href="av_attributes.php">Attributs</a></li>                                    
                                 </ul>
                             </li>     
                             <?
@@ -141,13 +162,14 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li><a href="av_camion.php">Camions</a></li>                                
                                     <li class="divider"></li>
                                     <li><a href="av_cms_lang.php">Contenu manager</a></li>                                    
+                                    
                                 </ul>
                             </li>  
                             <?
                         }
                         ?>  
-                            <?
-                        if ($_SESSION['role'] == "ADMIN"|| $_SESSION['role'] == "COMMANDE") {
+                        <?
+                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE") {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Devis <b class="caret"></b></a>
@@ -162,7 +184,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         ?>  
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                                    
+
                         <li><a href="logout.php">Deconnexion</a></li>                        
                     </ul>
                 </div><!--/.nav-collapse -->

@@ -116,6 +116,30 @@ $opts['fdd']['description'] = array(
     'cols' => 50),
   'sort'     => true
 );
+$opts['fdd']['meta_title'] = array(
+    'name' => 'Meta Titre',
+    'select' => 'T',
+    'maxlen' => 128,
+    'sort' => true
+);
+$opts['fdd']['meta_description'] = array(
+    'name' => 'Meta description',
+    'select' => 'T',
+    'maxlen' => 255,
+    'sort' => true
+);
+$opts['fdd']['meta_keywords'] = array(
+    'name' => 'Meta mot clés',
+    'select' => 'T',
+    'maxlen' => 255,
+    'sort' => true
+);
+$opts['fdd']['link_rewrite'] = array(
+  'name'     => 'Lien',
+  'select'   => 'T',
+  'maxlen'   => 128,
+  'sort'     => true
+);
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

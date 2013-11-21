@@ -56,7 +56,8 @@
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}
-                                            {if $detail.attributes}
+                                            {if $detail.combinations}
+                                                <br>
                                                 {foreach key=key item=attribute from=$detail.combinations}
                                                     {$attribute.name}
                                                 {/foreach}

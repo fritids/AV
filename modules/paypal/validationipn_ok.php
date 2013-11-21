@@ -9,33 +9,6 @@ include('./ipnlistener.php');
 require('../../configs/settings.php');
 require('../../classes/MysqliDb.php');
 require('../../functions/orders.php');
-require('../../libs/Smarty.class.php');
-require('../../classes/class.phpmailer.php');
-require('../../classes/tcpdf.php');
-
-$now = date("d-m-y");
-
-$smarty = new Smarty;
-$smarty->addTemplateDir(array('../../templates/mails', '../../templates/', '../../templates/pdf/', '../../templates/pdf/front/'));
-$smarty->setCompileDir('../../templates_c/');
-
-$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Allovitre');
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-$pdf->SetFont('times', '', 10);
-$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
-
-
-//Create a new PHPMailer instance
-$mail = new PHPMailer();
-//Set who the message is to be sent from
-$mail->SetFrom($confmail["from"]);
-$mail->CharSet = 'UTF-8';
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
@@ -136,38 +109,7 @@ if ($verified) {
         $db->insert("av_order_payment", $order_payment);
 
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
-        
-        $orderinfo = getOrderInfos($oid);
-
-        $smarty->assign("orderinfo", $orderinfo);
-
-        $content_body = $smarty->fetch('notif_order_payment.tpl');
-        $invoice = $smarty->fetch('front_order.tpl');
-
-        $pdf->AddPage('P', 'A4');
-        $pdf->writeHTML($invoice, true, false, true, false, '');
-        $pdf->lastPage();
-
-        $pdf->Output("AV_FA_" . $oid . "_" . $now . ".pdf", 'F');
-
-        $mail->AddAddress($orderinfo["customer"]["email"]);
-        $mail->Subject = $confmail["commande_new"] . " " . $oid;
-
-        $pdf_file = "AV_FA_" . $oid . "_" . $now . ".pdf";
-
-        $pdf->AddPage('P', 'A4');
-        $pdf->writeHTML($invoice, true, false, true, false, '');
-        $pdf->lastPage();
-        $pdf->Output("../../tmp/" . $pdf_file, 'F');
-        
-        $mail->MsgHTML($content_body);
-        $mail->AddAttachment("../../tmp/" . $pdf_file);
-        foreach ($monitoringEmails as $bccer) {
-            $mail->AddBCC($bccer);
-        }
-        
-        $mail->Send();
-        //unlink("../../tmp/" . $pdf_file);        
+        mail("stef.eugene@wanadoo.fr", 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
     }
 } else {
     // manually investigate the invalid IPN

@@ -14,15 +14,15 @@ $smarty->caching = 0;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
 $smarty->setTemplateDir(array('../templates', '../templates/mails/', '../templates/mails/admin', '../templates/pdf', '../templates/pdf/admin'));
 
-$date_livraison = "2013-11-19";
+$date_livraison = $_GET["delivery_date"];
 
 $r = $db->rawQuery("select distinct a.id_order, a.date_livraison, horaire, comment1, comment2, comment3, firstname, lastname, email
 from av_tournee a, av_order_detail b, av_orders c, av_customer d
 where a.id_order_detail = b.id_order_detail
 and a.id_order = c.id_order
 and c.id_customer = d.id_customer
-and a.id_truck = ?
-and date(a.date_livraison) = ?", array(7,$date_livraison));
+and a.mail_send = 0
+and date(a.date_livraison) = ?", array($date_livraison));
 
 //Create a new PHPMailer instance
 $mail = new PHPMailer();
@@ -47,7 +47,11 @@ foreach ($r as $k => $contact) {
 
     if ($mail->Send()) {
 
-        echo "envoi mail order#" . $contact["id_order"] . " " . $contact["firstname"] . " " . $contact["lastname"]. "<br>";
+        echo "envoi mail order#" . $contact["id_order"] . " " . $contact["firstname"] . " " . $contact["lastname"] . "<br>";
+
+        $r = $db->where("id_order", $contact["id_order"])
+                ->update("av_tournee", array("mail_send" => 1));
+
         $param = array(
             "id_order" => $contact["id_order"],
             "id_user" => $_SESSION["user_id"],
@@ -56,6 +60,5 @@ foreach ($r as $k => $contact) {
 
         $r = $db->insert("av_order_bdc", $param);
     }
-    
 }
 ?>

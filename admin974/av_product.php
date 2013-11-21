@@ -155,8 +155,8 @@ $opts['fdd']['description_short'] = array(
     'maxlen' => 65535,    
     'textarea' => array(
         'html' => true,
-        'rows' => 5,
-        'cols' => 50),
+        'rows' => 20,
+        'cols' => 100),
     'sort' => true,
     'width' => '200px'
 );
@@ -181,13 +181,6 @@ $opts['fdd']['min_height'] = array(
     'maxlen' => 11,
     'sort' => true
 );
-$opts['fdd']['max_surface'] = array(
-    'name' => 'Surface Max.',
-    'options' =>'AC',
-    'select' => 'T',
-    'maxlen' => 11,
-    'sort' => true
-);
 $opts['fdd']['max_width'] = array(
     'name' => 'Largeur Max',
     'options' =>'AC',
@@ -202,6 +195,55 @@ $opts['fdd']['max_height'] = array(
     'maxlen' => 11,
     'sort' => true
 );
+$opts['fdd']['min_area_invoiced'] = array(
+    'name' => 'Surface Min. facturé',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 11,
+    'sort' => true
+);
+$opts['fdd']['max_area_invoiced'] = array(
+    'name' => 'Surface Max. facturé',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 11,
+    'sort' => true
+);
+$opts['fdd']['position'] = array(
+    'name' => 'Position',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 11,
+    'sort' => true
+);
+$opts['fdd']['meta_title'] = array(
+    'name' => 'Meta Titre',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 128,
+    'sort' => true
+);
+$opts['fdd']['meta_description'] = array(
+    'name' => 'meta description',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 255,
+    'sort' => true
+);
+$opts['fdd']['meta_keywords'] = array(
+    'name' => 'Meta mots clés',
+    'options' =>'AC',
+    'select' => 'T',
+    'maxlen' => 255,
+    'sort' => true
+);
+$opts['fdd']['link_rewrite'] = array(
+  'name'     => 'URL Friendly',
+  'select'   => 'T',
+  'maxlen'   => 128,
+  'sort'     => true
+);
+
 
 // Now important call to phpMyEdit
 //require_once 'phpMyEdit.class.php';

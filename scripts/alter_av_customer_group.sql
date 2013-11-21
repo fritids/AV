@@ -1,0 +1,1 @@
+ALTER TABLE  `av_customer` ADD  `group` INT NULL DEFAULT  '0';

@@ -42,7 +42,7 @@ $confmail["devis_contact"] = "stephane.alamichel@gmail.com";
 $confmail["devis_subject"] = "Nouvelle demande de devis";
         
         
-$monitoringEmail = "stephane.alamichel@gmail.com, benoit@trusttelecom.fr";
+$monitoringEmail = "stephane.alamichel@gmail.com";
 $monitoringEmails = array("stephane.alamichel@gmail.com");
 
 define("CMCIC_CLE", "182A5C7FB0AD605886A46193E5E97278D7A5DD9A");

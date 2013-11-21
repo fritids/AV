@@ -165,18 +165,18 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
         $pdf->SetFont('times', '', 11);
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        $pdf->AddPage("L","A4");
+        $pdf->AddPage("L", "A4");
         $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
         $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
-        
+
         $smarty->assign("supplier", $orderSupplier);
         $smarty->assign("orderinfo", $orderinfo);
         $smarty->assign("user_email", $_SESSION["email"]);
         $smarty->assign("orderdetail", $orderDetailSupplier);
         $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
         $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
-        
+
         $pdf->writeHTML($bdc_pdf_body, true, false, true, false, '');
         $pdf->lastPage();
 
@@ -212,7 +212,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                 );
                 $r = $db->insert("av_order_bdc", $param);
             }
-            
+
             $orderinfo = getOrderInfos($oid);
         }
     }
@@ -532,14 +532,16 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     <?
                                     if ($orderinfo["history"])
                                         foreach ($orderinfo["history"] as $odh) {
-                                            ?>
-                                            <tr>
-                                                <td><?= $odh["prenom"] ?></td>
-                                                <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
-                                                <td><?= $odh["supplier_name"] ?></td>
-                                                <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
-                                            </tr>
-                                            <?
+                                            if ($odh["bdc_filename"]) {
+                                                ?>
+                                                <tr>
+                                                    <td><?= $odh["prenom"] ?></td>
+                                                    <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
+                                                    <td><?= $odh["supplier_name"] ?></td>
+                                                    <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
+                                                </tr>
+                                                <?
+                                            }
                                         }
                                     ?>
 

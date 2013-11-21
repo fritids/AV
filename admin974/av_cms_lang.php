@@ -92,6 +92,15 @@ $opts['fdd']['id_cms'] = array(
   'default'  => '0',
   'sort'     => true
 );
+$opts['fdd']['content'] = array(
+  'name'     => 'Content',
+  'select'   => 'T',
+  'maxlen'   => -1,
+  'textarea' => array(
+    'rows' => 40,
+    'cols' => 150),
+  'sort'     => true
+);
 $opts['fdd']['meta_title'] = array(
   'name'     => 'Meta title',
   'select'   => 'T',
@@ -105,20 +114,18 @@ $opts['fdd']['meta_description'] = array(
   'sort'     => true
 );
 $opts['fdd']['meta_keywords'] = array(
-  'name'     => 'Meta keywords',
+  'name'     => 'Meta mots clés',
   'select'   => 'T',
   'maxlen'   => 255,
   'sort'     => true
 );
-$opts['fdd']['content'] = array(
-  'name'     => 'Content',
+$opts['fdd']['link_rewrite'] = array(
+  'name'     => 'Lien',
   'select'   => 'T',
-  'maxlen'   => -1,
-  'textarea' => array(
-    'rows' => 5,
-    'cols' => 50),
+  'maxlen'   => 128,
   'sort'     => true
 );
+
 
 // Now important call to phpMyEdit
 require_once 'extensions/phpMyEdit-mce-cal.class.php';

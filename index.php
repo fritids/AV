@@ -717,9 +717,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
     }
 }
 if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
-
+    
     if ($_POST["id_devis"]) {
-
+        
         $mail->ClearAllRecipients();
 
         $did = $_POST["id_devis"];
