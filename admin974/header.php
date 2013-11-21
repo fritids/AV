@@ -61,6 +61,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
         <script src="js/jquery.chained.js"></script>        
         <script src="js/bootstrap.min.js"></script>
+
         <script>
             $(function() {
                 $("#datepicker").datepicker({
@@ -124,7 +125,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="av_orders.php">Commandes</a></li>                                    
-                                    <li><a href="av_address.php">Adresses</a></li>
+                                    <li><a href="av_customer.php">Clients</a></li>
                                 </ul>
                             </li>  
                             <?
@@ -160,7 +161,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li><a href="av_camion.php">Camions</a></li>                                
                                     <li class="divider"></li>
                                     <li><a href="av_cms_lang.php">Contenu manager</a></li>                                    
-                                    
+
                                 </ul>
                             </li>  
                             <?

@@ -51,7 +51,7 @@ $opts['fdd']['lastname'] = array(
     'select' => 'T',
     'maxlen' => 32,
     'sort' => true,
-    'URL' => 'av_address.php?c=$key'
+    'URL' => 'av_customer_view.php?id_customer=$key'
 );
 $opts['fdd']['email'] = array(
     'name' => 'Email',

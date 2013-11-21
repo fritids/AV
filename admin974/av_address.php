@@ -59,12 +59,6 @@ $opts['fdd']['id_address'] = array(
     'sort' => true
 );
 
-$opts['fdd']['alias'] = array(
-    'name' => 'Type',
-    'select' => 'T',
-    'maxlen' => 128,
-    'sort' => true
-);
 $opts['fdd']['address1'] = array(
     'name' => 'Adresse 1',
     'select' => 'T',

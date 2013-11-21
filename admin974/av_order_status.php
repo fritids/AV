@@ -92,6 +92,12 @@ $opts['fdd']['id_statut'] = array(
   'default'  => '0',
   'sort'     => true
 );
+$opts['fdd']['id_level'] = array(
+  'name'     => 'Categorie',
+  'select'   => 'T',
+  'maxlen'   => 1,
+  'sort'     => true
+);
 $opts['fdd']['title'] = array(
   'name'     => 'Title',
   'select'   => 'T',

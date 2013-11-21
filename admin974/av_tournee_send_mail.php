@@ -16,7 +16,7 @@ $smarty->setTemplateDir(array('../templates', '../templates/mails/', '../templat
 
 $date_livraison = $_GET["delivery_date"];
 
-$r = $db->rawQuery("select distinct a.id_order, a.date_livraison, horaire, comment1, comment2, comment3, firstname, lastname, email
+$r = $db->rawQuery("select distinct a.id_order, a.id_truck, a.date_livraison, horaire, comment1, comment2, comment3, firstname, lastname, email
 from av_tournee a, av_order_detail b, av_orders c, av_customer d
 where a.id_order_detail = b.id_order_detail
 and a.id_order = c.id_order
@@ -57,6 +57,15 @@ foreach ($r as $k => $contact) {
             "id_user" => $_SESSION["user_id"],
             "category" => "mail_livraison",
         );
+
+        /* on change le status des ligne de detail en livraison fixé*/
+        $orderDetails = $db->rawQuery("select id_order_detail from av_tournee where id_truck = ? and date_livraison = ? and id_order and status = 2", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"], ));
+
+        foreach ($orderDetails as $orderDetail) {
+            $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
+                    ->update("av_order_detail", array("product_current_state" => 19, "date_upd" => date("Y-m-d H:i:s")));
+        }
+
 
         $r = $db->insert("av_order_bdc", $param);
     }

@@ -37,6 +37,10 @@ function delProduitTournee($id) {
 
     $r = $db->where("id_order_detail", $id)
             ->delete("av_tournee");
+
+    $r = $db->where("id_order_detail", $id)
+            ->update("av_order_detail", array("product_current_state" => 17));
+
     if ($r)
         return(json_encode($id . "ok"));
 }

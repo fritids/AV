@@ -174,7 +174,7 @@ $suppliers = $db->get("av_supplier");
                           where id_truck not in (select id_truck from av_truck_planning where date_delivery = ?)", array($date_livraison));
 
 
-        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date, 
+        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
                     round(sum(product_quantity * ( product_width * product_height * product_depth) / 1000000000),2) order_volume,
                     sum(product_quantity * product_weight) tot_weight
                     from av_orders a, av_order_detail b, av_address c, av_customer d
@@ -251,7 +251,7 @@ $suppliers = $db->get("av_supplier");
                                 <th><?= $order["total_paid"] ?> €</th>        
                                 <th>&nbsp; </th>        
                                 <th><?= $order["tot_weight"] ?> Kg</th>        
-                                <th colspan="3">Actions</th>        
+                                <th colspan="3"><?= $order["order_comment"] ?></th>        
                             </tr>
                             <?
                             $queryOrderDetail = "select a.id_order, b.*,

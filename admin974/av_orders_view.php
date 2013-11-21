@@ -289,7 +289,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                     Nom : <?= @$customer_info["firstname"] ?> <br>
                     Prénom :<?= @$customer_info["lastname"] ?> <br>
                     Email : <?= @$customer_info["email"] ?> <br>                        
-                    
+                    Type : <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
                 </div>
             </div>            
         </div>

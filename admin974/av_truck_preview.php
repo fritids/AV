@@ -69,6 +69,9 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
                 ->update("av_tournee", array("status" => 2));
     }
 
+
+    return true;
+
     /* on bloque le camion pour la date livraison */
     /* $infoTruckPlanning = array(
       "id_truck" => $id_truck,
@@ -80,16 +83,18 @@ function updValidTruck($id_truck, $date_livraison, $updinfos) {
 
       $r = $db->insert("av_truck_planning", $infoTruckPlanning);
      */
-    
-    /* on passe les produits en livraison prévu */
-    $orderDetails = $db->rawQuery("select id_order_detail from av_tournee where id_truck = ? and date_livraison = ? and status = 2", array($id_truck, $date_livraison));
 
-    foreach ($orderDetails as $orderDetail) {
-        $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
-                ->update("av_order_detail", array("product_current_state" => 19, "date_upd" => date("Y-m-d H:i:s")));
-    }
-    if ($r)
-        return true;
+    /* on passe les produits en livraison prévu */
+    /* $orderDetails = $db->rawQuery("select id_order_detail from av_tournee where id_truck = ? and date_livraison = ? and status = 2", array($id_truck, $date_livraison));
+
+      foreach ($orderDetails as $orderDetail) {
+      $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
+      ->update("av_order_detail", array("product_current_state" => 19, "date_upd" => date("Y-m-d H:i:s")));
+      }
+      if ($r)
+      return true;
+
+     */
 }
 
 function getTruckLoad($id) {
@@ -116,6 +121,7 @@ $poids_produits = 0;
 $montant_produits = 0;
 $qte_remaining = 0;
 $upd = false;
+$date_livraison = "";
 ?>
 
 <?
@@ -132,8 +138,9 @@ if (isset($_POST) && !empty($_POST)) {
     $r = updValidTruck($_POST["id_truck"], $_POST["date_livraison"], $updinfos);
 
     if ($r)
-        echo "<div class='alert alert-success text-center' > Camion validé <a href='av_bon_livraison.php?date_livraison=" . $_POST["date_livraison"] . "&id_truck=" . $_POST["id_truck"] . "'>bon livraison  </a></div>";
+        echo "<div class='alert alert-success text-center' > Camion validé <a href='av_bon_livraison.php?date_livraison=" . $_POST["date_livraison"] . "&id_truck=" . $_POST["id_truck"] . "' target='_blank'>bon livraison  </a></div>";
 
+    echo "<center><a href='av_tournee.php?planning=" . $_POST["date_livraison"] . "' class='btn' >Retour</a></center>";
     $upd = true;
 }
 
@@ -181,7 +188,7 @@ if (isset($_GET["planning"]) && !$upd) {
                 <tr>
                     <td>
                         <ul id="list-cmd" class="sortable list">
-                            <li id="cmd_<?php echo $OrderProduct["id_order"]; ?>">
+                            <li id="cmd_<?php echo @$OrderProduct["id_order"]; ?>">
                                 <table >
                                     <?
                                     //on boucle sur les produits
@@ -218,7 +225,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                             <input type="hidden" value="" name="order[<?= $OrderProduct["id_order"] ?>]">
                                             <tr>
                                                 <td>&nbsp;</td>
-                                                <th colspan="2"><?= $OrderProduct["reference"] ?></th>
+                                                <th colspan="2"><a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>" class="fancybox"  ><?= $OrderProduct["reference"] ?></a></th>
                                                 <th colspan="2">
                                                     <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
                                                     <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
@@ -310,9 +317,9 @@ if (isset($_GET["planning"]) && !$upd) {
 
 <?
 $i = 0;
-
+if ($date_livraison) {
 // on recupère les produits affectés au camion
-$listOrderProduct = $db->rawQuery("select distinct a.id_customer, a.id_address_delivery
+    $listOrderProduct = $db->rawQuery("select distinct a.id_customer, a.id_address_delivery
                         from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail    
@@ -322,36 +329,38 @@ $listOrderProduct = $db->rawQuery("select distinct a.id_customer, a.id_address_d
                         order by c.position asc
                         ", array($truck["id_truck"], $date_livraison));
 
-foreach ($listOrderProduct as $OrderProduct) {
-    $customer = getOrderUserDetail($OrderProduct["id_customer"]);
-    $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
+    foreach ($listOrderProduct as $OrderProduct) {
+        $customer = getOrderUserDetail($OrderProduct["id_customer"]);
+        $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
 
-    $addrs = $adresse["address1"] . "<br>";
-    if ($adresse["address2"])
-        $addrs .= $adresse["address2"] . "<br>";
-    $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-    $addrs_link = str_replace(' ', '+', $addrs);
-    $addrs_link = str_replace('<br>', '+', $addrs_link);
-    $addrs_link = str_replace('"', '', $addrs_link);
-    $addrs_link = str_replace('\'', '', $addrs_link);
+        $addrs = $adresse["address1"] . "<br>";
+        if ($adresse["address2"])
+            $addrs .= $adresse["address2"] . "<br>";
+        $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+        $addrs_link = str_replace(' ', '+', $addrs);
+        $addrs_link = str_replace('<br>', '+', $addrs_link);
+        $addrs_link = str_replace('"', '', $addrs_link);
+        $addrs_link = str_replace('\'', '', $addrs_link);
 
-    $i++;
+        $i++;
 
-    $addrs_link = $addrs_link;
+        $addrs_link = $addrs_link;
 
-    if ($i == 1) {
-        echo '<br><br><a target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
-    } else {
-
-        if ($i == 20) {
-            echo '+to:+' . $addrs_link . '">Lien GG map</a><br><br><a  target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
+        if ($i == 1) {
+            echo '<br><br><a target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
         } else {
-            echo '+to:+' . $addrs_link;
+
+            if ($i == 20) {
+                echo '+to:+' . $addrs_link . '">Lien GG map</a><br><br><a  target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
+            } else {
+                echo '+to:+' . $addrs_link;
+            }
         }
     }
+    echo '">Lien GG map</a>';
 }
-echo '">Lien GG map</a>';
 ?>
+
 <script>
 
     $("button[name='validTruck']").click(function() {
@@ -455,3 +464,4 @@ echo '">Lien GG map</a>';
 
     });
 </script>
+
