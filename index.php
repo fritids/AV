@@ -19,7 +19,7 @@ require('classes/tcpdf.php');
 
 $smarty = new Smarty;
 //$smarty->caching = 0;
-//$smarty->error_reporting = E_ALL & ~E_NOTICE;
+$smarty->error_reporting = E_ALL & ~E_NOTICE;
 $smarty->setTemplateDir(array('templates', 'templates/mails', 'templates/pdf/front'));
 
 /* init pdf */
@@ -72,6 +72,12 @@ $meta = array(
 );
 /**/
 
+/* redirection page - 1 */
+$url = explode("?", $_SERVER["HTTP_REFERER"]);
+$previous_page = $url[1];
+/* redirection page - 1 */
+
+
 //Caddie
 $cart = new Panier();
 
@@ -115,7 +121,7 @@ if (isset($_GET["cart"])) {
 
                 if ($surface < $productInfos["min_area_invoiced"])
                     $surface = $productInfos["min_area_invoiced"];
-                if ($surface > $productInfos["max_area_invoiced"])
+                if ($surface >= $productInfos["max_area_invoiced"])
                     $productInfos["price"] = $productInfos["price"] * 1.5;
 
                 $dimension = array(
@@ -392,7 +398,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "active" => 1,
         "date_add" => date("Y-m-d"),
         "date_upd" => date("Y-m-d"),
-        "customer_goup" => $group
+        "customer_group" => $group
     );
 
     //compte existe déjà on update
@@ -404,7 +410,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
             "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
-            "customer_goup" => $group
+            "customer_group" => $group
         );
 
         $invoice_adresse = array(
@@ -483,7 +489,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             $mail->Send();
         } else { //error creation
             $ko_msg = array("txt" => "Le compte existe déjà");
-            
+
             $page = "register";
 
             if ($group == 1)
@@ -496,9 +502,12 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 if (isset($_GET["action"]) && $_GET["action"] == "login") {
     $res = checkUserLogin($_POST["email"], $_POST["passwd"]);
     if (!$res) {
-        $ko_msg = array("txt" => "La connexion a échoué");
+        $ko_msg = array("txt" => "Mot de passe incorrect, demander un nouveau mot de passe");
         $page = "identification";
         $page_type = "full";
+    } else {
+        if (count($_SESSION["cart"]) > 0)
+            header("Location: index.php?cart");
     }
 }
 
@@ -530,7 +539,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     //on redirige sur la listes des commandes
     $page = "order-confirmation";
 
-    $smarty->assign('reference', $_SESSION["reference"]);
+    $smarty->assign('reference', $_SESSION["reference "]);
     $smarty->assign('payment', $payment);
 
     //on flush le caddie
@@ -566,12 +575,12 @@ if (isset($_GET["devis"])) {
 
         $r = $db->where("id_devis", $devis_id)
                 ->where("id_customer", $_SESSION["user"]["id_customer"])
-                ->update("av_devis", array("current_state" => 2));
+                ->update("av_devis ", array("current_state" => 2));
     }
     $smarty->assign('mydevis', $mydevis);
 }
 
-if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
+if (isset($_GET[" action"]) && $_GET["action"] == "send_devis") {
     $page = "contact-devis";
     $mail->ClearAllRecipients();
 
@@ -599,7 +608,6 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
     $mail->MsgHTML($mail_body);
     if ($mail->Send()) {
         $ok_msg = array("txt" => "Votre demande de devis a été envoyé");
-        $r = $db->insert("av_devis_request", $contact_infos);
     }
 }
 
@@ -627,7 +635,6 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
             );
 
             $cart->addItem($pid, $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
-
             foreach ($odd["combinations"] as $i => $attribute) {
                 $option_price = $attribute["prixttc"];
                 $option_name = $attribute["name"];
@@ -645,7 +652,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
 
             $cart->addItem($odd["id_devis_detail"], $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
         }
-    }   
+    }
 
     $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
 
@@ -764,7 +771,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
 /* session */
 $smarty->assign('user', null);
 if (@$_SESSION["is_logged"]) {
-    $smarty->assign('user', $_SESSION["user"]);
+    $smarty->assign('us er', $_SESSION["user"]);
 }
 
 
@@ -789,7 +796,6 @@ $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
 
 $smarty->display('index.tpl');
-
 ?>
 <?
 if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["user"]["email"] == "alamichel.s@free.fr") {
@@ -809,7 +815,7 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= @print_r($devisinfo); ?>
     <h1>Post</h1>
     <?= @print_r($_POST); ?>
-    
+
     <?
 }
 ?>

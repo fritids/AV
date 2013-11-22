@@ -281,8 +281,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         <div class="col-xs-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Contact <div class="pull-right">
-                        <a href="av_customer_view.php?id_customer=<?=$customer_info["id_customer"]?>"><span class="glyphicon glyphicon-user"></span></a>
-                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=$customer_info["id_customer"]?>"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>"><span class="glyphicon glyphicon-user"></span></a>
+                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>"><span class="glyphicon glyphicon-edit"></span></a>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -296,7 +296,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=@$customer_delivery["id_address"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_delivery["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_delivery["phone"] ?><br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_delivery["phone_mobile"] ?> <br>
@@ -308,7 +308,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         </div>
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=@$customer_invoice["id_address"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_invoice["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_invoice["phone"] ?> <br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_invoice["phone_mobile"] ?> <br>
@@ -334,7 +334,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         </div>
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?=$orderinfo["id_order"]?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     N° :  <?= $orderinfo["id_order"] ?> reference :  <?= $orderinfo["reference"] ?><br>
                     Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
@@ -441,8 +441,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     $isFournisseurOk = ($od["id_supplier"] != '' ) ? true : false;
                                     ?>
                                     <tr id="id0">
-                                        <td><?= $od["id_order_detail"] ?></td>
-                                        <td><?= $od["id_product"] ?> <?= $od["product_name"] ?> </td>
+                                        <td nowrap><?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></td>
+                                        <td><?= $od["product_name"] ?> </td>
                                         <td>
                                             <?
                                             foreach ($od["attributes"] as $attribute) {
@@ -469,7 +469,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                             </select>
                                         </td>
                                         <td>
-                                            <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
+                                            <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
                                                 <option value=""></option>
                                                 <?
                                                 foreach ($suppliers as $supplier) {
@@ -499,15 +499,17 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                             </table>                            
                             <div class="col-xs-3 pull-right">
                                 <div class="col-xs-12" >
+                                    <p id="idmsg"></p>
+                                </div>
+                                <div class="col-xs-12" >
                                     <p>
-
                                         <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
                                     </p>
                                     <?
                                     if ($isFournisseurOk) {
                                         ?>
                                         <p>
-                                            <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"   class="btn-lg btn-block btn-primary">
+                                            <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"   class="btn-lg btn-block btn-primary" id="btn_send_supplier">
                                         </p>
                                         <?
                                     }
@@ -608,9 +610,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
 </div>
 
-
 <script>
-
     $(function() {
         $(".datepicker").datepicker({
             changeMonth: true,
@@ -618,4 +618,10 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             dateFormat: "yy-mm-dd"
         });
     });
+
+    $(".supplier").change(function() {
+        $("#btn_send_supplier").attr("disabled", "disabled");
+        $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
+        $("#idmsg").addClass("alert alert-info");
+    })
 </script>

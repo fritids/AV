@@ -219,7 +219,7 @@
                 if (area < min_area_invoiced) {
                     area = min_area_invoiced;
                 }
-                if (area > max_area_invoiced) {
+                if (area >= max_area_invoiced) {
                     coef = 1.5;
                 }
 

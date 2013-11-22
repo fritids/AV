@@ -31,7 +31,7 @@
                             &nbsp;&nbsp;
                             <form action="/index.php?action=dl_devis" method="post">
                                 <input type="hidden" name="id_devis"  value="{$devis.id_devis}"/>
-                                <button type="submit" class="btn btn-primary btn-lg " value="{$devis.id_devis}">
+                                <button type="submit" class="afficher btn btn-primary btn-lg " value="{$devis.id_devis}" >
                                     Afficher
                                 </button>
                             </form>
@@ -49,7 +49,7 @@
                                 <span>Devis rejeté</span>
                             </td>                          
                         {/if}
-                        {if $devis.current_state == 3}
+                        {if $devis.current_state == 3 || $devis.current_state == 4}
                             <td class="commander">
                                 <span class="valide">Devis déjà payé</span>
                             </td>                          

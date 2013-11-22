@@ -5,10 +5,18 @@ include ("../functions/products.php");
 include ("../functions/devis.php");
 include ("../functions/users.php");
 include ("../functions/tools.php");
+include ("../functions/orders.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $devis = $db->get("av_devis");
 $did = "";
+
+
+if (isset($_GET["create_order"]) && isset($_POST["id_devis"])) {
+    $did = $_POST["id_devis"];
+    $cid = CreateOrder($did);
+}
+
 
 if (isset($_POST["id_devis"]) || isset($_GET["id_devis"])) {
     if (isset($_POST["id_devis"]))
@@ -25,8 +33,9 @@ if (isset($_POST["id_devis"]) || isset($_GET["id_devis"])) {
         $customer_invoice = getAdresse($deviss[0]["id_customer"], 'invoice');
     }
 }
-if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
-    $cid = $_POST["id_customer"];
+if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid)) {
+    if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "")
+        $cid = $_POST["id_customer"];
 
     $customer_info = getCustomerDetail($cid);
     $customer_delivery = getAdresse($cid, 'delivery');
@@ -94,19 +103,6 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
             </div>
 
             <div class="col-xs-3" >
-                <!--
-                <select name="id_devis" class="pme-input-0">
-                <?
-                foreach ($devis as $dev) {
-                    ?>
-                         <option value="<?= $dev["id_devis"] ?>"
-                    <? if ($dev["id_devis"] == $did && !empty($did)) echo "selected" ?>
-                         ><?= $dev["id_devis"] ?> <?= $dev["date_add"] ?></option>
-                    <?
-                }
-                ?>
-                    
-                </select>--->
                 <input type="submit" class="btn btn-sm btn-primary">
             </div>
         </div>
@@ -116,9 +112,9 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
 
 
 
-    <?
-    if (!empty($deviss)) {
-        ?>
+<?
+if (!empty($deviss)) {
+    ?>
         <div class="row">
             <div class="col-xs-4">
                 <table class="table table-bordered" >
@@ -144,100 +140,141 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
             <div class="col-xs-10 panel-group" id="accordion">
                 <div class="panel panel-default">               
 
-                    <?
-                    $i = 0;
-                    foreach ($deviss as $devis) {
-                        $i++
-                        ?>
+    <?
+    $i = 0;
+    foreach ($deviss as $devis) {
+        $i++
+        ?>
 
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i ?>">
-                                    <table class="table table-bordered table-condensed" style="margin-bottom: 0px" >
-                                        <tr>
-                                            <th>Devis :</th>
-                                            <td><?= $devis["id_devis"] ?></td>
-                                            <th>Montant :</th>
-                                            <td><?= $devis["total_paid"] ?> €</td>
-                                            <th>Date ajout :</th>
-                                            <td><?= $devis["date_add"] ?></td>
-                                            <th>Etat :</th>
-                                            <td class="
-                                            <?
-                                            switch ($devis["current_state"]) {
-                                                case 1:
-                                                    echo "alert alert-warning";
-                                                    break;
+                                <table class="table table-bordered table-condensed" style="margin-bottom: 0px;" >
+                                    <tr>
+                                        <th>
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i ?>">
+                                                <table class="table table-bordered table-condensed" style="margin-bottom: 0px" >
+                                                    <tr>
+                                                        <th>Devis :</th>
+                                                        <td><?= $devis["id_devis"] ?></td>
+                                                        <th>Montant :</th>
+                                                        <td><?= $devis["total_paid"] ?> €</td>
+                                                        <th>Date ajout :</th>
+                                                        <td><?= $devis["date_add"] ?></td>
+                                                        <th>Etat :</th>
+                                                        <td class="
+        <?
+        switch ($devis["current_state"]) {
+            case 1:
+                echo "alert alert-warning";
+                break;
 
-                                                case 2:
-                                                    echo "alert alert-danger";
-                                                    break;
-                                                case 3:
-                                                    echo "alert alert-success";
-                                                    break;
+            case 2:
+                echo "alert alert-danger";
+                break;
+            case 3:
+                echo "alert alert-success";
+                break;
+            case 4:
+                echo "alert alert-success";
+                break;
+        }
+        ?> "
+                                                            >
+                                                            <?
+                                                            switch ($devis["current_state"]) {
+                                                                case 1:
+                                                                    echo "En attente";
+                                                                    break;
+
+                                                                case 2:
+                                                                    echo "Rejeté";
+                                                                    break;
+                                                                case 3:
+                                                                    echo "Validé";
+                                                                    break;
+                                                                case 4:
+                                                                    echo "Commande créée";
+                                                                    break;
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </a>
+                                        </th>
+                                        <td>
+        <?
+        if ($devis["current_state"] == 1) {
+            ?>
+                                                <form action="?create_order" method="post">
+                                                    <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                    <button class="btn btn-default"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                                                </form> 
+            <?
+        } else if ($devis["current_state"] == 4) {
+            ?>
+                                                <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                                                <?
                                             }
-                                            ?> "
-                                                >
-                                                    <?= $devis["current_state"] ?>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                            ?>
+                                        </td>
+                                    </tr>
+                                </table>
 
-                                </a>
+
+
                             </h4>
                         </div>
                         <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
                             <div class="panel-body">
-                                <div class="col-xs-12">
-                                    <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
-                                        <tr>
-                                            <th>Produit</th>
-                                            <th>Attributs</th>
-                                            <th>Larg x Long</th>
-                                            <th>Prix Unit.</th>
-                                            <th>Poids Unit.</th>
-                                            <th>Quantity</th>
-                                            <th>Prix ttc</th>                        
-                                        </tr>
-                                        <?
-                                        foreach ($devis["details"] as $line) {
-                                            ?>
+                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Attributs</th>
+                                        <th>Larg x Long</th>
+                                        <th>Prix Unit.</th>
+                                        <th>Poids Unit.</th>
+                                        <th>Quantity</th>
+                                        <th>Prix ttc</th>                        
+                                    </tr>
+        <?
+        foreach ($devis["details"] as $line) {
+            ?>
 
-                                            <tr id="id0">
-                                                <td><?= $line["product_name"] ?></td>
-                                                <td>
+                                        <tr id="id0">
+                                            <td><?= $line["product_name"] ?></td>
+                                            <td>
+            <?
+            foreach ($line["combinations"] as $attribute) {
+                ?>
+                                                    <?= $attribute["name"] ?><br>
                                                     <?
-                                                    foreach ($line["combinations"] as $attribute) {
-                                                        ?>
-                                                        <?= $attribute["name"] ?><br>
-                                                        <?
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
-                                                <td><?= $line["product_price"] ?></td>
-                                                <td><?= $line["product_weight"] ?></td>
-                                                <td><?= $line["product_quantity"] ?></td>                                                             
-                                                <td><?= $line["total_price_tax_incl"] ?></td>                    
-                                            </tr>
-                                            <?
-                                        }
-                                        ?>
-                                    </table>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <?
-                    }
-                    ?>
-                </div>
-
-            </div>
+                                                }
+                                                ?>
+                                            </td>
+                                            <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
+                                            <td><?= $line["product_price"] ?></td>
+                                            <td><?= $line["product_weight"] ?></td>
+                                            <td><?= $line["product_quantity"] ?></td>                                                             
+                                            <td><?= $line["total_price_tax_incl"] ?></td>                    
+                                        </tr>
             <?
         }
         ?>
+                                </table>
+
+                            </div>
+                        </div>
+
+        <?
+    }
+    ?>
+                </div>
+
+            </div>
+    <?
+}
+?>
     </div>
 </div>
 

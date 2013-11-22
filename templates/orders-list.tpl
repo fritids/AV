@@ -23,7 +23,7 @@
                             <td class="action">{$order.statut_label}</td>
                             <td>
                                 <form action="/index.php?action=dl_facture" method="post">
-                                    <button type="submit" name="id_order" value="{$order.id_order}">Afficher</button>
+                                    <button type="submit" name="id_order" value="{$order.id_order}" class="afficher">Afficher</button>
                                 </form>
                             </td>
                         </tr>

@@ -1,0 +1,1 @@
+ALTER TABLE  `av_devis` ADD  `id_order` INT NULL;
