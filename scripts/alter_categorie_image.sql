@@ -1,0 +1,1 @@
+ALTER TABLE  `av_category` ADD  `image` VARCHAR( 128 ) NULL;

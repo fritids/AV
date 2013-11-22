@@ -251,7 +251,7 @@ $suppliers = $db->get("av_supplier");
                                 <th><?= $order["total_paid"] ?> €</th>        
                                 <th>&nbsp; </th>        
                                 <th><?= $order["tot_weight"] ?> Kg</th>        
-                                <th colspan="3"><?= $order["order_comment"] ?></th>        
+                                <th colspan="3"><?= @$order["order_comment"] ?></th>        
                             </tr>
                             <?
                             $queryOrderDetail = "select a.id_order, b.*,

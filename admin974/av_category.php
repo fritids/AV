@@ -63,6 +63,12 @@ $opts['fdd']['description'] = array(
     'cols' => 50),
   'sort'     => true
 );
+$opts['fdd']['image'] = array(
+  'name'     => 'Nom Image',
+  'select'   => 'T',
+  'maxlen'   => 128,
+  'sort'     => true
+);
 $opts['fdd']['meta_title'] = array(
     'name' => 'Meta Titre',
     'select' => 'T',

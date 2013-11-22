@@ -86,7 +86,8 @@ function getUserOrdersAddress($iaid) {
     $r = $db->where("id_address", $iaid)
             ->get("av_address");
 
-    $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
+    if ($r[0]["postcode"])
+        $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
 
     if ($r)
         return $r[0];
@@ -96,9 +97,10 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
     global $db;
     $params = array($oid, $id_supplier, $id_supplier);
 
-    $r = $db->rawQuery("SELECT a.*, b.name supplier_name
-                        FROM av_order_detail a LEFT OUTER JOIN av_supplier b 
-                        on (a.id_supplier = b.id_supplier)
+    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name
+                        FROM av_order_detail a
+                        LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
+                        LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
                         where id_order = ? 
                         and (IFNULL(?,0) = 0 OR a.id_supplier = ?)
                         ", $params);
@@ -195,7 +197,7 @@ function saveOrder() {
         "id_customer" => $_SESSION["user"]["id_customer"],
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
         "id_address_invoice" => $_SESSION["user"]["invoice"]["id_address"],
-        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"] ,
+        "total_paid" => $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"],
         "invoice_date" => date("Y-m-d H:i:s"),
         "delivery_date" => date("Y-m-d H:i:s"),
         "date_add" => date("Y-m-d H:i:s"),
@@ -204,7 +206,7 @@ function saveOrder() {
     );
 
     $oid = $db->insert("av_orders", $order_summary);
-    
+
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("reference" => str_pad($oid, 9, '0', STR_PAD_LEFT)));
 

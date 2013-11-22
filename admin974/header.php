@@ -119,7 +119,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         }
                         ?>
                         <?
-                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE") {
+                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE" || $_SESSION['role'] == "LOGISTIC") {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
@@ -132,7 +132,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         }
                         ?>
                         <?
-                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "LIVRAISON") {
+                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "LIVRAISON" || $_SESSION['role'] == "LOGISTIC") {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livraison <b class="caret"></b></a>

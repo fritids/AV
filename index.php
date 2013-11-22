@@ -19,7 +19,7 @@ require('classes/tcpdf.php');
 
 $smarty = new Smarty;
 //$smarty->caching = 0;
-$smarty->error_reporting = E_ALL & ~E_NOTICE;
+//$smarty->error_reporting = E_ALL & ~E_NOTICE;
 $smarty->setTemplateDir(array('templates', 'templates/mails', 'templates/pdf/front'));
 
 /* init pdf */
@@ -480,7 +480,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 
             //envoie mail
             $mail->AddAddress($_POST["email"]);
-            $mail->Subject = notif_new_account;
+            $mail->Subject = "Allovitres - " . $confmail["welcome"];
             $smarty->assign("email", $_POST["email"]);
             $smarty->assign("mdp", $_POST["passwd"]);
 
@@ -771,7 +771,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
 /* session */
 $smarty->assign('user', null);
 if (@$_SESSION["is_logged"]) {
-    $smarty->assign('us er', $_SESSION["user"]);
+    $smarty->assign('user', $_SESSION["user"]);
 }
 
 

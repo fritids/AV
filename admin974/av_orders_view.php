@@ -59,11 +59,14 @@ $customer_delivery = getAdresseById($orderinfo["id_address_delivery"]);
 $customer_invoice = getAdresseById($orderinfo["id_address_invoice"]);
 
 // pour le system de nav.
-$a = $db->rawQuery("select id_order from mv_orders where ? > id_order  order by id_order desc", array($oid));
-$b = $db->rawQuery("select id_order from mv_orders where id_order > ? order by id_order asc", array($oid));
+$a = $db->rawQuery("select id_order, current_state from mv_orders where ? > id_order  order by id_order desc", array($oid));
+$b = $db->rawQuery("select id_order, current_state from mv_orders where id_order > ? order by id_order asc", array($oid));
 
-$order_precedent = @$a[0]["id_order"];
-$order_suivant = @$b[0]["id_order"];
+/* $order_precedent = @$a[0]["id_order"];
+  $order_suivant = @$b[0]["id_order"];
+ */
+$order_precedent = @$a;
+$order_suivant = @$b;
 
 /* Update des combobox */
 if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"])) {
@@ -221,7 +224,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             <?
             if ($order_precedent) {
                 ?>
-                <a href="?id_order=<?= $order_precedent ?>"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>"><span class="glyphicon glyphicon-arrow-left"></span></a>
                 <?
             }
             ?>
@@ -230,11 +233,34 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             <?
             if ($order_suivant) {
                 ?>
-                <a href="?id_order=<?= $order_suivant ?>"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                <a href="?id_order=<?= $order_suivant[0]["id_order"] ?>"><span class="glyphicon glyphicon-arrow-right"></span></a>
                 <?
             }
             ?>
         </div>
+        <div class="col-xs-10">
+            <ul class="pagination">
+                <?
+                for ($i = 5; $i >= 0; $i--) {
+                    ?>
+                    <li ><a href="?id_order=<?= @$order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
+                    <?
+                }
+                ?>
+
+                <li><a href="#" ><strong><?= $oid ?></strong></a></li>
+                <?
+                for ($i = 0; $i <= 5; $i++) {
+                    ?>
+                    <li><a href="?id_order=<?= @$order_suivant[$i]["id_order"] ?>" class="alert-<?= @$order_suivant[$i]["current_state"] ?>"><?= @$order_suivant[$i]["id_order"] ?></a></li>
+                    <?
+                }
+                ?>
+
+            </ul>
+        </div>
+
+        
     </div>
     <?
     if (!empty($updated)) {
@@ -324,6 +350,16 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     <div class="row">
         <div class="col-xs-3">
             <div class="panel panel-default">
+                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-body">
+                    Référence :  <?= $orderinfo["reference"] ?><br>
+                    Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
+                    Total :  <?= $orderinfo["total_paid"] ?>€<br>
+                </div>
+            </div> 
+        </div>
+        <div class="col-xs-3">
+            <div class="panel panel-default">
                 <div class="panel-heading">Paiement </div>
                 <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
                     Mode : <?= $orderinfo["payment"] ?><br>                        
@@ -331,17 +367,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                     Total : <?= $orderPayment["amount"] ?> €<br>
                 </div>
             </div> 
-        </div>
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    N° :  <?= $orderinfo["id_order"] ?> reference :  <?= $orderinfo["reference"] ?><br>
-                    Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
-                    Total :  <?= $orderinfo["total_paid"] ?>€<br>
-                </div>
-            </div> 
-        </div>
+        </div>       
 
         <div class="col-xs-3">
             <div class="panel panel-default">

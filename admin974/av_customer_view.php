@@ -69,7 +69,7 @@ $productStates = $db->where("id_level", 1)
         </div>
         <div class="col-xs-4">
             <div class="panel panel-default">
-                    <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_info["invoice"]["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_info["invoice"]["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_info["invoice"]["phone"] ?> <br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_info["invoice"]["phone_mobile"] ?> <br>
@@ -101,25 +101,26 @@ $productStates = $db->where("id_level", 1)
                         <div class="row">
                             <div class="col-xs-3">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Paiement </div>
-                                    <div class="panel-body <?= ($order["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
-                                        Mode : <?= $order["payment"] ?><br>                        
-                                        Payé le : <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
-                                        Total : <?= $orderPayment["amount"] ?> €<br>
+                                    <div class="panel-heading"><strong>Commande </strong>
+                                        <div class="pull-right">
+                                            <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                                            <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div>
+                                    </div>
+                                    <div class="panel-body alert alert-<?= $order["current_state"] ?>">
+                                        Référence :  <?= $order["reference"] ?><br>
+                                        Création :  <?= strftime("%a %d %b %y %T", strtotime($order["date_add"])) ?><br>                     
+                                        Total :  <?= $order["total_paid"] ?>€<br>
+                                        Statuts :  <?= $order["statut_label"] ?><br>
                                     </div>
                                 </div> 
                             </div>
                             <div class="col-xs-3">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Commande 
-                                        <div class="pull-right">
-                                            <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><span class="glyphicon glyphicon-zoom-in"></span></a>
-                                            <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $order["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div>
-                                    </div>
+                                    <div class="panel-heading">Paiement </div>
                                     <div class="panel-body">
-                                        N° :  <?= $order["id_order"] ?> reference :  <?= $order["reference"] ?><br>
-                                        Création :  <?= strftime("%a %d %b %y %T", strtotime($order["date_add"])) ?><br>                     
-                                        Total :  <?= $order["total_paid"] ?>€<br>
+                                        Mode : <?= $order["payment"] ?><br>                        
+                                        Payé le : <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
+                                        Total : <?= $orderPayment["amount"] ?> €<br>
                                     </div>
                                 </div> 
                             </div>
@@ -176,8 +177,8 @@ $productStates = $db->where("id_level", 1)
                                     <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
                                     <td><?= $od["product_quantity"] ?></td>
                                     <td><?= $od["total_price_tax_incl"] ?> €</td>
-                                    <td><?= $od["product_current_state"] ?></td>
-                                    <td><?= $od["id_supplier"] ?></td>
+                                    <td class="alert alert-<?= $od["product_current_state"] ?>"><?= $od["product_state_label"] ?></td>
+                                    <td><?= $od["supplier_name"] ?></td>
                                     <td><?= @$od["supplier_date_delivery"] ?></td>
                                     <td><?= $t["nb_product_delivered"] ?></td>
                                     <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
@@ -241,44 +242,43 @@ $productStates = $db->where("id_level", 1)
                         </div>
                         <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
                             <div class="panel-body">
-                                <div class="col-xs-12">
-                                    <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
-                                        <tr>
-                                            <th>Produit</th>
-                                            <th>Attributs</th>
-                                            <th>Larg x Long</th>
-                                            <th>Prix Unit.</th>
-                                            <th>Poids Unit.</th>
-                                            <th>Quantity</th>
-                                            <th>Prix ttc</th>                        
+
+                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Attributs</th>
+                                        <th>Larg x Long</th>
+                                        <th>Prix Unit.</th>
+                                        <th>Poids Unit.</th>
+                                        <th>Quantity</th>
+                                        <th>Prix ttc</th>                        
+                                    </tr>
+                                    <?
+                                    foreach ($devis["details"] as $line) {
+                                        ?>
+
+                                        <tr id="id0">
+                                            <td><?= $line["product_name"] ?></td>
+                                            <td>
+                                                <?
+                                                foreach ($line["combinations"] as $attribute) {
+                                                    ?>
+                                                    <?= $attribute["name"] ?><br>
+                                                    <?
+                                                }
+                                                ?>
+                                            </td>
+                                            <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
+                                            <td><?= $line["product_price"] ?></td>
+                                            <td><?= $line["product_weight"] ?></td>
+                                            <td><?= $line["product_quantity"] ?></td>                                                             
+                                            <td><?= $line["total_price_tax_incl"] ?></td>                    
                                         </tr>
                                         <?
-                                        foreach ($devis["details"] as $line) {
-                                            ?>
+                                    }
+                                    ?>
+                                </table>
 
-                                            <tr id="id0">
-                                                <td><?= $line["product_name"] ?></td>
-                                                <td>
-                                                    <?
-                                                    foreach ($line["combinations"] as $attribute) {
-                                                        ?>
-                                                        <?= $attribute["name"] ?><br>
-                                                        <?
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
-                                                <td><?= $line["product_price"] ?></td>
-                                                <td><?= $line["product_weight"] ?></td>
-                                                <td><?= $line["product_quantity"] ?></td>                                                             
-                                                <td><?= $line["total_price_tax_incl"] ?></td>                    
-                                            </tr>
-                                            <?
-                                        }
-                                        ?>
-                                    </table>
-
-                                </div>
                             </div>
                         </div>
 

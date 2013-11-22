@@ -4731,7 +4731,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
   margin-left: -1px;
   line-height: 1.428571429;
   text-decoration: none;
-  background-color: #ffffff;
+  /*background-color: #ffffff;*/
   border: 1px solid #dddddd;
 }
 

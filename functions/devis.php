@@ -66,7 +66,10 @@ function CreateOrder($did) {
     //Order 
     $r = $db->rawQuery("SELECT `id_customer`, `id_address_delivery`, `id_address_invoice`, `total_paid` FROM  av_devis a where id_devis = ? ", array($did));
     $cid = $r[0]["id_customer"];
+    //shipping
+    $r[0]["total_paid"] += 25;
     
+            
     $oid = $db->insert("av_orders", $r[0]);
     $params = array("invoice_date" => date("Y-m-d H:i:s"),
         "delivery_date" => date("Y-m-d H:i:s"),

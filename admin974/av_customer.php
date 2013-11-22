@@ -59,26 +59,30 @@ $opts['fdd']['email'] = array(
     'maxlen' => 128,
     'sort' => true
 );
-
+/*
 $opts['fdd']['passwd'] = array(
     'name' => 'mot de passe',
     'select' => 'T',
     'maxlen' => 32,
     'sort' => true,
     //'sqlw' => 'AES_ENCRYPT(' . _COOKIE_KEY_ . '"$val_as")',
-    'sqlw' => 'md5("' . _COOKIE_KEY_ . '$val_as'. '")',
+    'sqlw' => 'md5("' . _COOKIE_KEY_ . '$val_as' . '")',
 );
+ * 
+ */
 $opts['fdd']['customer_group'] = array(
     'name' => 'Group',
     'select' => 'T',
     'maxlen' => 1,
-    'sort' => true
+    'sort' => true,
+    'values' => array(0, 1)
 );
 $opts['fdd']['active'] = array(
     'name' => 'actif ?',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 1,
-    'sort' => true
+    'sort' => true,
+    'values' => array(0, 1)
 );
 
 

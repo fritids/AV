@@ -58,7 +58,7 @@ $opts['fdd']['id_order'] = array(
 $opts['fdd']['reference'] = array(
     'name' => 'Reference',
     'select' => 'T',
-    'options'=> 'VL',
+    'options' => 'VL',
     'maxlen' => 10,
     'sort' => true,
     'URL' => 'av_orders_view.php?id_order=$key'
@@ -74,7 +74,7 @@ $opts['fdd']['date_add'] = array(
 $opts['fdd']['id_customer'] = array(
     'name' => 'Client',
     'select' => 'T',
-    'options'=> 'VL',
+    'options' => 'VL',
     'maxlen' => 10,
     'values' => array(
         'table' => 'av_customer',
@@ -90,7 +90,7 @@ $opts['fdd']['id_address_invoice'] = array(
     'name' => 'Adresse facturation',
     'select' => 'T',
     'maxlen' => 10,
-    'options'=> 'VL',
+    'options' => 'VL',
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -103,7 +103,7 @@ $opts['fdd']['id_address_delivery'] = array(
     'name' => 'Adresse livraison',
     'select' => 'T',
     'maxlen' => 10,
-    'options'=> 'V',
+    'options' => 'V',
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -139,7 +139,7 @@ $opts['fdd']['order_comment'] = array(
     'name' => 'Commentaire client',
     'select' => 'T',
     'maxlen' => 65535,
-    'options'=> 'VC',
+    'options' => 'VC',
     'textarea' => array(
         'html' => true,
         'rows' => 20,
@@ -153,8 +153,11 @@ require_once 'phpMyEdit.class.php';
 ?>
 <h1>Les ventes</h1>
 
+<button class="btn btn-primary couleur">Modifier les couleurs</button>
+
 <?
-/*<button class="btn btn-primary modif">Modifier les statuts</button>*/
+/* <button class="btn btn-primary modif">Modifier les statuts</button> */
+
 new phpMyEdit($opts);
 ?>
 
@@ -165,12 +168,20 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
 <script>
+    $(".couleur").click(function() {
+        $('td[name=order_state]').each(function(index) {
+
+
+            $(this).closest("tr").addClass("alert alert-success");
+
+        });
+    });
+
     $(".modif").click(function() {
         var i = 0;
         $('td[name=order_state]').each(function(index) {
             dat = "";
             reference = $(this).parent().children(':nth-child(3)').text();
-
             //console.log("->" + reference + " " + index + ": " + $(this).text());
 
             $.ajax({
@@ -195,7 +206,6 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
             if (i > 1)
                 i = 0;
         });
-
         $("select")
                 .change(function(i, v) {
 

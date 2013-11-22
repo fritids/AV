@@ -112,9 +112,9 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
 
 
 
-<?
-if (!empty($deviss)) {
-    ?>
+    <?
+    if (!empty($deviss)) {
+        ?>
         <div class="row">
             <div class="col-xs-4">
                 <table class="table table-bordered" >
@@ -140,11 +140,11 @@ if (!empty($deviss)) {
             <div class="col-xs-10 panel-group" id="accordion">
                 <div class="panel panel-default">               
 
-    <?
-    $i = 0;
-    foreach ($deviss as $devis) {
-        $i++
-        ?>
+                    <?
+                    $i = 0;
+                    foreach ($deviss as $devis) {
+                        $i++
+                        ?>
 
                         <div class="panel-heading">
                             <h4 class="panel-title">
@@ -162,57 +162,57 @@ if (!empty($deviss)) {
                                                         <td><?= $devis["date_add"] ?></td>
                                                         <th>Etat :</th>
                                                         <td class="
-        <?
-        switch ($devis["current_state"]) {
-            case 1:
-                echo "alert alert-warning";
-                break;
+                                                        <?
+                                                        switch ($devis["current_state"]) {
+                                                            case 1:
+                                                                echo "alert alert-warning";
+                                                                break;
 
-            case 2:
-                echo "alert alert-danger";
-                break;
-            case 3:
-                echo "alert alert-success";
-                break;
-            case 4:
-                echo "alert alert-success";
-                break;
-        }
-        ?> "
+                                                            case 2:
+                                                                echo "alert alert-danger";
+                                                                break;
+                                                            case 3:
+                                                                echo "alert alert-success";
+                                                                break;
+                                                            case 4:
+                                                                echo "alert alert-success";
+                                                                break;
+                                                        }
+                                                        ?> "
                                                             >
-                                                            <?
-                                                            switch ($devis["current_state"]) {
-                                                                case 1:
-                                                                    echo "En attente";
-                                                                    break;
+                                                                <?
+                                                                switch ($devis["current_state"]) {
+                                                                    case 1:
+                                                                        echo "En attente";
+                                                                        break;
 
-                                                                case 2:
-                                                                    echo "Rejeté";
-                                                                    break;
-                                                                case 3:
-                                                                    echo "Validé";
-                                                                    break;
-                                                                case 4:
-                                                                    echo "Commande créée";
-                                                                    break;
-                                                            }
-                                                            ?>
+                                                                    case 2:
+                                                                        echo "Rejeté";
+                                                                        break;
+                                                                    case 3:
+                                                                        echo "Validé";
+                                                                        break;
+                                                                    case 4:
+                                                                        echo "Commande créée";
+                                                                        break;
+                                                                }
+                                                                ?>
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </a>
                                         </th>
                                         <td>
-        <?
-        if ($devis["current_state"] == 1) {
-            ?>
+                                            <?
+                                            if ($devis["current_state"] == 1) {
+                                                ?>
                                                 <form action="?create_order" method="post">
                                                     <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
                                                     <button class="btn btn-default"><span class="glyphicon glyphicon-floppy-save"></span></button>
                                                 </form> 
-            <?
-        } else if ($devis["current_state"] == 4) {
-            ?>
+                                                <?
+                                            } else if ($devis["current_state"] == 4) {
+                                                ?>
                                                 <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></a>
                                                 <?
                                             }
@@ -237,16 +237,16 @@ if (!empty($deviss)) {
                                         <th>Quantity</th>
                                         <th>Prix ttc</th>                        
                                     </tr>
-        <?
-        foreach ($devis["details"] as $line) {
-            ?>
+                                    <?
+                                    foreach ($devis["details"] as $line) {
+                                        ?>
 
                                         <tr id="id0">
                                             <td><?= $line["product_name"] ?></td>
                                             <td>
-            <?
-            foreach ($line["combinations"] as $attribute) {
-                ?>
+                                                <?
+                                                foreach ($line["combinations"] as $attribute) {
+                                                    ?>
                                                     <?= $attribute["name"] ?><br>
                                                     <?
                                                 }
@@ -258,23 +258,23 @@ if (!empty($deviss)) {
                                             <td><?= $line["product_quantity"] ?></td>                                                             
                                             <td><?= $line["total_price_tax_incl"] ?></td>                    
                                         </tr>
-            <?
-        }
-        ?>
+                                        <?
+                                    }
+                                    ?>
                                 </table>
 
                             </div>
                         </div>
 
-        <?
-    }
-    ?>
+                        <?
+                    }
+                    ?>
                 </div>
 
             </div>
-    <?
-}
-?>
+            <?
+        }
+        ?>
     </div>
 </div>
 
