@@ -24,6 +24,7 @@
 }
 
 .page_titre{
+	border-radius:8px;
     background: #539cf1;
     border: solid 1px #000;
     max-height: 40px;
@@ -695,15 +696,15 @@
 }
 
 #mescommandes table th{
-    background: #e4e4e4;
-    height: 45px;
+	background: none repeat scroll 0 0 #E4E4E4;
+	height: 35px;
 }
 
 #mescommandes table th.first{
-    border-radius: 35px 0px 0px 0px;
+    border-radius: 10px 0 0 0;
 }
 #mescommandes table th.last{
-    border-radius: 0px 35px 0px 0px;
+    border-radius: 0 10px 0 0;
 }
 
 #mescommandes table td{

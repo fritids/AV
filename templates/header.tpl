@@ -8,9 +8,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>{$meta.title|lower|ucfirst}</title>
         <meta name="description" content="{$meta.description}">
-		<meta name="keywords" content="{$meta.keywords}">
-		<meta name="robots" content="index,follow" />
-		<link rel="icon" type="image/vnd.microsoft.icon" href="/img/favicon.ico" />
+        <meta name="keywords" content="{$meta.keywords}">
+        <meta name="robots" content="index,follow" />
+        <link rel="icon" type="image/vnd.microsoft.icon" href="/img/favicon.ico" />
         <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
         <meta name="viewport" content="width=1200">
 
@@ -24,37 +24,41 @@
         <script src="/js/vendor/modernizr-2.6.2.min.js"></script>
         <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>-->
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
         <script type="text/javascript" src="http://malsup.github.io/jquery.cycle2.js"></script>
         <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-        <script>
-            $(window).load(function() {
 
-                var initialBg = $('#test123').css("background-image"); // added
-
-                var firstTime = true;
-                var arr = [initialBg, "url(/bg/2.png)", "url(/bg/1.png)", "url(/bg/2.png)", "url(/bg/1.png)"]; // changed
-                (function recurse(counter) {
-                    var bgImage = arr[counter];
-                    if (firstTime == false) {
-
-
-                        $('#test123').fadeTo(200, 0, function() {
-                            $('#test123').css('background-image', bgImage);
-                        }).delay(500).fadeTo(200, 1);
-
-
-                    } else {
-                        firstTime = false;
-                    }
-                    delete arr[counter];
-                    arr.push(bgImage);
-                    setTimeout(function() {
-                        recurse(counter + 1);
-                    }, 10000);
-                })(0);
-            });
-        </script>
+        <!--       <script>
+                   $(window).load(function() {
+       
+                       var initialBg = $('#test123').css("background-image"); // added
+       
+                       var firstTime = true;
+                       var arr = [initialBg, "url(/bg/2.png)", "url(/bg/1.png)", "url(/bg/2.png)", "url(/bg/1.png)"]; // changed
+                       (function recurse(counter) {
+                           var bgImage = arr[counter];
+                           if (firstTime == false) {
+       
+       
+                               $('#test123').fadeTo(200, 0, function() {
+                                   $('#test123').css('background-image', bgImage);
+                               }).delay(500).fadeTo(200, 1);
+       
+       
+                           } else {
+                               firstTime = false;
+                           }
+                           delete arr[counter];
+                           arr.push(bgImage);
+                           setTimeout(function() {
+                               recurse(counter + 1);
+                           }, 10000);
+                       })(0);
+                   });
+               </script>
+        -->
         <script language="JavaScript">
             function switch_recherche(a_cacher, a_voir)
             {
@@ -67,6 +71,7 @@
                     document.getElementById(a_deselectionner).style.background = '#1880b1';
                 }
         </script>
+
     </head>
     <body id="body">
         <div>
@@ -95,6 +100,14 @@
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
                         <span id="telephone">0 892 70 11 13</span>
                         <span id="telephone2">(0,34€TT/min)</span>
+                        <span id="recherche-header-classique">
+                            <form action="index.php" method="get">
+                                <input type="hidden" name="p" value="">
+                                <input type="hidden" name="id" value="" id="search_product">
+                                <input type="text" name="" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
+                                <input type="submit" value="Ok">
+                            </form>
+                        </span>
                     </div>
                     <div id="reseau-sociaux">
                         <img class="rs-icon" src="/img/RS-twitter.png" />
@@ -103,60 +116,72 @@
                         </div>
                     </div>
             </header>
+            <script>
+                $(function() {
+                    $.noConflict();
+                    $("#recherche_classique").autocomplete({
+                        source: '/functions/ajax_produits.php',
+                        select: function(event, ui) {
+                            console.log(ui.item.id_product);
+                            $("#search_product").val(ui.item.id_product);
+                        }
+                    });
+                });
+            </script>
 
             {include file='sub_menu.tpl'}
 
             <div id="recherche">
-			<img src="/img/recherche.jpg"/>
-			{*
+                <img src="/img/recherche.jpg"/>
+                {*
                 <div id="rech-conteneur-gauche" >
-                    <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
-                    switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
-                        <span class="txt-recherche">RECHERCHE</span>
-                        <span class="txt-recherche2">Par type de verre</span>
-                    </div>
-                    <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
-                    switch_recherche2('rech-selecteur2', 'rech-selecteur1');">
-                        <span class="txt-recherche">RECHERCHE</span>
-                        <span class="txt-recherche2">Par type de projet</span>
-                    </div>
+                <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
+                switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
+                <span class="txt-recherche">RECHERCHE</span>
+                <span class="txt-recherche2">Par type de verre</span>
+                </div>
+                <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
+                switch_recherche2('rech-selecteur2', 'rech-selecteur1');">
+                <span class="txt-recherche">RECHERCHE</span>
+                <span class="txt-recherche2">Par type de projet</span>
+                </div>
                 </div>
                 <div id="rech-conteneur-droit1">
-                    <ul>
-                        <li>
-                            <label>Type 1</label>
-                            <select id="select_type1">
-                                <option value="0">choix 1</option>
-                                <option value="1">choix 2</option>
-                            </select>
-                        </li>
-                        <li>
-                            <label>type 2</label>
-                            <select id="select_type2">
-                                <option value="0">choix 1</option>
-                                <option value="1">choix 2</option>
-                            </select>
-                        </li>
-                        <li>
-                            <label>Type 3</label>
-                            <select id="select_type3">
-                                <option value="0">choix 1</option>
-                                <option value="1">choix 2</option>
-                            </select>
-                        </li>
-                        <li>
-                            <label>type 4</label>
-                            <select id="select_type4">
-                                <option value="0">choix 1</option>
-                                <option value="1">choix 2</option>
-                            </select>
-                        </li>
-                    </ul>
-                    <img id="btn-rechercher" src="/img/rechercher.png" />
+                <ul>
+                <li>
+                <label>Type 1</label>
+                <select id="select_type1">
+                <option value="0">choix 1</option>
+                <option value="1">choix 2</option>
+                </select>
+                </li>
+                <li>
+                <label>type 2</label>
+                <select id="select_type2">
+                <option value="0">choix 1</option>
+                <option value="1">choix 2</option>
+                </select>
+                </li>
+                <li>
+                <label>Type 3</label>
+                <select id="select_type3">
+                <option value="0">choix 1</option>
+                <option value="1">choix 2</option>
+                </select>
+                </li>
+                <li>
+                <label>type 4</label>
+                <select id="select_type4">
+                <option value="0">choix 1</option>
+                <option value="1">choix 2</option>
+                </select>
+                </li>
+                </ul>
+                <img id="btn-rechercher" src="/img/rechercher.png" />
                 </div>
                 <div id="rech-conteneur-droit2">
 
                 </div>
         
-			*}
-			</div>
+                *}
+            </div>

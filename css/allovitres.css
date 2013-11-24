@@ -683,4 +683,9 @@ a.forget_pass{display:block;float:left;font-size:14px;color:#0053b4;text-decorat
 .submit_account{width:146px;height:28px;float:right;background:url("/img/btn_connect.png") no-repeat;border:none;cursor:pointer;}
 .submit_generer_mdp{width:295px;height:28px;float:right;background:url("/img/btn_generer_mdp.png") no-repeat;border:none;cursor:pointer;}
 .submit_mdp_oublie{width:170px;height:28px;background:url("/img/btn_mdp_oublie.png") no-repeat;border:none;cursor:pointer;}
-    
+
+.h3-contact {
+font-family: "Muli";
+font-size: 18px;
+color: #ff6000;
+}    

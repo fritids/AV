@@ -1,4 +1,8 @@
 <?php
+if($_SERVER['REQUEST_URI']=='/index.php') {
+  header("Status: 301 Moved Permanently", false, 301);
+  header("Location: /");
+}
 include ('configs/settings.php');
 require('libs/Smarty.class.php');
 require('classes/MysqliDb.php');

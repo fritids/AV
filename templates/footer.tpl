@@ -77,6 +77,7 @@
                                  background-repeat: no-repeat;
                                  width:100%;height:100%;">
                             </div>
+                            
 
                             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.js"></script>
                             <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.1.js"><\/script>')</script>
@@ -92,5 +93,6 @@
                                     s.parentNode.insertBefore(g, s)
                                 }(document, 'script'));
                             </script>
+
                             </body>
                             </html>

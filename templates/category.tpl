@@ -14,7 +14,7 @@
         {if !isset($categorie.image)}
             <img src="/img/categorie.jpg"/>
         {else}
-            <img src="/img/c/{$categorie.image}" alt="{$categorie.name}" width="140">
+            <img src="/img/c/{$categorie.image}" alt="{$categorie.name}" width="673" height="246" >
         {/if}
     </div>
     {*    <div class="verre-categorie">

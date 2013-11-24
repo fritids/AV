@@ -95,7 +95,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php"><img src="../img/logo.png" style="height: 50px;"> </a>
+                    <a class="navbar-brand" href="http://www.allovitres.com/"><img src="../img/logo.png" style="height: 50px;"> </a>
 
                 </div>
                 <div class="navbar-collapse collapse">

@@ -42,7 +42,7 @@
 #cssmenu a,
 #cssmenu a:link,
 #cssmenu a:visited {
-  padding: 10px 10px; 
+  padding: 10px 5px; 
   display: block;
   text-decoration: none;
   color: #ffffff;
