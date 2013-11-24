@@ -57,7 +57,7 @@ $mydevis = array();
 $ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
-
+$secured_pages = array("my-account", "devis", "orders-list");
 
 /* Cms */
 $AllCMS = getAllCmsInfo();
@@ -71,12 +71,6 @@ $meta = array(
     "keyword" => "simple vitrage, double vitrage, verre décoratifs, verre spécifique, verre feuilleté, miroir, verre surmesure, allovitres"
 );
 /**/
-
-/* redirection page - 1 */
-$url = explode("?", $_SERVER["HTTP_REFERER"]);
-$previous_page = $url[1];
-/* redirection page - 1 */
-
 
 //Caddie
 $cart = new Panier();
@@ -268,6 +262,10 @@ if (isset($_GET["devis"])) {
 if (isset($_GET["contactez-nous"])) {
     $page = "contact";
 }
+if (isset($_GET["sitemap"])) {
+    $page = "plan-site";
+    $page_type = "full";
+}
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
@@ -276,8 +274,6 @@ if (isset($_GET["orders-list"])) {
     $breadcrumb = array("parent" => "Accueil", "fils" => "Historique");
     $smarty->assign('orders', $orders);
 }
-
-
 
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 $smarty->assign('CMCIC_CHECKOUT_FORM', '');
@@ -488,7 +484,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             $mail->MsgHTML($user_mail_body);
             $mail->Send();
         } else { //error creation
-            $ko_msg = array("txt" => "Le compte existe déjà");
+            $ko_msg = array("txt" => "Le compte existe déjà, merci de faire une demande d'un nouveau mot de passe.");
 
             $page = "register";
 
@@ -506,8 +502,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "login") {
         $page = "identification";
         $page_type = "full";
     } else {
-        if (count($_SESSION["cart"]) > 0)
-            header("Location: index.php?cart");
+        if (isset($_POST["referer"]) && !empty($_POST["referer"]))
+            header("Location: " . $_POST["referer"]);
+        if (empty($_POST["referer"]))
+            header("Location: index.php?my-account");
     }
 }
 
@@ -580,7 +578,7 @@ if (isset($_GET["devis"])) {
     $smarty->assign('mydevis', $mydevis);
 }
 
-if (isset($_GET[" action"]) && $_GET["action"] == "send_devis") {
+if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
     $page = "contact-devis";
     $mail->ClearAllRecipients();
 
@@ -590,7 +588,7 @@ if (isset($_GET[" action"]) && $_GET["action"] == "send_devis") {
         "phone" => $_POST["tel"],
         "email" => $_POST["email"],
         "demande" => $_POST["demande"],
-        "request" => $_POST["demande"],
+        //"request" => $_POST["demande"],
         "id_customer" => @$_SESSION["user"]["id_customer"]
     );
 
@@ -608,6 +606,8 @@ if (isset($_GET[" action"]) && $_GET["action"] == "send_devis") {
     $mail->MsgHTML($mail_body);
     if ($mail->Send()) {
         $ok_msg = array("txt" => "Votre demande de devis a été envoyé");
+    } else {
+        $ko_msg = array("txt" => "Une erreur s'est produite pendant l'envoi de votre demande.");
     }
 }
 
@@ -768,12 +768,30 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
 
 /* Fichier pdf */
 
+if (isset($_GET["newsletter"]) && isset($_POST["email"])) {
+
+    $newsletter = array(
+        "date_add" => date("Y-m-d H:i:s"),
+        "email" => $_POST["email"]
+    );
+    $r = $db->insert("av_newsletter", $newsletter);
+    if ($r) {
+        $page = "generic_page";
+        $ok_msg = array("txt" => "Bravo vous êtes bien enregistré au programme de Newsletter d'allovitres.com . Vous recevrez très prochainement toutes nos promotions et nos bons plans");
+    } 
+}
+
+
 /* session */
 $smarty->assign('user', null);
 if (@$_SESSION["is_logged"]) {
     $smarty->assign('user', $_SESSION["user"]);
 }
 
+//secured page
+if (in_array($page, $secured_pages) && !isset($_SESSION["is_logged"])) {
+    $page = "identification";
+}
 
 $mydevis = getUserDevis($_SESSION["user"]["id_customer"]);
 
@@ -794,6 +812,7 @@ $smarty->assign('okmsg', $ok_msg);
 $smarty->assign('config', $config);
 $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
+$smarty->assign('previous_page', $previous_page);
 
 $smarty->display('index.tpl');
 ?>

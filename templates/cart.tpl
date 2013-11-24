@@ -32,17 +32,7 @@
                                     {$option_price =  $option_price+$option.o_price}
                                     {$option.o_name} 
                                 {/foreach}   
-                            {/if}
-                            {*
-                            <li > 
-                            id_option = {$option.o_id} 
-                            option_name = {$option.o_name} 
-                            option_qte={$option.o_quantity} 
-                            option_price={$option.o_price} 
-                            option_shipping_amount={$option.o_shipping} 
-                            option_surface={$option.o_surface} 
-                            </li>
-                            *}
+                            {/if}                            
                         </a>
                     </td>
                     {if $product.dimension}
@@ -53,7 +43,7 @@
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">{$product.prixttc - $product.discount} €
                         {if $product.pro_discounted}
-                            <em>dont remise pro ({$product.discount})</em>
+                            <em>dont remise pro ({$product.discount} €)</em>
                         {/if}
                     </td>
                     <td><form action="?cart" method="post">

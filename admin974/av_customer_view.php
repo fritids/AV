@@ -41,7 +41,7 @@ $productStates = $db->where("id_level", 1)
         <?
     }
     ?>
-    <h1>Le client</h1>
+    <h1><?= @$customer_info["firstname"] ?> <?= @$customer_info["lastname"] ?> </h1>
     <div class="row">
         <div class="col-xs-4">
             <div class="panel panel-default">
@@ -81,7 +81,7 @@ $productStates = $db->where("id_level", 1)
         </div>
 
     </div>
-    <h1>Details du compte client</h1>
+    <h1>Ses opérations</h1>
 
     <div class="row">
         <div class="col-xs-12">
@@ -97,7 +97,11 @@ $productStates = $db->where("id_level", 1)
                     foreach ($orders as $order) {
                         $orderPayment = getOrderPayment($order["id_order"]);
                         ?>
-
+                        <div class="row">
+                            <div class="col-md-offset-3 col-xs-6">                            
+                                <h2 class="well">#   <?= $order["id_order"] ?></h2>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-xs-3">
                                 <div class="panel panel-default">
@@ -142,9 +146,7 @@ $productStates = $db->where("id_level", 1)
                                 <th colspan="6" class="text-center">LIVRAISON</th>                          
                             </tr>
                             <tr>
-                                <th>#</th>                            
                                 <th>Produit</th>
-                                <th>Option</th>
                                 <th>Long x Larg</th>
                                 <th>P.U.</th>
                                 <th>Qte</th>
@@ -164,14 +166,15 @@ $productStates = $db->where("id_level", 1)
                                 $t = getItemTourneeinfo($od["id_order_detail"]);
                                 ?>
                                 <tr id="id0">
-                                    <td><?= $od["id_order_detail"] ?></td>
-                                    <td><?= $od["id_product"] ?> <?= $od["product_name"] ?> </td>
                                     <td>
+                                        <?= $od["product_name"] ?> <br>
                                         <?
                                         foreach ($od["attributes"] as $attribute) {
-                                            echo $attribute["name"] . "<br>";
+                                            echo " - " . $attribute["attribute_name"] . " : " . $attribute["attribute_value"] . "<br>";
                                         }
                                         ?>
+                                        <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
+
                                     </td>
                                     <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
                                     <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
@@ -198,93 +201,122 @@ $productStates = $db->where("id_level", 1)
                 </div>
 
                 <div class="tab-pane" id="devis">
-                    <?
-                    $i = 0;
-                    foreach ($deviss as $devis) {
-                        $i++
-                        ?>
+                    <div class="panel panel-default">        
+                        <?
+                        $i = 0;
+                        foreach ($deviss as $devis) {
+                            $i++
+                            ?>
 
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i ?>">
-                                    <table class="table table-bordered table-condensed" style="margin-bottom: 0px" >
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <table class="table table-bordered table-condensed" style="margin-bottom: 0px;" >
                                         <tr>
-                                            <th>Devis :</th>
-                                            <td><?= $devis["id_devis"] ?></td>
-                                            <th>Montant :</th>
-                                            <td><?= $devis["total_paid"] ?> €</td>
-                                            <th>Date ajout :</th>
-                                            <td><?= $devis["date_add"] ?></td>
-                                            <th>Etat :</th>
-                                            <td class="
-                                            <?
-                                            switch ($devis["current_state"]) {
-                                                case 1:
-                                                    echo "alert alert-warning";
-                                                    break;
+                                            <th>
 
-                                                case 2:
-                                                    echo "alert alert-danger";
-                                                    break;
-                                                case 3:
-                                                    echo "alert alert-success";
-                                                    break;
-                                            }
-                                            ?> "
-                                                >
-                                                    <?= $devis["current_state"] ?>
-                                            </td>
+
+                                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i ?>">
+                                                    <table class="table table-bordered table-condensed" style="margin-bottom: 0px" >
+                                                        <tr>
+                                                            <th>Devis :</th>
+                                                            <td><?= $devis["id_devis"] ?></td>
+                                                            <th>Montant :</th>
+                                                            <td><?= $devis["total_paid"] ?> €</td>
+                                                            <th>Date ajout :</th>
+                                                            <td><?= $devis["date_add"] ?></td>
+                                                            <th>Etat :</th>
+                                                            <td class="
+                                                            <?
+                                                            switch ($devis["current_state"]) {
+                                                                case 1:
+                                                                    echo "alert alert-warning";
+                                                                    break;
+
+                                                                case 2:
+                                                                    echo "alert alert-danger";
+                                                                    break;
+                                                                case 3:
+                                                                    echo "alert alert-success";
+                                                                    break;
+                                                                case 4:
+                                                                    echo "alert alert-success";
+                                                                    break;
+                                                            }
+                                                            ?> "
+                                                                >
+                                                                    <?
+                                                                    switch ($devis["current_state"]) {
+                                                                        case 1:
+                                                                            echo "En attente";
+                                                                            break;
+
+                                                                        case 2:
+                                                                            echo "Rejeté";
+                                                                            break;
+                                                                        case 3:
+                                                                            echo "Validé";
+                                                                            break;
+                                                                        case 4:
+                                                                            echo "Commande créée: " . $devis["id_order"];
+                                                                            break;
+                                                                    }
+                                                                    ?>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                </a>
+                                            </th>
                                         </tr>
                                     </table>
+                                </h4>
+                            </div>
+                            <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
+                                <div class="panel-body">
 
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
-                            <div class="panel-body">
-
-                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
-                                    <tr>
-                                        <th>Produit</th>
-                                        <th>Attributs</th>
-                                        <th>Larg x Long</th>
-                                        <th>Prix Unit.</th>
-                                        <th>Poids Unit.</th>
-                                        <th>Quantity</th>
-                                        <th>Prix ttc</th>                        
-                                    </tr>
-                                    <?
-                                    foreach ($devis["details"] as $line) {
-                                        ?>
-
-                                        <tr id="id0">
-                                            <td><?= $line["product_name"] ?></td>
-                                            <td>
-                                                <?
-                                                foreach ($line["combinations"] as $attribute) {
-                                                    ?>
-                                                    <?= $attribute["name"] ?><br>
-                                                    <?
-                                                }
-                                                ?>
-                                            </td>
-                                            <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
-                                            <td><?= $line["product_price"] ?></td>
-                                            <td><?= $line["product_weight"] ?></td>
-                                            <td><?= $line["product_quantity"] ?></td>                                                             
-                                            <td><?= $line["total_price_tax_incl"] ?></td>                    
+                                    <table class="table table-bordered table-condensed col-xs-12" id="tab_devis" style="margin-bottom: 0px;">
+                                        <tr>
+                                            <th>Produit</th>
+                                            <th>Attributs</th>
+                                            <th>Larg x Long</th>
+                                            <th>Prix Unit.</th>
+                                            <th>Poids Unit.</th>
+                                            <th>Quantity</th>
+                                            <th>Prix ttc</th>                        
                                         </tr>
                                         <?
-                                    }
-                                    ?>
-                                </table>
+                                        foreach ($devis["details"] as $line) {
+                                            ?>
 
+                                            <tr id="id0">
+                                                <td><?= $line["product_name"] ?></td>
+                                                <td>
+                                                    <?
+                                                    foreach ($line["combinations"] as $attribute) {
+                                                        ?>
+                                                        <?= $attribute["name"] ?><br>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
+                                                <td><?= $line["product_price"] ?></td>
+                                                <td><?= $line["product_weight"] ?></td>
+                                                <td><?= $line["product_quantity"] ?></td>                                                             
+                                                <td><?= $line["total_price_tax_incl"] ?></td>                    
+                                            </tr>
+                                            <?
+                                        }
+                                        ?>
+                                    </table>
+
+                                </div>
                             </div>
-                        </div>
 
-                        <?
-                    }
-                    ?>
+                            <?
+                        }
+                        ?>
+                    </div>
                 </div>
             </div>
 

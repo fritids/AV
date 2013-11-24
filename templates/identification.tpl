@@ -18,6 +18,7 @@
     <div class="identification">
         <h3 class="account_title no2">J'AI D&Eacute;J&Agrave; UN COMPTE</h3>
         <form action="/index.php?action=login" method="post">
+            <input type="hidden" value="{$smarty.server.HTTP_REFERER}" name="referer">
             <div class="box_chmp">
                 <label>Identifiant:</label>
                 <input type="text" class="txt_account" name="email"  />

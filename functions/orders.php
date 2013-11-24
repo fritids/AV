@@ -23,6 +23,7 @@ function getUserOrders($cid) {
                     where a.current_state = b.id_statut 
                     and a.id_customer= ?
                     and ifnull(current_state,0) >0
+                    order by a.date_add desc
                     ", $params);
 
     foreach ($r as $k => $order) {
@@ -114,7 +115,7 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
 function getUserOrdersDetailHistory($oid) {
     global $db;
     $params = array($oid);
-    $r = $db->rawQuery("SELECT distinct b.date_add, b.id_order, b.supplier_name, b.bdc_filename, d.prenom
+    $r = $db->rawQuery("SELECT distinct b.date_add, b.category, b.id_order, b.supplier_name, b.bdc_filename, d.prenom
                         FROM av_order_bdc b, admin_user d
                         where d.id_admin = b.id_user
                         and  b.id_order = ?
@@ -154,9 +155,11 @@ function getOrdersDetailAttribute($odid) {
     global $db;
     $params = array($odid);
 
-    $r = $db->rawQuery("SELECT a.*
-                        FROM av_order_product_attributes a 
-                        where id_order_detail = ? ", $params);
+    $r = $db->rawQuery("SELECT a.*, a.name attribute_value, b.weight, c.name attribute_name
+                        FROM av_order_product_attributes a , av_product_attribute b, av_attributes c
+                        where a.id_attribute = b.id_product_attribute
+                        and b.id_attribute = c.id_attribute 
+                        and  id_order_detail = ?  ", $params);
 
     return $r;
 }

@@ -242,25 +242,29 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             <ul class="pagination">
                 <?
                 for ($i = 5; $i >= 0; $i--) {
-                    ?>
-                    <li ><a href="?id_order=<?= @$order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
-                    <?
+                    if (isset($order_precedent[$i])) {
+                        ?>
+                        <li ><a href="?id_order=<?= $order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
+                        <?
+                    }
                 }
                 ?>
 
                 <li><a href="#" ><strong><?= $oid ?></strong></a></li>
                 <?
                 for ($i = 0; $i <= 5; $i++) {
-                    ?>
-                    <li><a href="?id_order=<?= @$order_suivant[$i]["id_order"] ?>" class="alert-<?= @$order_suivant[$i]["current_state"] ?>"><?= @$order_suivant[$i]["id_order"] ?></a></li>
-                    <?
+                    if (isset($order_suivant[$i])) {
+                        ?>
+                        <li><a href="?id_order=<?= $order_suivant[$i]["id_order"] ?>" class="alert-<?= @$order_suivant[$i]["current_state"] ?>"><?= @$order_suivant[$i]["id_order"] ?></a></li>
+                        <?
+                    }
                 }
                 ?>
 
             </ul>
         </div>
 
-        
+
     </div>
     <?
     if (!empty($updated)) {
@@ -429,6 +433,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                 <ul class="nav nav-pills">
                     <li class="active"><a href="#Produits" data-toggle="tab">Produits</a></li>
                     <li><a href="#bdc" data-toggle="tab">Bon de commande</a></li>
+                    <li><a href="#history" data-toggle="tab">Historique</a></li>
                 </ul>
                 <form method="post">
                     <div class="tab-content">
@@ -442,9 +447,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     <th colspan="6" class="text-center">LIVRAISON</th>                          
                                 </tr>
                                 <tr>
-                                    <th>#</th>                            
                                     <th>Produit</th>
-                                    <th>Option</th>
                                     <th>Long x Larg</th>
                                     <th>P.U.</th>
                                     <th>Qte</th>
@@ -467,15 +470,18 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     $isFournisseurOk = ($od["id_supplier"] != '' ) ? true : false;
                                     ?>
                                     <tr id="id0">
-                                        <td nowrap><?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></td>
-                                        <td><?= $od["product_name"] ?> </td>
+
                                         <td>
+                                            <?= $od["product_name"] ?> <br>
                                             <?
                                             foreach ($od["attributes"] as $attribute) {
-                                                echo $attribute["name"] . "<br>";
+                                                echo " - " . $attribute["attribute_name"] . " : " . $attribute["attribute_value"] . "<br>";
                                             }
                                             ?>
+                                            <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
+
                                         </td>
+
                                         <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
                                         <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
                                         <td><?= $od["product_quantity"] ?></td>
@@ -557,7 +563,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     <?
                                     if ($orderinfo["history"])
                                         foreach ($orderinfo["history"] as $odh) {
-                                            if ($odh["bdc_filename"]) {
+                                            if ($odh["supplier_name"]) {
                                                 ?>
                                                 <tr>
                                                     <td><?= $odh["prenom"] ?></td>
@@ -574,8 +580,46 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
                             </div>
                         </div>
-                    </div>
+                        <div class="tab-pane" id="history">
+                            <div class="row">
+                                <table>
+                                    <tr>
+                                        <th>Utilisateur</th>                                        
+                                        <th>Date envoi</th>
+                                        <th>Objet</th>
+                                        <th>Fichier</th>
+                                    </tr>
+                                    <?
+                                    foreach ($orderinfo["history"] as $odh) {
+                                        if (empty($odh["supplier_name"])) {
+                                            ?>
+                                            <tr>
+                                                <td><?= $odh["prenom"] ?></td>
+                                                <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
+                                                <td><?= $odh["category"] ?></td>  
+                                                <td>
 
+                                                    <?
+                                                    if ($odh["bdc_filename"]) {
+                                                        if ($odh["category"] == "roadmap")
+                                                            $folder = "roadmap";
+                                                        if ($odh["category"] == "bl")
+                                                            $folder = "bon_de_livraison";
+                                                        ?>
+                                                        <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            <?
+                                        }
+                                    }
+                                    ?>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <form method="post">
                     <input type="hidden" name="id_order" value="<?= $oid ?>">

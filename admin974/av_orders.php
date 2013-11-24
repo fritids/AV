@@ -153,8 +153,6 @@ require_once 'phpMyEdit.class.php';
 ?>
 <h1>Les ventes</h1>
 
-<button class="btn btn-primary couleur">Modifier les couleurs</button>
-
 <?
 /* <button class="btn btn-primary modif">Modifier les statuts</button> */
 
