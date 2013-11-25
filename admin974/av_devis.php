@@ -5,6 +5,7 @@ include ("../functions/products.php");
 include ("../functions/orders.php");
 include ("../functions/users.php");
 include ("../functions/tools.php");
+include ("../functions/devis.php");
 
 require('../libs/Smarty.class.php');
 require('../classes/class.phpmailer.php');
@@ -13,7 +14,8 @@ require('../classes/tcpdf.php');
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 $smarty = new Smarty;
-$smarty->setTemplateDir(array('../templates', '../templates/mails'));
+$smarty->setTemplateDir(array('../templates', '../templates/mails', '../templates/pdf/front'));
+$smarty->setCompileDir("../templates_c");
 
 //Create a new PHPMailer instance
 $mail = new PHPMailer();
@@ -21,11 +23,25 @@ $mail = new PHPMailer();
 $mail->SetFrom($confmail["from"]);
 $mail->CharSet = 'UTF-8';
 
+
+$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Allovitre');
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+$pdf->SetFont('times', '', 10);
+$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
+
+
 //---------
 $pAll = getAllProductInfo();
 $a = $db->get("av_attributes");
 
-$customers = $db->get("av_customer");
 $cid = "";
 $customer_info = array();
 $customer_delivery = array();
@@ -256,12 +272,26 @@ if (isset($_POST["devis_save"])) {
 
     if ($did) {
 
-
         $customer_info = getCustomerDetail($cid);
 
-        $mail->AddAddress($customer_info["email"]);
-        //$mail->AddAddress("stephane.alamichel@gmail.com");
+        $now = date("Y-M-d");
 
+        $devisinfo = getDevis($did);
+        $smarty->assign("devisinfo", $devisinfo[0]);
+        $content_body = $smarty->fetch('front_devis.tpl');
+
+        $pdf->AddPage('P', 'A4');
+        $pdf->writeHTML($content_body, true, false, true, false, '');
+        $pdf->lastPage();
+
+        $path = "../tmp";
+
+        $filename = $path . "/" . "AV_DE_" . $did . "_" . $now . ".pdf";
+        $pdf->Output($filename, 'F');
+
+
+
+        $mail->AddAddress($customer_info["email"]);
 
         //creation de compte
         if ($isNewCustomer == 1) {
@@ -284,9 +314,11 @@ if (isset($_POST["devis_save"])) {
         }
 
         $mail_body = $smarty->fetch('notif_new_devis.tpl');
+        $mail->AddAttachment($path . "/" . $filename);
         $mail->MsgHTML($mail_body);
 
         if ($mail->Send()) {
+            unlink($path . "/" . $filename);
             echo '<div class="alert alert-success text-center">Email envoyé et devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
         }
     }
@@ -727,14 +759,16 @@ if (isset($_POST["devis_save"])) {
 
 <div class="container">
     <div class="row">
+        <p class="alert alert-info">
+            Lors de la création du devis, un pdf est joint à l'envoi du mail.
+        </p>
+    </div>
+    <div class="row">
         <div class="col-md-3">
             <h3>Recherche client existant</h3>
             <form class="form-horizontal" role="form" method="post">
                 <input type="text" id ="ajax_customer" />
                 <input type="hidden" name ="id_customer"  id ="id_customer"/>
-
-
-
                 <input type="submit" >
             </form>
         </div>
@@ -879,8 +913,8 @@ if (isset($_POST["devis_save"])) {
                     <input type="hidden"  value="<?= $cid ?>" name="id_customer">
                     <input type="hidden" name ="isNewCustomer"  value="<?= $isNewCustomer ?>"/>
 
-                    <ul class="nav nav-tabs">
-                        <li><a href="#classique" data-toggle="tab">Classique</a></li>
+                    <ul class="nav nav-pills">
+                        <li class="active"><a href="#classique" data-toggle="tab">Classique</a></li>
                         <li><a href="#exotique" data-toggle="tab">Exotique</a></li>
                     </ul>
 
@@ -929,7 +963,7 @@ if (isset($_POST["devis_save"])) {
                             </table>
                         </div>                       
                     </div>
-                    <div class="pull-left">
+                    <div class="col-xs-6 pull-left">
                         <textarea name="devis_comment"></textarea>
                     </div>
                     <div class=" col-xs-6 pull-right">    
@@ -939,12 +973,9 @@ if (isset($_POST["devis_save"])) {
                         <button type="button" id='calculate_total'>Calculer : prix total</button>
                         Total ttc <b>hors frais de port</b> : <h1><span class="totaldevis">0</span> €</h1> 
 
-
                         Valider le devis <input type="checkbox" required="required"> 
                         <input type="submit" name ="devis_save"  class="btn-lg btn-warning pull-right">
-
                     </div>
-
                 </form>
             </div>
         </div>

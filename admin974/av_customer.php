@@ -13,7 +13,7 @@ $opts['key'] = 'id_customer';
 $opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_customer');
+$opts['sort_field'] = array('-id_customer');
 
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
@@ -72,7 +72,7 @@ $opts['fdd']['passwd'] = array(
  */
 $opts['fdd']['customer_group'] = array(
     'name' => 'Group',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 1,
     'sort' => true,
     'values' => array(0, 1)
@@ -91,6 +91,11 @@ $opts['fdd']['active'] = array(
 require_once 'phpMyEdit.class.php';
 ?>
 <h1>Les comptes clients</h1>
+<p>
+    <strong>Codification :</strong><br>
+    groupe client : 0 = normal ; 1 = Pro<br>
+    Actif ? : 0 = désactivé ; 1 = actif<br>
+</p>
 <?
 new phpMyEdit($opts);
 ?>

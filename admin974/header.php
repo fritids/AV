@@ -38,7 +38,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 theme: "modern",
                 width: "800",
                 height: "200",
-                plugins: "table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image, fullscreen",
+                plugins: "table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image,fullscreen,textcolor,hr",
                 theme_advanced_buttons1_add_before: "save,separator",
                 theme_advanced_buttons1_add: "fontselect,fontsizeselect",
                 theme_advanced_buttons2_add: "separator,insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",
@@ -47,14 +47,14 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 theme_advanced_buttons3_add: "emotions,iespell,flash,advhr,separator,print",
                 theme_advanced_toolbar_location: "top",
                 theme_advanced_toolbar_align: "left",
-                theme_advanced_path_location: "bottom",
-                content_css: "example_full.css",
+                theme_advanced_path_location: "bottom",                
                 plugin_insertdate_dateFormat: "%Y-%m-%d",
                 plugin_insertdate_timeFormat: "%H:%M:%S",
                 extended_valid_elements: "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
 
             });
         </script>
+            
         <!-- /tinyMCE -->
 
         <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>        
@@ -170,7 +170,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                         }
                         ?>  
                         <?
-                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE") {
+                        if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE" || $_SESSION['role'] == "LOGISTIC") {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Devis <b class="caret"></b></a>

@@ -108,7 +108,7 @@ $opts['fdd']['id_address_delivery'] = array(
 
 $opts['fdd']['current_state'] = array(
     'name' => 'Status',
-    'options' => 'LC',
+    'options' => 'L',
     'select' => 'D',
     'maxlen' => 10,
     'values' => array(
@@ -119,8 +119,6 @@ $opts['fdd']['current_state'] = array(
     "colattrs" => "name='order_state'",
     'sort' => true
 );
-
-
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
     'select' => 'T',

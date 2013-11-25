@@ -25,7 +25,6 @@ $mail->CharSet = 'UTF-8';
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
 
-
 if (isset($_GET["id_order"]))
     $oid = $_GET["id_order"];
 
@@ -123,11 +122,73 @@ if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"
             }
         }
 
-//maj status order  
+    //maj status order  
     if (isset($_POST["current_state"]) && !empty($_POST["current_state"])) {
+
         $r = $db->where("id_order", $oid)
                 ->update("av_orders", array("current_state" => $_POST["current_state"]));
-        $updated["text"] = "Modification a été effectuée avec succés.";
+
+        if ($r) {
+
+            switch ($_POST["current_state"]) {
+                case 7:
+                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été remboursé";
+                    $order_mail_from = "service.commercial@allovitres.com";
+                    $order_mail_tpl = "notif_order_refund";
+                    break;
+                case 6:
+                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été annulé";
+                    $order_mail_from = "service.commercial@allovitres.com";
+                    $order_mail_tpl = "notif_order_cancel";
+                    break;
+                case 3:
+                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
+                    $order_mail_from = "livraison@allovitres.com";
+                    $order_mail_tpl = "notif_order_preparation";
+                    break;
+                default :
+                    $order_mail_subject = "";
+                    $order_mail_from = "";
+                    $order_mail_tpl = "";
+                    break;
+            }
+
+            if (!empty($order_mail_tpl)) {
+
+                $mail->ClearAllRecipients();
+                $mail->ClearAttachments();
+
+                foreach ($monitoringEmails as $bccer) {
+                    $mail->AddbCC($bccer);
+                }
+                $mail->AddAddress($orderinfo["customer"]["email"]);
+
+                $mail->SetFrom($order_mail_from);
+                $mail->Subject = $order_mail_subject;
+                $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
+                
+                $mail->MsgHTML($mail_body);
+                if ($mail->Send()) {
+                    $updated["text"] = "mail a été envoyé <br>";
+                    $param = array(
+                        "id_order" => $orderinfo["id_order"],
+                        "id_user" => $_SESSION["user_id"],
+                        "category" => $order_mail_tpl,
+                    );
+                    $r = $db->insert("av_order_bdc", $param);
+                }
+            }
+
+            addLog(array("tabs" => "mv_orders",
+                "rowkey" => $orderinfo["id_order"],
+                "col" => "current_state",
+                "operation" => "update",
+                "oldval" => $orderinfo["current_state"],
+                "newval" => $_POST["current_state"]
+            ));
+
+            @$updated["text"] .= "Modification a été effectuée avec succés.";
+        }
     }
 
 //suite aux update on recharge les infos

@@ -1,5 +1,4 @@
 {include file='mail_header.tpl'}
-
 Bonjour,<br><br>
 
 Nous vous informons que votre commande vient de vous être remboursée.<br><br>

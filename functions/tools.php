@@ -73,4 +73,21 @@ function getItemTourneeinfo($odetail) {
         return($r[0]);
 }
 
+function addLog($info) {
+    global $db;
+
+    $params = array(
+        "updated" => date("Y-m-d H:i:s"),
+        "user" => $_SESSION["email"],
+        "host" => $_SERVER['REMOTE_ADDR'],
+        "operation" =>  $info["operation"],
+        "tab" => $info["tabs"],
+        "col" => $info["col"],
+        "rowkey" => $info["rowkey"],
+        "oldval" => addslashes($info["oldval"]),
+        "newval" => addslashes($info["newval"])
+    );
+    $r = $db->insert("changelog", $params);
+}
+
 ?>

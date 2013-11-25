@@ -384,8 +384,7 @@ if (isset($_GET["order-payment"])) {
 
 /* new user */
 if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
-    $isPro = 0;
-
+    $group = 0;
     if (isset($_POST["is_pro"])) {
         $group = 1;
     }

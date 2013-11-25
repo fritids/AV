@@ -172,12 +172,6 @@ $opts['fdd']['meta_keywords'] = array(
     'maxlen' => 255,
     'sort' => true
 );
-$opts['fdd']['link_rewrite'] = array(
-  'name'     => 'URL Friendly',
-  'select'   => 'T',
-  'maxlen'   => 128,
-  'sort'     => true
-);
 
 
 // Now important call to phpMyEdit
