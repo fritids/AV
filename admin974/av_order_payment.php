@@ -20,14 +20,6 @@ $opts['sort_field'] = array('id_order_payment');
 // Value of -1 lists all records in a table
 $opts['inc'] = 15;
 
-// Display special page elements
-$opts['display'] = array(
-	'form'  => true,
-	'query' => true,
-	'sort'  => true,
-	'time'  => true,
-	'tabs'  => true
-);
 
 $opts['fdd']['id_order_payment'] = array(
   'name'     => 'ID order payment',

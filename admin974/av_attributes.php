@@ -18,15 +18,6 @@ $opts['sort_field'] = array('id_attribute');
 // Value of -1 lists all records in a table
 $opts['inc'] = 15;
 
-// Display special page elements
-$opts['display'] = array(
-	'form'  => true,
-	'query' => true,
-	'sort'  => true,
-	'time'  => true,
-	'tabs'  => true
-);
-
 
 $opts['fdd']['id_attribute'] = array(
   'name'     => 'ID attribute',

@@ -47,9 +47,9 @@
         <th width="50">Qte</th>
         <th width="250">Designation</th>        
         <th width="70">Dimension</th>
-        <th width="70">&nbsp;</th>
-        <th width="70">&nbsp;</th>
-        <th width="70">&nbsp;</th>
+        <th width="70">Epaisseur</th>
+        <th width="70">Façonnage</th>
+        <th width="70">Finition</th>
         <th width="70">&nbsp;</th>
     </tr>
     
@@ -61,7 +61,7 @@
             <td>{$detail.product_name}</td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
             {foreach key=key2 item=attribut from=$detail.attributes}
-                <td>{$attribut.name}</td>
+                <td>{$attribut.attribute_value}</td>
             {/foreach}            
         </tr>
     {/foreach}

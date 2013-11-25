@@ -16,8 +16,6 @@ $opts['key_type'] = 'int';
 // Sorting field(s)
 $opts['sort_field'] = array('id_product');
 
-
-
 $opts['inc'] = 50;
 
 // Options you wish to give the users
@@ -25,23 +23,6 @@ $opts['inc'] = 50;
 // F - filter, I - initial sort suppressed
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '10';
-
-// Navigation style: B - buttons (default), T - text links, G - graphic links
-// Buttons position: U - up, D - down (default)
-// Display special page elements
-$opts['display'] = array(
-    'form' => true,
-    'query' => true,
-    'sort' => true,
-    'time' => true,
-    'tabs' => true
-);
-
-/* Get the user's default language and use it if possible or you can
-  specify particular one you want to use. Refer to official documentation
-  for list of available languages. */
-$opts['language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'] . '-UTF8';
-
 
 $opts['fdd']['id_product'] = array(
     'name' => 'ID',

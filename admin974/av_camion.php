@@ -19,14 +19,6 @@ $opts['sort_field'] = array('id_truck');
 // Value of -1 lists all records in a table
 $opts['inc'] = 15;
 
-// Display special page elements
-$opts['display'] = array(
-	'form'  => true,
-	'query' => true,
-	'sort'  => true,
-	'time'  => true,
-	'tabs'  => true
-);
 
 /* Get the user's default language and use it if possible or you can
    specify particular one you want to use. Refer to official documentation

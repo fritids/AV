@@ -12,7 +12,7 @@ $opts['dhtml']['prefix'] = 'PME_dhtml_';
 $opts['cgi']['prefix']['operation'] = 'PME_op_';
 $opts['cgi']['prefix']['sys'] = 'PME_sys_';
 $opts['cgi']['prefix']['data'] = 'PME_data_';
-        
+
 $opts['logtable'] = 'changelog';
 
 // Options you wish to give the users
@@ -20,5 +20,7 @@ $opts['logtable'] = 'changelog';
 // F - filter, I - initial sort suppressed
 $opts['options'] = 'ACDF';
 
-    
+$opts['cgi']['append']['PME_sys_fl'] = 1;
+
+$opts['display'] = array('form' => true, 'num_pages' => true, 'num_records' => true, 'sort' => true, 'tabs' => true, 'time' => false);
 ?>

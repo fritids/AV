@@ -1,5 +1,5 @@
 <?php
-
+ini_set('session.gc_maxlifetime', 14400);
 session_start();
 include ("../configs/settings.php");
 mysql_connect($bdserv, $bduser, $bdpass);

@@ -19,5 +19,4 @@ if (isset($_SESSION['email']) && isset($_SESSION['mdp'])) {
 } else {
     header('location: identification.php');
 }
-?> 
-
+?>

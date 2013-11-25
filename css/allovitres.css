@@ -281,7 +281,7 @@ margin:-2px 10px 0 0;
 }
 #telephone{
 	display:block;
-	margin-top:15px;
+	margin-top:5px;
 	font-family: Arial;
 	font-size: 1.5em;
 	text-align: right;
@@ -298,6 +298,10 @@ margin:-2px 10px 0 0;
 	font-weight:bold;
 	font-style:italic;
 	color:#FFF;
+}
+#recherche-header-classique{
+	display:block;
+	margin-top:10px;
 }
 #reseau-sociaux {
 	margin-top:-42px;

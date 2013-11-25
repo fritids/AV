@@ -18,22 +18,6 @@ $opts['sort_field'] = array('id_zone');
 // Value of -1 lists all records in a table
 $opts['inc'] = 15;
 
-
-// Display special page elements
-$opts['display'] = array(
-	'form'  => true,
-	'query' => true,
-	'sort'  => true,
-	'time'  => true,
-	'tabs'  => true
-);
-
-
-/* Get the user's default language and use it if possible or you can
-   specify particular one you want to use. Refer to official documentation
-   for list of available languages. */
-$opts['language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'] . '-UTF8';
-
 /* Table-level filter capability. If set, it is included in the WHERE clause
    of any generated SELECT statement in SQL query. This gives you ability to
    work only with subset of data from table.

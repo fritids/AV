@@ -22,16 +22,6 @@ $opts['inc'] = 15;
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
-// Display special page elements
-$opts['display'] = array(
-    'form' => true,
-    'query' => true,
-    'sort' => true,
-    'time' => true,
-    'tabs' => true
-);
-
-
 /* Get the user's default language and use it if possible or you can
   specify particular one you want to use. Refer to official documentation
   for list of available languages. */

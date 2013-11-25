@@ -23,15 +23,6 @@ $opts['sort_field'] = array('id_product_attribute');
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
-// Display special page elements
-$opts['display'] = array(
-	'form'  => true,
-	'query' => true,
-	'sort'  => true,
-	'time'  => true,
-	'tabs'  => true
-);
-
 /* Table-level filter capability. If set, it is included in the WHERE clause
    of any generated SELECT statement in SQL query. This gives you ability to
    work only with subset of data from table.

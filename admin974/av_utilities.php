@@ -26,7 +26,15 @@ function get_server_var($name) /* {{{ */ {
 }
 
 /* }}} */
+function getOrderCurrentState() {
 
+    global $db;
+
+    $r2 = $db->where("reference", $_POST["reference"])
+            ->get("av_orders");
+
+    return(print_r(json_encode($r2[0]["current_state"])));
+}
 function getOrderCombobox() {
 
     global $db;
@@ -193,6 +201,9 @@ if (isset($_POST["action"])) {
         if ($_POST["action"] == "getOrderCombobox") {
             getOrderCombobox();
         }
+        if ($_POST["action"] == "getOrderCurrentState") {
+            getOrderCurrentState();
+        }
     }
     if ($_POST["module"] == "orders_detail") {
         if ($_POST["action"] == "getOrderDetailCombobox") {
@@ -202,4 +213,3 @@ if (isset($_POST["action"])) {
 }
 /* dispatcher */
 ?>
-

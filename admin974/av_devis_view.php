@@ -18,6 +18,7 @@ if (isset($_GET["create_order"]) && isset($_POST["id_devis"])) {
 }
 
 
+
 if (isset($_POST["id_devis"]) || isset($_GET["id_devis"])) {
     if (isset($_POST["id_devis"]))
         $did = $_POST["id_devis"];
@@ -193,7 +194,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                                         echo "Validé";
                                                                         break;
                                                                     case 4:
-                                                                        echo "Commande créée";
+                                                                        echo "Convertie: " . $devis["id_order"];
                                                                         break;
                                                                 }
                                                                 ?>
@@ -202,18 +203,23 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                 </table>
                                             </a>
                                         </th>
-                                        <td>
+                                        <td nowrap>
                                             <?
                                             if ($devis["current_state"] == 1) {
                                                 ?>
                                                 <form action="?create_order" method="post">
                                                     <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
-                                                    <button class="btn btn-default"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                                                    <button class="btn btn-default" data-toggle="tooltip" title="Créer une commande à partir de ce devis"><span class="glyphicon glyphicon-shopping-cart"></span></button>
                                                 </form> 
                                                 <?
                                             } else if ($devis["current_state"] == 4) {
                                                 ?>
-                                                <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                                                <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default" data-toggle="tooltip" title="Aller à la facture"><span class="glyphicon glyphicon-zoom-in"></span></a>
+
+                                                <form action="av_download_pdf.php?devis" method="post" target="blank">
+                                                    <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                    <button class="btn btn-default" data-toggle="tooltip" title="Télécharger le devis au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                                                </form> 
                                                 <?
                                             }
                                             ?>
@@ -227,7 +233,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                         </div>
                         <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
                             <div class="panel-body">
-                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
+                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis" style="margin-bottom: 0px;"    >
                                     <tr>
                                         <th>Produit</th>
                                         <th>Attributs</th>

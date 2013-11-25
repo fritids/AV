@@ -224,7 +224,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             <?
             if ($order_precedent) {
                 ?>
-                <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>" data-toggle="tooltip" title="Commande précédente"><span class="glyphicon glyphicon-arrow-left"></span></a>
                 <?
             }
             ?>
@@ -233,7 +233,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             <?
             if ($order_suivant) {
                 ?>
-                <a href="?id_order=<?= $order_suivant[0]["id_order"] ?>"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                <a href="?id_order=<?= $order_suivant[0]["id_order"] ?>" data-toggle="tooltip" title="Commande suivante"><span class="glyphicon glyphicon-arrow-right"></span></a>
                 <?
             }
             ?>
@@ -283,9 +283,15 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     ?>
     <div class="row">
         <div class="col-xs-12">
-            <div class="col-xs-8">
+            <div class="col-xs-5">
                 <h3>Commande : <?= $oid ?></h3>
             </div>  
+            <div class="col-xs-3">
+                <form action="av_download_pdf.php?order" method="post" target="blank">
+                    <input type="hidden" value="<?= $oid ?>" name="id_order">
+                    <button class="btn btn-default" data-toggle="tooltip" title="Télécharger la facture au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                </form> 
+            </div>
             <div class="text-center col-xs-4 alert alert-<?= $orderinfo["current_state"] ?>" >
                 <form method="post">
                     <select name="current_state" class="pme-input-0">
@@ -311,8 +317,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         <div class="col-xs-4">
             <div class="panel panel-default">
                 <div class="panel-heading">Contact <div class="pull-right">
-                        <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>"><span class="glyphicon glyphicon-user"></span></a>
-                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>"><span class="glyphicon glyphicon-edit"></span></a>
+                        <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
+                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Modifier les infos personnelles"><span class="glyphicon glyphicon-edit"></span></a>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -326,7 +332,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_delivery["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_delivery["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_delivery["phone"] ?><br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_delivery["phone_mobile"] ?> <br>
@@ -338,7 +344,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         </div>
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_invoice["id_address"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_invoice["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_invoice["phone"] ?> <br>
                     <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_invoice["phone_mobile"] ?> <br>

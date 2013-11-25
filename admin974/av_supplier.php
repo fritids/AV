@@ -1,32 +1,21 @@
-<?php
-
+<?
 include ("header.php");
-// MySQL host name, user name, password, database, and table
 require_once ("../configs/settings.php");
 
-$opts['tb'] = 'av_departements';
+$opts['tb'] = 'av_supplier';
 
 // Name of field which is the unique key
-$opts['key'] = 'id_departement';
+$opts['key'] = 'id_supplier';
 
 // Type of key field (int/real/string/date etc.)
-$opts['key_type'] = 'string';
+$opts['key_type'] = 'int';
 
 // Sorting field(s)
-$opts['sort_field'] = array('id_departement');
+$opts['sort_field'] = array('id_supplier');
 
-// Number of records to display on the screen
-// Value of -1 lists all records in a table
-$opts['inc'] = 15;
+// Number of lines to display on multiple selection filters
+$opts['multiple'] = '4';
 
-/* Table-level filter capability. If set, it is included in the WHERE clause
-  of any generated SELECT statement in SQL query. This gives you ability to
-  work only with subset of data from table.
-
-  $opts['filters'] = "column1 like '%11%' AND column2<17";
-  $opts['filters'] = "section_id = 9";
-  $opts['filters'] = "PMEtable0.sessions_count > 200";
- */
 
 /* Field definitions
 
@@ -66,49 +55,35 @@ $opts['inc'] = 15;
   descriptions fields are also possible. Check documentation for this.
  */
 
-$opts['fdd']['id_departement'] = array(
-    'name' => 'ID departement',
+$opts['fdd']['id_supplier'] = array(
+    'name' => 'ID supplier',
     'select' => 'T',
-    'maxlen' => 2,
-    'sort' => true
-);
-$opts['fdd']['id_region'] = array(
-    'name' => 'Région',
-    'select' => 'T',
-    'maxlen' => 2,
-    'values' => array(
-        'table' => 'av_regions',
-        'column' => 'id_region',
-        'description' => 'nom'
-    ),
-    'sort' => true
-);
-$opts['fdd']['id_zone'] = array(
-    'name' => 'Zone',
-    'select' => 'T',
+    'options' => 'AVCPDR', // auto increment
     'maxlen' => 10,
-    'values' => array(
-        'table' => 'av_zone',
-        'column' => 'id_zone',
-        'description' => 'nom'
-    ),    
+    'default' => '0',
     'sort' => true
 );
-$opts['fdd']['nom'] = array(
+$opts['fdd']['name'] = array(
     'name' => 'Nom',
     'select' => 'T',
-    'maxlen' => 32,
+    'maxlen' => 100,
+    'sort' => true
+);
+$opts['fdd']['email'] = array(
+    'name' => 'Email',
+    'select' => 'T',
+    'maxlen' => 150,
     'sort' => true
 );
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les départements par zone</h1>
+<h1>Les fournisseurs</h1>
 <?
 new phpMyEdit($opts);
 ?>
-
+<br>
 <?
 getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>

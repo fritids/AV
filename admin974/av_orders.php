@@ -23,15 +23,8 @@ $opts['options'] = 'CF';
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '10';
 
-// Display special page elements
-$opts['display'] = array(
-    'form' => true,
-    'query' => true,
-    'sort' => true,
-    'time' => true,
-    'tabs' => true
-);
 
+$opts['inc'] = 25;
 
 /* Get the user's default language and use it if possible or you can
   specify particular one you want to use. Refer to official documentation
@@ -127,6 +120,7 @@ $opts['fdd']['current_state'] = array(
     'sort' => true
 );
 
+
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
     'select' => 'T',
@@ -154,8 +148,6 @@ require_once 'phpMyEdit.class.php';
 <h1>Les ventes</h1>
 
 <?
-/* <button class="btn btn-primary modif">Modifier les statuts</button> */
-
 new phpMyEdit($opts);
 ?>
 
@@ -166,12 +158,31 @@ getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
 ?>
 
 <script>
-    $(".couleur").click(function() {
+    $(function() {
         $('td[name=order_state]').each(function(index) {
+            dat = "";
+            reference = $(this).parent().children(':nth-child(3)').text();
 
+            $.ajax({
+                url: "av_utilities.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    action: 'getOrderCurrentState',
+                    module: 'orders',
+                    reference: reference
+                },
+                success: function(data) {
+                    dat = data;
+                },
+                error: function() {
+                    console.log('Error occured');
+                }
+            });
 
-            $(this).closest("tr").addClass("alert alert-success");
-
+            $(this).removeClass();
+            $(this).addClass("alert alert-" + dat);
         });
     });
 
