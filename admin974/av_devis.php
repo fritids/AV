@@ -195,7 +195,7 @@ if (isset($_POST["devis_save"])) {
                     $p_unit_price = $p["price"];
                     $p_unit_weight = $p["weight"];
 
-                    $product_amount = $p["price"] * $p_qte[$k] * $p_width[$k] * $p_height[$k] / 1000000;
+                    $product_amount = $p["price"] * $p_qte[$k] * round($p_width[$k] * $p_height[$k] / 1000000,2);
 
                     $devis_detail = array(
                         "id_devis" => $did,
@@ -221,7 +221,7 @@ if (isset($_POST["devis_save"])) {
                                 "prixttc" => $arr[2],
                                 "name" => $arr[3]);
                             $db->insert("av_devis_product_attributes", $devis_product_attributes);
-                            $attributes_amount += $arr[2] * $p_width[$k] * $p_height[$k] / 1000000 * $p_qte[$k];
+                            $attributes_amount += $arr[2] * round($p_width[$k] * $p_height[$k] / 1000000,2) * $p_qte[$k];
                         }
                     }
 
@@ -459,10 +459,10 @@ if (isset($_POST["devis_save"])) {
                 mytr.find(".poids").text(parseFloat(p_uweight) * parseInt(p_qte));
 
             } else {
-                pprice = p_width * p_height / 1000000 * p_uprice * p_qte;
+                pprice = (p_width * p_height / 1000000).toFixed(2) * p_uprice * p_qte;
 
                 mytr.find(".prixttc").val(pprice.toFixed(2));
-                mytr.find(".poids").text(p_width * p_height / 1000000 * p_uweight * p_qte);
+                mytr.find(".poids").text((p_width * p_height / 1000000).toFixed(2) * p_uweight * p_qte);
             }
         }
 

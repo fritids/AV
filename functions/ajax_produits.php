@@ -12,7 +12,7 @@ mysql_select_db($bdd_name);
 
 $req = "SELECT name, id_product, weight, price, min_width , min_height , max_width ,max_height, min_area_invoiced, max_area_invoiced "
         . "FROM av_product "
-        . "WHERE name LIKE '%" . $_REQUEST['term'] . "%' ";
+        . "WHERE active = 1 and name LIKE '%" . $_REQUEST['term'] . "%' ";
 
 $query = mysql_query($req);
 

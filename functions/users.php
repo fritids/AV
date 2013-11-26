@@ -70,14 +70,24 @@ function checkUserLogin($email, $pwd) {
         $_SESSION["user"] = $user[0];
         $_SESSION["is_logged"] = true;
 
+        
         // get adresse
-
         $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
         $_SESSION["user"]["invoice"] = getAdresse($user[0]["id_customer"], "invoice");
-
-        if (empty($_SESSION["user"]["delivery"]))
-            $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "invoice");
-
+        
+        
+        if (empty($_SESSION["user"]["delivery"])) {
+            $delivery_adresse = $_SESSION["user"]["invoice"];
+            $delivery_adresse["alias"] = 'delivery';         
+            $delivery_adresse["date_add"] = date("Y-m-d");
+            $delivery_adresse["date_upd"] = date("Y-m-d");
+            unset($delivery_adresse["id_address"]);
+            
+            createNewAdresse($delivery_adresse);
+            
+            $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
+        }      
+        
         return(true);
     } else {
         return(FALSE);

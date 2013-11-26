@@ -64,10 +64,10 @@
     </div>
     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
         {if empty($smarty.session.user.delivery.address1)}
-            <p>Merci de renseigner votre adresse complète de livraison.</p>
+            <p><font color="red"> Merci de renseigner votre adresse complète de livraison.</font></p>
             <a href="?register"><button>Mon compte</button></a>
         {else}
-            <a href="?delivery"><button id="btn-livraison"></button></a>
+            <a href="?delivery"><input id="btn-livraison" type="button" /></a>
             {/if}
         {else}
         <a href="?order-identification"><button id="btn-connexion"></button></a>

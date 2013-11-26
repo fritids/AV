@@ -245,6 +245,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                     </tr>
                                     <?
                                     foreach ($devis["details"] as $line) {
+                                        $attribute_price = 0;
                                         ?>
 
                                         <tr id="id0">
@@ -252,6 +253,8 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                             <td>
                                                 <?
                                                 foreach ($line["combinations"] as $attribute) {
+                                                    
+                                                    $attribute_price = $attribute["prixttc"];
                                                     ?>
                                                     <?= $attribute["name"] ?><br>
                                                     <?
@@ -259,7 +262,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                 ?>
                                             </td>
                                             <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
-                                            <td><?= $line["product_price"] ?></td>
+                                            <td><?= $line["product_price"] +$attribute_price ?></td>
                                             <td><?= $line["product_weight"] ?></td>
                                             <td><?= $line["product_quantity"] ?></td>                                                             
                                             <td><?= $line["total_price_tax_incl"] ?></td>                    

@@ -72,6 +72,12 @@ $opts['fdd']['name'] = array(
     'sort' => true,
     'URL' => 'av_product_attribute.php?p=$key'
 );
+$opts['fdd']['msg_dispo'] = array(
+    'name' => 'msg dispo.',
+    'select' => 'T',
+    'maxlen' => 255,
+    'sort' => true,
+);
 $opts['fdd']['description'] = array(
     'name' => 'Description',
     'select' => 'T',
@@ -84,6 +90,7 @@ $opts['fdd']['description'] = array(
     'sort' => true,
     'css' => array('id' => 'test', 'page_type' => 'test')
 );
+
 $opts['fdd']['description_short'] = array(
     'name' => 'Description courte',
     'select' => 'T',
@@ -95,6 +102,7 @@ $opts['fdd']['description_short'] = array(
     'sort' => true,
     'width' => '200px'
 );
+
 $opts['fdd']['video'] = array(
     'name' => 'Video.',
     'options' => 'AC',
