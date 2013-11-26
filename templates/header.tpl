@@ -88,7 +88,7 @@
                                 Bonjour <a href="/?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
                                 <a href="/?action=logout">deconnexion</a>
                             {else}
-                                <a href="/?identification" title="connexion">SE CONNECTER</a>
+                                <span style="background:#fe6600;height:29px;height-line:29px;min-height:29px;display:inline-block;padding:0 10px;"><a href="/?identification" title="connexion">SE CONNECTER</a></span>
                             {/if}
                         </div>
                     </div>

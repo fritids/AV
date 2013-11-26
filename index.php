@@ -72,7 +72,7 @@ $cms = array();
 $meta = array(
     "title" => "ALLOVITRES : verre pas cher, tout type de vitrage sur mesure. - Allovitres.com",
     "description" => "Allovitres propose la vente en ligne de vitres pas chers. Simple vitrage, double vitrage, verre décoratifs ou autres verres spécifiques, toutes nos offres de vitres sont à tarif discount.",
-    "keyword" => "simple vitrage, double vitrage, verre décoratifs, verre spécifique, verre feuilleté, miroir, verre surmesure, allovitres"
+    "keywords" => "simple vitrage, double vitrage, verre décoratifs, verre spécifique, verre feuilleté, miroir, verre surmesure, allovitres"
 );
 /**/
 

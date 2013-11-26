@@ -24,7 +24,6 @@ $mail->CharSet = 'UTF-8';
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
-
 if (isset($_GET["id_order"]))
     $oid = $_GET["id_order"];
 
@@ -67,22 +66,27 @@ $b = $db->rawQuery("select id_order, current_state from mv_orders where id_order
 $order_precedent = @$a;
 $order_suivant = @$b;
 
+//print_r($_POST);
+
+if (isset($_POST) && isset($_POST["add_notes"])) {
+
+    $params = array(
+        "id_order" => $oid,
+        "id_admin" => $_SESSION["user_id"],
+        "message" => $_POST["order_note"],
+        "private" => 1,
+        "date_add" => date("y-m-d H:i:s")
+    );
+    $r = $db->insert("av_order_note", $params);
+    if ($r)
+        $updated["text"] = "Note a été ajouté";
+
+    $orderinfo = getOrderInfos($oid);
+}
+
+
 /* Update des combobox */
-if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"])) {
-
-    if (isset($_POST["add_notes"])) {
-        $params = array(
-            "id_order" => $oid,
-            "id_admin" => $_SESSION["user_id"],
-            "message" => $_POST["order_note"],
-            "private" => 1,
-            "date_add" => date("y-m-d H:i:s")
-        );
-        $r = $db->insert("av_order_note", $params);
-        if ($r)
-            $updated["text"] = "Note a été ajouté";
-    }
-
+if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
 
     if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
         if (is_array($_POST["product_current_state"])) {
@@ -122,7 +126,7 @@ if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"
             }
         }
 
-    //maj status order  
+//maj status order  
     if (isset($_POST["current_state"]) && !empty($_POST["current_state"])) {
 
         $r = $db->where("id_order", $oid)
@@ -166,7 +170,7 @@ if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"
                 $mail->SetFrom($order_mail_from);
                 $mail->Subject = $order_mail_subject;
                 $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
-                
+
                 $mail->MsgHTML($mail_body);
                 if ($mail->Send()) {
                     $updated["text"] = "mail a été envoyé <br>";
@@ -186,11 +190,12 @@ if (isset($_POST) && !empty($_POST) && empty($_POST["order_action_send_supplier"
                 "oldval" => $orderinfo["current_state"],
                 "newval" => $_POST["current_state"]
             ));
-
-            @$updated["text"] .= "Modification a été effectuée avec succés.";
         }
+        
     }
 
+    @$updated["text"] .= "Modification a été effectuée.";
+    
 //suite aux update on recharge les infos
     $orderDetail = getUserOrdersDetail($oid);
     $orderinfo = getOrderInfos($oid);
@@ -239,7 +244,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         $path = "./ressources/bon_de_commandes";
         $order_path = $path . "/" . $orderinfo["id_order"];
-        //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
+//$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
         $bdc_commande_filename = md5(rand());
         @mkdir($order_path);
         $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
@@ -256,7 +261,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                     ->where("id_supplier", $orderSupplier["id_supplier"])
                     ->update("av_order_detail", $params);
 
-            //le statut a changé on recharge les données
+//le statut a changé on recharge les données
             $orderDetail = getUserOrdersDetail($oid);
 
             foreach ($orderDetailSupplier as $k => $ods) {
@@ -274,6 +279,20 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         }
     }
     $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s) : <ul>" . $tmp . "</ul>";
+}
+
+
+if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
+
+    $p_qte = $_POST["qte"];
+
+    foreach ($p_qte as $odid => $qte) {
+        if (!empty($qte))
+            $oid = splitOrderDetail($odid, $qte);
+    }
+    $orderDetail = getUserOrdersDetail($oid);
+
+    $updated["text"] = "La ligne a été 'splitté'";
 }
 ?>
 
@@ -368,7 +387,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                 ?> 
                     </select>
 
-                    <button type="submit" class="btn btn-sm">Ok</button>
+                    <button type="submit" class="btn btn-sm" name="order_state">Ok</button>
                 </form>
             </div>
         </div>
@@ -528,6 +547,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     <th>commentaire</th>    
                                     <th>commentaire</th>    
                                     <th>commentaire</th>    
+                                    <th></th>    
                                 </tr>
                                 <?
                                 foreach ($orderDetail as $od) {
@@ -538,7 +558,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                     ?>
                                     <tr id="id0">
 
-                                        <td>
+                                        <td nowrap> 
                                             <?= $od["product_name"] ?> <br>
                                             <?
                                             foreach ($od["attributes"] as $attribute) {
@@ -549,10 +569,10 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
                                         </td>
 
-                                        <td><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
-                                        <td><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
+                                        <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
+                                        <td nowrap><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
                                         <td><?= $od["product_quantity"] ?></td>
-                                        <td><?= $od["total_price_tax_incl"] ?> €</td>
+                                        <td nowrap><?= $od["total_price_tax_incl"] ?> €</td>
                                         <td>
                                             <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
                                                 <option value=""></option>
@@ -591,6 +611,32 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                                         <td><?= $t["comment1"] ?></td>
                                         <td><?= $t["comment2"] ?></td>
                                         <td><?= $t["comment3"] ?></td>
+                                        <td>
+                                            <?
+                                            if ($od["product_quantity"] > 1) {
+                                                ?>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">
+                                                        <select name="qte[<?= $od["id_order_detail"] ?>]">
+                                                            <option></option>
+                                                            <?
+                                                            for ($n = 1; $n < $od["product_quantity"]; $n++) {
+                                                                ?>
+                                                                <option value="<?= $n ?>"><?= $n ?></option>
+                                                                <?
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </span>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="submit" name="split_order">Split!</button>
+                                                    </span>
+                                                </div><!-- /input-group -->
+                                                <?
+                                            }
+                                            ?>
+                                        </td>
+
                                     </tr>
                                     <?
                                 }
@@ -720,10 +766,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
                 </form>
             </div>
-        </div>
-
-
-
+        </div>        
         <?
     }
     ?>

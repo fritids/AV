@@ -289,4 +289,46 @@ function checkOrderPaid() {
     }
 }
 
+function splitOrderDetail($odid, $qty_request) {
+    global $db;
+
+    $r = $db->where("id_order_detail", $odid)
+            ->get("av_order_detail");
+
+    $coef = $qty_request / $r[0]["product_quantity"];
+
+    $oid = $r[0]["id_order"];
+    $init_qte = $r[0]["product_quantity"];
+    $init_ttc = $r[0]["total_price_tax_incl"];
+    $init_excl = $r[0]["total_price_tax_incl"];
+
+    $r[0]["product_quantity"] = $r[0]["product_quantity"] * $coef;
+    $r[0]["total_price_tax_incl"] = $r[0]["total_price_tax_incl"] * $coef;
+    $r[0]["total_price_tax_excl"] = $r[0]["total_price_tax_excl"] * $coef;
+
+    unset($r[0]["id_order_detail"]);
+
+    $new_odid = $db->insert("av_order_detail", $r[0]);
+
+    if ($r) {
+        $params = array(
+            "product_quantity" => $init_qte * (1 - $coef),
+            "total_price_tax_incl" => $init_ttc * (1 - $coef),
+            "total_price_tax_excl" => $init_excl * (1 - $coef),
+        );
+
+        $r = $db->where("id_order_detail", $odid)
+                ->update("av_order_detail", $params);
+    }
+
+    //les attributs
+    $r = $db->where("id_order_detail", $odid)
+            ->get("av_order_product_attributes");
+    foreach ($r as $attribut) {
+        $attribut["id_order_detail"] = $new_odid;
+        $db->insert("av_order_product_attributes", $attribut);
+    }
+    return $oid;
+}
+
 ?>

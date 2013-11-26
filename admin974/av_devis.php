@@ -72,7 +72,6 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
   print_r($customer_invoice);
  */
 
-
 if (isset($_POST["contact"])) {
     if ($_POST["contact"] == "Ajouter") {
         $customer_info = array(
@@ -195,7 +194,7 @@ if (isset($_POST["devis_save"])) {
                     $p_unit_price = $p["price"];
                     $p_unit_weight = $p["weight"];
 
-                    $product_amount = $p["price"] * $p_qte[$k] * round($p_width[$k] * $p_height[$k] / 1000000,2);
+                    $product_amount = $p["price"] * $p_qte[$k] * round($p_width[$k] * $p_height[$k] / 1000000, 2);
 
                     $devis_detail = array(
                         "id_devis" => $did,
@@ -210,7 +209,7 @@ if (isset($_POST["devis_save"])) {
 
                     $ddid = $db->insert("av_devis_detail", $devis_detail);
 
-                    foreach ($_POST["product_attribut"] as $attributes) {
+                    foreach ($_POST["product_attribut"][$k] as $attributes) {
                         $arr = explode("|", $attributes);
                         if ($arr[0] == $product) {
                             $devis_product_attributes = array(
@@ -221,7 +220,7 @@ if (isset($_POST["devis_save"])) {
                                 "prixttc" => $arr[2],
                                 "name" => $arr[3]);
                             $db->insert("av_devis_product_attributes", $devis_product_attributes);
-                            $attributes_amount += $arr[2] * round($p_width[$k] * $p_height[$k] / 1000000,2) * $p_qte[$k];
+                            $attributes_amount += $arr[2] * round($p_width[$k] * $p_height[$k] / 1000000, 2) * $p_qte[$k];
                         }
                     }
 
@@ -376,6 +375,22 @@ if (isset($_POST["devis_save"])) {
         $row.find(".attributes5").chained($row.find(".product"));
         $row.find(".attributes6").chained($row.find(".product"));
         $row.find(".attributes7").chained($row.find(".product"));
+
+        $row.find(".attributes1").attr('name', $row.find(".attributes1").attr('name') + "[" + c + "][]");
+        $row.find(".attributes2").attr('name', $row.find(".attributes2").attr('name') + "[" + c + "][]");
+        $row.find(".attributes3").attr('name', $row.find(".attributes3").attr('name') + "[" + c + "][]");
+        $row.find(".attributes4").attr('name', $row.find(".attributes4").attr('name') + "[" + c + "][]");
+        $row.find(".attributes5").attr('name', $row.find(".attributes5").attr('name') + "[" + c + "][]");
+        $row.find(".attributes6").attr('name', $row.find(".attributes6").attr('name') + "[" + c + "][]");
+        $row.find(".attributes7").attr('name', $row.find(".attributes7").attr('name') + "[" + c + "][]");
+
+        $row.find(".product").attr('name', $row.find(".product").attr('name') + "[" + c + "]");
+
+        $row.find(".product_width").attr('name', $row.find(".product_width").attr('name') + "[" + c + "]");
+        $row.find(".product_height").attr('name', $row.find(".product_height").attr('name') + "[" + c + "]");
+        $row.find(".product_quantity").attr('name', $row.find(".product_quantity").attr('name') + "[" + c + "]");
+
+
         $row.show();
 
         //.find(".product_width").val();
@@ -759,9 +774,11 @@ if (isset($_POST["devis_save"])) {
 
 <div class="container">
     <div class="row">
-        <p class="alert alert-info">
-            Lors de la création du devis, un pdf est joint à l'envoi du mail.
-        </p>
+          
+        <ul class=" col-xs-6 alert alert-info">
+            <li>correction : bug sur la saisie de devis de plusieurs produits standards <b>identiques</b>.</li>
+            <li>Lors de la création du devis, un pdf est joint à l'envoi du mail.</li>
+        </ul>
     </div>
     <div class="row">
         <div class="col-md-3">
@@ -857,7 +874,7 @@ if (isset($_POST["devis_save"])) {
                     <input type="hidden" name="" value="0" class="attr6_price" size="2" />
                     <input type="hidden" name="" value="0" class="attr7_price" size="2" />
                     <td>
-                        <select name="product_id[]" class="product" id="product">
+                        <select name="product_id" class="product" id="product">
                             <?
                             foreach ($pAll as $product) {
                                 if ($product["min_width"] > 0 && $product["min_height"] > 0) {
@@ -875,7 +892,7 @@ if (isset($_POST["devis_save"])) {
                         $a = $db->get("av_attributes");
                         foreach ($a as $attribute) {
                             ?>
-                            <select name = "product_attribut[]" class = "attributes<?= $attribute["id_attribute"] ?>" id="attributes<?= $attribute["id_attribute"] ?>">
+                            <select name = "product_attribut" class = "attributes<?= $attribute["id_attribute"] ?>" id="attributes<?= $attribute["id_attribute"] ?>">
                                 <?
                                 foreach ($pAll as $product) {
                                     if (is_array($product["combinations"])) {
@@ -892,16 +909,17 @@ if (isset($_POST["devis_save"])) {
                                     }
                                 }
                                 ?>
-                            </select><br>
+                            </select>
+                            <br>
                             <?
                         }
                         ?>
 
                     </td>
-                    <td><input type="text" name="product_width[]"  class="product_width" size="5" /></td>
-                    <td><input type="text" name="product_height[]" class="product_height" size="5" /></td>                                    
-                    <td><input type="text" name="product_unit_price[]" class="unit_price" size="5" readonly="readonly" /> €/m²</td>
-                    <td><input type="text" name="product_quantity[]" class="product_quantity" size="2" /></td>                                                        
+                    <td><input type="text" name="product_width"  class="product_width" size="5" /></td>
+                    <td><input type="text" name="product_height" class="product_height" size="5" /></td>                                    
+                    <td><input type="text" name="product_unit_price" class="unit_price" size="5" readonly="readonly" /> €/m²</td>
+                    <td><input type="text" name="product_quantity" class="product_quantity" size="2" /></td>                                                        
 
                     <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
                     </tr>

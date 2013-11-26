@@ -56,7 +56,7 @@
     {foreach key=key item=detail from=$orderdetail name=orderdetail}
         <tr>
             <td>{$orderinfo.address.delivery.zone}</td>
-            <td>{$orderinfo.customer.lastname} AV</td>
+            <td>{$orderinfo.customer.lastname} {$orderinfo.customer.firstname} AV</td>
             <td>{$detail.product_quantity}</td>
             <td>{$detail.product_name}</td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
