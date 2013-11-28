@@ -12,8 +12,6 @@ function addtruckTournee($id) {
     $order = $db->where("id_order_detail", $imp[2])
             ->get("av_order_detail");
 
-
-
     $info = array(
         "id_truck" => $imp[1],
         "id_order" => $order[0]["id_order"],
@@ -39,7 +37,7 @@ function delProduitTournee($id) {
             ->delete("av_tournee");
 
     $r = $db->where("id_order_detail", $id)
-            ->update("av_order_detail", array("product_current_state" => 17));
+            ->update("av_order_detail", array("product_current_state" => 18));
 
     if ($r)
         return(json_encode($id . "ok"));

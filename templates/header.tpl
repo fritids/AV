@@ -29,6 +29,7 @@
         <script type="text/javascript" src="http://malsup.github.io/jquery.cycle2.js"></script>
         <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+        <script src="js/jquery.chained.js"></script>    
 
         <!--       <script>
                    $(window).load(function() {
@@ -133,55 +134,53 @@
 
             <div id="recherche">
                 <img src="/img/recherche.jpg"/>
-                {*
+
                 <div id="rech-conteneur-gauche" >
-                <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
-                switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
-                <span class="txt-recherche">RECHERCHE</span>
-                <span class="txt-recherche2">Par type de verre</span>
-                </div>
-                <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
-                switch_recherche2('rech-selecteur2', 'rech-selecteur1');">
-                <span class="txt-recherche">RECHERCHE</span>
-                <span class="txt-recherche2">Par type de projet</span>
-                </div>
+                    <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
+                    switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
+                        <span class="txt-recherche">RECHERCHE</span>
+                        <span class="txt-recherche2">Par type de verre</span>
+                    </div>
+                    <div id="rech-selecteur2" onmouseover="switch_recherche('rech-conteneur-droit1', 'rech-conteneur-droit2');
+                    switch_recherche2('rech-selecteur2', 'rech-selecteur1');">
+                        <span class="txt-recherche">RECHERCHE</span>
+                        <span class="txt-recherche2">Par type de projet</span>
+                    </div>
                 </div>
                 <div id="rech-conteneur-droit1">
-                <ul>
-                <li>
-                <label>Type 1</label>
-                <select id="select_type1">
-                <option value="0">choix 1</option>
-                <option value="1">choix 2</option>
-                </select>
-                </li>
-                <li>
-                <label>type 2</label>
-                <select id="select_type2">
-                <option value="0">choix 1</option>
-                <option value="1">choix 2</option>
-                </select>
-                </li>
-                <li>
-                <label>Type 3</label>
-                <select id="select_type3">
-                <option value="0">choix 1</option>
-                <option value="1">choix 2</option>
-                </select>
-                </li>
-                <li>
-                <label>type 4</label>
-                <select id="select_type4">
-                <option value="0">choix 1</option>
-                <option value="1">choix 2</option>
-                </select>
-                </li>
-                </ul>
-                <img id="btn-rechercher" src="/img/rechercher.png" />
+                    <form action="index.php?search" method="post"> 
+
+                        <ul>
+                            <li>
+                                <label>Type 1</label>
+                                <select id="select_type1" name="search_lvl_1">
+                                    {foreach key=key item=search from=$searchs}
+                                        <option value="{$key}" >{$search.lvl1_title}</option>                                
+                                    {/foreach}
+                                </select>
+                            </li>
+                            <li>
+                                <label>type 2</label>
+                                <select id="select_type2" name="search_lvl_2">
+                                    {foreach key=key item=search from=$searchs}
+                                        {foreach key=key2 item=lvl2 from=$search.lvl2}
+                                            <option value="{$lvl2.id_search_lvl2}" class="{$key}">{$lvl2.lvl2_title}</option>                                
+                                        {/foreach}
+                                    {/foreach}
+                                </select>
+                            </li>
+
+                        </ul>
+                        <input type="submit" />
+                    </form>
                 </div>
+
+                <script>
+                $("#select_type2").chained("#select_type1");
+                </script>
                 <div id="rech-conteneur-droit2">
 
                 </div>
-        
-                *}
+
+
             </div>

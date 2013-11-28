@@ -18,9 +18,9 @@ function getDeliveryZone($postcode) {
     $query = "select b.nom 
             from av_departements a , av_zone b
             where  a.id_zone = b.id_zone
-            and  a.id_departement = " . substr($postcode, 0, 2);
+            and  a.id_departement = ? " ;
 
-    $z = $db->rawQuery($query);
+    $z = $db->rawQuery($query, array(substr($postcode, 0, 2)));
 
     if ($z)
         return ($z[0]["nom"]);

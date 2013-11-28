@@ -56,9 +56,9 @@ function getDeliveryZone($postcode) {
     $query = "select b.nom 
             from av_departements a , av_zone b
             where  a.id_zone = b.id_zone
-            and  a.id_departement = " . substr($postcode, 0, 2);
+            and  a.id_departement = ? ";
 
-    $z = $db->rawQuery($query);
+    $z = $db->rawQuery($query, array(substr($postcode, 0, 2)));
 
     if ($z)
         return ($z[0]["nom"]);
@@ -80,7 +80,7 @@ function addLog($info) {
         "updated" => date("Y-m-d H:i:s"),
         "user" => $_SESSION["email"],
         "host" => $_SERVER['REMOTE_ADDR'],
-        "operation" =>  $info["operation"],
+        "operation" => $info["operation"],
         "tab" => $info["tabs"],
         "col" => $info["col"],
         "rowkey" => $info["rowkey"],
@@ -88,6 +88,48 @@ function addLog($info) {
         "newval" => addslashes($info["newval"])
     );
     $r = $db->insert("changelog", $params);
+}
+
+function getSearchCriterias() {
+    global $db;
+
+    $r = $db->rawQuery("select distinct a.id_search_lvl1 , b.label lvl1_title
+        from av_search_result a , av_search_criteria b
+        where a.id_search_lvl1 = b.id_search_criteria");
+
+    foreach ($r as $i => $lvl1) {
+        $k = $db->rawQuery("select distinct a.id_search_lvl2 , b.label lvl2_title
+        from av_search_result a , av_search_criteria b
+        where a.id_search_lvl2 = b.id_search_criteria
+        and a.id_search_lvl1 = ?
+        ", array($lvl1["id_search_lvl1"]));
+
+        $o[$lvl1["id_search_lvl1"]]["lvl1_title"] = $lvl1["lvl1_title"];
+        $o[$lvl1["id_search_lvl1"]]["lvl2"] = $k;
+    }
+
+    /* select a.* , b.label lvl1_title, c.label lvl2_title, d.id_product, d.name product_name
+      from av_search_result a , av_search_criteria b ,av_search_criteria c , av_product d
+      where a.id_search_lvl1 = b.id_search_criteria
+      and a.id_search_lvl2 = c.id_search_criteria
+      and a.result_id_product = d.id_product
+     */
+    return $o;
+}
+
+function getSearchResults($param1, $param2) {
+    global $db;
+
+    $r = $db->rawQuery("select result_id_product
+      from av_search_result a 
+      where id_search_lvl1  = ?
+      and id_search_lvl2  = ?
+      ", array($param1, $param2));
+
+    foreach ($r as $i => $product) {
+        $o[$i] = getProductInfos($product["result_id_product"]);
+    }
+    return $o;
 }
 
 ?>

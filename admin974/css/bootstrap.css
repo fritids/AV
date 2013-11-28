@@ -5190,6 +5190,15 @@ a.thumbnail:focus {
   background-color:#5cb85c;
   border-color: #d6e9c6;
 }
+.alert-21 {
+  background-color: blueviolet;
+  border-color: #d6e9c6;
+  color: #fff;
+}
+.alert-22 {
+  background-color: coral;
+  border-color: #d6e9c6;
+}
 
 .alert-success {
   color: #468847;

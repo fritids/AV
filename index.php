@@ -1,7 +1,7 @@
 <?php
-if($_SERVER['REQUEST_URI']=='/index.php') {
-  header("Status: 301 Moved Permanently", false, 301);
-  header("Location: /");
+if ($_SERVER['REQUEST_URI'] == '/index.php') {
+    header("Status: 301 Moved Permanently", false, 301);
+    header("Location: /");
 }
 include ('configs/settings.php');
 require('libs/Smarty.class.php');
@@ -62,6 +62,8 @@ $ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 $secured_pages = array("my-account", "devis", "orders-list");
+$search = getSearchCriterias();
+$search_result = array();
 
 /* Cms */
 $AllCMS = getAllCmsInfo();
@@ -238,7 +240,6 @@ if (isset($_GET["order-identification"])) {
     $breadcrumb = array("parent" => "Accueil", "fils" => "Connexion");
     $page_type = "full";
 }
-
 if (isset($_GET["contact-devis"])) {
     $page = "contact-devis";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Demande de devis");
@@ -269,6 +270,13 @@ if (isset($_GET["contactez-nous"])) {
 if (isset($_GET["sitemap"])) {
     $page = "plan-site";
     $page_type = "full";
+}
+if (isset($_GET["search"])) {
+    $page = "search";
+    $page_type = "full";
+    $param1 = $_POST["search_lvl_1"];
+    $param2 = $_POST["search_lvl_2"];
+    $search_result = getSearchResults($param1, $param2);
 }
 
 if (isset($_GET["orders-list"])) {
@@ -781,7 +789,7 @@ if (isset($_GET["newsletter"]) && isset($_POST["email"])) {
     if ($r) {
         $page = "generic_page";
         $ok_msg = array("txt" => "Bravo vous êtes bien enregistré au programme de Newsletter d'allovitres.com . Vous recevrez très prochainement toutes nos promotions et nos bons plans");
-    } 
+    }
 }
 
 
@@ -816,6 +824,8 @@ $smarty->assign('config', $config);
 $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
 $smarty->assign('previous_page', $previous_page);
+$smarty->assign('searchs', $search);
+$smarty->assign('search_result', $search_result);
 
 $smarty->display('index.tpl');
 ?>
@@ -837,6 +847,9 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= @print_r($devisinfo); ?>
     <h1>Post</h1>
     <?= @print_r($_POST); ?>
+    <h1>Search</h1>
+    <?= @print_r($search); ?>
+    <?= @print_r($search_result); ?>
 
     <?
 }
