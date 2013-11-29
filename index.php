@@ -62,7 +62,7 @@ $ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 $secured_pages = array("my-account", "devis", "orders-list");
-$search = getSearchCriterias();
+//$search = getSearchCriterias();
 $search_result = array();
 
 /* Cms */
@@ -650,11 +650,12 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $option_price = $attribute["prixttc"];
                 $option_name = $attribute["name"];
                 $option_weight = $attribute["weight"];
+                $id_option = $attribute["id_attribute"];
                 //$shipping_amount = $shipping_ratio * $option_weight;
                 $shipping_amount = 0;
 
                 echo $option_name . "<br>";
-                $cart->addItemOption($pid, $i, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
             }
         } else {
             $surface = 0;

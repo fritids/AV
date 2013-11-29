@@ -23,13 +23,7 @@ $opts['options'] = 'CF';
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '10';
 
-
 $opts['inc'] = 25;
-
-/* Get the user's default language and use it if possible or you can
-  specify particular one you want to use. Refer to official documentation
-  for list of available languages. */
-$opts['language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'] . '-UTF8';
 
 /* Table-level filter capability. If set, it is included in the WHERE clause
   of any generated SELECT statement in SQL query. This gives you ability to
@@ -131,6 +125,17 @@ $opts['fdd']['order_comment'] = array(
     'name' => 'Commentaire client',
     'select' => 'T',
     'maxlen' => 65535,
+    'options' => 'VC',
+    'textarea' => array(
+        'html' => true,
+        'rows' => 20,
+        'cols' => 100),
+    'sort' => true,
+);
+$opts['fdd']['delivery_comment'] = array(
+    'name' => 'Commentaire interne livraison',
+    'select' => 'T',
+    'maxlen' => 255,
     'options' => 'VC',
     'textarea' => array(
         'html' => true,

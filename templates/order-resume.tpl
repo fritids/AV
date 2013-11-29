@@ -57,8 +57,9 @@
                                 option : 
                                 {foreach key=key item=option from=$product.options}
                                     {$option_price =  $option_price+$option.o_price}
+                                    {$option.o_name} 
                                 {/foreach}   
-                            {/if}
+                            {/if} 
 
                         </a>
                     </td>                    

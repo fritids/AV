@@ -331,4 +331,52 @@ function splitOrderDetail($odid, $qty_request) {
     return $oid;
 }
 
+/*
+function setPreparationEncours($oid) {
+    global $db, $mail, $monitoringEmails, $smarty;
+
+    $orderinfo = getOrderInfos($oid);
+
+    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
+    $order_mail_from = "livraison@allovitres.com";
+    $order_mail_tpl = "notif_order_preparation";
+
+    $new_order_state = 3;
+
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", array("current_state" => $new_order_state));
+
+    $mail->ClearAllRecipients();
+    $mail->ClearAttachments();
+
+    foreach ($monitoringEmails as $bccer) {
+        $mail->AddbCC($bccer);
+    }
+    $mail->AddAddress($orderinfo["customer"]["email"]);
+
+    $mail->SetFrom($order_mail_from);
+    $mail->Subject = $order_mail_subject;
+    $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
+
+    $mail->MsgHTML($mail_body);
+
+    if ($mail->Send()) {
+
+        $param = array(
+            "id_order" => $orderinfo["id_order"],
+            "id_user" => $_SESSION["user_id"],
+            "category" => $order_mail_tpl,
+        );
+
+        addLog(array("tabs" => "mv_orders",
+            "rowkey" => $orderinfo["id_order"],
+            "col" => "current_state",
+            "operation" => "update",
+            "oldval" => $orderinfo["current_state"],
+            "newval" => $new_order_state
+        ));
+        $r = $db->insert("av_order_bdc", $param);
+    }
+}
+*/
 ?>

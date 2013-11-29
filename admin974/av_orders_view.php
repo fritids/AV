@@ -93,11 +93,21 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
             foreach ($_POST["product_current_state"] as $id => $state) {
                 $r = $db->where("id_order_detail", $id)
                         ->update("av_order_detail", array("product_current_state" => $state));
+                //casse ou SAV
+                if ($state == 21 || $state == 22) {
+                    $r = $db->where("id_order_detail", $id)
+                            ->delete(("av_tournee"));
+                }
             }
         } else {
             foreach ($orderDetail as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
+                //casse ou SAV
+                if ($state == 21 || $state == 22) {
+                    $r = $db->where("id_order_detail", $id)
+                            ->delete(("av_tournee"));
+                }
             }
         }
     if (isset($_POST["id_supplier"]) && !empty($_POST["id_supplier"]))
@@ -191,11 +201,10 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 "newval" => $_POST["current_state"]
             ));
         }
-        
     }
 
     @$updated["text"] .= "Modification a été effectuée.";
-    
+
 //suite aux update on recharge les infos
     $orderDetail = getUserOrdersDetail($oid);
     $orderinfo = getOrderInfos($oid);
@@ -330,7 +339,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 }
                 ?>
 
-                <li><a href="#" ><strong><?= $oid ?></strong></a></li>
+                <li><a href="#" class="alert-<?= $orderinfo["current_state"] ?>"><strong><?= $oid ?></strong></a></li>
                 <?
                 for ($i = 0; $i <= 5; $i++) {
                     if (isset($order_suivant[$i])) {
@@ -394,7 +403,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
     </div>
 
     <div class="row">
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="panel panel-default">
                 <div class="panel-heading">Contact <div class="pull-right">
                         <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
@@ -410,7 +419,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
             </div>            
         </div>
 
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="panel panel-default">
                 <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_delivery["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
@@ -422,7 +431,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 </div>
             </div>  
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <div class="panel panel-default">
                 <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_invoice["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
@@ -433,6 +442,14 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                     <?= @$customer_invoice["postcode"] ?> <?= @$customer_invoice["city"] ?><br>
                 </div>
             </div> 
+        </div>
+        <div class="col-xs-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Commentaire client <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-body">
+                    <?= $orderinfo["order_comment"] ?>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -461,9 +478,9 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Commentaire client</div>
+                <div class="panel-heading">Commentaire interne livraison <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
-                    <?= $orderinfo["order_comment"] ?>
+                    <?= $orderinfo["delivery_comment"] ?>
                 </div>
             </div>
         </div>

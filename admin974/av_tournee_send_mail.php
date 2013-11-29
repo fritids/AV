@@ -55,26 +55,28 @@ foreach ($r as $k => $contact) {
         $r = $db->where("id_order", $contact["id_order"])
                 ->update("av_tournee", array("mail_send" => 1));
 
-        $param = array(
-            "id_order" => $contact["id_order"],
-            "id_user" => $_SESSION["user_id"],
-            "category" => "mail_livraison",
-        );
 
-        /* on change le status des ligne de detail en livraison fixé*/
+        /* on change le statut global a préparation en cours */
+        $s = $db->where("id_order", $contact["id_order"])
+                ->update("av_orders", array("current_state" => 3, "date_upd" => date("Y-m-d H:i:s")));
+
+        /* on change le status des ligne de detail en livraison fixé */
         $orderDetails = $db->rawQuery("select id_order_detail 
             from av_tournee 
             where id_truck = ?
             and date_livraison = ? 
-            and id_order = ?
-            and status = 2", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
+            and id_order = ? ", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
 
         foreach ($orderDetails as $orderDetail) {
             $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
                     ->update("av_order_detail", array("product_current_state" => 19, "date_upd" => date("Y-m-d H:i:s")));
         }
 
-
+        $param = array(
+            "id_order" => $contact["id_order"],
+            "id_user" => $_SESSION["user_id"],
+            "category" => "mail_livraison",
+        );
         $r = $db->insert("av_order_bdc", $param);
     }
 }

@@ -195,13 +195,14 @@ if (isset($_GET["planning"]) && !$upd) {
                                     <table>
                                         <?
                                         //on boucle sur les produits
+                                        $i = 0;
+                                        $order_weight = 0;
                                         foreach ($listOrderProduct as $OrderProduct) {
-                                            ?>
-
-                                            <?
+                                            $i++;
+                                            $o_truck = getOrderInfos($OrderProduct["id_order"]);
                                             $customer = getOrderUserDetail($OrderProduct["id_customer"]);
                                             $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
-
+                                            
                                             $p_qty = $OrderProduct["nb_product_delivered"];
 
                                             $montant_produits += $OrderProduct["product_price"];
@@ -220,19 +221,30 @@ if (isset($_GET["planning"]) && !$upd) {
 
                                             if ($tmpRef != $OrderProduct["reference"]) {
                                                 $montant_transport += $conf_shipping_amount;
+                                                if ($i > 1) {
+                                                    ?>
+                                                    <tr>
+                                                        <td colspan="7" class="text-right" > <h4>Total</h4></td>
+                                                        <td class="text-center"><h4><?= $order_weight ?> Kg</h4></td>                                                                                                                          
+                                                    </tr>
+
+                                                    <?
+                                                    $order_weight = 0;
+                                                }
                                                 ?>
                                             </table>
                                         </li>
                                         <li id="cmd_<?php echo $OrderProduct["id_order"]; ?>">
-                                            <table >
+                                            <table>
                                                 <input type="hidden" value="" name="order[<?= $OrderProduct["id_order"] ?>]">
+
                                                 <tr>
-                                                    <td>&nbsp;</td>
-                                                    <th colspan="2"><a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>" class="fancybox"  ><?= $OrderProduct["reference"] ?></a></th>
+                                                    <th colspan="2"><a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a> <br> <?= date("d/m", strtotime($o_truck["date_add"])) ?></th>
                                                     <th colspan="2">
                                                         <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
                                                         <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
                                                     </th>
+
                                                     <th>temps de trajet <br><input type="text" value="<?= $OrderProduct["comment1"] ?>" name="comment1[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Heure de livraison<br><input type="text" value="<?= $OrderProduct["comment2"] ?>" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Informations <br><input type="text" value="<?= $OrderProduct["comment3"] ?>" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
@@ -242,18 +254,26 @@ if (isset($_GET["planning"]) && !$upd) {
                                                 <?
                                                 $tmpRef = $OrderProduct["reference"];
                                             }
+
+                                            $order_weight += $p_qty * $OrderProduct["product_weight"];
                                             ?>
                                             <tr>
-                                                <td><?= $p_qty ?></td>
-                                                <td colspan="6"><?= $OrderProduct["product_name"] ?></td>
-                                                <td nowrap><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
-                                                <td><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
+
+                                                <td colspan="6"><?= $p_qty ?> x <?= $OrderProduct["product_name"] ?></td>
+                                                <td nowrap class="text-center"><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
+                                                <td class="text-center"><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
 
                                             </tr>
+
+
 
                                             <?
                                         }
                                         ?>
+                                        <tr>
+                                            <td colspan="7" class="text-right" > <h4>Total</h4></td>
+                                            <td class="text-center"><h4><?= $order_weight ?> Kg</h4></td>                                                                                                                          
+                                        </tr>
                                     </table>
                                 </li>
                                 <table class="col-md-6">

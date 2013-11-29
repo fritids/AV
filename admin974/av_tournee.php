@@ -18,7 +18,7 @@ function getDeliveryZone($postcode) {
     $query = "select b.nom 
             from av_departements a , av_zone b
             where  a.id_zone = b.id_zone
-            and  a.id_departement = ? " ;
+            and  a.id_departement = ? ";
 
     $z = $db->rawQuery($query, array(substr($postcode, 0, 2)));
 
@@ -258,6 +258,17 @@ $suppliers = $db->get("av_supplier");
                                 <th colspan="3"><?= @$o["order_comment"] ?></th>        
                             </tr>
                             <?
+                            if ($o["delivery_comment"]) {
+                                ?>
+                                <tr >
+                                    <td colspan="8" class="alert" style=" background-color: red; color: #fff">
+                                        <?= @$o["delivery_comment"] ?>
+                                    </td>
+                                </tr>
+                                <?
+                            }
+                            ?>
+                            <?
                             $queryOrderDetail = "select a.id_order, b.*,
                                             product_quantity * product_weight tot_prod_weight
                                             from av_orders a, av_order_detail b
@@ -285,7 +296,8 @@ $suppliers = $db->get("av_supplier");
                                 //$product_weight = $OrderProduct["product_quantity"] * round(($OrderProduct["product_width"] * $OrderProduct["product_height"] * $OrderProduct["product_depth"]) / 1000000000, 2);
                                 $mytruck = getProductTruck($OrderProduct["id_order_detail"], $date_livraison);
 
-                                $qte_remaining = $OrderProduct["product_quantity"] - $mytruck["nb_product_delivered"];
+                                //$qte_remaining = $OrderProduct["product_quantity"] - $mytruck["nb_product_delivered"];
+                                $qte_remaining = $OrderProduct["product_quantity"];
 
                                 $product_weight = $qte_remaining * $OrderProduct["product_weight"];
                                 ?>
@@ -461,6 +473,7 @@ $suppliers = $db->get("av_supplier");
                                                         //on boucle sur les produits
                                                         foreach ($listOrderProduct as $OrderProduct) {
                                                             $p_qty = $OrderProduct["nb_product_delivered"];
+                                                            $o_truck = getOrderInfos($OrderProduct["id_order"]);
 
                                                             $montant_produits += $OrderProduct["product_price"];
                                                             $nb_produits += $OrderProduct["nb_product_delivered"];
@@ -472,9 +485,13 @@ $suppliers = $db->get("av_supplier");
                                                                 $nb_commandes++;
                                                                 ?>
                                                                 <tr>
-                                                                    <td>&nbsp;</td>
-                                                                    <th colspan="4">
-                                                                        <a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a>
+                                                                    <th colspan="6">
+                                                                        <a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>">
+                                                                            <?= $OrderProduct["reference"] ?>
+                                                                        </a>
+                                                                            <?= date("d/m", strtotime($o_truck["date_add"])) ?> 
+                                                                            <?= $o_truck["customer"]["firstname"] ?> <?= $o_truck["customer"]["lastname"] ?>
+                                                                        
                                                                     </th>
                                                                 </tr>
                                                                 <?
