@@ -43,7 +43,7 @@
 <table border="1">
     <tr>
         <th width="50">Zone</th>
-        <th width="150">Réference Client</th>
+        <th width="150">Référence Client</th>
         <th width="50">Qte</th>
         <th width="250">Designation</th>        
         <th width="70">Dimension</th>
@@ -61,7 +61,7 @@
             <td>{$detail.product_name}</td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
             {foreach key=key2 item=attribut from=$detail.attributes}
-                <td>{$attribut.attribute_value}</td>
+                <td>&nbsp;&nbsp;{$attribut.attribute_value}</td>
             {/foreach}            
         </tr>
     {/foreach}

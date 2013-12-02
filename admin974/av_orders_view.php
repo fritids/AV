@@ -9,6 +9,7 @@ include ("functions/supplier.php");
 require('../libs/Smarty.class.php');
 require('../classes/class.phpmailer.php');
 require('../classes/tcpdf.php');
+require "../classes/php-export-data.class.php";
 
 define("COMMANDE_FOURNISSEUR", 16);
 
@@ -227,6 +228,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $mail->Subject = "Bon de commande : #" . $orderinfo["id_order"];
 
         $orderDetailSupplier = getUserOrdersDetail($oid, $orderSupplier["id_supplier"]);
+        $orderDetailSupplierXLS = $orderDetailSupplier;
 
         $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         $pdf->SetCreator(PDF_CREATOR);
@@ -253,13 +255,24 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         $path = "./ressources/bon_de_commandes";
         $order_path = $path . "/" . $orderinfo["id_order"];
-//$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
+
+        //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
         $bdc_commande_filename = md5(rand());
         @mkdir($order_path);
         $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
 
+        //Excel
+
+
+        $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
+        fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
+        fclose($fp);
+       
+
+        // fin excel
 
         $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
+        $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
         $mail->MsgHTML($mail_body);
 
         if ($mail->Send()) {

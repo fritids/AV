@@ -62,7 +62,7 @@ $ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
 $secured_pages = array("my-account", "devis", "orders-list");
-//$search = getSearchCriterias();
+$search = getSearchCriterias();
 $search_result = array();
 
 /* Cms */
@@ -273,7 +273,6 @@ if (isset($_GET["sitemap"])) {
 }
 if (isset($_GET["search"])) {
     $page = "search";
-    $page_type = "full";
     $param1 = $_POST["search_lvl_1"];
     $param2 = $_POST["search_lvl_2"];
     $search_result = getSearchResults($param1, $param2);

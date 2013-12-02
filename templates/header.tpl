@@ -100,15 +100,7 @@
                     <div id="header-droit">
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
                         <span id="telephone">0 892 70 11 13</span>
-                        <span id="telephone2">(0,34€TT/min)</span>
-                        <span id="recherche-header-classique">
-                            <form action="index.php" method="get">
-                                <input type="hidden" name="p" value="">
-                                <input type="hidden" name="id" value="" id="search_product">
-                                <input type="text" name="" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
-                                <input type="submit" value="Ok">
-                            </form>
-                        </span>
+                        <span id="telephone2">(0,34€TT/min)</span>                        
                     </div>
                     <div id="reseau-sociaux">
                         <img class="rs-icon" src="/img/RS-twitter.png" />
@@ -133,8 +125,7 @@
             {include file='sub_menu.tpl'}
 
             <div id="recherche">
-                <img src="/img/recherche.jpg"/>
-
+                
                 <div id="rech-conteneur-gauche" >
                     <div id="rech-selecteur1" onmouseover="switch_recherche('rech-conteneur-droit2', 'rech-conteneur-droit1');
                     switch_recherche2('rech-selecteur1', 'rech-selecteur2');">
@@ -148,6 +139,16 @@
                     </div>
                 </div>
                 <div id="rech-conteneur-droit1">
+                    <span id="recherche-header-classique">
+                        <form action="index.php" method="get">
+                            <input type="hidden" name="p" value="">
+                            <input type="hidden" name="id" value="" id="search_product">
+                            <input type="text" name="" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
+                            <input type="submit" value="Ok">
+                        </form>
+                    </span>
+                </div>
+                <div id="rech-conteneur-droit2">
                     <form action="index.php?search" method="post"> 
 
                         <ul>
@@ -155,7 +156,7 @@
                                 <label>Type 1</label>
                                 <select id="select_type1" name="search_lvl_1">
                                     {foreach key=key item=search from=$searchs}
-                                        <option value="{$key}" >{$search.lvl1_title}</option>                                
+                                        <option value="{$key}" {if $smarty.post.search_lvl_1 == $key} selected {/if}>{$search.lvl1_title}</option>                                
                                     {/foreach}
                                 </select>
                             </li>
@@ -164,7 +165,7 @@
                                 <select id="select_type2" name="search_lvl_2">
                                     {foreach key=key item=search from=$searchs}
                                         {foreach key=key2 item=lvl2 from=$search.lvl2}
-                                            <option value="{$lvl2.id_search_lvl2}" class="{$key}">{$lvl2.lvl2_title}</option>                                
+                                            <option value="{$lvl2.id_search_lvl2}" class="{$key}" {if $smarty.post.search_lvl_2 == $lvl2.id_search_lvl2} selected {/if}>{$lvl2.lvl2_title}</option>                                
                                         {/foreach}
                                     {/foreach}
                                 </select>
