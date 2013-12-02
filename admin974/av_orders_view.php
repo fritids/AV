@@ -89,28 +89,6 @@ if (isset($_POST) && isset($_POST["add_notes"])) {
 /* Update des combobox */
 if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
 
-    if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
-        if (is_array($_POST["product_current_state"])) {
-            foreach ($_POST["product_current_state"] as $id => $state) {
-                $r = $db->where("id_order_detail", $id)
-                        ->update("av_order_detail", array("product_current_state" => $state));
-                //casse ou SAV
-                if ($state == 21 || $state == 22) {
-                    $r = $db->where("id_order_detail", $id)
-                            ->delete(("av_tournee"));
-                }
-            }
-        } else {
-            foreach ($orderDetail as $od) {
-                $r = $db->where("id_order_detail", $od["id_order_detail"])
-                        ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
-                //casse ou SAV
-                if ($state == 21 || $state == 22) {
-                    $r = $db->where("id_order_detail", $id)
-                            ->delete(("av_tournee"));
-                }
-            }
-        }
     if (isset($_POST["id_supplier"]) && !empty($_POST["id_supplier"]))
         if (is_array($_POST["id_supplier"])) {
             foreach ($_POST["id_supplier"] as $id => $supplier) {
@@ -134,6 +112,34 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
             foreach ($orderDetail as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("supplier_date_delivery" => $_POST["supplier_date_delivery"]));
+            }
+        }
+    if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
+        if (is_array($_POST["product_current_state"])) {
+            foreach ($_POST["product_current_state"] as $id => $state) {
+                $r = $db->where("id_order_detail", $id)
+                        ->update("av_order_detail", array("product_current_state" => $state));
+                //casse ou SAV
+                if ($state == 21 || $state == 22) {
+                    $r = $db->where("id_order_detail", $id)
+                            ->delete("av_tournee");
+
+                    $r = $db->where("id_order_detail", $id)
+                            ->update("av_order_detail", array("supplier_date_delivery" => null));
+                }
+            }
+        } else {
+            foreach ($orderDetail as $od) {
+                $r = $db->where("id_order_detail", $od["id_order_detail"])
+                        ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
+                //casse ou SAV
+                if ($_POST["product_current_state"] == 21 || $_POST["product_current_state"] == 22) {
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->delete(("av_tournee"));
+
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->update("av_order_detail", array("supplier_date_delivery" => null));
+                }
             }
         }
 
@@ -267,7 +273,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
         fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
         fclose($fp);
-       
+
 
         // fin excel
 
@@ -565,7 +571,6 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                 <tr>
                                     <th>Produit</th>
                                     <th>Long x Larg</th>
-                                    <th>P.U.</th>
                                     <th>Qte</th>
                                     <th>Prix TTC</th>
                                     <th>Statuts</th>
@@ -596,12 +601,11 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                             }
                                             ?>
                                             <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
-
                                         </td>
-
                                         <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
-                                        <td nowrap><?= $od["product_price"] + $od["attribute_price"] ?> €</td>                                
-                                        <td><?= $od["product_quantity"] ?></td>
+                                        <td>
+                                            <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
+                                        </td>
                                         <td nowrap><?= $od["total_price_tax_incl"] ?> €</td>
                                         <td>
                                             <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">

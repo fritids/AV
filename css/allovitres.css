@@ -240,7 +240,7 @@ margin-top:10px;
 	font-weight:bold;
  /*   background: #234; */
 	margin: 0;
-	padding-right:10px;
+/*	padding-right:10px; */
 	line-height: 29px;
 	font-size: 0.9em;
 	color: #FFF;
@@ -422,6 +422,23 @@ nav{
 	padding:10px 20px;
 }
 #rech-conteneur-droit1 ul li label {
+	display: block;
+    float: none;
+	margin-bottom:5px;
+}
+#rech-conteneur-droit2 ul {
+	list-style-type: none;
+	font-family: Arial;
+	font-size: 0.8em;
+	font-weight:bold;
+	color:#FFF;
+	text-shadow: 2px 1px 2px #000;
+}
+#rech-conteneur-droit2 ul li {
+	float:left;
+	padding:10px 20px;
+}
+#rech-conteneur-droit2 ul li label {
 	display: block;
     float: none;
 	margin-bottom:5px;
@@ -692,4 +709,7 @@ a.forget_pass{display:block;float:left;font-size:14px;color:#0053b4;text-decorat
 font-family: "Muli";
 font-size: 18px;
 color: #ff6000;
-}    
+}
+#recherche_classique {
+margin:35px 0 0 80px;
+}

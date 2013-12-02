@@ -144,7 +144,7 @@
                             <input type="hidden" name="p" value="">
                             <input type="hidden" name="id" value="" id="search_product">
                             <input type="text" name="" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
-                            <input type="submit" value="Ok">
+                            <input type="submit" value="Valider">
                         </form>
                     </span>
                 </div>
@@ -153,7 +153,7 @@
 
                         <ul>
                             <li>
-                                <label>Type 1</label>
+                                <label>Etape 1</label>
                                 <select id="select_type1" name="search_lvl_1">
                                     {foreach key=key item=search from=$searchs}
                                         <option value="{$key}" {if $smarty.post.search_lvl_1 == $key} selected {/if}>{$search.lvl1_title}</option>                                
@@ -161,7 +161,7 @@
                                 </select>
                             </li>
                             <li>
-                                <label>type 2</label>
+                                <label>Etape 2</label>
                                 <select id="select_type2" name="search_lvl_2">
                                     {foreach key=key item=search from=$searchs}
                                         {foreach key=key2 item=lvl2 from=$search.lvl2}
@@ -172,7 +172,7 @@
                             </li>
 
                         </ul>
-                        <input type="submit" />
+                        <input type="submit" style="background-image:url(img/rechercher.png);width:195px;height:41px;margin-top:15px;" value=""/>
                     </form>
                 </div>
 
