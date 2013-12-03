@@ -564,7 +564,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 
                             <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
                                 <tr>
-                                    <th colspan="9" class="text-center">PRODUIT</th>
+                                    <th colspan="7" class="text-center">PRODUIT</th>
                                     <th colspan="2" class="text-center">FOURNISSEUR</th>
                                     <th colspan="6" class="text-center">LIVRAISON</th>                          
                                 </tr>

@@ -41,7 +41,7 @@
                         <td class="dimensions"><em>N/A</em></td>
                     {/if}                                        
                     <td class="quantite">{$product.quantity}</td>
-                    <td class="total">{$product.prixttc - $product.discount} €
+                    <td class="total">{($product.prixttc - $product.discount)|number_format:2} €
                         {if $product.pro_discounted}
                             <em>dont remise pro ({$product.discount} €)</em>
                         {/if}
@@ -60,7 +60,7 @@
     </table>
 
     <div class="promo clearfix">
-        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits-$smarty.session.cart_summary.total_discount}€</span></p>
+        <p class="total">Total de votre commande : <span class="prix">{($smarty.session.cart_summary.total_produits-$smarty.session.cart_summary.total_discount)|number_format:2}€</span></p>
     </div>
     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
         {if empty($smarty.session.user.delivery.address1)}

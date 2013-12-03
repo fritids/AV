@@ -651,9 +651,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $option_weight = $attribute["weight"];
                 $id_option = $attribute["id_attribute"];
                 //$shipping_amount = $shipping_ratio * $option_weight;
-                $shipping_amount = 0;
-
-                echo $option_name . "<br>";
+                $shipping_amount = 0;               
                 $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
             }
         } else {

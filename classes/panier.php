@@ -83,6 +83,11 @@ class Panier {
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($montant_produit_ttc, 2);
         @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
 
+        if (isset($this->panier[$n][$refproduit]['discount']) && $this->panier[$n][$refproduit]['discount'] > 0) {
+            echo $this->panier[$n][$refproduit]['discount'];
+
+            $this->panier_summary['total_discount'] -= $this->panier[$n][$refproduit]['discount'];
+        }
 
         if ($this->panier[$n][$refproduit]['quantity'] <= 0) {
             //remove option
@@ -101,7 +106,6 @@ class Panier {
 
             if ($this->panier_summary['total_taxes'] < 0)
                 $this->panier_summary['total_taxes'] = 0;
-
 
             unset($this->panier[$n][$refproduit]);
             //array_splice($this->panier,1);
@@ -135,47 +139,47 @@ class Panier {
     }
 
     public function addVoucher($voucher = "") {
-        $total_discount = 0;
         $discount = 0;
         $reduction = $voucher["reduction"];
+
+        if (!isset($_SESSION["cart_summary"]["total_discount"]))
+            $_SESSION["cart_summary"]["total_discount"] = 0;
 
         foreach ($_SESSION["cart"] as $i => $items) {
             foreach ($items as $ref => $item) {
                 if (!empty($ref)) {
                     if ($item["productinfos"]["id_category"] == $voucher["value"]) {
                         $discount = round($_SESSION["cart"][$i][$ref]["prixttc"] * $reduction / 100, 2);
-                        $total_discount = $discount;
+                        $_SESSION["cart_summary"]["total_discount"] += $discount;
                         $_SESSION["cart"][$i][$ref]["discount"] = $discount;
                         $_SESSION["cart"][$i][$ref]["voucher_code"] = $voucher["code"];
                     }
                 }
             }
         }
-        if ($total_discount >= 0) {
-            $_SESSION["cart_summary"]["total_discount"] = $total_discount;
-            $_SESSION["cart_summary"]["discount_title"] = $voucher["title"];
-        }
+
+        $_SESSION["cart_summary"]["discount_title"] = $voucher["title"];
     }
 
     public function applyProDiscount() {
-        $total_discount = 0;
         $discount = 0;
         $reduction = 5;
+
+        if (!isset($_SESSION["cart_summary"]["total_discount"]))
+            $_SESSION["cart_summary"]["total_discount"] = 0;
 
         foreach ($_SESSION["cart"] as $i => $items) {
             foreach ($items as $ref => $item) {
                 if (!empty($ref)) {
                     if (empty($item["pro_discounted"])) {
                         $discount = round($_SESSION["cart"][$i][$ref]["prixttc"] * $reduction / 100, 2);
-                        $total_discount = $discount;
+                        $_SESSION["cart_summary"]["total_discount"] += $discount;
                         $_SESSION["cart"][$i][$ref]["discount"] = $discount;
                         $_SESSION["cart"][$i][$ref]["pro_discounted"] = 1;
+                        echo $discount . "<br>";
                     }
                 }
             }
-        }
-        if ($total_discount >= 0) {
-            $_SESSION["cart_summary"]["total_discount"] = $total_discount;
         }
     }
 

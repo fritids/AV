@@ -59,12 +59,13 @@ $opts['fdd']['postcode'] = array(
     'maxlen' => 12,
     'sort' => true
 );
-$opts['fdd']['country'] = array(
+$opts['fdd']['city'] = array(
     'name' => 'Ville',
     'select' => 'T',
     'maxlen' => 64,
     'sort' => true
 );
+
 $opts['fdd']['phone'] = array(
   'name'     => 'Tel.',
   'select'   => 'T',
