@@ -76,7 +76,7 @@
 
     {if isset($smarty.session.cart_summary.order_option)}
         <div class="promo clearfix">
-            <p class="total">Option SMS 1€</p>
+            <p class="total">Option SMS 1€ ({$smarty.session.cart_summary.alert_sms_phone})</p>
         </div>
     {/if}
 

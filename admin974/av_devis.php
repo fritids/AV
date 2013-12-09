@@ -831,10 +831,10 @@ if (isset($_POST["devis_save"])) {
                 <div class="form-group">
                     <input type="hidden" value="<?= @$customer_invoice["id_address"] ?>" name="invoice_id" >
                     <div class="col-xs-6">
-                        <input type="text" name="invoice_phone" value="<?= @$customer_invoice["phone"] ?>" class="col-xs-06 form-control" placeholder="Téléphone">
+                        <input type="text" name="invoice_phone" value="<?= @$customer_invoice["phone"] ?>" class="col-xs-6 form-control" placeholder="Téléphone">
                     </div>
                     <div class="col-xs-6">
-                        <input type="text" name="invoice_phone_mobile" value="<?= @$customer_invoice["phone_mobile"] ?>" class="col-xs-06 form-control" placeholder="Mobile">                                        
+                        <input type="text" name="invoice_phone_mobile" value="<?= @$customer_invoice["phone_mobile"] ?>" class="col-xs-6 form-control" placeholder="Mobile">                                        
                     </div>
                     <div class="col-xs-6">
                         <input type="text" value="<?= @$customer_invoice["address1"] ?>" name="invoice_address1" class="form-control" placeholder="Adresse 1">

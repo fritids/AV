@@ -251,9 +251,11 @@ function saveOrder() {
     $is_product_custom = 0;
     $nb_product = 0;
     $nb_custom_product = 0;
-    
+    $alert_sms_phone = "";
+
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $alert_sms = 1;
+        $alert_sms_phone = $_SESSION["cart_summary"]["alert_sms_phone"] ;
     }
     //global de la commande
     $order_summary = array(
@@ -267,7 +269,8 @@ function saveOrder() {
         "date_upd" => date("Y-m-d H:i:s"),
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
         "vat_rate" => ( $config["vat_rate"] - 1 ) * 100,
-        "alert_sms" => $alert_sms
+        "alert_sms" => $alert_sms,
+        "alert_sms_phone" => $alert_sms_phone
     );
 
     $oid = $db->insert("av_orders", $order_summary);
@@ -354,7 +357,7 @@ function saveOrder() {
         );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);
-        
+
 // post update global
         $param = array(
             "nb_product" => $nb_product - $nb_custom_product,

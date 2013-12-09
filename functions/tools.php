@@ -130,6 +130,16 @@ function getSearchResults($param1, $param2) {
     }
     return $o;
 }
+function getSearchResultsByName($param1) {
+    global $db;
+
+    $r = $db->rawQuery("SELECT id_product FROM av_product WHERE active = 1 and lower(name) LIKE ? ", array("%".$param1."%"));
+
+    foreach ($r as $i => $product) {
+        $o[$i] = getProductInfos($product["id_product"]);
+    }
+    return $o;
+}
 
 function mapCustomAttribute($pCustomDetail) {
     global $db;

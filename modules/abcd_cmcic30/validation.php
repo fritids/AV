@@ -5,12 +5,22 @@ header("Content-type: text/plain");
 require_once("../../configs/settings.php");
 require_once("../../classes/CMCIC_Tpe.inc.php");
 require('../../classes/MysqliDb.php');
-require('../../functions/orders.php');
 require('../../libs/Smarty.class.php');
 require('../../classes/class.phpmailer.php');
 require('../../classes/tcpdf.php');
+require('../../classes/sms.inc.php');
+include ("../../functions/products.php");
+include ("../../functions/orders.php");
 
 $now = date("d-m-y");
+
+//sms
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
+$api_key = 'PLYvbMEbIhW5zfnQy0Xi';
+$sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
+$sms_mode = INSTANTANE; // ou encore DIFFERE
+$sms_sender = 'ALLOVITRES';
+
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
@@ -85,7 +95,7 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
                 "date_add" => date("Y-m-d H:i:s"),
             );
 
-           
+
             $db->insert("av_order_payment", $order_payment);
 
             $orderinfo = getOrderInfos($oid);
@@ -102,6 +112,11 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
 
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($invoice, true, false, true, false, '');
+            if ($orderinfo["nb_custom_product"] > 0) {
+                $annexe_body = $smarty->fetch('front_annexe.tpl');
+                $pdf->AddPage('P', 'A4');
+                $pdf->writeHTML($annexe_body, true, false, true, false, '');
+            }
             $pdf->lastPage();
             $pdf->Output("../../tmp/" . $pdf_file, 'F');
             $mail->MsgHTML($mail_content);
@@ -109,11 +124,39 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
             foreach ($monitoringEmails as $bccer) {
                 $mail->AddBCC($bccer);
             }
-            $mail->Send();
+            if ($mail->Send()) {
+                $param = array(
+                    "id_order" => $oid,
+                    "id_user" => 0,
+                    "category" => "mail_commande",
+                );
+                $r = $db->insert("av_order_bdc", $param);
+            }
 
             unlink("../../tmp/" . $pdf_file);
 
-            mail($monitoringEmail, 'monitoring - Valid CB ' . $oid, var_export($CMCIC_bruteVars, true));            
+            mail($monitoringEmail, 'monitoring - Valid CB ' . $oid, var_export($CMCIC_bruteVars, true));
+
+            //sms
+            if ($orderinfo["alert_sms"] == 1) {
+                $order_sms_text = "Bonjour, nous vous remercions pour votre commande, votre facture vous a été transmise par mail. L'équipe Allovitres.";
+                $sms = new SMS();
+                $sms->set_user_login($user_login);
+                $sms->set_api_key($api_key);
+                $sms->set_sms_mode($sms_mode);
+                $sms->set_sms_text($order_sms_text);
+                $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
+                $sms->set_sms_type($sms_type);
+                $sms->set_sms_sender($sms_sender);
+                $sms->send();
+
+                $param = array(
+                    "id_order" => $oid,
+                    "id_user" => 0,
+                    "category" => "sms_mail_commande",
+                );
+                $r = $db->insert("av_order_bdc", $param);
+            }
 
             break;
     }

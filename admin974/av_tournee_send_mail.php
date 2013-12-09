@@ -4,10 +4,19 @@ include ("../configs/settings.php");
 include ("header.php");
 require('../libs/Smarty.class.php');
 require('../classes/class.phpmailer.php');
-
+require('../classes/sms.inc.php');
+include ("../functions/products.php");
+include ("../functions/orders.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
+//SMS
+
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
+$api_key = 'PLYvbMEbIhW5zfnQy0Xi';
+$sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
+$sms_mode = INSTANTANE; // ou encore DIFFERE
+$sms_sender = 'ALLOVITRES';
 
 $smarty = new Smarty;
 $smarty->caching = 0;
@@ -50,6 +59,8 @@ foreach ($r as $k => $contact) {
 
     if ($mail->Send()) {
 
+        $orderinfo = getOrderInfos($contact["id_order"]);
+
         echo "envoi mail order#" . $contact["id_order"] . " " . $contact["firstname"] . " " . $contact["lastname"] . " " . $contact["email"] . "<br>";
 
         $r = $db->where("id_order", $contact["id_order"])
@@ -78,6 +89,27 @@ foreach ($r as $k => $contact) {
             "category" => "mail_livraison",
         );
         $r = $db->insert("av_order_bdc", $param);
+
+        //sms
+        if ($orderinfo["alert_sms"] == 1) {
+            $order_sms_text = "Bonjour, Votre livraison est prévue pour le " . $contact["horaire"] . " . L'équipe Allovitres.";
+            $sms = new SMS();
+            $sms->set_user_login($user_login);
+            $sms->set_api_key($api_key);
+            $sms->set_sms_mode($sms_mode);
+            $sms->set_sms_text($order_sms_text);
+            $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
+            $sms->set_sms_type($sms_type);
+            $sms->set_sms_sender($sms_sender);
+            $sms->send();
+
+            $param = array(
+                "id_order" => $contact["id_order"],
+                "id_user" => $_SESSION["user_id"],
+                "category" => "sms_mail_livraison",
+            );
+            $r = $db->insert("av_order_bdc", $param);
+        }
     }
 }
 ?>

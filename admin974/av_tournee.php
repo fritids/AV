@@ -338,23 +338,17 @@ $suppliers = $db->get("av_supplier");
                                                         <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                         <?
                                                     } else {
-                                                        if (!isset($mytruck) && ($truckLoad["poids_restant"] !='' && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
-                                                            ?>
-                                                            <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
+                                                        ?>
+                                                        <button name="addtruck"  class="<?= ($mytruck["date_livraison"]) ? "btn btn-xs alert-success" : "btn btn-primary btn-xs btn" ?>" value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?>                                                             
                                                             <?
-                                                        } else {
-                                                            ?>
-                                                            <button name="addtruck"  class="<?= ($mytruck["date_livraison"]) ? "btn btn-xs alert-success" : "btn btn-primary btn-xs btn" ?>" value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?>                                                             
-                                                                <?
-                                                                if ($mytruck["date_livraison"]) {
-                                                                    ?>
-                                                                    <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
-                                                                    <?
-                                                                }
+                                                            if ($mytruck["date_livraison"]) {
                                                                 ?>
-                                                            </button>
-                                                            <?
-                                                        }
+                                                                <br> <span class="glyphicon glyphicon-road" > <?= date('d/m', strtotime($mytruck["date_livraison"])) ?>  </span>
+                                                                <?
+                                                            }
+                                                            ?>
+                                                        </button>
+                                                        <?
                                                         if ($mytruck["date_livraison"] == $date_livraison) {
                                                             if ($truckLoad["truck_weight_load"] >= TRUCK_OVER_LOAD) {
                                                                 ?>
@@ -489,9 +483,9 @@ $suppliers = $db->get("av_supplier");
                                                                         <a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>">
                                                                             <?= $OrderProduct["reference"] ?>
                                                                         </a>
-                                                                            <?= date("d/m", strtotime($o_truck["date_add"])) ?> 
-                                                                            <?= $o_truck["customer"]["firstname"] ?> <?= $o_truck["customer"]["lastname"] ?>
-                                                                        
+                                                                        <?= date("d/m", strtotime($o_truck["date_add"])) ?> 
+                                                                        <?= $o_truck["customer"]["firstname"] ?> <?= $o_truck["customer"]["lastname"] ?>
+
                                                                     </th>
                                                                 </tr>
                                                                 <?

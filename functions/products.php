@@ -141,18 +141,22 @@ function getProductCustomAttribut($pid) {
     foreach ($r as $k => $attribut) {
         foreach (array_keys($attribut) as $key)
             $o[$attribut["id_attribute"]][$key] = $attribut[$key];
-        $o[$attribut["id_attribute"]]["items"] = getProductCustomAttributItem($attribut["id_attribute"]);
+        $o[$attribut["id_attribute"]]["items"] = getProductCustomAttributItem($pid, $attribut["id_attribute"]);
     }
     if (empty($o))
         return (null);
     return $o;
 }
 
-function getProductCustomAttributItem($piad) {
+function getProductCustomAttributItem($pid, $piad) {
     global $db;
 
-    $r = $db->where("id_attribute", $piad)
-            ->get("av_attributes_items");
+     $r = $db->rawQuery("select b.*
+        from av_product_custom a , av_attributes_items b 
+        where a.id_attributes_items = b.id_attributes_items         
+        and a.id_product = ? 
+        and a.id_attribute = ? 
+        ", array($pid, $piad));     
 
     foreach ($r as $k => $item) {
         

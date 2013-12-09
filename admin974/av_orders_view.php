@@ -10,8 +10,18 @@ require('../libs/Smarty.class.php');
 require('../classes/class.phpmailer.php');
 require('../classes/tcpdf.php');
 require "../classes/php-export-data.class.php";
+require('../classes/sms.inc.php');
 
 define("COMMANDE_FOURNISSEUR", 16);
+
+//SMS
+
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
+$api_key = 'PLYvbMEbIhW5zfnQy0Xi';
+$sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
+$sms_mode = INSTANTANE; // ou encore DIFFERE
+$sms_sender = 'ALLOVITRES';
+
 
 $smarty = new Smarty;
 $smarty->caching = 0;
@@ -49,7 +59,7 @@ $customer_info = getCustomerDetail($cid);
 $orderinfo = getOrderInfos($oid);
 
 
-//paiement
+//paiementtoi t
 $orderPayment = getOrderPayment($orderinfo["id_order"]);
 
 //Adresse
@@ -157,6 +167,10 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $order_mail_tpl = "notif_order_refund";
                     $order_sms_tpl = "notif_sms_refund";
                     break;
+                case 5:
+                    $order_sms_text = "Bonjour, Votre commande vous a été livrée. Nous espérons avoir répondu convenablement à vos attentes.A bientôt sur notre site allovitres.com";
+                    $order_sms_tpl = "notif_sms_delivered";
+                    break;
                 case 6:
                     $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été annulé";
                     $order_mail_from = "service.commercial@allovitres.com";
@@ -168,7 +182,10 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $order_mail_from = "livraison@allovitres.com";
                     $order_mail_tpl = "notif_order_preparation";
                     $order_sms_tpl = "notif_sms_preparation";
+                    $order_sms_text = "Bonjour, Votre commande est en phase de fabrication. Vous recevrez sous 7 à 15 j ouvrés un mail et sms pour la livraison. L'équipe Allovitres.";
                     break;
+                
+                
                 default :
                     $order_mail_subject = "";
                     $order_mail_from = "";
@@ -176,15 +193,30 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     break;
             }
 
-            if ($orderinfo . alert_sms == 1) {
+            if ($orderinfo["alert_sms"] == 1) {
 
-                //
-                $param = array(
-                    "id_order" => $orderinfo["id_order"],
-                    "id_user" => $_SESSION["user_id"],
-                    "category" => $order_sms_tpl,
-                );
-                $r = $db->insert("av_order_bdc", $param);
+                if (isset($order_sms_text) && $order_sms_text != '') {
+
+                    $sms = new SMS();
+                    $sms->set_user_login($user_login);
+                    $sms->set_api_key($api_key);
+                    $sms->set_sms_mode($sms_mode);
+                    $sms->set_sms_text($order_sms_text);
+                    $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
+                    $sms->set_sms_type($sms_type);
+                    $sms->set_sms_sender($sms_sender);
+                    $sms->send();
+
+                    @$updated["text"] .= "un SMS de notification a été envoyé au " . $orderinfo["alert_sms_phone"] . "<br>";
+
+                    //log
+                    $param = array(
+                        "id_order" => $orderinfo["id_order"],
+                        "id_user" => $_SESSION["user_id"],
+                        "category" => $order_sms_tpl,
+                    );
+                    $r = $db->insert("av_order_bdc", $param);
+                }
             }
 
             if (!empty($order_mail_tpl)) {
@@ -203,7 +235,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
                 $mail->MsgHTML($mail_body);
                 if ($mail->Send()) {
-                    $updated["text"] = "mail a été envoyé <br>";
+                    @$updated["text"] .= "un mail de notification a été envoyé à l'adresse " . $orderinfo["customer"]["email"] . "<br>";
                     $param = array(
                         "id_order" => $orderinfo["id_order"],
                         "id_user" => $_SESSION["user_id"],
@@ -488,6 +520,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 <div class="panel-body">
                     Référence :  <?= $orderinfo["reference"] ?><br>
                     Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
+                    Suivi SMS :  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
                     Total :  <?= $orderinfo["total_paid"] ?>€<br>
                 </div>
             </div> 

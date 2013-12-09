@@ -74,7 +74,7 @@ if (isset($_GET["all_orders"]) && isset($_POST["start_date"]) && isset($_POST["e
     $start_date = $_POST["start_date"];
     $end_date = $_POST["end_date"];
 
-    $r = $db->rawQuery("select id_order from av_orders where ifnull(current_state,0) != 0 and invoice_date between ? and ?", array($start_date, $end_date));
+    $r = $db->rawQuery("select id_order from av_orders where ifnull(current_state,0) != 0 and date(invoice_date) between ? and ?", array($start_date, $end_date));
 
     if ($r) {
         foreach ($r as $order) {

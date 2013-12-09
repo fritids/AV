@@ -141,10 +141,9 @@ if (isset($_POST) && !empty($_POST)) {
         echo "<div class='alert alert-success text-center' > Camion validé <a href='av_bon_livraison.php?date_livraison=" . $_POST["date_livraison"] . "&id_truck=" . $_POST["id_truck"] . "' target='_blank'>bon livraison  </a></div>";
 
     echo "<center><a href='av_tournee.php?planning=" . $_POST["date_livraison"] . "' class='btn' >Retour</a></center>";
-    $upd = true;
 }
 
-if (isset($_GET["planning"]) && !$upd) {
+if (isset($_GET["planning"])) {
 
     $date_livraison = $_GET["planning"];
 
@@ -202,7 +201,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                             $o_truck = getOrderInfos($OrderProduct["id_order"]);
                                             $customer = getOrderUserDetail($OrderProduct["id_customer"]);
                                             $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
-                                            
+
                                             $p_qty = $OrderProduct["nb_product_delivered"];
 
                                             $montant_produits += $OrderProduct["product_price"];
@@ -250,6 +249,17 @@ if (isset($_GET["planning"]) && !$upd) {
                                                     <th>Informations <br><input type="text" value="<?= $OrderProduct["comment3"] ?>" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Horaire indiqué au client<br><input type="text" value="<?= $OrderProduct["horaire"] ?>" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
                                                 </tr>
+                                                <?
+                                                if ($o_truck["delivery_comment"]) {
+                                                    ?>
+                                                    <tr >
+                                                        <td colspan="8" class="alert" style=" background-color: red; color: #fff">
+                                                            <?= @$o_truck["delivery_comment"] ?>
+                                                        </td>
+                                                    </tr>
+                                                    <?
+                                                }
+                                                ?>
 
                                                 <?
                                                 $tmpRef = $OrderProduct["reference"];
@@ -324,7 +334,7 @@ if (isset($_GET["planning"]) && !$upd) {
                                     </tr>
                                     <tr>
                                         <td colspan="9">
-                                            <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Sauvegarder</button>
+                                            <button type="submit" name="validate"  class="btn btn-warning btn-lg btn-block">Sauvegarder & Rester</button>
                                         </td>
                                     </tr>
                                 </table>
@@ -339,7 +349,19 @@ if (isset($_GET["planning"]) && !$upd) {
                 <form action="av_tournee_send_mail.php" method="post" >
                     <input type="hidden" name="id_truck" value="<?= $truck["id_truck"] ?>"/>
                     <input type="hidden" name="delivery_date" value="<?= $_GET["planning"] ?>"/>   
-                    <button type="submit" name="send_mail"  class="btn btn-danger    btn-lg">Envoyer les mails</button>
+
+                    <div class="input-group">
+                        <span class="input-group-addon alert alert-danger">
+                            <input type="checkbox" required="required" >
+                        </span>
+                        <span class="input-group-btn">
+                            <button type="submit" name="send_mail"  class="btn btn-danger btn-lg">Envoyer les mails</button>
+                        </span>
+                    </div><!-- /input-group -->
+
+                    
+
+                    
                 </form>
             </div>
         </div>

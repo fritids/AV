@@ -61,9 +61,18 @@
         *}
     </div>
     <form action="?order-resume" method="post">
-        {*<div class="options2 clearfix">
-            <p><input type="checkbox" name="alert_sms" value="1" {if isset($smarty.session.cart_summary.order_option) && $smarty.session.cart_summary.order_option == "SMS"} checked {/if}> SMS (1€)</p>
-        </div>*}
+        <div class="options2 clearfix">
+
+            <p class="un"><span class="orange">Suivi de commande par sms</span></p>
+            <p>Désirez vous bénéficier du suivi de commande par SMS ?<br/>
+                Ce service vous permet de recevoir un sms sur le numero de téléphone portable de votre choix à chaque étape de votre commande.<br/>Il vous permet notamment d'etre informé de la date et du créneau horaire de votre livraison dès que celle-ci est programmée.</p>
+            <p><input type="checkbox" name="alert_sms" class="alert_sms" value="1" checked="checked"> SMS (1€) 
+                {literal}
+                    Tél: <input type="tel" name="alert_sms_phone" class="alert_sms_phone" required="required" pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$"> ( Format: 0612345678 )
+                {/literal}
+
+            </p>
+        </div>
         <div class="clearfix"></div>
 
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>
@@ -75,3 +84,13 @@
     </form>
     <p class="clearfix">&nbsp;</p>
 </div>
+
+<script>
+    $(".alert_sms").click(function() {
+        if ($(this).is(':checked')) {
+            $(".alert_sms_phone").attr("required", "required");
+        } else {
+            $(".alert_sms_phone").removeAttr("required");
+        }
+    })
+</script>

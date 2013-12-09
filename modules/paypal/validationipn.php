@@ -8,12 +8,23 @@ ini_set('error_log', dirname(__FILE__) . '/ipn_errors.log');
 include('./ipnlistener.php');
 require('../../configs/settings.php');
 require('../../classes/MysqliDb.php');
-require('../../functions/orders.php');
 require('../../libs/Smarty.class.php');
 require('../../classes/class.phpmailer.php');
 require('../../classes/tcpdf.php');
+require('../../classes/sms.inc.php');
+include("../../functions/products.php");
+include("../../functions/orders.php");
+
 
 $now = date("d-m-y");
+
+//sms
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
+$api_key = 'PLYvbMEbIhW5zfnQy0Xi';
+$sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
+$sms_mode = INSTANTANE; // ou encore DIFFERE
+$sms_sender = 'ALLOVITRES';
+
 
 $smarty = new Smarty;
 $smarty->addTemplateDir(array('../../templates/mails', '../../templates/', '../../templates/pdf/', '../../templates/pdf/front/'));
@@ -125,7 +136,7 @@ if ($verified) {
 
         $order_payment = array(
             "id_order" => $oid,
-            "order_reference" =>  str_pad($oid, 9, '0', STR_PAD_LEFT),
+            "order_reference" => str_pad($oid, 9, '0', STR_PAD_LEFT),
             "id_currency" => 1,
             "amount" => $amount,
             "conversion_rate" => 1,
@@ -136,7 +147,7 @@ if ($verified) {
         $db->insert("av_order_payment", $order_payment);
 
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
-        
+
         $orderinfo = getOrderInfos($oid);
 
         $smarty->assign("orderinfo", $orderinfo);
@@ -157,17 +168,51 @@ if ($verified) {
 
         $pdf->AddPage('P', 'A4');
         $pdf->writeHTML($invoice, true, false, true, false, '');
+        if ($orderinfo["nb_custom_product"] > 0) {
+            $annexe_body = $smarty->fetch('front_annexe.tpl');
+            $pdf->AddPage('P', 'A4');
+            $pdf->writeHTML($annexe_body, true, false, true, false, '');
+        }
         $pdf->lastPage();
         $pdf->Output("../../tmp/" . $pdf_file, 'F');
-        
+
         $mail->MsgHTML($content_body);
         $mail->AddAttachment("../../tmp/" . $pdf_file);
         foreach ($monitoringEmails as $bccer) {
             $mail->AddBCC($bccer);
         }
-        
-        $mail->Send();
-        //unlink("../../tmp/" . $pdf_file);        
+
+        if ($mail->Send()) {
+            $param = array(
+                "id_order" => $oid,
+                "id_user" => 0,
+                "category" => "mail_commande",
+            );
+            $r = $db->insert("av_order_bdc", $param);
+        }
+
+        unlink("../../tmp/" . $pdf_file);
+
+        //sms
+        if ($orderinfo["alert_sms"] == 1) {
+            $order_sms_text = "Bonjour, nous vous remercions pour votre commande, votre facture vous a été transmise par mail. L'équipe Allovitres.";
+            $sms = new SMS();
+            $sms->set_user_login($user_login);
+            $sms->set_api_key($api_key);
+            $sms->set_sms_mode($sms_mode);
+            $sms->set_sms_text($order_sms_text);
+            $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
+            $sms->set_sms_type($sms_type);
+            $sms->set_sms_sender($sms_sender);
+            $sms->send();
+
+            $param = array(
+                "id_order" => $oid,
+                "id_user" => 0,
+                "category" => "sms_mail_commande",
+            );
+            $r = $db->insert("av_order_bdc", $param);
+        }
     }
 } else {
     // manually investigate the invalid IPN

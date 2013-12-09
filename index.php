@@ -226,16 +226,22 @@ if (isset($_GET["c"])) {
 if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
-    if (empty($product["meta_title"])) {
-        $meta["title"] = $product["name"];
-    } else {
-        $meta["title"] = $product["meta_title"];
-    }
-    $meta["description"] = $product["meta_description"];
-    $meta["keywords"] = $product["meta_keywords"];
 
-    $smarty->assign('product', $product);
-    $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
+    if (isset($product["name"])) {
+        if (empty($product["meta_title"])) {
+            $meta["title"] = $product["name"];
+        } else {
+            $meta["title"] = $product["meta_title"];
+        }
+        $meta["description"] = $product["meta_description"];
+        $meta["keywords"] = $product["meta_keywords"];
+
+        $smarty->assign('product', $product);
+        $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
+    } else {
+        $ko_msg = array("txt" => "Le produit demandé n'existe plus.");
+        $page = "generic_page";
+    }
 }
 if (isset($_GET["register"])) {
     $page = "register";
@@ -298,14 +304,19 @@ if (isset($_GET["sitemap"])) {
 }
 if (isset($_GET["search"])) {
     $page = "search";
-    $param1 = $_POST["search_lvl_1"];
-    $param2 = $_POST["search_lvl_2"];
-    $search_result = getSearchResults($param1, $param2);
+
+    if (isset($_POST["search_query"]) && !empty($_POST["search_query"])) {        
+        $search_result = getSearchResultsByName($_POST["search_query"]);        
+    } else {
+        $param1 = $_POST["search_lvl_1"];
+        $param2 = $_POST["search_lvl_2"];
+        $search_result = getSearchResults($param1, $param2);
+    }
 }
 if (isset($_GET["product_custom"])) {
     $page = "product_custom";
-
     $product = getProductInfos($_GET["id"]);
+
     if (empty($product["meta_title"])) {
         $meta["title"] = $product["name"];
     } else {
@@ -333,8 +344,14 @@ if (isset($_GET["order-resume"])) {
 
     if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1 && !isset($_SESSION["cart_summary"]["order_option"])) {
         $_SESSION["cart_summary"]["total_amount"] += 1;
-        $_SESSION["cart_summary"]["order_option"] = "SMS";
+        $_SESSION["cart_summary"]["order_option"] = "SMS";        
     }
+    
+    if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1) {
+        $_SESSION["cart_summary"]["alert_sms_phone"] = $_POST["alert_sms_phone"];
+    }
+            
+    
     // option déja souscrite on retire l'option
     if (!isset($_POST["alert_sms"]) && isset($_SESSION["cart_summary"]["order_option"])) {
         $_SESSION["cart_summary"]["total_amount"] -= 1;
@@ -797,7 +814,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
         if (!empty($orderinfo)) {
             $smarty->assign("orderinfo", $orderinfo);
             $content_body = $smarty->fetch('front_order.tpl');
-            
+
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($content_body, true, false, true, false, '');
 
