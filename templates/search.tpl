@@ -8,7 +8,7 @@
     <div class="clearfix"></div>
 
     {foreach key=key item=product from=$search_result}   
-         <div class="item">
+        <div class="item">
             <table>
                 <tr>
                     <td>
@@ -22,7 +22,7 @@
                             <p>{$product.description_short}</p>
                         </div>
                         <div class="prix block">
-                            <span>{$product.price} €</span>
+                            <span>{($product.price*$config.vat_rate)|round:"2"} €</span>
                             <a href="/{$product.category.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html" class="indent">Voir le produit</a>
                         </div>
                         <div class="clearfix"></div>
@@ -30,7 +30,7 @@
                 </tr>
             </table>
         </div>
-       
+
     {/foreach}
 
 </div>

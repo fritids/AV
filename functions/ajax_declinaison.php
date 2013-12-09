@@ -9,6 +9,7 @@ mysql_select_db($bdd_name);
 
 $priceAttribut = 0;
 $weightAttribut = 0;
+$impact_coef = 1;
 
 foreach ($_POST["ids"] as $combination) {
     if ($combination["value"] > 0) {
@@ -18,11 +19,27 @@ foreach ($_POST["ids"] as $combination) {
 
         $query = mysql_query($req);
         $rows = mysql_fetch_array($query);
-        $priceAttribut += $rows["price"];
+        $priceAttribut += round($rows["price"] * $config["vat_rate"], 2);
         $weightAttribut += $rows["weight"];
     }
 }
+foreach ($_POST["subItems"] as $sub_item) {
+    if ($sub_item["value"] > 0) {
+        $req = "SELECT * "
+                . " FROM av_attributes_items "
+                . " WHERE id_attributes_items = " . $sub_item["value"];
 
+        $query = mysql_query($req);
+        $rows = mysql_fetch_array($query);
+
+        if ($rows["price_impact_percentage"] > 0) {
+            $impact_coef = $rows["price_impact_percentage"];
+        }
+        if ($rows["price_impact_amount"] > 0) {
+            $priceAttribut += round($rows["price_impact_amount"] * $config["vat_rate"], 2);
+        }
+    }
+}
 
 $req = "SELECT * "
         . " FROM av_product"
@@ -31,7 +48,7 @@ $req = "SELECT * "
 
 $query = mysql_query($req);
 $rows = mysql_fetch_array($query);
-$productPrice = $rows["price"];
+$productPrice = round($rows["price"] * $impact_coef * $config["vat_rate"], 2);
 $productweight = $rows["weight"];
 
 echo json_encode(array("price" => $priceAttribut + $productPrice, "weight" => $weightAttribut + $productweight));

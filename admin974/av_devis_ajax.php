@@ -181,22 +181,6 @@ if (isset($_POST["devis_save"])) {
             );
             $db->insert("av_devis_detail", $devis_detail);
         }
-// les options
-        /* if (isset($item["options"])) {
-          foreach ($item["options"] as $k => $option) {
-          $devis_detail["product_attribute_id"] = $option["o_id"];
-          $devis_detail["attribute_name"] = $option["o_name"];
-          $devis_detail["attribute_quantity"] = $option["o_quantity"];
-          $devis_detail["attribute_price"] = $option["o_price"];
-          $devis_detail["attribute_shipping"] = $option["o_shipping"];
-          $devis_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-          $devis_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-
-          $db->insert("av_devis_detail", $devis_detail);
-          }
-          } else { // pas d'option
-          $db->insert("av_devis_detail", $devis_detail);
-          } */
     }
 
     $devis_summary = array("total_paid" => $total_paid);

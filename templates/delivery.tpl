@@ -33,7 +33,7 @@
     <div class="options2 clearfix">
         <div class="option">
             {*<div class="input">
-                <input type="radio" name="" id="" checked="true">
+            <input type="radio" name="" id="" checked="true">
             </div>
             *}
             <div class="text">
@@ -49,20 +49,23 @@
         </div>
         {*<div class="option ou">OU</div>
         <div class="option">
-            <div class="input">
-                <input type="radio" name="" id=""  disabled="true" disabled="true">
-            </div>
+        <div class="input">
+        <input type="radio" name="" id=""  disabled="true" disabled="true">
+        </div>
 
-            <div class="text">
-                <span class="label">livrer à une autre adresse</span>
-            </div>			
+        <div class="text">
+        <span class="label">livrer à une autre adresse</span>
+        </div>			
 
         </div>
         *}
     </div>
-    <div class="clearfix"></div>
-
     <form action="?order-resume" method="post">
+        <div class="options2 clearfix">
+            <p><input type="checkbox" name="alert_sms" value="1" {if isset($smarty.session.cart_summary.order_option) && $smarty.session.cart_summary.order_option == "SMS"} checked {/if}> SMS (1€)</p>
+        </div>
+        <div class="clearfix"></div>
+
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>
         <textarea name="order_comment" id="" cols="30" rows="10">{$smarty.session.cart_summary.order_comment}</textarea>
         <p>

@@ -56,10 +56,10 @@
                                 {foreach key=key item=detail from=$orderinfo.details}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
-                                            {$detail.product_name}
+                                            {$detail.product_name}<br>
                                             {if $detail.attributes}
                                                 {foreach key=key item=attribute from=$detail.attributes}
-                                                    {$attribute.name}
+                                                    {$attribute.attribute_name}: {$attribute.attribute_value} <br>
                                                 {/foreach}
                                             {/if}
                                         </td>
@@ -77,10 +77,13 @@
                             <br>
                             <br>
 
-                            Total produits HT :{(($orderinfo.total_paid-25)/1.196)|number_format:2} €<br>
-                            Total Tva ( 19.6% ) :{($orderinfo.total_paid - ($orderinfo.total_paid-25)/1.196 - 25)|number_format:2} €<br>
-                            Total produits TTc :{$orderinfo.total_paid - 25} €<br>
-                            Frais de transport : 25€ <br>
+                            {if $orderinfo.alert_sms}
+                                Option Alerte SMS : 1€ <br><br>
+                            {/if}
+                            Total produits HT: {(($orderinfo.total_paid-25)/(1+$orderinfo.vat_rate/100))|number_format:2} €<br>
+                            Total Tva ( {$orderinfo.vat_rate}% ): {($orderinfo.total_paid - ($orderinfo.total_paid-25)/(1+$orderinfo.vat_rate/100) - 25)|number_format:2} €<br>
+                            Total produits TTC: {$orderinfo.total_paid - 25} €<br>
+                            Frais de transport: 25€ <br>
                             Total TTc :{$orderinfo.total_paid} €<br>
                         </td>
                     </tr>

@@ -38,7 +38,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 theme: "modern",
                 width: "800",
                 height: "200",
-                plugins: "table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image,fullscreen,textcolor,hr",
+                plugins: "textcolor,table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image,fullscreen,hr,code",
                 theme_advanced_buttons1_add_before: "save,separator",
                 theme_advanced_buttons1_add: "fontselect,fontsizeselect",
                 theme_advanced_buttons2_add: "separator,insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",

@@ -20,7 +20,7 @@ $req = "SELECT * "
 
 $query = mysql_query($req);
 $rows = mysql_fetch_array($query);
-$priceAttribut = $rows["price"];
+$priceAttribut = round($rows["price"] * $config["vat_rate"], 2);
 $weightAttribut = $rows["weight"];
 
 
@@ -32,7 +32,7 @@ $req = "SELECT * "
 $query = mysql_query($req);
 $rows = mysql_fetch_array($query);
 
-$productPrice = $rows["price"];
+$productPrice = round($rows["price"] * $config["vat_rate"], 2);
 $productweight = $rows["weight"];
 
 echo json_encode(array("priceAttribut" => $priceAttribut,

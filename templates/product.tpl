@@ -26,9 +26,9 @@
             <div class="features">
                 <div class="separ clearfix">
                     <div class="infos">
-                        <p class="prix" ><span id="total_price">{$product.price}</span> €</p>
+                        <p class="prix" ><span id="total_price">{($product.price*$config.vat_rate)|round:2}</span> €</p>
                         {if $product.id_category !=19}
-                            <p><span id="surface"></span> m² calculé</p>
+                            <p><span id="surface"></span> m² calculé</p>                            
                             {*<p><span id="total_poids"></span> kg calculés</p>*}
                             <p><span id=""></span> min facturé {$product.min_area_invoiced} m²</p>
                         {/if}
@@ -165,7 +165,7 @@
 </div>
 
 <script>
-    var unit_price = {$product.price};
+    var unit_price = {($product.price*$config.vat_rate)|round:2};
 
     myArray = $('.attribute');
 

@@ -21,6 +21,7 @@ $opts['pw'] = $bdd_pwd;
 
 $config["payment"]["cheque_infos"] = "ALLOVITRE <br> adresse 1 <br> cp ville";
 $config["payment"]["virement_infos"] = "RIB ###### <br> IBAN ############";
+$config["vat_rate"] = 1.196;
 
 $conf_shipping_amount = 25;
 
@@ -29,6 +30,7 @@ $paypal["email_account"] = "contact@moka-web.net";
 $paypal["returnurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementok";
 $paypal["cancelurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementko";
 $paypal["returnipn"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/modules/paypal/validationipn.php";
+
 
 
 // free texte : a bigger reference, session context for the return on the merchant website

@@ -13,7 +13,7 @@
                         <img src="/img/p/{$product.cover.filename}" width="147">
                     </a>
                     <h3 class="titre">{$product.name}</h3>
-                    <p class="prix">{$product.price} €</p>
+                    <p class="prix">{($product.price*$config.vat_rate)|round:2} €</p>
                     <p class="liens">
                         <a href="" class="panier indent">Panier</a>
                         <a href="/?p&id={$product.id_product}" class="voir indent">Voir</a>

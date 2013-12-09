@@ -131,4 +131,43 @@ function getSearchResults($param1, $param2) {
     return $o;
 }
 
+function mapCustomAttribute($pCustomDetail) {
+    global $db;
+
+    foreach ($pCustomDetail as $k => $main_attribute) {
+        if (is_array($main_attribute)) {
+
+            $r = $db->where("id_attribute", $k)
+                    ->get("av_attributes");
+
+            $o[$k]["id_attribute"] = $k;
+            $o[$k]["main_item_name"] = $r[0]["name"];
+
+            foreach ($main_attribute as $l => $sub_attribute) {
+                if (is_array($sub_attribute)) {
+                    $r = $db->where("id_attributes_items", $l)
+                            ->get("av_attributes_items");
+
+                    $o[$k][$l]["id_attributes_items"] = $l;
+                    $o[$k][$l]["sub_item_name"] = $r[0]["name"];
+                    $o[$k][$l]["picture"] = $r[0]["picture"];
+                    $o[$k][$l]["price_impact_percentage"] = $r[0]["price_impact_percentage"];
+                    $o[$k][$l]["price_impact_amount"] = $r[0]["price_impact_amount"];
+
+
+                    foreach ($sub_attribute as $m => $item_value) {
+                        $r = $db->where("id_attributes_items_values", $m)
+                                ->get("av_attributes_items_values");
+
+                        $o[$k][$l][$m]["custom_value"] = $item_value;
+                        $o[$k][$l][$m]["item_value_name"] = $r[0]["name"];
+                    }
+                }
+            }
+        }
+    }
+
+    return $o;
+}
+
 ?>

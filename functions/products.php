@@ -1,8 +1,8 @@
 <?php
 
 function getAllProductInfo() {
-    global $db;
-    
+    global $db, $vat_rate;
+
     $r = $db->rawQuery("select * from av_product where active = 1 order by name asc");
 
     foreach ($r as $k => $p) {
@@ -19,6 +19,7 @@ function getProductInfos($pid) {
     $carac = getProductCaracts($pid);
     //$attributes = getProductAttributes($pid);
     $combinations = getProductCombination($pid);
+    $customCombinations = getProductCustomAttribut($pid, 1);
     $images = getImages($pid);
     $cover = getImageCover($pid);
     $category = getProductCategory($r[0]["id_category"]);
@@ -26,6 +27,7 @@ function getProductInfos($pid) {
     $r[0]["caracteristiques"] = $carac;
     //$r[0]["attributes"] = $attributes;
     $r[0]["combinations"] = $combinations;
+    $r[0]["specific_combinations"] = $customCombinations;
     $r[0]["images"] = $images;
     $r[0]["cover"] = $cover;
     $r[0]["category"] = $category;
@@ -86,7 +88,6 @@ function getProductCombination($pid) {
         where a.id_attribute = b.id_attribute 
         and id_product = ? ", array($pid));
 
-
     foreach ($r as $k => $attribut) {
         //print_r($attribut);
         if (is_array($attribut) && $attribut["id_attribute"] != "") {
@@ -128,6 +129,59 @@ function getAttributes($aid) {
     return $r[0];
 }
 
+function getProductCustomAttribut($pid) {
+    global $db;
+    $o = array();
+
+    $r = $db->rawQuery("select b.*
+        from av_product_custom a , av_attributes b 
+        where a.id_attribute = b.id_attribute 
+        and id_product = ? ", array($pid));
+
+    foreach ($r as $k => $attribut) {
+        foreach (array_keys($attribut) as $key)
+            $o[$attribut["id_attribute"]][$key] = $attribut[$key];
+        $o[$attribut["id_attribute"]]["items"] = getProductCustomAttributItem($attribut["id_attribute"]);
+    }
+    if (empty($o))
+        return (null);
+    return $o;
+}
+
+function getProductCustomAttributItem($piad) {
+    global $db;
+
+    $r = $db->where("id_attribute", $piad)
+            ->get("av_attributes_items");
+
+    foreach ($r as $k => $item) {
+        
+        $t[$item["id_attributes_items"]] = $item;
+        $t[$item["id_attributes_items"]]["item_values"] = getProductCustomAttributItemValues($item["id_attributes_items"]);
+    }
+
+    if (empty($r))
+        return (null);
+
+    return $t;
+}
+
+function getProductCustomAttributItemValues($iaid) {
+    global $db;
+
+    $r = $db->where("id_attributes_items", $iaid)
+            ->get("av_attributes_items_values");
+
+    foreach ($r as $k => $item_values) {
+        $t[$item_values["id_attributes_items_values"]] = $item_values;
+    }
+
+    if (empty($r))
+        return (null);
+
+    return $t;
+}
+
 function getImages($pid) {
     global $db;
     $r = $db->where("id_product", $pid)
@@ -162,6 +216,15 @@ function getProductByCategorie($cid) {
         $p[$k] = getProductInfos($product["id_product"]);
     }
     return ($p);
+}
+
+function getProductAttributeWeight($iad) {
+    global $db;
+
+    $r = $db->where("id_product_attribute", $iad)
+            ->get("av_product_attribute");
+
+    return $r[0];
 }
 
 ?>

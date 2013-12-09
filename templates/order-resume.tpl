@@ -22,7 +22,6 @@
                     {$smarty.session.user.delivery.postcode} {$smarty.session.user.delivery.city}<br>
                     {$smarty.session.user.delivery.country}
                 </div>
-
             </div>
             <div class="block mode_trans">
                 <h3>mode de transport</h3>
@@ -75,6 +74,12 @@
         </tbody>
     </table>
 
+    {*if isset($smarty.session.cart_summary.order_option)}
+        <div class="promo clearfix">
+            <p class="total">Option SMS 1€</p>
+        </div>
+    {/if*}
+
     <div class="promo clearfix">
         <p class="total">Total produit : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>
     </div>
@@ -88,7 +93,7 @@
     {/if}
 
     <div class="promo clearfix">
-        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_produits - {$smarty.session.cart_summary.total_discount} + $smarty.session.cart_summary.total_shipping}€</span></p>
+        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount - {$smarty.session.cart_summary.total_discount} + $smarty.session.cart_summary.total_shipping}€</span></p>
     </div>
     {if $smarty.session.cart_summary.total_discount == 0}
         <form action="/?action=add_voucher&order-resume" method="post">
@@ -105,12 +110,14 @@
     <table width="100%">
         <tr>
             <td align="left"><a href="/?delivery" ><button class="precedent" style="float:left;"></button></a></td>
-            <td align="right"><span >
+            <td align="right">
+                <span>
                     <form action="/?order-payment" method="post">
                         <input type="checkbox" required="true">J’ai lu et j’accepte <a href="/index.php?cms&id=3">les conditions générales de vente</a>.        
                         <input type="submit" class="valider-porsuivre" value="">
                     </form>
-                </span></td>
+                </span>
+            </td>
         </tr>
     </table>
 

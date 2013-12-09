@@ -49,7 +49,7 @@ $mail = new PHPMailer();
 $mail->SetFrom($confmail["from"]);
 $mail->CharSet = 'UTF-8';
 
-$promo_id = array(79, 65, 123, 124);
+$promo_id = array(79, 65, 49, 124);
 foreach ($promo_id as $id) {
     $promos[] = getProductInfos($id);
 }
@@ -61,7 +61,7 @@ $mydevis = array();
 $ko_msg = array();
 $breadcrumb = array("parent" => NULL, "fils" => null);
 $sub_menu = getCategories();
-$secured_pages = array("my-account", "devis", "orders-list");
+$secured_pages = array("my-account", "devis", "orders-list", "order-resume", "delivery", "order-payment");
 $search = getSearchCriterias();
 $search_result = array();
 
@@ -92,9 +92,15 @@ if (isset($_GET["cart"])) {
     if (isset($_POST["id_product"]) and $_POST["id_product"] != "" && $_POST["quantity"] != "") {
         $pid = $_POST["id_product"];
         $pqte = $_POST["quantity"];
+        $pcustom = @$_POST["custom"];
 
         $productInfos = getProductInfos($_POST["id_product"]);
 
+        if ($pcustom) {
+            $mapCustomAttribute = mapCustomAttribute($pcustom);
+            $productInfos["custom_label"] = $mapCustomAttribute;
+            $productInfos["custom"] = $pcustom;
+        }
         $pweight = $productInfos["weight"];
         $shipping_ratio = getDeliveryRatio($pweight);
         //$shipping_amount = $shipping_ratio * $pweight;
@@ -131,6 +137,23 @@ if (isset($_GET["cart"])) {
                 );
             }
 
+            //Si option
+            if (isset($_POST["custom"])) {
+                if (is_array($_POST["custom"])) {
+                    foreach ($mapCustomAttribute as $custom_item) {
+                        if (is_array($custom_item)) {
+                            foreach ($custom_item as $k => $sub_item) {
+                                if ($sub_item["price_impact_percentage"] > 0)
+                                    $productInfos["price"] *= $sub_item["price_impact_percentage"];
+
+                                if ($sub_item["price_impact_amount"] > 0)
+                                    $productInfos["price"] += $sub_item["price_impact_amount"] * $config["vate_rate"];
+                            }
+                        }
+                    }
+                }
+            }
+
             $nbItem = $cart->getNbItems() + 1;
 
             if (empty($ko_msg))
@@ -151,6 +174,8 @@ if (isset($_GET["cart"])) {
                     }
                 }
             }
+
+
             $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
         }
 
@@ -277,6 +302,19 @@ if (isset($_GET["search"])) {
     $param2 = $_POST["search_lvl_2"];
     $search_result = getSearchResults($param1, $param2);
 }
+if (isset($_GET["product_custom"])) {
+    $page = "product_custom";
+
+    $product = getProductInfos($_GET["id"]);
+    if (empty($product["meta_title"])) {
+        $meta["title"] = $product["name"];
+    } else {
+        $meta["title"] = $product["meta_title"];
+    }
+
+    $smarty->assign('product', $product);
+    $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
+}
 
 if (isset($_GET["orders-list"])) {
     $page = "orders-list";
@@ -292,6 +330,19 @@ $smarty->assign('CMCIC_CHECKOUT_FORM', '');
 if (isset($_GET["order-resume"])) {
     $page = "order-resume";
     $page_type = "full";
+
+    if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1 && !isset($_SESSION["cart_summary"]["order_option"])) {
+        $_SESSION["cart_summary"]["total_amount"] += 1;
+        $_SESSION["cart_summary"]["order_option"] = "SMS";
+    }
+    // option déja souscrite on retire l'option
+    if (!isset($_POST["alert_sms"]) && isset($_SESSION["cart_summary"]["order_option"])) {
+        $_SESSION["cart_summary"]["total_amount"] -= 1;
+        unset($_SESSION["cart_summary"]["order_option"]);
+    }
+
+
+
 
     if (isset($_POST["order_comment"])) {
         $_SESSION["cart_summary"]["order_comment"] = $_POST["order_comment"];
@@ -651,7 +702,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $option_weight = $attribute["weight"];
                 $id_option = $attribute["id_attribute"];
                 //$shipping_amount = $shipping_ratio * $option_weight;
-                $shipping_amount = 0;               
+                $shipping_amount = 0;
                 $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
             }
         } else {
@@ -684,9 +735,23 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
             "reduction" => 10)
         );
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-    } else {
-        $ko_msg = array("txt" => "Ce bon de réduction est erroné");
-    }
+    } /* else {
+      $ko_msg = array("txt" => "Ce bon de réduction est erroné");
+      } */
+
+
+    if ($code == "NOEL2013DV") {
+        $cart->addVoucher(array(
+            "code" => "VICTOIREPAUC",
+            "title" => "VICTOIREPAUC",
+            "group" => "category",
+            "value" => 12,
+            "reduction" => 10)
+        );
+        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+    } /* else {
+      $ko_msg = array("txt" => "Ce bon de réduction est erroné");
+      } */
 }
 
 // mot de passe oublié
@@ -732,8 +797,12 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
         if (!empty($orderinfo)) {
             $smarty->assign("orderinfo", $orderinfo);
             $content_body = $smarty->fetch('front_order.tpl');
+            $annexe_body = $smarty->fetch('front_annexe.tpl');
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($content_body, true, false, true, false, '');
+            
+            //$pdf->AddPage('P', 'A4');
+            //$pdf->writeHTML($annexe_body, true, false, true, false, '');
             $pdf->lastPage();
             $pdf->Output("AV_FA_" . $oid . "_" . $now . ".pdf", 'D');
 
@@ -845,9 +914,6 @@ if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com" || $_SESSION["u
     <?= @print_r($devisinfo); ?>
     <h1>Post</h1>
     <?= @print_r($_POST); ?>
-    <h1>Search</h1>
-    <?= @print_r($search); ?>
-    <?= @print_r($search_result); ?>
 
     <?
 }

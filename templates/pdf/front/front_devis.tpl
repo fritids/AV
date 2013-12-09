@@ -69,7 +69,7 @@
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_excl}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_incl}</td>
                                     </tr>
                                 {/foreach}
                             </table>

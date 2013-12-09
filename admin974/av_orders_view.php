@@ -47,7 +47,6 @@ $customer_info = getCustomerDetail($cid);
 
 //commande 
 $orderinfo = getOrderInfos($oid);
-$orderDetail = getUserOrdersDetail($oid);
 
 
 //paiement
@@ -96,7 +95,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                         ->update("av_order_detail", array("id_supplier" => $supplier));
             }
         } else {
-            foreach ($orderDetail as $od) {
+            foreach ($orderinfo["details"] as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("id_supplier" => $_POST["id_supplier"]));
             }
@@ -109,7 +108,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->update("av_order_detail", array("supplier_date_delivery" => $date_delivery));
             }
         }else {
-            foreach ($orderDetail as $od) {
+            foreach ($orderinfo["details"] as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("supplier_date_delivery" => $_POST["supplier_date_delivery"]));
             }
@@ -129,7 +128,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 }
             }
         } else {
-            foreach ($orderDetail as $od) {
+            foreach ($orderinfo["details"] as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
                 //casse ou SAV
@@ -156,22 +155,36 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été remboursé";
                     $order_mail_from = "service.commercial@allovitres.com";
                     $order_mail_tpl = "notif_order_refund";
+                    $order_sms_tpl = "notif_sms_refund";
                     break;
                 case 6:
                     $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été annulé";
                     $order_mail_from = "service.commercial@allovitres.com";
                     $order_mail_tpl = "notif_order_cancel";
+                    $order_sms_tpl = "notif_sms_cancel";
                     break;
                 case 3:
                     $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
                     $order_mail_from = "livraison@allovitres.com";
                     $order_mail_tpl = "notif_order_preparation";
+                    $order_sms_tpl = "notif_sms_preparation";
                     break;
                 default :
                     $order_mail_subject = "";
                     $order_mail_from = "";
                     $order_mail_tpl = "";
                     break;
+            }
+
+            if ($orderinfo . alert_sms == 1) {
+
+                //
+                $param = array(
+                    "id_order" => $orderinfo["id_order"],
+                    "id_user" => $_SESSION["user_id"],
+                    "category" => $order_sms_tpl,
+                );
+                $r = $db->insert("av_order_bdc", $param);
             }
 
             if (!empty($order_mail_tpl)) {
@@ -212,8 +225,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
     @$updated["text"] .= "Modification a été effectuée.";
 
-//suite aux update on recharge les infos
-    $orderDetail = getUserOrdersDetail($oid);
+//suite aux update on recharge les infos    
     $orderinfo = getOrderInfos($oid);
 }
 
@@ -289,9 +301,6 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                     ->where("id_supplier", $orderSupplier["id_supplier"])
                     ->update("av_order_detail", $params);
 
-//le statut a changé on recharge les données
-            $orderDetail = getUserOrdersDetail($oid);
-
             foreach ($orderDetailSupplier as $k => $ods) {
                 $param = array(
                     "id_order" => $oid,
@@ -318,8 +327,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
         if (!empty($qte))
             $oid = splitOrderDetail($odid, $qte);
     }
-    $orderDetail = getUserOrdersDetail($oid);
-
+    $orderinfo = getOrderInfos($oid);
     $updated["text"] = "La ligne a été 'splitté'";
 }
 ?>
@@ -547,7 +555,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
     </div>
 
     <?
-    if (!empty($orderDetail)) {
+    if (!empty($orderinfo["details"])) {
         ?>
         <div class="row">
             <div class="col-xs-12">
@@ -585,7 +593,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                     <th></th>    
                                 </tr>
                                 <?
-                                foreach ($orderDetail as $od) {
+                                foreach ($orderinfo["details"] as $od) {
                                     $t = getItemTourneeinfo($od["id_order_detail"]);
 
                                     $isFournisseurOk = true;
@@ -600,6 +608,19 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                                 echo " - " . $attribute["attribute_name"] . " : " . $attribute["attribute_value"] . "<br>";
                                             }
                                             ?>
+                                            <font color="red">
+                                            <?
+                                            foreach ($od["custom"] as $custom) {
+                                                echo " - " . $custom["main_item_name"];
+                                                foreach ($custom["sub_item"] as $sub_item) {
+                                                    echo " - " . $sub_item["sub_item_name"] . "<br>";
+                                                    foreach ($sub_item["item_values"] as $item_value) {
+                                                        echo $item_value["item_value_name"] . " : " . $item_value["custom_value"] . "<br>";
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                            </font>
                                             <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
                                         </td>
                                         <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>

@@ -32,7 +32,28 @@
                                     {$option_price =  $option_price+$option.o_price}
                                     {$option.o_name} 
                                 {/foreach}   
+                                <br>
                             {/if}                            
+
+                            {if isset($product.productinfos.custom_label)}  
+                                {foreach key=key item=main_item from=$product.productinfos.custom_label}
+                                    {if is_array($main_item)}
+                                        {foreach key=key2 item=sub_item from=$main_item}
+                                            {if is_array($sub_item)}
+                                                {$main_item.main_item_name} : {$sub_item.sub_item_name}<br>
+                                                {foreach key=key3 item=values_items from=$sub_item}
+                                                    {if is_array($values_items)}
+                                                        {$values_items.item_value_name} : {$values_items.custom_value}<br>
+                                                    {/if}
+                                                {/foreach}
+                                            {/if}
+                                        {/foreach} 
+
+                                    {/if}
+
+                                {/foreach}   
+                                <br>
+                            {/if} 
                         </a>
                     </td>
                     {if $product.dimension}

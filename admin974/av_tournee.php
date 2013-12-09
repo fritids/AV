@@ -338,7 +338,7 @@ $suppliers = $db->get("av_supplier");
                                                         <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                         <?
                                                     } else {
-                                                        if (!isset($mytruck) && (!empty($truckLoad) && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
+                                                        if (!isset($mytruck) && ($truckLoad["poids_restant"] !='' && $product_weight > $truckLoad["poids_restant"] ) /* || $product_weight > $truck["capacity"] */) {
                                                             ?>
                                                             <button name="addtruck"  class="btn btn-xs btn btn-default" disabled="disabled"><?= $truck["name"] ?> </button>
                                                             <?

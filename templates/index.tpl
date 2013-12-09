@@ -50,7 +50,8 @@
                             Total produit : {$smarty.session.cart_summary.total_produits} € TTC<br/>
                             {*Expédition : {$smarty.session.cart_summary.total_shipping} € TTC<br/>*}
                             Taxes incluses : {$smarty.session.cart_summary.total_taxes} €<br/>                
-                            Total : {$smarty.session.cart_summary.total_amount} € TTC<br/>                
+                            Réduction: {$smarty.session.cart_summary.total_discount}€ TTC<br/>                
+                            Total : {($smarty.session.cart_summary.total_produits - $smarty.session.cart_summary.total_discount)|number_format:2} € TTC<br/>                
                         </p>
                         <a class="bouton" href="/?cart">Panier</a>                        
                     </div>

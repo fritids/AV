@@ -108,6 +108,7 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
 
     foreach ($r as $k => $od) {
         $r[$k]["attributes"] = getOrdersDetailAttribute($od["id_order_detail"]);
+        $r[$k]["custom"] = getOrdersCustomMainItem($od["id_order_detail"]);
     }
     return $r;
 }
@@ -164,6 +165,57 @@ function getOrdersDetailAttribute($odid) {
     return $r;
 }
 
+function getOrdersCustomMainItem($odid) {
+    global $db;
+    $params = array($odid);
+
+    $r = $db->rawQuery("SELECT distinct a.id_order_detail, a.id_attribute, b.name as main_item_name 
+                        FROM av_order_product_custom a , av_attributes b
+                        where a.id_attribute = b.id_attribute
+                        and  id_order_detail = ?  ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["sub_item"] = getOrdersCustomSubItem($od["id_order_detail"], $od["id_attribute"]);
+    }
+
+    return $r;
+}
+
+function getOrdersCustomSubItem($odid, $iaid) {
+    global $db;
+    $params = array($odid, $iaid);
+
+    $r = $db->rawQuery("SELECT distinct a.id_order_detail, a.id_attributes_items, c.name as sub_item_name , c.picture 
+                        FROM av_order_product_custom a , av_attributes_items c
+                        where a.id_attributes_items = c.id_attributes_items                         
+                        and a.id_order_detail = ?  
+                        and a.id_attribute = ?", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["item_values"] = getOrdersCustomItemValues($od["id_order_detail"], $iaid, $od["id_attributes_items"]);
+    }
+
+    return $r;
+}
+
+function getOrdersCustomItemValues($odid, $iaid, $iaiid) {
+    global $db;
+    $params = array($odid, $iaid, $iaiid);
+
+    $r = $db->rawQuery("SELECT a.*, d.name as item_value_name
+                        FROM av_order_product_custom a , av_attributes_items_values d
+                        where a.id_attributes_items_values = d.id_attributes_items_values 
+                        and a.id_order_detail = ?  
+                        and a.id_attribute = ?
+                        and a.id_attributes_items = ?
+                        ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k] = $od;
+    }
+    return $r;
+}
+
 function saveOrderPayment($oid, $payment) {
     global $db;
     //paiement
@@ -193,8 +245,12 @@ function validateOrder($oid, $orderValidateInfo) {
 
 function saveOrder() {
 
-    global $db, $cartItems;
+    global $db, $cartItems, $config;
     //$ref = getLastOrderId();
+    $alert_sms = 0;
+    if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
+        $alert_sms = 1;
+    }
     //global de la commande
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
@@ -206,6 +262,8 @@ function saveOrder() {
         "date_add" => date("Y-m-d H:i:s"),
         "date_upd" => date("Y-m-d H:i:s"),
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
+        "vat_rate" => ( $config["vat_rate"] - 1 ) * 100,
+        "alert_sms" => $alert_sms
     );
 
     $oid = $db->insert("av_orders", $order_summary);
@@ -227,7 +285,6 @@ function saveOrder() {
             "product_width" => $item["dimension"]["width"],
             "product_height" => $item["dimension"]["height"],
             "product_depth" => $item["dimension"]["depth"],
-            "product_weight" => $item["quantity"] * $p["weight"] * $item["surface"],
             "total_price_tax_incl" => $item["prixttc"] + $item["shipping"],
             "total_price_tax_excl" => $item["prixttc"] + $item["shipping"]
         );
@@ -243,7 +300,9 @@ function saveOrder() {
 
         // on rajoute les options
         if (isset($item["options"])) {
+            $option_weight = 0;
             foreach ($item["options"] as $k => $option) {
+                //$option_weight += getOptionWeight($option["o_id"]);
 
                 $order_product_attributes = array(
                     "id_order" => $oid,
@@ -251,20 +310,42 @@ function saveOrder() {
                     "id_product" => $item["id"],
                     "id_attribute" => $option["o_id"],
                     "prixttc" => $option["o_price"],
-                    "name" => $option["o_name"]);
-
-                /* $order_detail["product_attribute_id"] = $option["o_id"];
-                  $order_detail["attribute_name"] = $option["o_name"];
-                  $order_detail["attribute_quantity"] = $option["o_quantity"];
-                  $order_detail["attribute_price"] = $option["o_price"];
-                  $order_detail["attribute_shipping"] = $option["o_shipping"];
-                  $order_detail["total_price_tax_incl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                  $order_detail["total_price_tax_excl"] += $option["o_quantity"] * $option["o_price"] + $option["o_shipping"];
-                 */
+                    "name" => $option["o_name"],
+                    "weight" => $option_weight
+                );
 
                 $db->insert("av_order_product_attributes", $order_product_attributes);
             }
         }
+        // on rajoute les options personalisé
+        if (isset($item["custom"])) {
+            foreach ($item["custom"] as $k => $main_attribute) {
+                if (is_array($main_attribute)) {
+                    $order_custom_attributes["id_attribute"] = $k;
+                    foreach ($main_attribute as $l => $sub_attribute) {
+                        if (is_array($sub_attribute)) {
+                            $order_custom_attributes["id_attributes_items"] = $l;
+
+                            foreach ($sub_attribute as $m => $item_value) {
+                                $order_custom_attributes["id_attributes_items_values"] = $m;
+                                $order_custom_attributes["id_order"] = $oid;
+                                $order_custom_attributes["id_order_detail"] = $odid;
+                                $order_custom_attributes["id_product"] = $item["id"];
+                                $order_custom_attributes["custom_value"] = $item_value;
+
+                                $db->insert("av_order_product_custom", $order_custom_attributes);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        $param = array("product_weight" => ($p["weight"] + $option_weight) * $item["surface"]);
+
+        $r = $db->where("id_order_detail", $odid)
+                ->update("av_order_detail", $param);
 
         $_SESSION["id_order"] = $oid;
         $_SESSION["reference"] = str_pad($oid, 9, '0', STR_PAD_LEFT);
@@ -332,51 +413,51 @@ function splitOrderDetail($odid, $qty_request) {
 }
 
 /*
-function setPreparationEncours($oid) {
-    global $db, $mail, $monitoringEmails, $smarty;
+  function setPreparationEncours($oid) {
+  global $db, $mail, $monitoringEmails, $smarty;
 
-    $orderinfo = getOrderInfos($oid);
+  $orderinfo = getOrderInfos($oid);
 
-    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
-    $order_mail_from = "livraison@allovitres.com";
-    $order_mail_tpl = "notif_order_preparation";
+  $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
+  $order_mail_from = "livraison@allovitres.com";
+  $order_mail_tpl = "notif_order_preparation";
 
-    $new_order_state = 3;
+  $new_order_state = 3;
 
-    $r = $db->where("id_order", $oid)
-            ->update("av_orders", array("current_state" => $new_order_state));
+  $r = $db->where("id_order", $oid)
+  ->update("av_orders", array("current_state" => $new_order_state));
 
-    $mail->ClearAllRecipients();
-    $mail->ClearAttachments();
+  $mail->ClearAllRecipients();
+  $mail->ClearAttachments();
 
-    foreach ($monitoringEmails as $bccer) {
-        $mail->AddbCC($bccer);
-    }
-    $mail->AddAddress($orderinfo["customer"]["email"]);
+  foreach ($monitoringEmails as $bccer) {
+  $mail->AddbCC($bccer);
+  }
+  $mail->AddAddress($orderinfo["customer"]["email"]);
 
-    $mail->SetFrom($order_mail_from);
-    $mail->Subject = $order_mail_subject;
-    $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
+  $mail->SetFrom($order_mail_from);
+  $mail->Subject = $order_mail_subject;
+  $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
 
-    $mail->MsgHTML($mail_body);
+  $mail->MsgHTML($mail_body);
 
-    if ($mail->Send()) {
+  if ($mail->Send()) {
 
-        $param = array(
-            "id_order" => $orderinfo["id_order"],
-            "id_user" => $_SESSION["user_id"],
-            "category" => $order_mail_tpl,
-        );
+  $param = array(
+  "id_order" => $orderinfo["id_order"],
+  "id_user" => $_SESSION["user_id"],
+  "category" => $order_mail_tpl,
+  );
 
-        addLog(array("tabs" => "mv_orders",
-            "rowkey" => $orderinfo["id_order"],
-            "col" => "current_state",
-            "operation" => "update",
-            "oldval" => $orderinfo["current_state"],
-            "newval" => $new_order_state
-        ));
-        $r = $db->insert("av_order_bdc", $param);
-    }
-}
-*/
+  addLog(array("tabs" => "mv_orders",
+  "rowkey" => $orderinfo["id_order"],
+  "col" => "current_state",
+  "operation" => "update",
+  "oldval" => $orderinfo["current_state"],
+  "newval" => $new_order_state
+  ));
+  $r = $db->insert("av_order_bdc", $param);
+  }
+  }
+ */
 ?>

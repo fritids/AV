@@ -21,6 +21,14 @@
         <link rel="stylesheet" href="/css/menu.css" type="text/css">
         <link rel="stylesheet" href="/css/menu.css" type="text/css">
         <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
+		{if isset($categorie)}
+<link rel="canonical" href="http://www.allovitres.com/{$categorie.id_category}-{$categorie.link_rewrite}"/>
+		{/if}
+		
+		{if isset($product)}
+<link rel="canonical" href="http://www.allovitres.com/{$product.category.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html"/>
+		{/if}
+		
         <script src="/js/vendor/modernizr-2.6.2.min.js"></script>
         <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.3.min.js"></script>-->
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -30,7 +38,7 @@
         <script type="text/javascript" src="/js/bootstrap.js"></script>
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
         <script src="js/jquery.chained.js"></script>    
-
+		<!-- lien : /{$categorie.id_category}-{$categorie.link_rewrite}/ -->
         <!--       <script>
                    $(window).load(function() {
        
@@ -140,7 +148,7 @@
                 </div>
                 <div id="rech-conteneur-droit1">
                     <span id="recherche-header-classique">
-                        <form action="index.php" method="get">
+                        <form action="/index.php" method="get">
                             <input type="hidden" name="p" value="">
                             <input type="hidden" name="id" value="" id="search_product">
                             <input type="text" name="" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>

@@ -1,0 +1,1 @@
+ALTER TABLE  `av_orders` ADD  `alert_sms` INT( 1 ) NOT NULL DEFAULT  '0';
