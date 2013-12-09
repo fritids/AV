@@ -55,12 +55,16 @@ if (isset($_GET["order"]) && isset($_POST["id_order"])) {
 
     $smarty->assign("orderinfo", $orderinfo);
     $content_body = $smarty->fetch('front_order.tpl');
-    $annexe_body = $smarty->fetch('front_annexe.tpl');
+    
 
     $pdf->AddPage('P', 'A4');
     $pdf->writeHTML($content_body, true, false, true, false, '');
-    $pdf->AddPage('P', 'A4');
-    $pdf->writeHTML($annexe_body, true, false, true, false, '');
+
+    if ($orderinfo["nb_custom_product"] > 0) {
+        $annexe_body = $smarty->fetch('front_annexe.tpl');
+        $pdf->AddPage('P', 'A4');
+        $pdf->writeHTML($annexe_body, true, false, true, false, '');
+    }
     $pdf->lastPage();
     $filename = "AV_FA_" . $oid . "_" . $now . ".pdf";
     $pdf->Output($filename, 'D');
@@ -85,7 +89,7 @@ if (isset($_GET["all_orders"]) && isset($_POST["start_date"]) && isset($_POST["e
         $pdf->lastPage();
         $filename = "AV_FA_" . $start_date . "_" . $end_date . "_" . $now . ".pdf";
         $pdf->Output($filename, 'D');
-    }else{
+    } else {
         echo "pas de résultat.";
     }
 }

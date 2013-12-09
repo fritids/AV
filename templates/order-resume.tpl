@@ -74,11 +74,11 @@
         </tbody>
     </table>
 
-    {*if isset($smarty.session.cart_summary.order_option)}
+    {if isset($smarty.session.cart_summary.order_option)}
         <div class="promo clearfix">
             <p class="total">Option SMS 1€</p>
         </div>
-    {/if*}
+    {/if}
 
     <div class="promo clearfix">
         <p class="total">Total produit : <span class="prix">{$smarty.session.cart_summary.total_produits}€</span></p>

@@ -127,3 +127,9 @@ CREATE TABLE IF NOT EXISTS `av_order_product_custom` (
   `custom_value` int(11) NOT NULL,
   PRIMARY KEY (`id_order_product_custom`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+
+ALTER TABLE  `av_order_detail` ADD  `is_product_custom` INT( 1 ) NOT NULL;
+
+ALTER TABLE  `av_orders` ADD  `nb_product` INT( 3 ) NULL ,
+ADD  `nb_custom_product` INT( 3 ) NULL

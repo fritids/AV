@@ -50,7 +50,7 @@
                                     <td width="14%" bgcolor="#f5f5f5">Dimension</td>
                                     {*<td width="14%" bgcolor="#f5f5f5">Référence</td>*}
                                     <td width="10%" bgcolor="#f5f5f5">Qté</td>
-                                    <td width="10%" bgcolor="#f5f5f5">Prix TTc</td>
+                                    <td width="10%" bgcolor="#f5f5f5">Prix TTC</td>
                                 </tr>
 
                                 {foreach key=key item=detail from=$orderinfo.details}
@@ -84,7 +84,7 @@
                             Total Tva ( {$orderinfo.vat_rate}% ): {($orderinfo.total_paid - ($orderinfo.total_paid-25)/(1+$orderinfo.vat_rate/100) - 25)|number_format:2} €<br>
                             Total produits TTC: {$orderinfo.total_paid - 25} €<br>
                             Frais de transport: 25€ <br>
-                            Total TTc :{$orderinfo.total_paid} €<br>
+                            Total TTC :{$orderinfo.total_paid} €<br>
                         </td>
                     </tr>
                 </table>

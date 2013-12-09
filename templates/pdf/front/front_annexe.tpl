@@ -5,7 +5,7 @@
             <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                         <td height="87">&nbsp;</td>
-                        <td width=""><h2>Annexe FA{$orderinfo.reference}</h2><br> le {$orderinfo.date_add|date_format:"%d/%m/%y"}</td>
+                        <td width=""><h2>Annexe - FA{$orderinfo.reference}</h2><br> le {$orderinfo.date_add|date_format:"%d/%m/%y"}</td>
                     </tr>                    
                     <tr>
                         <td height="120">&nbsp;</td>
@@ -20,11 +20,7 @@
                             <table width="620" border="0" align="center" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td width="20%" style="padding:3px;" bgcolor="#f5f5f5"></td>
-                                    <td width="46%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>
-                                    <td width="14%" bgcolor="#f5f5f5">Dimension</td>
-                                    {*<td width="14%" bgcolor="#f5f5f5">Référence</td>*}
-                                    <td width="10%" bgcolor="#f5f5f5">Qté</td>
-                                    <td width="10%" bgcolor="#f5f5f5">Prix TTc</td>
+                                    <td width="80%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>                                    
                                 </tr>
 
                                 {foreach key=key item=detail from=$orderinfo.details}
@@ -61,14 +57,7 @@
                                                     {/foreach} 
                                                 {/foreach} 
                                             {/if}
-                                        </td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
-                                            {if $detail.product_width}
-                                                {$detail.product_width} x {$detail.product_height} 
-                                            {/if}
-                                        </td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_incl}</td>
+                                        </td>                                        
                                     </tr>
                                 {/foreach}
 

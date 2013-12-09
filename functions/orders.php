@@ -248,6 +248,10 @@ function saveOrder() {
     global $db, $cartItems, $config;
     //$ref = getLastOrderId();
     $alert_sms = 0;
+    $is_product_custom = 0;
+    $nb_product = 0;
+    $nb_custom_product = 0;
+    
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $alert_sms = 1;
     }
@@ -273,6 +277,7 @@ function saveOrder() {
 
     foreach ($cartItems as $item) {
 
+        $nb_product++;
         $p = getProductInfos($item["id"]);
 
         $order_detail = array(
@@ -327,6 +332,7 @@ function saveOrder() {
                             $order_custom_attributes["id_attributes_items"] = $l;
 
                             foreach ($sub_attribute as $m => $item_value) {
+                                $nb_custom_product = 1;
                                 $order_custom_attributes["id_attributes_items_values"] = $m;
                                 $order_custom_attributes["id_order"] = $oid;
                                 $order_custom_attributes["id_order_detail"] = $odid;
@@ -334,18 +340,29 @@ function saveOrder() {
                                 $order_custom_attributes["custom_value"] = $item_value;
 
                                 $db->insert("av_order_product_custom", $order_custom_attributes);
+                                $is_product_custom = 1;
                             }
                         }
                     }
                 }
             }
         }
-
-
-        $param = array("product_weight" => ($p["weight"] + $option_weight) * $item["surface"]);
-
+        // post update sur les details
+        $param = array(
+            "product_weight" => ($p["weight"] + $option_weight) * $item["surface"],
+            "is_product_custom" => $is_product_custom
+        );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);
+        
+// post update global
+        $param = array(
+            "nb_product" => $nb_product - $nb_custom_product,
+            "nb_custom_product" => $nb_custom_product
+        );
+
+        $r = $db->where("id_order", $oid)
+                ->update("av_orders", $param);
 
         $_SESSION["id_order"] = $oid;
         $_SESSION["reference"] = str_pad($oid, 9, '0', STR_PAD_LEFT);

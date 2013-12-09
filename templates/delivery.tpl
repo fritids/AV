@@ -61,9 +61,9 @@
         *}
     </div>
     <form action="?order-resume" method="post">
-        <div class="options2 clearfix">
+        {*<div class="options2 clearfix">
             <p><input type="checkbox" name="alert_sms" value="1" {if isset($smarty.session.cart_summary.order_option) && $smarty.session.cart_summary.order_option == "SMS"} checked {/if}> SMS (1€)</p>
-        </div>
+        </div>*}
         <div class="clearfix"></div>
 
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>

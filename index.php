@@ -797,12 +797,15 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
         if (!empty($orderinfo)) {
             $smarty->assign("orderinfo", $orderinfo);
             $content_body = $smarty->fetch('front_order.tpl');
-            $annexe_body = $smarty->fetch('front_annexe.tpl');
+            
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($content_body, true, false, true, false, '');
-            
-            //$pdf->AddPage('P', 'A4');
-            //$pdf->writeHTML($annexe_body, true, false, true, false, '');
+
+            if ($orderinfo["nb_custom_product"] > 0) {
+                $annexe_body = $smarty->fetch('front_annexe.tpl');
+                $pdf->AddPage('P', 'A4');
+                $pdf->writeHTML($annexe_body, true, false, true, false, '');
+            }
             $pdf->lastPage();
             $pdf->Output("AV_FA_" . $oid . "_" . $now . ".pdf", 'D');
 
