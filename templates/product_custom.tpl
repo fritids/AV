@@ -67,6 +67,8 @@
                                     <script>
                                         $(document).ready(function() {
                                             bindItemAdd();
+                                            $('.main_item option:eq(1)').prop('selected', true);
+                                            $('.main_item').change();
                                         });
                                     </script> 
 
@@ -254,6 +256,8 @@
                 });
 
                 $('.attribute').change();
+                
+                
             });
         }
 
@@ -282,9 +286,9 @@
 
 
 
-        $(document).ready(function($) {
-
-    
+        $(document).ready(function($) {           
+            
+        
             $('.attribute').change(function() {
                 myArray = $('.attribute');
                 //console.log($('.attribute').serializeArray());

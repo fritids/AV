@@ -156,6 +156,7 @@ function getProductCustomAttributItem($pid, $piad) {
         where a.id_attributes_items = b.id_attributes_items         
         and a.id_product = ? 
         and a.id_attribute = ? 
+        order by position
         ", array($pid, $piad));     
 
     foreach ($r as $k => $item) {

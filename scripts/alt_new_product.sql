@@ -132,4 +132,9 @@ CREATE TABLE IF NOT EXISTS `av_order_product_custom` (
 ALTER TABLE  `av_order_detail` ADD  `is_product_custom` INT( 1 ) NOT NULL;
 
 ALTER TABLE  `av_orders` ADD  `nb_product` INT( 3 ) NULL ,
-ADD  `nb_custom_product` INT( 3 ) NULL
+ADD  `nb_custom_product` INT( 3 ) NULL;
+
+
+ALTER TABLE  `av_attributes_items` ADD  `position` INT( 2 ) NOT NULL AFTER  `id_attribute`;
+
+update av_attributes_items set `position` =`id_attributes_items`

@@ -44,7 +44,12 @@ if ($stda != "" && $enda) {
             <div class="panel panel-default">
                 <div class="panel-heading">Reporting</div>
                 <div class="panel-body">
-                    <form action="av_download_pdf.php?all_orders" method="post"  target="blank">
+                    
+                    <form action="av_download_pdf.php" method="post"  target="blank">
+                        <div>
+                            <input type="radio"  name="extract" value="1"> Excel
+                            <input type="radio"  name="extract" value="2"> PDF
+                        </div>
                         Début : <input type="text" class="datepicker" value="" name="start_date"> 
                         Fin : <input type="text" class="datepicker" value="" name="end_date"> 
                         <input type="submit">

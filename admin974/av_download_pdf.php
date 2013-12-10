@@ -11,8 +11,18 @@ require_once ("../functions/tools.php");
 require_once ("../functions/orders.php");
 require_once ('../classes/tcpdf.php');
 require_once ('../libs/Smarty.class.php');
+require "../classes/php-export-data.class.php";
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+
+$options = array(
+    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+);
+
+$dns = 'mysql:host=' . $bdd_host . ';dbname=' . $bdd_name;
+$db2 = new PDO($dns, $bdd_user, $bdd_pwd, $options);
+
 
 $smarty = new Smarty;
 $smarty->setTemplateDir(array('../templates', '../templates/mails', '../templates/pdf/front'));
@@ -55,7 +65,7 @@ if (isset($_GET["order"]) && isset($_POST["id_order"])) {
 
     $smarty->assign("orderinfo", $orderinfo);
     $content_body = $smarty->fetch('front_order.tpl');
-    
+
 
     $pdf->AddPage('P', 'A4');
     $pdf->writeHTML($content_body, true, false, true, false, '');
@@ -70,7 +80,7 @@ if (isset($_GET["order"]) && isset($_POST["id_order"])) {
     $pdf->Output($filename, 'D');
     //echo $annexe_body;
 }
-if (isset($_GET["all_orders"]) && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+if ($_POST["extract"] == 2 && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
     $start_date = $_POST["start_date"];
     $end_date = $_POST["end_date"];
 
@@ -92,5 +102,41 @@ if (isset($_GET["all_orders"]) && isset($_POST["start_date"]) && isset($_POST["e
     } else {
         echo "pas de résultat.";
     }
+}
+
+if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+
+    $filename = "tmp/av_orders_" . $_POST["start_date"] . "-" . $_POST["end_date"] . ".xls";
+
+    $stmt = $db2->prepare("SELECT reference, invoice_date date_commande, lastname nom,firstname prenom,  email, address1, city ville, payment paiement, vat_rate Tva, 
+                        25 frais_de_port_TTC, 
+                        25/(1+vat_rate/100) frais_de_port_HT, 
+                        total_paid/(1+vat_rate/100) - 25/(1+vat_rate/100) total_produit_HT, (total_paid - 25) Total_produit_TTC,
+                        total_paid/(1+vat_rate/100) total_HT, total_paid Total_TTC
+                        FROM  mv_orders a, av_customer b, av_address c
+                        WHERE a.id_customer = b.id_customer
+                        and a.id_address_invoice = c.id_address
+                        and date(invoice_date) between ? and ?
+                        and current_state not in (1,6,7,8)
+                        ");
+
+    $stmt->execute(array($_POST["start_date"], $_POST["end_date"]));
+
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $excel = new ExportDataExcel('file');
+    $excel->filename = $filename;
+    $excel->initialize();
+    $header = array_keys($r[0]);
+
+    $excel->addRow($header);
+
+    foreach ($r as $record) {
+        $excel->addRow($record);
+    }
+
+    $excel->finalize();
+
+    header("Location: " . $filename);
 }
 ?>

@@ -305,8 +305,8 @@ if (isset($_GET["sitemap"])) {
 if (isset($_GET["search"])) {
     $page = "search";
 
-    if (isset($_POST["search_query"]) && !empty($_POST["search_query"])) {        
-        $search_result = getSearchResultsByName($_POST["search_query"]);        
+    if (isset($_POST["search_query"]) && !empty($_POST["search_query"])) {
+        $search_result = getSearchResultsByName($_POST["search_query"]);
     } else {
         $param1 = $_POST["search_lvl_1"];
         $param2 = $_POST["search_lvl_2"];
@@ -344,14 +344,14 @@ if (isset($_GET["order-resume"])) {
 
     if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1 && !isset($_SESSION["cart_summary"]["order_option"])) {
         $_SESSION["cart_summary"]["total_amount"] += 1;
-        $_SESSION["cart_summary"]["order_option"] = "SMS";        
+        $_SESSION["cart_summary"]["order_option"] = "SMS";
     }
-    
+
     if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1) {
         $_SESSION["cart_summary"]["alert_sms_phone"] = $_POST["alert_sms_phone"];
     }
-            
-    
+
+
     // option déja souscrite on retire l'option
     if (!isset($_POST["alert_sms"]) && isset($_SESSION["cart_summary"]["order_option"])) {
         $_SESSION["cart_summary"]["total_amount"] -= 1;
@@ -370,6 +370,11 @@ if (isset($_GET["order-payment"])) {
     $page = "order-payment";
     $breadcrumb = array("parent" => "Accueil", "fils" => "Paiement");
     $page_type = "full";
+    $extra_options = 0;
+
+    if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
+        $extra_options = 1;
+    }
 
     saveorder();
 
@@ -383,15 +388,17 @@ if (isset($_GET["order-payment"])) {
         'returntxt' => 'Retour au site', //What is written on the return button in paypal
         'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
         'returnipn' => $paypal["returnipn"], //Where to go if the user cancels.
-        'shipping' => $conf_shipping_amount, //Shipping Cost
+        'shipping' => $conf_shipping_amount + $extra_options, //Shipping Cost        
         'invoice' => $_SESSION["id_order"], // order ref
         'custom' => ''                           //Custom attribute
     );
+
 
     $pp = new paypalcheckout($settings); //Create an instance of the class
     $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
     //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
+
     $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
     // fin paypal
     // CMCIC
