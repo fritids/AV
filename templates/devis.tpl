@@ -21,7 +21,7 @@
                         <td class="numero">Devis N° <span>{$devis.id_devis}</span></td>
                         <td class="date">{$devis.date_add|date_format:"%d/%m/%y"}</td>
                         <td class="client">{$devis.prenom}</td>
-                        <td class="prix">{$devis.total_paid} €</td>
+                        <td class="prix">{($devis.total_paid*$config.vat_rate)|round:"2"} €</td>
                         <td class="action">
                             {if $devis.current_state == 1}
                                 <button>

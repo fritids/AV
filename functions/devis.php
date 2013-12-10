@@ -61,15 +61,15 @@ function getUserDevisProductAttributs($ddid) {
 }
 
 function CreateOrder($did) {
-    global $db;
+    global $db, $config;
 
     //Order 
     $r = $db->rawQuery("SELECT `id_customer`, `id_address_delivery`, `id_address_invoice`, `total_paid` FROM  av_devis a where id_devis = ? ", array($did));
     $cid = $r[0]["id_customer"];
     //shipping
-    $r[0]["total_paid"] += 25;
-    
-            
+    $r[0]["total_paid"] = $r[0]["total_paid"] * $config["vat_rate"] + 25;
+    $nb_product = 0;
+
     $oid = $db->insert("av_orders", $r[0]);
     $params = array("invoice_date" => date("Y-m-d H:i:s"),
         "delivery_date" => date("Y-m-d H:i:s"),
@@ -78,17 +78,22 @@ function CreateOrder($did) {
         "reference" => str_pad($oid, 9, '0', STR_PAD_LEFT),
         "order_comment" => @$r[0]["devis_comment"],
         "current_state" => 2,
+        "vat_rate" => ($config["vat_rate"] - 1) * 100,
         "payment" => "Manuel"
     );
     $r = $db->where("id_order", $oid)
             ->update("av_orders", $params);
-    
+
     // order detail
     $r = $db->rawQuery("SELECT `id_devis_detail`, `id_product`, ? as id_order, `product_name`, `product_quantity`, `product_price`, `product_width`, `product_height`, `product_weight`, `total_price_tax_incl`, `total_price_tax_excl`  FROM `av_devis_detail` WHERE id_devis = ?", array($oid, $did));
 
     foreach ($r as $details) {
+        $nb_product++;
         $ddid = $details["id_devis_detail"];
         unset($details["id_devis_detail"]);
+        $details["product_price"] *= $config["vat_rate"];
+        $details["total_price_tax_incl"] *= $config["vat_rate"];
+
         $odid = $db->insert("av_order_detail", $details);
 
         //les attributs
@@ -98,6 +103,9 @@ function CreateOrder($did) {
         }
     }
 
+
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", $params = array("nb_product" => $nb_product));
 
     $r = $db->where("id_devis", $did)
             ->update("av_devis", array("current_state" => 4, "id_order" => $oid));

@@ -191,7 +191,7 @@ if (isset($_POST["devis_save"])) {
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
 
-                    $p_unit_price = $p["price"];
+                    $p_unit_price = $p["price"] ;
                     $p_unit_weight = $p["weight"];
 
                     $product_amount = $p["price"] * $p_qte[$k] * round($p_width[$k] * $p_height[$k] / 1000000, 2);
@@ -201,7 +201,7 @@ if (isset($_POST["devis_save"])) {
                         "id_product" => $product,
                         "product_name" => $p["name"],
                         "product_quantity" => $p_qte[$k],
-                        "product_price" => $p_unit_price,
+                        "product_price" => $p_unit_price ,
                         "product_width" => $p_width[$k],
                         "product_height" => $p_height[$k],
                         "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight * $p_qte[$k],
@@ -224,7 +224,7 @@ if (isset($_POST["devis_save"])) {
                         }
                     }
 
-                    $total_price_tax_incl = $product_amount + $attributes_amount;
+                    $total_price_tax_incl = ($product_amount + $attributes_amount) * $config["vat_rate"];
                     $total_paid += $total_price_tax_incl;
 
 

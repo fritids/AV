@@ -158,7 +158,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                         <th>Devis :</th>
                                                         <td><?= $devis["id_devis"] ?></td>
                                                         <th>Montant :</th>
-                                                        <td><?= $devis["total_paid"] ?> €</td>
+                                                        <td><?= round($devis["total_paid"] * $config["vat_rate"] , 2) ?> €</td>
                                                         <th>Date ajout :</th>
                                                         <td><?= $devis["date_add"] ?></td>
                                                         <th>Etat :</th>
@@ -238,7 +238,6 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                         <th>Produit</th>
                                         <th>Attributs</th>
                                         <th>Larg x Long</th>
-                                        <th>Prix Unit.</th>
                                         <th>Poids Unit.</th>
                                         <th>Quantity</th>
                                         <th>Prix ttc</th>                        
@@ -262,10 +261,9 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                 ?>
                                             </td>
                                             <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
-                                            <td><?= $line["product_price"] +$attribute_price ?></td>
                                             <td><?= $line["product_weight"] ?></td>
                                             <td><?= $line["product_quantity"] ?></td>                                                             
-                                            <td><?= $line["total_price_tax_incl"] ?></td>                    
+                                            <td><?= round($line["total_price_tax_incl"] * $config["vat_rate"] ,2) ?></td>                    
                                         </tr>
                                         <?
                                     }

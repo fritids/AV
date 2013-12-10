@@ -69,7 +69,7 @@
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_incl}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{($detail.total_price_tax_incl*1.196)|round:"2"}</td>
                                     </tr>
                                 {/foreach}
                             </table>
@@ -77,9 +77,9 @@
                             <br>
                             <br>
 
-                            Total produits TTc :{$devisinfo.total_paid} €<br>
+                            Total produits TTc :{($devisinfo.total_paid*1.196)|round:"2"} €<br>
                             Frais de transport : 25€ <br>
-                            Total TTc :{$devisinfo.total_paid+25} €<br>
+                            Total TTc :{($devisinfo.total_paid*1.196+25)|round:"2"} €<br>
                         </td>
                     </tr>
                 </table>
