@@ -470,8 +470,8 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                     </div>
                 </div>
                 <div class="panel-body">
-                    Nom : <?= @$customer_info["firstname"] ?> <br>
-                    Prénom :<?= @$customer_info["lastname"] ?> <br>
+                    Nom :<?= @$customer_info["firstname"] ?> <br>
+                    Prénom : <?= @$customer_info["lastname"] ?> <br>                    
                     Email : <?= @$customer_info["email"] ?> <br>                        
                     Type : <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
                 </div>

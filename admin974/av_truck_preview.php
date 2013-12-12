@@ -405,7 +405,7 @@ if ($date_livraison) {
             echo '<br><br><a target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
         } else {
 
-            if ($i == 20) {
+            if ($i == 20 || $i == 40 || $i == 60 || $i == 80 ) {
                 echo '+to:+' . $addrs_link . '">Lien GG map</a><br><br><a  target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
             } else {
                 echo '+to:+' . $addrs_link;

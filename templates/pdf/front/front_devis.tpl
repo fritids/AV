@@ -73,10 +73,29 @@
                                     </tr>
                                 {/foreach}
                             </table>
-                            <br>
-                            <br>
-                            <br>
-
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td height="40">
+                            {if $devisinfo.devis_comment}
+                                <table width="620" border="0" align="center" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
+                                            {$devisinfo.devis_comment}
+                                        </td>
+                                    </tr>
+                                </table>
+                            {/if}
+                        </td>                        
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
                             Total produits TTc :{($devisinfo.total_paid*1.196)|round:"2"} €<br>
                             Frais de transport : 25€ <br>
                             Total TTc :{($devisinfo.total_paid*1.196+25)|round:"2"} €<br>

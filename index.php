@@ -490,8 +490,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "firstname" => $_POST["firstname"],
             "lastname" => $_POST["lastname"],
             "email" => $_POST["email"],
-            "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
-            "customer_group" => $group
+            "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"])
         );
 
         $invoice_adresse = array(

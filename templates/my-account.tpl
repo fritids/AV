@@ -8,7 +8,7 @@
             <h3>MES AVOIRS</h3>
             <p>Vérifiez vos avoirs et/ou bons de réduction</p>
         </div>
-        
+
         <a href="/?devis">
             <div class="block devis">
                 <h3>MES DEVIS</h3>
@@ -23,19 +23,19 @@
             </div>
         </a>
 
-        <a href="/?register">
-            <div class="block infos">
-                <h3>MES INFORMATIONS PERSOS</h3>
-                <p><a href="/?register">Modifiez vos informations personnelles</a></p>
-            </div>
-        </a>
-        <a href="/?register">
-            <div class="block adresses">
-                <h3>MES ADRESSES</h3>
-                <p>Modifiez vos adresses de livraison ou facturation</p>
-            </div>
-        </a>
-
+            <a href="/?register">
+                <div class="block infos">
+                    <h3>MES INFORMATIONS PERSOS</h3>
+                    <p><a href="/?register">Modifiez vos informations personnelles</a></p>
+                </div>
+            </a>
+            <a href="/?register">
+                <div class="block adresses">
+                    <h3>MES ADRESSES</h3>
+                    <p>Modifiez vos adresses de livraison ou facturation</p>
+                </div>
+            </a>
+       
         <div class="block parrainage">
             <h3>PARRAINAGE</h3>
             <p>Parrainez des proches et bénéficiez d’offres exclusives</p>

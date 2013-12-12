@@ -49,6 +49,11 @@
                                 <span>Devis rejeté</span>
                             </td>                          
                         {/if}
+                        {if $devis.current_state == 5}
+                            <td class="rejeted">
+                                <span>Devis annulé</span>
+                            </td>                          
+                        {/if}
                         {if $devis.current_state == 3 || $devis.current_state == 4}
                             <td class="commander">
                                 <span class="valide">Devis déjà payé</span>

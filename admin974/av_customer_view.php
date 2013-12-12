@@ -213,15 +213,13 @@ $productStates = $db->where("id_level", 1)
                                     <table class="table table-bordered table-condensed" style="margin-bottom: 0px;" >
                                         <tr>
                                             <th>
-
-
                                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i ?>">
                                                     <table class="table table-bordered table-condensed" style="margin-bottom: 0px" >
                                                         <tr>
                                                             <th>Devis :</th>
                                                             <td><?= $devis["id_devis"] ?></td>
                                                             <th>Montant :</th>
-                                                            <td><?= $devis["total_paid"] ?> €</td>
+                                                            <td><?= round($devis["total_paid"] * $config["vat_rate"], 2) ?> €</td>
                                                             <th>Date ajout :</th>
                                                             <td><?= $devis["date_add"] ?></td>
                                                             <th>Etat :</th>
@@ -241,6 +239,9 @@ $productStates = $db->where("id_level", 1)
                                                                 case 4:
                                                                     echo "alert alert-success";
                                                                     break;
+                                                                case 5:
+                                                                    echo "alert alert-danger";
+                                                                    break;
                                                             }
                                                             ?> "
                                                                 >
@@ -258,6 +259,9 @@ $productStates = $db->where("id_level", 1)
                                                                             break;
                                                                         case 4:
                                                                             echo "Commande créée: " . $devis["id_order"];
+                                                                            break;
+                                                                        case 5:
+                                                                            echo "Annulé";
                                                                             break;
                                                                     }
                                                                     ?>
@@ -303,7 +307,7 @@ $productStates = $db->where("id_level", 1)
                                                 <td><?= $line["product_price"] ?></td>
                                                 <td><?= $line["product_weight"] ?></td>
                                                 <td><?= $line["product_quantity"] ?></td>                                                             
-                                                <td><?= $line["total_price_tax_incl"] ?></td>                    
+                                                <td><?= round(($line["total_price_tax_incl"] * $config["vat_rate"]), 2) ?></td>                    
                                             </tr>
                                             <?
                                         }

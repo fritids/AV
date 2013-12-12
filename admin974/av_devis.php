@@ -224,7 +224,7 @@ if (isset($_POST["devis_save"])) {
                         }
                     }
 
-                    $total_price_tax_incl = ($product_amount + $attributes_amount) * $config["vat_rate"];
+                    $total_price_tax_incl = $product_amount + $attributes_amount;
                     $total_paid += $total_price_tax_incl;
 
 
@@ -245,7 +245,7 @@ if (isset($_POST["devis_save"])) {
             $p_unit_weight = $_POST["exo_product_unit_weight"];
 
             $shipping_amount = 0;
-            $product_amount = $p_unit_price[$k] * $p_qte[$k];
+            $product_amount = $p_unit_price[$k] / $config["vat_rate"] * $p_qte[$k];
 
             $total_price_tax_incl = $shipping_amount + $product_amount;
             $total_paid += $total_price_tax_incl;
@@ -255,7 +255,7 @@ if (isset($_POST["devis_save"])) {
                 "id_product" => 0,
                 "product_name" => $product,
                 "product_quantity" => $p_qte[$k],
-                "product_price" => $p_unit_price[$k],
+                "product_price" => $p_unit_price[$k] / $config["vat_rate"],
                 "product_weight" => $p_unit_weight[$k] * $p_qte[$k],
                 "total_price_tax_incl" => $total_price_tax_incl,
                 "total_price_tax_excl" => $total_price_tax_incl
@@ -375,6 +375,7 @@ if (isset($_POST["devis_save"])) {
         $row.find(".attributes5").chained($row.find(".product"));
         $row.find(".attributes6").chained($row.find(".product"));
         $row.find(".attributes7").chained($row.find(".product"));
+        $row.find(".attributes8").chained($row.find(".product"));
 
         $row.find(".attributes1").attr('name', $row.find(".attributes1").attr('name') + "[" + c + "][]");
         $row.find(".attributes2").attr('name', $row.find(".attributes2").attr('name') + "[" + c + "][]");
@@ -383,6 +384,7 @@ if (isset($_POST["devis_save"])) {
         $row.find(".attributes5").attr('name', $row.find(".attributes5").attr('name') + "[" + c + "][]");
         $row.find(".attributes6").attr('name', $row.find(".attributes6").attr('name') + "[" + c + "][]");
         $row.find(".attributes7").attr('name', $row.find(".attributes7").attr('name') + "[" + c + "][]");
+        $row.find(".attributes8").attr('name', $row.find(".attributes8").attr('name') + "[" + c + "][]");
 
         $row.find(".product").attr('name', $row.find(".product").attr('name') + "[" + c + "]");
 
@@ -740,6 +742,28 @@ if (isset($_POST["devis_save"])) {
                 });
             }
         });
+        $(".attributes8").change(function() {
+            $attr = $(this).val();
+            var mytr = $(this).closest('tr');
+            if ($attr != null) {
+                jQuery.ajax({
+                    url: "../functions/ajax_declinaison2.php",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: {
+                        value: $attr
+                    },
+                    success: function(result) {
+                        //console.log(result.productPrice + " " + result.priceAttribut);
+                        mytr.find('.prod_price').val(result.productPrice);
+                        mytr.find('.attr8_price').val(result.priceAttribut);
+                        updUnitPrice(mytr);
+
+                    }
+                });
+            }
+        });
 
         $(".unit_price").change(function() {
             var mytr = $(this).closest('tr');
@@ -773,11 +797,9 @@ if (isset($_POST["devis_save"])) {
 </script>
 
 <div class="container">
-    <div class="row">
-          
-        <ul class=" col-xs-6 alert alert-info">
-            <li>correction : bug sur la saisie de devis de plusieurs produits standards <b>identiques</b>.</li>
-            <li>Lors de la création du devis, un pdf est joint à l'envoi du mail.</li>
+    <div class="row">          
+        <ul class=" col-xs-6 alert alert-success">
+            <li class="list-unstyled" style="text-decoration: line-through;">NE PLUS UTILISER DEVIS POUR PRODUIT NORMAUX, Refonte du module avec les nouveautées</li>
         </ul>
     </div>
     <div class="row">
@@ -873,6 +895,7 @@ if (isset($_POST["devis_save"])) {
                     <input type="hidden" name="" value="0" class="attr5_price" size="2" />
                     <input type="hidden" name="" value="0" class="attr6_price" size="2" />
                     <input type="hidden" name="" value="0" class="attr7_price" size="2" />
+                    <input type="hidden" name="" value="0" class="attr8_price" size="2" />
                     <td>
                         <select name="product_id" class="product" id="product">
                             <?
@@ -959,7 +982,7 @@ if (isset($_POST["devis_save"])) {
                             <table class="table table-bordered table-condensed col-md-12" id="tab_exotique">
                                 <tr>
                                     <th>Produit</th>
-                                    <th>Prix Unit.</th>
+                                    <th>Prix Unit. TTC</th>
                                     <th>Poids Unit.</th>
                                     <th>Quantity</th>
                                     <th>Poids</th>                        

@@ -137,4 +137,5 @@ ADD  `nb_custom_product` INT( 3 ) NULL;
 
 ALTER TABLE  `av_attributes_items` ADD  `position` INT( 2 ) NOT NULL AFTER  `id_attribute`;
 
-update av_attributes_items set `position` =`id_attributes_items`
+update av_attributes_items set `position` =`id_attributes_items`;
+

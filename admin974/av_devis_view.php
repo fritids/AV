@@ -16,7 +16,12 @@ if (isset($_GET["create_order"]) && isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
     $cid = CreateOrder($did);
 }
-
+if (isset($_GET["remove"]) && isset($_POST["id_devis"])) {
+    $did = $_POST["id_devis"];
+    $params = array("current_state" => 5);
+    $r = $db->where("id_devis", $did)
+            ->update("av_devis", $params);
+}
 
 
 if (isset($_POST["id_devis"]) || isset($_GET["id_devis"])) {
@@ -87,6 +92,13 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
 
 
 <div class="container">
+    
+     <div class="row">
+          
+        <ul class=" col-xs-6 alert alert-success">
+            <li class="list-unstyled">Nouveauté : possibilité d'annuler un devis en attente.</li>
+        </ul>
+    </div>
     <form method="post"> 
         <div class="row">
 
@@ -158,7 +170,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                         <th>Devis :</th>
                                                         <td><?= $devis["id_devis"] ?></td>
                                                         <th>Montant :</th>
-                                                        <td><?= round($devis["total_paid"] * $config["vat_rate"] , 2) ?> €</td>
+                                                        <td><?= round($devis["total_paid"] * $config["vat_rate"], 2) ?> €</td>
                                                         <th>Date ajout :</th>
                                                         <td><?= $devis["date_add"] ?></td>
                                                         <th>Etat :</th>
@@ -178,6 +190,9 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                             case 4:
                                                                 echo "alert alert-success";
                                                                 break;
+                                                            case 5:
+                                                                echo "alert alert-danger";
+                                                                break;
                                                         }
                                                         ?> "
                                                             >
@@ -196,6 +211,9 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                                     case 4:
                                                                         echo "Convertie: " . $devis["id_order"];
                                                                         break;
+                                                                    case 5:
+                                                                        echo "Annulé";
+                                                                        break;
                                                                 }
                                                                 ?>
                                                         </td>
@@ -204,31 +222,34 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                             </a>
                                         </th>
                                         <td nowrap>
-                                            <?
-                                            if ($devis["current_state"] == 1) {
-                                                ?>
-                                                <form action="?create_order" method="post">
-                                                    <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
-                                                    <button class="btn btn-default" data-toggle="tooltip" title="Créer une commande à partir de ce devis"><span class="glyphicon glyphicon-shopping-cart"></span></button>
-                                                </form> 
+                                            <div>
                                                 <?
-                                            } else if ($devis["current_state"] == 4) {
+                                                if ($devis["current_state"] == 1) {
+                                                    ?>
+                                                    <form action="?create_order" method="post">
+                                                        <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                        <button class="btn btn-default" data-toggle="tooltip" title="Créer une commande à partir de ce devis"><span class="glyphicon glyphicon-shopping-cart"></span></button>
+                                                    </form> 
+                                                    <form action="?remove" method="post">
+                                                        <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                        <button class="btn btn-default" data-toggle="tooltip" title="Annuler le devis"><span class="glyphicon glyphicon-remove"></span></button>
+                                                    </form> 
+                                                    <?
+                                                } else if ($devis["current_state"] == 4) {
+                                                    ?>
+                                                    <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default" data-toggle="tooltip" title="Aller à la facture"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                                                    <?
+                                                }
                                                 ?>
-                                                <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default" data-toggle="tooltip" title="Aller à la facture"><span class="glyphicon glyphicon-zoom-in"></span></a>
 
                                                 <form action="av_download_pdf.php?devis" method="post" target="blank">
                                                     <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
                                                     <button class="btn btn-default" data-toggle="tooltip" title="Télécharger le devis au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
                                                 </form> 
-                                                <?
-                                            }
-                                            ?>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
-
-
-
                             </h4>
                         </div>
                         <div id="collapse<?= $i ?>" class="panel-collapse collapse in">
@@ -252,7 +273,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                             <td>
                                                 <?
                                                 foreach ($line["combinations"] as $attribute) {
-                                                    
+
                                                     $attribute_price = $attribute["prixttc"];
                                                     ?>
                                                     <?= $attribute["name"] ?><br>
@@ -263,7 +284,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                             <td><?= $line["product_width"] ?> x <?= $line["product_height"] ?></td>
                                             <td><?= $line["product_weight"] ?></td>
                                             <td><?= $line["product_quantity"] ?></td>                                                             
-                                            <td><?= round($line["total_price_tax_incl"] * $config["vat_rate"] ,2) ?></td>                    
+                                            <td><?= round($line["total_price_tax_incl"] * $config["vat_rate"], 2) ?></td>                    
                                         </tr>
                                         <?
                                     }
