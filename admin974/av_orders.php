@@ -126,12 +126,7 @@ $opts['fdd']['RECU_INFO'] = array(
     'select' => 'D',
     'sort' => true
 );
-$opts['fdd']['COMMANDE_INFO'] = array(
-    'name' => 'Commande fournisseur',
-    'options' => 'L',
-    'select' => 'D',
-    'sort' => true
-);
+
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
     'select' => 'T',

@@ -149,20 +149,14 @@ if ($verified) {
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
 
         $orderinfo = getOrderInfos($oid);
+        
+        $mail->AddAddress($orderinfo["customer"]["email"]);
+        $mail->Subject = $confmail["commande_new"] . " " . $oid;
 
         $smarty->assign("orderinfo", $orderinfo);
 
-        $content_body = $smarty->fetch('notif_order_payment.tpl');
+        $mail_content = $smarty->fetch('notif_order_payment.tpl');
         $invoice = $smarty->fetch('front_order.tpl');
-
-        $pdf->AddPage('P', 'A4');
-        $pdf->writeHTML($invoice, true, false, true, false, '');
-        $pdf->lastPage();
-
-        $pdf->Output("AV_FA_" . $oid . "_" . $now . ".pdf", 'F');
-
-        $mail->AddAddress($orderinfo["customer"]["email"]);
-        $mail->Subject = $confmail["commande_new"] . " " . $oid;
 
         $pdf_file = "AV_FA_" . $oid . "_" . $now . ".pdf";
 
@@ -175,13 +169,11 @@ if ($verified) {
         }
         $pdf->lastPage();
         $pdf->Output("../../tmp/" . $pdf_file, 'F');
-
-        $mail->MsgHTML($content_body);
+        $mail->MsgHTML($mail_content);
         $mail->AddAttachment("../../tmp/" . $pdf_file);
         foreach ($monitoringEmails as $bccer) {
             $mail->AddBCC($bccer);
         }
-
         if ($mail->Send()) {
             $param = array(
                 "id_order" => $oid,

@@ -30,7 +30,7 @@
             <label for="adresse">Adresse de facturation *</label>
             <textarea id="adresse" name="invoice_address1" required="true">{$user.invoice.address1}</textarea><br />
             <label for="cp">Code Postal *</label>
-            <input id="cp" name="invoice_postcode" type="text" value="{$user.invoice.postcode}" required="true" /><br />
+            <input id="cp" name="invoice_postcode" type="text" value="{$user.invoice.postcode}" required="true" {literal}pattern="[0-9]{5}"{/literal}/><br />
             <label for="ville">Ville *</label>
             <input id="ville" name="invoice_city" type="text" value="{$user.invoice.city}" required="true"/><br />
 
@@ -44,7 +44,7 @@
             <label for="LIV_adresse">Adresse de livraison *</label>
             <textarea id="LIV_adresse"  name="delivery_address1">{$user.delivery.address1}</textarea><br />
             <label for="LIV_cp">Code Postal *</label>
-            <input id="LIV_cp" name="delivery_postcode" type="text" value="{$user.delivery.postcode}"/><br />
+            <input id="LIV_cp" name="delivery_postcode" type="text" value="{$user.delivery.postcode}"  {literal}pattern="[0-9]{5}"{/literal}/><br />
             <label for="LIV_ville">Ville *</label>
             <input id="LIV_ville" name="delivery_city" type="text" value="{$user.delivery.city}"/><br />
 

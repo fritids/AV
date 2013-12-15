@@ -26,7 +26,7 @@ $sms_sender = 'ALLOVITRES';
 $smarty = new Smarty;
 $smarty->caching = 0;
 //$smarty->error_reporting = E_ALL & ~E_NOTICE;
-$smarty->setTemplateDir(array('../templates', '../templates/mails/', '../templates/mails/admin', '../templates/pdf', '../templates/pdf/admin'));
+$smarty->setTemplateDir(array('../templates', '../templates/mails/', '../templates/mails/admin', '../templates/pdf', '../templates/pdf/admin', '../templates/pdf/front'));
 
 //Create a new PHPMailer instance
 $mail = new PHPMailer();
@@ -184,8 +184,8 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $order_sms_tpl = "notif_sms_preparation";
                     $order_sms_text = "Bonjour, Votre commande est en phase de fabrication. Vous recevrez sous 7 à 15 j ouvrés un mail et sms pour la livraison. L'équipe Allovitres.";
                     break;
-                
-                
+
+
                 default :
                     $order_mail_subject = "";
                     $order_mail_from = "";
@@ -299,8 +299,12 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $smarty->assign("orderdetail", $orderDetailSupplier);
         $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
         $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
-
         $pdf->writeHTML($bdc_pdf_body, true, false, true, false, '');
+        if ($orderinfo["nb_custom_product"] > 0) {
+            $annexe_body = $smarty->fetch('front_annexe.tpl');
+            $pdf->AddPage('P', 'A4');
+            $pdf->writeHTML($annexe_body, true, false, true, false, '');
+        }
         $pdf->lastPage();
 
         $path = "./ressources/bon_de_commandes";
@@ -313,11 +317,9 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
         //Excel
 
-
         $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
         fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
         fclose($fp);
-
 
         // fin excel
 

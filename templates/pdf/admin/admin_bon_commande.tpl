@@ -43,26 +43,58 @@
 <table border="1">
     <tr>
         <th width="50">Zone</th>
-        <th width="150">Référence Client</th>
-        <th width="50">Qte</th>
-        <th width="250">Designation</th>        
-        <th width="70">Dimension</th>
-        <th width="70">&nbsp;</th>
-        <th width="70">&nbsp;</th>
-        <th width="70">&nbsp;</th>
-        <th width="70">&nbsp;</th>
+        <th width="110">Référence Client</th>
+        <th width="30">Qte</th>
+        <th width="200">Designation</th>        
+        <th width="50">Dimension</th>    
+        <th width="60">Epaisseur</th>
+        <th width="60">Façonnage</th>
+        <th width="60">Couleur</th>
+        <th width="60">Nat. verre</th>
+        <th width="60">Finition</th>
+        <th width="60">Trait. Verre</th>        
+
+        {if $orderinfo.nb_custom_product > 0}
+            <th width="60">Trait. manuel</th>
+            {/if}
     </tr>
-    
+
     {foreach key=key item=detail from=$orderdetail name=orderdetail}
         <tr>
             <td>{$orderinfo.address.delivery.zone}</td>
             <td>{$orderinfo.customer.lastname} {$orderinfo.customer.firstname} AV</td>
             <td>{$detail.product_quantity}</td>
-            <td>{$detail.product_name}</td>
+            <td>
+                {$detail.product_name}
+                {if $detail.is_product_custom == 1}
+                    forme spécifique voir annexe
+                {/if}
+            </td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
-            {foreach key=key2 item=attribut from=$detail.attributes}
-                <td>{$attribut.attribute_name} &nbsp;{$attribut.attribute_value}</td>
-            {/foreach}            
+                     
+   
+            {for $i=0 to 5}
+                
+                {if $detail.attributes[$i].index_attribute == 1}
+                    <td>{$detail.attributes[$i].attribute_value}</td>
+                {elseif $detail.attributes[$i].index_attribute == 2}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 3}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 4}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 5}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 7}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {else}
+                    <td>&nbsp;</td>
+                {/if}
+            {/for}   
+
+            {if $detail.is_product_custom == 1}
+                <td>OUI</td>
+            {/if}
         </tr>
     {/foreach}
 </table>

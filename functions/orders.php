@@ -156,11 +156,12 @@ function getOrdersDetailAttribute($odid) {
     global $db;
     $params = array($odid);
 
-    $r = $db->rawQuery("SELECT a.*, a.name attribute_value, b.weight, c.name attribute_name
+    $r = $db->rawQuery("SELECT c.id_attribute index_attribute,a.*, a.name attribute_value, b.weight, c.name attribute_name
                         FROM av_order_product_attributes a , av_product_attribute b, av_attributes c
                         where a.id_attribute = b.id_product_attribute
                         and b.id_attribute = c.id_attribute 
-                        and  id_order_detail = ?  ", $params);
+                        and  id_order_detail = ?  
+                        order by c.id_attribute", $params);
 
     return $r;
 }
@@ -255,7 +256,7 @@ function saveOrder() {
 
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $alert_sms = 1;
-        $alert_sms_phone = $_SESSION["cart_summary"]["alert_sms_phone"] ;
+        $alert_sms_phone = $_SESSION["cart_summary"]["alert_sms_phone"];
     }
     //global de la commande
     $order_summary = array(
@@ -335,7 +336,7 @@ function saveOrder() {
                             $order_custom_attributes["id_attributes_items"] = $l;
 
                             foreach ($sub_attribute as $m => $item_value) {
-                                $nb_custom_product = 1;
+                                $nb_custom_product += 1;
                                 $order_custom_attributes["id_attributes_items_values"] = $m;
                                 $order_custom_attributes["id_order"] = $oid;
                                 $order_custom_attributes["id_order_detail"] = $odid;
@@ -349,16 +350,20 @@ function saveOrder() {
                     }
                 }
             }
+            // post update sur les details
+            $r = $db->where("id_order_detail", $odid)
+                    ->update("av_order_detail", array("is_product_custom" => $is_product_custom));
         }
+
+        
         // post update sur les details
         $param = array(
-            "product_weight" => ($p["weight"] + $option_weight) * $item["surface"],
-            "is_product_custom" => $is_product_custom
+            "product_weight" => ($p["weight"] + $option_weight) * $item["surface"]
         );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);
 
-// post update global
+        // post update global
         $param = array(
             "nb_product" => $nb_product - $nb_custom_product,
             "nb_custom_product" => $nb_custom_product

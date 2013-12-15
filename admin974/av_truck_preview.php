@@ -248,12 +248,13 @@ if (isset($_GET["planning"])) {
                                                     <th>Heure de livraison<br><input type="text" value="<?= $OrderProduct["comment2"] ?>" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Informations <br><input type="text" value="<?= $OrderProduct["comment3"] ?>" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Horaire indiqué au client<br><input type="text" value="<?= $OrderProduct["horaire"] ?>" name="horaire[<?= $OrderProduct["id_order"] ?>]"> </th>    
+                                                    <th><?= $o_truck["order_comment"] ?></th>    
                                                 </tr>
                                                 <?
                                                 if ($o_truck["delivery_comment"]) {
                                                     ?>
                                                     <tr >
-                                                        <td colspan="8" class="alert" style=" background-color: red; color: #fff">
+                                                        <td colspan="9" class="alert" style=" background-color: red; color: #fff">
                                                             <?= @$o_truck["delivery_comment"] ?>
                                                         </td>
                                                     </tr>
@@ -269,7 +270,7 @@ if (isset($_GET["planning"])) {
                                             ?>
                                             <tr>
 
-                                                <td colspan="6"><?= $p_qty ?> x <?= $OrderProduct["product_name"] ?></td>
+                                                <td colspan="7"><?= $p_qty ?> x <?= $OrderProduct["product_name"] ?></td>
                                                 <td nowrap class="text-center"><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                                 <td class="text-center"><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
 
@@ -281,7 +282,7 @@ if (isset($_GET["planning"])) {
                                         }
                                         ?>
                                         <tr>
-                                            <td colspan="7" class="text-right" > <h4>Total</h4></td>
+                                            <td colspan="8" class="text-right" > <h4>Total</h4></td>
                                             <td class="text-center"><h4><?= $order_weight ?> Kg</h4></td>                                                                                                                          
                                         </tr>
                                     </table>
@@ -359,9 +360,9 @@ if (isset($_GET["planning"])) {
                         </span>
                     </div><!-- /input-group -->
 
-                    
 
-                    
+
+
                 </form>
             </div>
         </div>
@@ -405,7 +406,7 @@ if ($date_livraison) {
             echo '<br><br><a target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
         } else {
 
-            if ($i == 20 || $i == 40 || $i == 60 || $i == 80 ) {
+            if ($i == 20 || $i == 40 || $i == 60 || $i == 80) {
                 echo '+to:+' . $addrs_link . '">Lien GG map</a><br><br><a  target="_blank" href="https://maps.google.fr/maps?f=q&hl=fr&q=from:' . $addrs_link;
             } else {
                 echo '+to:+' . $addrs_link;
