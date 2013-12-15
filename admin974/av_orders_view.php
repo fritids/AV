@@ -103,11 +103,26 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
             foreach ($_POST["id_supplier"] as $id => $supplier) {
                 $r = $db->where("id_order_detail", $id)
                         ->update("av_order_detail", array("id_supplier" => $supplier));
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $id,
+                    "col" => "id_supplier",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $supplier
+                ));
             }
         } else {
             foreach ($orderinfo["details"] as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("id_supplier" => $_POST["id_supplier"]));
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $od["id_order_detail"],
+                    "col" => "id_supplier",
+                    "operation" => "update",
+                    "oldval" => $od["id_supplier"],
+                    "newval" => $_POST["id_supplier"]
+                ));
             }
         }
     if (isset($_POST["supplier_date_delivery"]) && !empty($_POST["supplier_date_delivery"]))
@@ -116,11 +131,25 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 if (!empty($date_delivery))
                     $r = $db->where("id_order_detail", $id)
                             ->update("av_order_detail", array("supplier_date_delivery" => $date_delivery));
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $id,
+                    "col" => "supplier_date_delivery",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $date_delivery
+                ));
             }
         }else {
             foreach ($orderinfo["details"] as $od) {
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("supplier_date_delivery" => $_POST["supplier_date_delivery"]));
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $od["id_order_detail"],
+                    "col" => "supplier_date_delivery",
+                    "operation" => "update",
+                    "oldval" => $od["supplier_date_delivery"],
+                    "newval" => $_POST["supplier_date_delivery"]
+                ));
             }
         }
     if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
@@ -136,6 +165,14 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $r = $db->where("id_order_detail", $id)
                             ->update("av_order_detail", array("supplier_date_delivery" => null));
                 }
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $id,
+                    "col" => "product_current_state",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $state
+                ));
             }
         } else {
             foreach ($orderinfo["details"] as $od) {
@@ -149,113 +186,18 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
                             ->update("av_order_detail", array("supplier_date_delivery" => null));
                 }
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $od["id_order_detail"],
+                    "col" => "supplier_date_delivery",
+                    "operation" => "update",
+                    "oldval" => $od["product_current_state"],
+                    "newval" => $_POST["product_current_state"]
+                ));
             }
         }
 
-//maj status order  
-    if (isset($_POST["current_state"]) && !empty($_POST["current_state"])) {
-
-        $r = $db->where("id_order", $oid)
-                ->update("av_orders", array("current_state" => $_POST["current_state"]));
-
-        if ($r) {
-
-            switch ($_POST["current_state"]) {
-                case 7:
-                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été remboursé";
-                    $order_mail_from = "service.commercial@allovitres.com";
-                    $order_mail_tpl = "notif_order_refund";
-                    $order_sms_tpl = "notif_sms_refund";
-                    break;
-                case 5:
-                    $order_sms_text = "Bonjour, Votre commande vous a été livrée. Nous espérons avoir répondu convenablement à vos attentes.A bientôt sur notre site allovitres.com";
-                    $order_sms_tpl = "notif_sms_delivered";
-                    break;
-                case 6:
-                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été annulé";
-                    $order_mail_from = "service.commercial@allovitres.com";
-                    $order_mail_tpl = "notif_order_cancel";
-                    $order_sms_tpl = "notif_sms_cancel";
-                    break;
-                case 3:
-                    $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
-                    $order_mail_from = "livraison@allovitres.com";
-                    $order_mail_tpl = "notif_order_preparation";
-                    $order_sms_tpl = "notif_sms_preparation";
-                    $order_sms_text = "Bonjour, Votre commande est en phase de fabrication. Vous recevrez sous 7 à 15 j ouvrés un mail et sms pour la livraison. L'équipe Allovitres.";
-                    break;
-
-
-                default :
-                    $order_mail_subject = "";
-                    $order_mail_from = "";
-                    $order_mail_tpl = "";
-                    break;
-            }
-
-            if ($orderinfo["alert_sms"] == 1) {
-
-                if (isset($order_sms_text) && $order_sms_text != '') {
-
-                    $sms = new SMS();
-                    $sms->set_user_login($user_login);
-                    $sms->set_api_key($api_key);
-                    $sms->set_sms_mode($sms_mode);
-                    $sms->set_sms_text($order_sms_text);
-                    $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
-                    $sms->set_sms_type($sms_type);
-                    $sms->set_sms_sender($sms_sender);
-                    $sms->send();
-
-                    @$updated["text"] .= "un SMS de notification a été envoyé au " . $orderinfo["alert_sms_phone"] . "<br>";
-
-                    //log
-                    $param = array(
-                        "id_order" => $orderinfo["id_order"],
-                        "id_user" => $_SESSION["user_id"],
-                        "category" => $order_sms_tpl,
-                    );
-                    $r = $db->insert("av_order_bdc", $param);
-                }
-            }
-
-            if (!empty($order_mail_tpl)) {
-
-                $mail->ClearAllRecipients();
-                $mail->ClearAttachments();
-
-                foreach ($monitoringEmails as $bccer) {
-                    $mail->AddbCC($bccer);
-                }
-                $mail->AddAddress($orderinfo["customer"]["email"]);
-
-                $mail->SetFrom($order_mail_from);
-                $mail->Subject = $order_mail_subject;
-                $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
-
-                $mail->MsgHTML($mail_body);
-                if ($mail->Send()) {
-                    @$updated["text"] .= "un mail de notification a été envoyé à l'adresse " . $orderinfo["customer"]["email"] . "<br>";
-                    $param = array(
-                        "id_order" => $orderinfo["id_order"],
-                        "id_user" => $_SESSION["user_id"],
-                        "category" => $order_mail_tpl,
-                    );
-                    $r = $db->insert("av_order_bdc", $param);
-                }
-            }
-
-            addLog(array("tabs" => "mv_orders",
-                "rowkey" => $orderinfo["id_order"],
-                "col" => "current_state",
-                "operation" => "update",
-                "oldval" => $orderinfo["current_state"],
-                "newval" => $_POST["current_state"]
-            ));
-        }
-    }
-
-    @$updated["text"] .= "Modification a été effectuée.";
+    @$updated["text"] .= "Modification a été effectuée.<br>";
 
 //suite aux update on recharge les infos    
     $orderinfo = getOrderInfos($oid);
@@ -352,7 +294,116 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s) : <ul>" . $tmp . "</ul>";
 }
 
+//maj status order  
+if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($orderinfo["ARC_INFO"] == 5 && $orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] != 3)
+) {
 
+    if (isset($_POST["current_state"]) && !empty($_POST["current_state"]))
+        $new_state = $_POST["current_state"];
+
+    if ($orderinfo["ARC_INFO"] == 5 && $orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] != 3)
+        $new_state = 3;
+
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", array("current_state" => $new_state));
+
+    if ($r) {
+        switch ($new_state) {
+            case 7:
+                $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été remboursé";
+                $order_mail_from = "service.commercial@allovitres.com";
+                $order_mail_tpl = "notif_order_refund";
+                $order_sms_tpl = "notif_sms_refund";
+                break;
+            case 5:
+                $order_sms_text = "Bonjour, Votre commande vous a été livrée. Nous espérons avoir répondu convenablement à vos attentes.A bientôt sur notre site allovitres.com";
+                $order_sms_tpl = "notif_sms_delivered";
+                break;
+            case 6:
+                $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " a été annulé";
+                $order_mail_from = "service.commercial@allovitres.com";
+                $order_mail_tpl = "notif_order_cancel";
+                $order_sms_tpl = "notif_sms_cancel";
+                break;
+            case 3:
+                $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
+                $order_mail_from = "livraison@allovitres.com";
+                $order_mail_tpl = "notif_order_preparation";
+                $order_sms_tpl = "notif_sms_preparation";
+                $order_sms_text = "Bonjour, Votre commande est en phase de fabrication. Vous recevrez sous 7 à 15 j ouvrés un mail et sms pour la livraison. L'équipe Allovitres.";
+                break;
+
+
+            default :
+                $order_mail_subject = "";
+                $order_mail_from = "";
+                $order_mail_tpl = "";
+                break;
+        }
+
+        if ($orderinfo["alert_sms"] == 1) {
+
+            if (isset($order_sms_text) && $order_sms_text != '') {
+
+                $sms = new SMS();
+                $sms->set_user_login($user_login);
+                $sms->set_api_key($api_key);
+                $sms->set_sms_mode($sms_mode);
+                $sms->set_sms_text($order_sms_text);
+                $sms->set_sms_recipients(array($orderinfo["alert_sms_phone"]));
+                $sms->set_sms_type($sms_type);
+                $sms->set_sms_sender($sms_sender);
+                $sms->send();
+
+                @$updated["text"] .= "un SMS de notification a été envoyé au " . $orderinfo["alert_sms_phone"] . "<br>";
+
+                //log
+                $param = array(
+                    "id_order" => $orderinfo["id_order"],
+                    "id_user" => $_SESSION["user_id"],
+                    "category" => $order_sms_tpl,
+                );
+                $r = $db->insert("av_order_bdc", $param);
+            }
+        }
+
+        if (!empty($order_mail_tpl)) {
+
+            $mail->ClearAllRecipients();
+            $mail->ClearAttachments();
+
+            foreach ($monitoringEmails as $bccer) {
+                $mail->AddbCC($bccer);
+            }
+            $mail->AddAddress($orderinfo["customer"]["email"]);
+
+            $mail->SetFrom($order_mail_from);
+            $mail->Subject = $order_mail_subject;
+            $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
+
+            $mail->MsgHTML($mail_body);
+            if ($mail->Send()) {
+                @$updated["text"] .= "un mail de notification a été envoyé à l'adresse " . $orderinfo["customer"]["email"] . "<br>";
+                $param = array(
+                    "id_order" => $orderinfo["id_order"],
+                    "id_user" => $_SESSION["user_id"],
+                    "category" => $order_mail_tpl,
+                );
+                $r = $db->insert("av_order_bdc", $param);
+            }
+        }
+
+        addLog(array("tabs" => "mv_orders",
+            "rowkey" => $orderinfo["id_order"],
+            "col" => "current_state",
+            "operation" => "update",
+            "oldval" => $orderinfo["current_state"],
+            "newval" => $new_state
+        ));
+        
+        $orderinfo = getOrderInfos($oid);
+    }
+}
 if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 
     $p_qte = $_POST["qte"];
@@ -432,17 +483,84 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
     }
     ?>
     <div class="row">
-        <div class="col-xs-12">
-            <div class="col-xs-5">
-                <h3>Commande : <?= $oid ?></h3>
-            </div>  
-            <div class="col-xs-3">
+
+        <div class="col-xs-3">
+            <div class="alert">
+                <b class="h3">#<?= $oid ?></b>   
+            </div>
+        </div>  
+        <div class="col-xs-2">
+            <div class="alert">
                 <form action="av_download_pdf.php?order" method="post" target="blank">
                     <input type="hidden" value="<?= $oid ?>" name="id_order">
                     <button class="btn btn-default" data-toggle="tooltip" title="Télécharger la facture au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
                 </form> 
             </div>
-            <div class="text-center col-xs-4 alert alert-<?= $orderinfo["current_state"] ?>" >
+        </div>
+        <div class="col-xs-3">
+            <table class="table table-condensed  table-bordered">
+                <tr class="text-center">
+                    <th class="text-center" style="width: 50px">ARC</th>
+                    <th class="text-center" style="width: 50px">COMM.</th>
+                    <th class="text-center" style="width: 50px">RECU</th>
+                </tr>
+                <tr>
+                    <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["ARC_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>
+                    <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["COMMANDE_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>
+                    <td class="text-center alert-<?= $orderinfo["RECU_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["RECU_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>                   
+
+                </tr>
+            </table>
+
+        </div>  
+
+        <div class="col-xs-4">
+            <div class="alert alert-<?= $orderinfo["current_state"] ?>">
                 <form method="post">
                     <select name="current_state" class="pme-input-0">
                         <option value="">--</option>
@@ -461,6 +579,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 </form>
             </div>
         </div>
+
     </div>
 
     <div class="row">
@@ -598,7 +717,8 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 <ul class="nav nav-pills">
                     <li class="active"><a href="#Produits" data-toggle="tab">Produits</a></li>
                     <li><a href="#bdc" data-toggle="tab">Bon de commande</a></li>
-                    <li><a href="#history" data-toggle="tab">Historique</a></li>
+                    <li><a href="#history_mail" data-toggle="tab">Historique e-mail</a></li>
+                    <li><a href="#history_mod" data-toggle="tab">Historique Modifications</a></li>
                 </ul>
                 <form method="post">
                     <div class="tab-content">
@@ -754,73 +874,75 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                         </div>
 
                         <div class="tab-pane" id="bdc">
-                            <div class="row">
-                                <table>
-                                    <tr>
-                                        <th>Utilisateur</th>                                        
-                                        <th>Date envoi</th>
-                                        <th>Fournisseur</th>
-                                        <th>Bdc</th>
+                            <table>
+                                <tr>
+                                    <th>Utilisateur</th>                                        
+                                    <th>Date envoi</th>
+                                    <th>Fournisseur</th>
+                                    <th>Bdc</th>
 
-                                    </tr>
-                                    <?
-                                    if ($orderinfo["history"])
-                                        foreach ($orderinfo["history"] as $odh) {
-                                            if ($odh["supplier_name"]) {
-                                                ?>
-                                                <tr>
-                                                    <td><?= $odh["prenom"] ?></td>
-                                                    <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
-                                                    <td><?= $odh["supplier_name"] ?></td>
-                                                    <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
-                                                </tr>
-                                                <?
-                                            }
-                                        }
-                                    ?>
-
-                                </table>
-
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="history">
-                            <div class="row">
-                                <table>
-                                    <tr>
-                                        <th>Utilisateur</th>                                        
-                                        <th>Date envoi</th>
-                                        <th>Objet</th>
-                                        <th>Fichier</th>
-                                    </tr>
-                                    <?
+                                </tr>
+                                <?
+                                if ($orderinfo["history"])
                                     foreach ($orderinfo["history"] as $odh) {
-                                        if (empty($odh["supplier_name"])) {
+                                        if ($odh["supplier_name"]) {
                                             ?>
                                             <tr>
                                                 <td><?= $odh["prenom"] ?></td>
                                                 <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
-                                                <td><?= $odh["category"] ?></td>  
-                                                <td>
-
-                                                    <?
-                                                    if ($odh["bdc_filename"]) {
-                                                        if ($odh["category"] == "roadmap")
-                                                            $folder = "roadmap";
-                                                        if ($odh["category"] == "bl")
-                                                            $folder = "bon_de_livraison";
-                                                        ?>
-                                                        <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
-                                                        <?
-                                                    }
-                                                    ?>
-                                                </td>
+                                                <td><?= $odh["supplier_name"] ?></td>
+                                                <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
                                             </tr>
                                             <?
                                         }
                                     }
-                                    ?>
-                                </table>
-                            </div>
+                                ?>
+
+                            </table>
+
+                        </div>
+                        <div class="tab-pane" id="history_mail">                           
+                            <table>
+                                <tr>
+                                    <th>Utilisateur</th>                                        
+                                    <th>Date envoi</th>
+                                    <th>Objet</th>
+                                    <th>Fichier</th>
+                                </tr>
+                                <?
+                                foreach ($orderinfo["history"] as $odh) {
+                                    if (empty($odh["supplier_name"])) {
+                                        ?>
+                                        <tr>
+                                            <td><?= $odh["prenom"] ?></td>
+                                            <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
+                                            <td><?= $odh["category"] ?></td>  
+                                            <td>
+
+                                                <?
+                                                if ($odh["bdc_filename"]) {
+                                                    if ($odh["category"] == "roadmap")
+                                                        $folder = "roadmap";
+                                                    if ($odh["category"] == "bl")
+                                                        $folder = "bon_de_livraison";
+                                                    ?>
+                                                    <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
+                                                    <?
+                                                }
+                                                ?>
+                                            </td>
+                                        </tr>
+                                        <?
+                                    }
+                                }
+                                ?>
+                            </table>                            
+                        </div>
+                        <div class="tab-pane" id="history_mod">
+                            <?
+                            getChangeLog('mv_orders', $oid);
+                            //getChangeLog('av_order_detail', $oid);
+                            ?>
                         </div>
                     </div>
                 </form>
@@ -846,14 +968,11 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                 }
                             ?>
                         </table>
-
                         <textarea name="order_note" cols="20" rows="5" ></textarea>
                         <p>
                             <button type="submit" name="add_notes" class="btn btn-lg btn-default btn-block ">Ajouter note</button> 
                         </p>
-
                     </div>
-
                 </form>
             </div>
         </div>        
@@ -862,15 +981,14 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
     ?>
 
 
+
     <div class = "row">
-        <div class = "col-xs-2">
+        <div class = "col-xs-3">
             <?
             foreach ($orderStates as $orderState) {
                 ?>
-                <div class="row">
-                    <div class="alert-<?= $orderState["id_statut"] ?>" >
-                        <?= $orderState["title"] ?>
-                    </div>
+                <div class="alert-<?= $orderState["id_statut"] ?>" >
+                    <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
                 </div>
                 <?
             }

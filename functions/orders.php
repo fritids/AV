@@ -19,7 +19,7 @@ function getUserOrders($cid) {
     $params = array($cid);
 
     $r = $db->rawQuery("select a.* , b.title statut_label
-                    from av_orders a, av_order_status b
+                    from mv_orders a, av_order_status b
                     where a.current_state = b.id_statut 
                     and a.id_customer= ?
                     and ifnull(current_state,0) >0
@@ -35,7 +35,7 @@ function getUserOrders($cid) {
 function getOrderInfos($oid) {
     global $db;
     $r = $db->where("id_order", $oid)
-            ->get("av_orders");
+            ->get("mv_orders");
 
     foreach ($r as $k => $order) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
@@ -355,7 +355,7 @@ function saveOrder() {
                     ->update("av_order_detail", array("is_product_custom" => $is_product_custom));
         }
 
-        
+
         // post update sur les details
         $param = array(
             "product_weight" => ($p["weight"] + $option_weight) * $item["surface"]

@@ -25,6 +25,15 @@ $opts['multiple'] = '10';
 
 $opts['inc'] = 25;
 
+if (isset($_GET["nb_orders"]) && $_GET["nb_orders"] > 0) {
+    $_SESSION["nb_orders"] = $_GET["nb_orders"];
+} else {
+    $_SESSION["nb_orders"] = $opts['inc'];
+}
+if (isset($_SESSION["nb_orders"]))
+    $opts['inc'] = $_SESSION["nb_orders"];
+
+
 /* Table-level filter capability. If set, it is included in the WHERE clause
   of any generated SELECT statement in SQL query. This gives you ability to
   work only with subset of data from table.
@@ -56,6 +65,7 @@ $opts['fdd']['date_add'] = array(
     'select' => 'D',
     'maxlen' => 10,
     'sort' => true,
+    'size' => 10,
     'strftimemask' => "%d %b %y %H:%M:%S"
 );
 $opts['fdd']['id_customer'] = array(
@@ -63,6 +73,7 @@ $opts['fdd']['id_customer'] = array(
     'select' => 'T',
     'options' => 'VL',
     'maxlen' => 10,
+    'size' => 40,
     'values' => array(
         'table' => 'av_customer',
         'column' => 'id_customer',
@@ -77,7 +88,7 @@ $opts['fdd']['id_address_invoice'] = array(
     'name' => 'Adresse facturation',
     'select' => 'T',
     'maxlen' => 10,
-    'options' => 'VL',
+    'options' => 'V',
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -90,7 +101,8 @@ $opts['fdd']['id_address_delivery'] = array(
     'name' => 'Adresse livraison',
     'select' => 'T',
     'maxlen' => 10,
-    'options' => 'V',
+    'options' => 'VL',
+    'size' => 40,
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -105,6 +117,7 @@ $opts['fdd']['current_state'] = array(
     'options' => 'L',
     'select' => 'D',
     'maxlen' => 10,
+    'size' => 15,
     'values' => array(
         'table' => 'av_order_status',
         'column' => 'id_statut',
@@ -129,6 +142,7 @@ $opts['fdd']['RECU_INFO'] = array(
 
 $opts['fdd']['total_paid'] = array(
     'name' => 'Total TTC',
+    'options' => 'L',
     'select' => 'T',
     'maxlen' => 19,
     'default' => '0.00',
@@ -162,17 +176,28 @@ $opts['fdd']['delivery_comment'] = array(
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les ventes</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>Les ventes</h1>
+    </div>
+    <div class="row">
+        <form action="" method="text">
+            <div class="input-group">
+                Nb commandes par page:
+                <input type="text"  value="<?= $opts['inc'] ?>" name="nb_orders" class="input input-sm" style="width: 50px" placeholder="Nb commande"/>
+                <input type="submit" name="Valider" class="btn btn-sm btn-primary">
+            </div>
+        </form> 
+        <br>
+    </div>
+</div>
+<center>
+    <?
+    new phpMyEdit($opts);
+    ?>
+</center>
 
-<?
-new phpMyEdit($opts);
-?>
 
-<br>
-
-<?
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
-?>
 
 <script>
     $(function() {

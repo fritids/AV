@@ -89,15 +89,95 @@
             <![endif]-->
 
             <header>
+			
+			<div class="modal fade" id="LostPwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Mot de passe oublié</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/index.php?action=lost_pwd">
+                        <div class="box_chmp">
+                            <label>email :</label>
+                            <input class="txt_account" type="text" name="email">
+                            <div class="clear"></div>
+                        </div>
+                        <br/>
+                        <input class="submit_generer_mdp" type="submit" value=" ">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>                            
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+			
+			
                 <div id="top-header">
                     <div id="top-header-centre">
                         <span id="top-header-texte" ><h1 style="font-size: 0.9em;line-height: 29px;display:inline;">Vos vitres moins chères avec Allovitres, spécialiste de la vente de verre pas cher</h1></span>
-                        <div id="top-header-droit"><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="/?cart"><img src="/img/caddie.png"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                        <div id="top-header-droit">
                                     {if isset($smarty.session.is_logged) && $smarty.session.is_logged}
-                                Bonjour <a href="/?my-account">{$smarty.session.user.lastname} {$smarty.session.user.firstname}</a>
-                                <a href="/?action=logout">deconnexion</a>
+						
+								
+								<span id="test12345" style="height:29px;height-line:29px;min-height:29px;display:inline-block;">
+								
+								
+								 <ul class="menu_ident">
+								<li><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="/?cart"><img style="margin-right:15px;" src="/img/caddie.png"/></a> | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/?my-account">Bonjour {$smarty.session.user.firstname} </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+								 <li class="ident">
+									<span><a style="color:white;text-decoration:none;" href="/?action=logout">SE DECONNECTER</a></span>
+			
+									
+								</li> 
+								</ul>
+								
+								
+								
+								
+								
+								</span>
+								
+								
+								
+								
+								
                             {else}
-                                <span style="background:#fe6600;height:29px;height-line:29px;min-height:29px;display:inline-block;padding:0 10px;"><a href="/?identification" title="connexion">SE CONNECTER</a></span>
+                                <span id="test12345" style="height:29px;height-line:29px;min-height:29px;display:inline-block;">
+								
+								
+								 <ul class="menu_ident">
+								<li><div class="puce_caddie"><div class="puce_caddie_taille"><p class="puce_caddie_taille">{$cart_nb_items}</p></div></div><a href="/?cart"><img style="margin-right:15px;" src="/img/caddie.png"/></a></li>
+								 <li class="ident">
+									<span><a style="color:white;text-decoration:none;" href="/?identification">SE CONNECTER</a></span>
+									<ul>
+										<li>
+											<span>J'ai déjà un compte</span>
+											<span id="login_message"></span>
+											<form action="/index.php?action=login" method="post" id="loginForm">
+												<input name="email" id="login_email" type="text" placeholder="Mon adresse email" />
+												<input name="passwd" id="login_pass" type="password" placeholder="Mon mot de passe" />
+                                                <input type="hidden" name="referer" value="/?my-account" />
+												<a class="oubli" href="" data-target="#LostPwd" data-toggle="modal">Mot de passe oublié ?</a>
+												<button id="login_submit" class="bouton_generique" type="submit" title="Se connecter">Se connecter</button>
+											</form>
+										</li>
+										<li>
+											<span><a href="/?register">Je n'ai pas de compte</a></span>
+											<a class="bouton_generique" href="/?register" title="Créer un compte client">Créer un compte client</a>
+										</li>
+									</ul>
+									
+								</li> 
+								</ul>
+								
+								
+								
+								
+								
+								</span>
                             {/if}
                         </div>
                     </div>
@@ -152,7 +232,7 @@
                             <input type="hidden" name="p" value="">
                             <input type="hidden" name="id" value="" id="search_product">
                             <input type="text" name="search_query" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
-                            <input type="submit" value="Valider">
+                            <input type="submit" style="padding:3px 10px;" value="Valider">
                         </form>
                     </span>
                 </div>

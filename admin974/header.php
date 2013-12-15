@@ -126,6 +126,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <ul class="dropdown-menu">
                                     <li><a href="av_orders.php">Commandes</a></li>                                    
                                     <li><a href="av_customer.php">Clients</a></li>
+                                    <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
                                 </ul>
                             </li>  
                             <?

@@ -26,6 +26,7 @@ function get_server_var($name) /* {{{ */ {
 }
 
 /* }}} */
+
 function getOrderCurrentState() {
 
     global $db;
@@ -35,6 +36,7 @@ function getOrderCurrentState() {
 
     return(print_r(json_encode($r2[0]["current_state"])));
 }
+
 function getOrderCombobox() {
 
     global $db;
@@ -56,6 +58,7 @@ function getOrderCombobox() {
 
     return(print_r(json_encode($opt)));
 }
+
 function getOrderDetailCombobox() {
 
     global $db;
@@ -141,45 +144,49 @@ function getChangeLog($table, $key) {
 
     $r = $db->get("changelog");
 
-    echo "<h2>Piste d'audit </h2>";
-    echo "<table border='1'>";
-    echo "<tr><th>Opération</th><th>Date</th><th>Utilisateur</th><th>Référence</th><th>Colonne</th><th>Valeur</th></tr>";
-    foreach ($r as $k => $v) {
+    if ($r) {
+                echo "<table class='table table-bordered table-condensed'>";
+        echo "<tr><th>Opération</th><th>Date</th><th>Utilisateur</th><th>Référence</th><th>Colonne</th><th>Valeur</th></tr>";
+        foreach ($r as $k => $v) {
 
-        $operation = $v["operation"];
-        $user = $v["user"];
-        $time = $v["updated"];
-        $key = $v["rowkey"];
-        $tab = $v["tab"];
-        $col = $v["col"];
-        $user = $v["user"];
-        $newval = @unserialize($v["newval"]);
-        $oldval = @unserialize($v["oldval"]);
+            $operation = $v["operation"];
+            $user = $v["user"];
+            $time = $v["updated"];
+            $key = $v["rowkey"];
+            $tab = $v["tab"];
+            $col = $v["col"];
+            $user = $v["user"];
+            $newval = @unserialize($v["newval"]);
+            $oldval = @unserialize($v["oldval"]);
 
 
-        echo "<td>" . $operation . "</td> <td> " . $time . " </td> <td> " . $user . " </td> <td> " . $key . " </td> <td> " . $col . " </td> <td> ";
+            echo "<td>" . $operation . "</td> <td> " . $time . " </td> <td> " . $user . " </td> <td> " . $key . " </td> <td> " . $col . " </td> <td> ";
 
-        if (is_array($oldval)) {
-            foreach ($oldval as $k2 => $v2) {
-                echo $k2 . " --> " . $v2 . "<br> ";
+            echo "<table>";
+            if (is_array($oldval)) {
+                foreach ($oldval as $k2 => $v2) {
+                    echo "<tr><td>" . $k2 . " </td><td>" . $v2 . "</td></tr> ";
+                }
+            } else {
+                if (!empty($v["oldval"]))
+                    echo "<tr><td>" . "ancienne valeur </td><td> " . $v["oldval"] . "</td></tr>";
             }
-        } else {
-            if (!empty($v["oldval"]))
-                echo "ancienne valeur = " . $v["oldval"] . "<br> ";
-        }
 
-        if (is_array($newval)) {
-            foreach ($newval as $k2 => $v2) {
-                echo $k2 . " --> " . $v2 . "<br>";
+            if (is_array($newval)) {
+                foreach ($newval as $k2 => $v2) {
+                    echo "<tr><td>" . $k2 . " </td><td>" . $v2 . "</td></tr>";
+                }
+            } else {
+                if (!empty($v["newval"]))
+                    echo"<tr><td>" . "nouvelle valeur </td><td>" . $v["newval"] . "</td></tr>";
             }
-        } else {
-            if (!empty($v["newval"]))
-                echo "nouvelle valeur --> " . $v["newval"] . "<br>";
-        }
 
-        echo "</td></tr>";
+            echo "</table></td></tr>";
+        }
+        echo "</table>";
+    }else {
+        echo "Pas de modifications recensées";
     }
-    echo "</table>";
 }
 
 /* dispatcher */
