@@ -1,4 +1,4 @@
-/*!
+a/*!
  * Bootstrap v3.0.0 by @fat and @mdo
  * Copyright 2013 Twitter, Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0
@@ -5122,10 +5122,12 @@ a.thumbnail:focus {
 .alert-3 {
   background-color: #FE6600;
   border-color: #d6e9c6;
+  color: #fff;
 }
 .alert-4 {
   background-color: #3071a9;
   border-color: #d6e9c6;
+  color: #fff;
 }
 .alert-5 {
   background-color: #5cb85c;
@@ -5185,6 +5187,7 @@ a.thumbnail:focus {
 .alert-19 {
   background-color: #DB3484;
   border-color: #d6e9c6;
+  color: #fff;
 }
 .alert-20 {
   background-color:#5cb85c;

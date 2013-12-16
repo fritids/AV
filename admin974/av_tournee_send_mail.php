@@ -69,7 +69,7 @@ foreach ($r as $k => $contact) {
 
         /* on change le statut global a préparation en cours */
         $s = $db->where("id_order", $contact["id_order"])
-                ->update("av_orders", array("current_state" => 3, "date_upd" => date("Y-m-d H:i:s")));
+                ->update("av_orders", array("current_state" => 4, "date_upd" => date("Y-m-d H:i:s")));
 
         /* on change le status des ligne de detail en livraison fixé */
         $orderDetails = $db->rawQuery("select id_order_detail 

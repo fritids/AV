@@ -27,7 +27,7 @@
                 <div class="separ clearfix">
                     <div class="infos">
                         <p class="prix" ><span id="total_price">{($product.price*$config.vat_rate)|round:2}</span> €</p>
-                        {if $product.id_category !=19}
+                        {if $product.id_category != 19 && !($product.width && $product.height)}
                             <p><span id="surface"></span> m² calculé</p>                            
                             {*<p><span id="total_poids"></span> kg calculés</p>*}
                             <p><span id=""></span> min facturé {$product.min_area_invoiced} m²</p>
@@ -75,9 +75,14 @@
                         <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
                     </div>   
                     <div class="row clearfix">
-                        <input type="button" value="Calculer" id="calculer" class="submit">						
+                        <input type="button" value="Calculer" id="calculer" class="submit">	
+                        {if isset($product.specific_combinations) && count($product.specific_combinations) > 0}
+                            <a href="/?product_custom&id={$product.id_product}">Formes spécifiques</a>
+                        {/if}
                     </div>	
                 {/if}
+
+
             </div>   	
         </form>
     </div>

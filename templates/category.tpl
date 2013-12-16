@@ -48,7 +48,9 @@
                         </div>
                         <div class="prix block">
                             <span>{($product.price*$config.vat_rate)|round:"2"} €</span>
-                            <span style="font-size: 14px;font-weight: none;">Prix au m²</span>
+                            {if $product.id_category != 19 && !($product.width && $product.height)}
+                                <span style="font-size: 14px;font-weight: none;">Prix au m²</span>
+                            {/if}
                             <a href="/{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html" class="indent">Voir le produit</a>
                         </div>
                         <div class="clearfix"></div>

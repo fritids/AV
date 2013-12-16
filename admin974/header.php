@@ -138,7 +138,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Livraison <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_tournee.php?planning=<?= date("Y-m-d") ?>">La tournée</a></li>                                
+                                    <li><a href="av_tournee.php">La tournée</a></li>                                
                                     <li><a href="av_bon_livraison.php">Bon livraison</a></li>                                
                                     <li><a href="av_roadmap.php">Feuille de route</a></li> 
                                     <li class="divider"></li>

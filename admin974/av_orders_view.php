@@ -13,6 +13,8 @@ require "../classes/php-export-data.class.php";
 require('../classes/sms.inc.php');
 
 define("COMMANDE_FOURNISSEUR", 16);
+define("PREPARATION_EN_COURS", 3);
+define("PAIEMENT_ACCEPTE", 2);
 
 //SMS
 
@@ -164,6 +166,9 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
                     $r = $db->where("id_order_detail", $id)
                             ->update("av_order_detail", array("supplier_date_delivery" => null));
+
+                    $r = $db->where("id_order", $oid)
+                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
                 }
 
                 addLog(array("tabs" => "av_order_detail",
@@ -185,6 +190,9 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
                             ->update("av_order_detail", array("supplier_date_delivery" => null));
+                    
+                     $r = $db->where("id_order", $oid)
+                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
                 }
 
                 addLog(array("tabs" => "av_order_detail",
@@ -295,17 +303,25 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 }
 
 //maj status order  
-if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($orderinfo["ARC_INFO"] == 5 && $orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] != 3)
+if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] == PAIEMENT_ACCEPTE)
 ) {
 
     if (isset($_POST["current_state"]) && !empty($_POST["current_state"]))
         $new_state = $_POST["current_state"];
 
-    if ($orderinfo["ARC_INFO"] == 5 && $orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] != 3)
-        $new_state = 3;
+    if ($orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] == PAIEMENT_ACCEPTE)
+        $new_state = PREPARATION_EN_COURS;
 
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("current_state" => $new_state));
+    
+    addLog(array("tabs" => "mv_orders",
+                    "rowkey" => $oid,
+                    "col" => "current_state",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $new_state
+                ));
 
     if ($r) {
         switch ($new_state) {
@@ -400,7 +416,7 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
             "oldval" => $orderinfo["current_state"],
             "newval" => $new_state
         ));
-        
+
         $orderinfo = getOrderInfos($oid);
     }
 }
@@ -500,27 +516,12 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
         <div class="col-xs-3">
             <table class="table table-condensed  table-bordered">
                 <tr class="text-center">
-                    <th class="text-center" style="width: 50px">ARC</th>
                     <th class="text-center" style="width: 50px">COMM.</th>
+                    <th class="text-center" style="width: 50px">ARC</th>
                     <th class="text-center" style="width: 50px">RECU</th>
+                    <th class="text-center" style="width: 50px">LIV PROG</th>
                 </tr>
                 <tr>
-                    <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["ARC_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default :
-                        }
-                        ?>                        
-                    </td>
                     <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
                         <?
                         switch ($orderinfo["COMMANDE_INFO"]) {
@@ -537,9 +538,41 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                         }
                         ?>                        
                     </td>
+                    <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["ARC_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>
                     <td class="text-center alert-<?= $orderinfo["RECU_INFO"] ?>">
                         <?
                         switch ($orderinfo["RECU_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>                   
+                    <td class="text-center alert-<?= $orderinfo["LIV_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["LIV_INFO"]) {
                             case 5:
                                 echo '<span class="glyphicon glyphicon-ok"></span>';
                                 break;
@@ -727,7 +760,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 
                             <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
                                 <tr>
-                                    <th colspan="7" class="text-center">PRODUIT</th>
+                                    <th colspan="5" class="text-center">PRODUIT</th>
                                     <th colspan="2" class="text-center">FOURNISSEUR</th>
                                     <th colspan="6" class="text-center">LIVRAISON</th>                          
                                 </tr>
@@ -738,8 +771,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                     <th>Prix TTC</th>
                                     <th>Statuts</th>
                                     <th>Fournisseur</th>
-                                    <th>Date Livraison</th>
-                                    <th>Nb Livré</th>    
+                                    <th>Date Livraison</th>                                    
                                     <th>Date Livraison camion</th>    
                                     <th>Horaire</th>    
                                     <th>commentaire</th>    
@@ -814,8 +846,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                         <td>
                                             <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
 
-                                        </td>
-                                        <td><?= $t["nb_product_delivered"] ?></td>
+                                        </td>                                        
                                         <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
                                         <td><?= $t["horaire"] ?></td>
                                         <td><?= $t["comment1"] ?></td>
