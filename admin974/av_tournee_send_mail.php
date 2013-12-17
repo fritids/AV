@@ -7,8 +7,12 @@ require('../classes/class.phpmailer.php');
 require('../classes/sms.inc.php');
 include ("../functions/products.php");
 include ("../functions/orders.php");
+include ("../functions/tools.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
+
+define("EN_COURS_LIVRAISON", 4);
+define("LIVRAISON_PROGRAMMEE", 19);
 
 //SMS
 
@@ -69,18 +73,35 @@ foreach ($r as $k => $contact) {
 
         /* on change le statut global a préparation en cours */
         $s = $db->where("id_order", $contact["id_order"])
-                ->update("av_orders", array("current_state" => 4, "date_upd" => date("Y-m-d H:i:s")));
+                ->update("av_orders", array("current_state" => EN_COURS_LIVRAISON, "date_upd" => date("Y-m-d H:i:s")));
+
+        addLog(array("tabs" => "mv_orders",
+            "rowkey" => $orderinfo["id_order"],
+            "col" => "current_state",
+            "operation" => "update",
+            "oldval" => $orderinfo["current_state"],
+            "newval" => EN_COURS_LIVRAISON
+        ));
 
         /* on change le status des ligne de detail en livraison fixé */
-        $orderDetails = $db->rawQuery("select id_order_detail 
-            from av_tournee 
-            where id_truck = ?
-            and date_livraison = ? 
-            and id_order = ? ", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
+        $orderDetails = $db->rawQuery("select a.id_order_detail, b.product_current_state 
+            from av_tournee a, av_order_detail b
+            where a.id_order_detail = b.id_order_detail
+            and a.id_truck = ?
+            and a.date_livraison = ? 
+            and a.id_order = ? ", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
 
         foreach ($orderDetails as $orderDetail) {
             $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
-                    ->update("av_order_detail", array("product_current_state" => 19, "date_upd" => date("Y-m-d H:i:s")));
+                    ->update("av_order_detail", array("product_current_state" => LIVRAISON_PROGRAMMEE, "date_upd" => date("Y-m-d H:i:s")));
+
+            addLog(array("tabs" => "mv_orders",
+                "rowkey" => $orderDetail["id_order_detail"],
+                "col" => "product_current_state",
+                "operation" => "update",
+                "oldval" => $orderDetail["product_current_state"],
+                "newval" => LIVRAISON_PROGRAMMEE
+            ));
         }
 
         $param = array(

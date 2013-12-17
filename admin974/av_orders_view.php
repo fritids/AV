@@ -169,6 +169,14 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
                     $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
+
+                    addLog(array("tabs" => "mv_orders",
+                        "rowkey" => $oid,
+                        "col" => "current_state",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => PREPARATION_EN_COURS
+                    ));
                 }
 
                 addLog(array("tabs" => "av_order_detail",
@@ -190,9 +198,17 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
                             ->update("av_order_detail", array("supplier_date_delivery" => null));
-                    
-                     $r = $db->where("id_order", $oid)
+
+                    $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
+
+                    addLog(array("tabs" => "mv_orders",
+                        "rowkey" => $oid,
+                        "col" => "current_state",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => PREPARATION_EN_COURS
+                    ));
                 }
 
                 addLog(array("tabs" => "av_order_detail",
@@ -285,6 +301,14 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                     ->where("id_supplier", $orderSupplier["id_supplier"])
                     ->update("av_order_detail", $params);
 
+            addLog(array("tabs" => "av_order_detail",
+                "rowkey" => $od["id_order_detail"],
+                "col" => "product_current_state",
+                "operation" => "update",
+                "oldval" => '',
+                "newval" => COMMANDE_FOURNISSEUR
+            ));
+
             foreach ($orderDetailSupplier as $k => $ods) {
                 $param = array(
                     "id_order" => $oid,
@@ -314,14 +338,14 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
 
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("current_state" => $new_state));
-    
+
     addLog(array("tabs" => "mv_orders",
-                    "rowkey" => $oid,
-                    "col" => "current_state",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $new_state
-                ));
+        "rowkey" => $orderinfo["id_order"],
+        "col" => "current_state",
+        "operation" => "update",
+        "oldval" => $orderinfo["current_state"],
+        "newval" => $new_state
+    ));
 
     if ($r) {
         switch ($new_state) {
@@ -408,15 +432,6 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
                 $r = $db->insert("av_order_bdc", $param);
             }
         }
-
-        addLog(array("tabs" => "mv_orders",
-            "rowkey" => $orderinfo["id_order"],
-            "col" => "current_state",
-            "operation" => "update",
-            "oldval" => $orderinfo["current_state"],
-            "newval" => $new_state
-        ));
-
         $orderinfo = getOrderInfos($oid);
     }
 }

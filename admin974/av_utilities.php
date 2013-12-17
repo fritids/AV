@@ -145,7 +145,7 @@ function getChangeLog($table, $key) {
     $r = $db->get("changelog");
 
     if ($r) {
-                echo "<table class='table table-bordered table-condensed'>";
+        echo "<table class='table table-bordered table-condensed'>";
         echo "<tr><th>Opération</th><th>Date</th><th>Utilisateur</th><th>Référence</th><th>Colonne</th><th>Valeur</th></tr>";
         foreach ($r as $k => $v) {
 
@@ -163,22 +163,31 @@ function getChangeLog($table, $key) {
             echo "<td>" . $operation . "</td> <td> " . $time . " </td> <td> " . $user . " </td> <td> " . $key . " </td> <td> " . $col . " </td> <td> ";
 
             echo "<table>";
+
+            if ($col == "current_state") {
+                $func = "logGetStateLabel";
+            } elseif ($col == "id_supplier") {
+                $func = "logGetSupplier";
+            } else {
+                $func = "logNoFunc";
+            }
+
             if (is_array($oldval)) {
                 foreach ($oldval as $k2 => $v2) {
-                    echo "<tr><td>" . $k2 . " </td><td>" . $v2 . "</td></tr> ";
+                    echo "<tr><td>" . $k2 . " </td><td>" . call_user_func($func, $v2) . "</td></tr> ";
                 }
             } else {
                 if (!empty($v["oldval"]))
-                    echo "<tr><td>" . "ancienne valeur </td><td> " . $v["oldval"] . "</td></tr>";
+                    echo "<tr><td>" . "ancienne valeur :</td><td> " . call_user_func($func, $v["oldval"]) . "</td></tr>";
             }
 
             if (is_array($newval)) {
                 foreach ($newval as $k2 => $v2) {
-                    echo "<tr><td>" . $k2 . " </td><td>" . $v2 . "</td></tr>";
+                    echo "<tr><td>" . $k2 . " </td><td>" . call_user_func($func, $v2) . "</td></tr>";
                 }
             } else {
                 if (!empty($v["newval"]))
-                    echo"<tr><td>" . "nouvelle valeur </td><td>" . $v["newval"] . "</td></tr>";
+                    echo"<tr><td>" . "nouvelle valeur :</td><td>" . call_user_func($func, $v["newval"]) . "</td></tr>";
             }
 
             echo "</table></td></tr>";
@@ -187,6 +196,26 @@ function getChangeLog($table, $key) {
     }else {
         echo "Pas de modifications recensées";
     }
+}
+
+function logNoFunc($a) {
+    return $a;
+}
+
+function logGetStateLabel($a) {
+    global $db;
+    $r = $db->where(("id_statut"), $a)
+            ->get("av_order_status");
+
+    return $r[0]["title"];
+}
+
+function logGetSupplier($a) {
+    global $db;
+    $r = $db->where(("id_supplier"), $a)
+            ->get("av_supplier");
+
+    return $r[0]["name"];
 }
 
 /* dispatcher */
