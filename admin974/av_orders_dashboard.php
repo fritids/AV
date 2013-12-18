@@ -12,7 +12,8 @@ $recu = 0;
 $comm = 0;
 $liv = 0;
 $reference = '';
-$date_add = '';
+$invoice_stda_date = '1900-01-01';
+$invoice_enda_date = '2050-01-01';
 $current_state = 0;
 
 if (isset($_POST["status_arc"]))
@@ -27,10 +28,12 @@ if (isset($_POST["reference"]))
     $reference = $_POST["reference"];
 if (isset($_POST["current_state"]))
     $current_state = $_POST["current_state"];
-if (isset($_POST["date_add"]))
-    $date_add = $_POST["date_add"];
+if (isset($_POST["invoice_stda_date"]) && $_POST["invoice_stda_date"] != '')
+    $invoice_stda_date = $_POST["invoice_stda_date"];
+if (isset($_POST["invoice_enda_date"]) && $_POST["invoice_enda_date"] != '')
+    $invoice_enda_date = $_POST["invoice_enda_date"];
 
-$params = array($arc, $arc, $recu, $recu, $comm, $comm, $liv, $liv, $reference, '%' . $reference . '%', $current_state, $current_state, $date_add, $date_add);
+$params = array($arc, $arc, $recu, $recu, $comm, $comm, $liv, $liv, $reference, '%' . $reference . '%', $current_state, $current_state, $invoice_stda_date, $invoice_stda_date, $invoice_enda_date);
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $r = $db->rawQuery("select a.* , b.lastname, b.firstname, c.*
@@ -44,7 +47,7 @@ $r = $db->rawQuery("select a.* , b.lastname, b.firstname, c.*
             and (? = 0 or LIV_INFO = ?)
             and (ifnull(?,0) = 0 or reference like ?)
             and (? = 0 or current_state = ?)
-            and (ifnull(?,0) = 0 or date(a.date_add) = ?)
+            and (ifnull(?,0) = 0 or date(a.invoice_date) between ? and ?)
             and id_order not in (select id_order from mv_orders where (ARC_INFO = 5 and RECU_INFO = 5 and COMMANDE_INFO = 5 and LIV_INFO = 5))", $params);
 
 $orderStates = $db->where("id_level", 0)
@@ -64,13 +67,29 @@ $orderStates = $db->where("id_level", 0)
                 <div class="col-xs-6">
                     <table class="table table-bordered">
                         <tr>
+                            <td>Date commande</td>
+                            <td> 
+                                <table>
+                                    <tr>
+                                        <td>début </td>
+                                        <td>
+                                            <input type="text" name="invoice_stda_date" class="datepicker"  value="<?= ($invoice_stda_date != '1900-01-01') ? $invoice_stda_date : "" ?>">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>fin </td>
+                                        <td>
+                                            <input type="text" name="invoice_enda_date" class="datepicker"  value="<?= ($invoice_enda_date != '2050-01-01') ? $invoice_enda_date : "" ?>">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>   
+                        <tr>
                             <td>Référence</td>
                             <td><input type="text" name="reference" value="<?= $reference ?>"></td>
                         </tr>
-                        <tr>
-                            <td>Date</td>
-                            <td><input type="text" name="date_add" class="datepicker" value=""></td>
-                        </tr>
+
                         <tr>
                             <td>Statuts Commande</td>
                             <td>
@@ -167,12 +186,12 @@ $orderStates = $db->where("id_level", 0)
             ?>
             <tr>
                 <td class="text-center"><a href="av_orders_view.php?id_order=<?= $row["id_order"] ?>" target="_blank" ><?= $row["reference"] ?></a></td>
-                <td class="text-center"><?= strftime("%a %d %b %y %T", strtotime($row["date_add"])) ?></td>
+                <td class="text-center"><?= strftime("%a %d %b %y %T", strtotime($row["invoice_date"])) ?></td>
                 <td class="text-center"><?= $row["lastname"] . " " . $row["firstname"] ?></td>
                 <td class="text-center"><?= $row["address1"] . " <br> " . $row["address2"] . " <br> " . $row["postcode"] . " " . $row["city"] ?></td>
                 <td class="text-center alert-<?= $row["current_state"] ?>"><?= $row["state_label"] ?></td>
                 <td class="text-center"><?= number_format($row["total_paid"], 2, ".", " ") ?> €</td>
-                <td class="text-center"><?= round((time() - strtotime($row["date_add"])) / 86400) ?> j</td>
+                <td class="text-center"><?= getJours($row["invoice_date"], date("Y-m-d")) ?> j</td>
                 <td class="text-center alert-<?= $row["COMMANDE_INFO"] ?>">
                     <?
                     switch ($row["COMMANDE_INFO"]) {

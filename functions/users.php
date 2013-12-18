@@ -70,28 +70,34 @@ function checkUserLogin($email, $pwd) {
         $_SESSION["user"] = $user[0];
         $_SESSION["is_logged"] = true;
 
-        
+
         // get adresse
         $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
         $_SESSION["user"]["invoice"] = getAdresse($user[0]["id_customer"], "invoice");
-        
-        
+
+
         if (empty($_SESSION["user"]["delivery"])) {
             $delivery_adresse = $_SESSION["user"]["invoice"];
-            $delivery_adresse["alias"] = 'delivery';         
+            $delivery_adresse["alias"] = 'delivery';
             $delivery_adresse["date_add"] = date("Y-m-d");
             $delivery_adresse["date_upd"] = date("Y-m-d");
             unset($delivery_adresse["id_address"]);
-            
+
             createNewAdresse($delivery_adresse);
-            
+
             $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
-        }      
-        
+        }
+
         return(true);
     } else {
         return(FALSE);
     }
+}
+
+function getVoucher($cid) {
+    global $db;
+    $r = $db->rawQuery("select * from av_voucher where id_customer = ? ", array($cid));
+    return $r;
 }
 
 function getCustomerDetail($id) {
@@ -101,6 +107,7 @@ function getCustomerDetail($id) {
 
     $r[0]["delivery"] = getAdresse($id, "delivery");
     $r[0]["invoice"] = getAdresse($id, "invoice");
+    $r[0]["voucher"] = getVoucher($id);
 
     return $r[0];
 }

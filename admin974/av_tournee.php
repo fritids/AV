@@ -71,43 +71,32 @@ $nb_produits = 0;
 $poids_produits = 0;
 $montant_produits = 0;
 $qte_remaining = 0;
+$filter_truck = "";
 $zones = $db->get("av_zone");
 $suppliers = $db->get("av_supplier");
 $trucks = $db->get("av_truck");
 ?>
 
 <div class="container">
+    <div class="page-header">
+        <h1>Livraison</h1>
+    </div>
     <form method="get">
 
         <input type="hidden" id="planning" value="<?= @$_GET["planning"] ?>">
 
         <table class="table table-bordered">
             <tr>
-                <th>Commande avec au moins un de ces status</th>
                 <th>Organiser la tournée du</th>
                 <th>Références</th>
                 <th>Zones</th>
                 <th>Founisseur </th>
                 <th>Nom client</th>                
                 <th>Voulez vous retirer les produits actuellement dans le camion</th>                            
-                <th>Camion</th>
-                <th></th>
+                <th>Camion</th>                
             </tr>
             <tr>
-                <td>
-                    <input type="radio" name="product_state" value=""> remise à zéro
-                    <?
-                    foreach ($productStates as $pState) {
-                        ?>
-                        <div class="alert-<?= $pState["id_statut"] ?>" >
-                            <input type="radio" name="product_state" value="<?= $pState["id_statut"] ?>"
-                            <?= (@$_GET["product_state"] == $pState["id_statut"] ) ? "checked" : "" ?>
-                                   > <?= $pState["title"] ?>
-                        </div>
-                        <?
-                    }
-                    ?>
-                </td>
+
                 <td><input type="text" id="datepicker2" value="" name="planning"></td>
                 <td><input type="text" name="reference" value="<?= @$_GET["reference"] ?>" ></td>
                 <td>
@@ -156,15 +145,17 @@ $trucks = $db->get("av_truck");
                                 }
                                 ?>
                     </select>
+                </td>                
+            </tr>
+            <tr>
+                <td colspan="7">
+                    <input type="submit" class="btn btn-primary btn-lg btn-block" >
                 </td>
-                <td><input type="submit" ></td>
             </tr>
         </table>
-
-
     </form>
 
-    <div class = "row">
+    <div class = "row">        
         <div class = "col-xs-9">
             <h5>Critères :</h5>
             <?
@@ -191,6 +182,7 @@ $trucks = $db->get("av_truck");
             ?>
         </div>
     </div>
+    <hr>
     <?
     if (isset($_GET["planning"])) {
 
@@ -207,7 +199,8 @@ $trucks = $db->get("av_truck");
                     sum(product_quantity * product_weight) tot_weight
                     from av_orders a, av_order_detail b, av_address c, av_customer d
                     where a.id_order = b.id_order                   
-                    and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2 )
+                    and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2)
+                    and b.product_current_state not in (20)
                     and a.id_address_delivery = c.id_address 
                     and a.id_customer = d.id_customer          
                     and current_state not in (5, 1, 6, 7 )
@@ -265,8 +258,8 @@ $trucks = $db->get("av_truck");
                             $adresse = getAdresseById($order["id_address_delivery"]);
                             ?>
                             <tr>
-                                <th nowrap class="alert alert-info" >
-                                    <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>"><?= $order["reference"] ?></a> <br>
+                                <th colspan="2" nowrap class="alert alert-info" >
+                                    <a href="av_orders_view.php?id_order=<?= $order["id_order"] ?>" target="_blank"><?= $order["reference"] ?></a> <br>
                                     <?= date("d/m", strtotime($order["invoice_date"])) ?>
 
                                 </th>
@@ -333,12 +326,80 @@ $trucks = $db->get("av_truck");
 
                                 $product_weight = $qte_remaining * $OrderProduct["product_weight"];
                                 ?>
-                                <tr id="<?= $OrderProduct["id_order_detail"] ?>"
-                                <?= ($OrderProduct["supplier_date_delivery"] == null) ? "class='alert alert-danger'" : "class='alert alert-" . $OrderProduct["product_current_state"] . "'" ?>
 
-                                    >
+                                <?
+                                $not_deliverable = false;
+                                $helper="";
+                                $icon="";
+                                $cssalert="";
+                                switch ($OrderProduct["product_current_state"]) {
+                                    case 15:
+                                        $icon = "";
+                                        $cssalert = 8;
+                                        $helper = "En attente de validation";
+                                        break;
+                                    case 16:
+                                        $icon = "glyphicon-phone";
+                                        $cssalert = 8;
+                                        $helper = "Commandé chez le fournisseur";
+                                        break;
+                                    case 17:
+                                        if ($OrderProduct["supplier_date_delivery"] == null) {
+                                            $helper = "attente date fournisseur";
+                                            $icon = "glyphicon-exclamation-sign";
+                                            $cssalert = 8;
+                                            $not_deliverable = true;
+                                        } else {
+                                            $icon = "glyphicon-cog";
+                                            $helper = "ARC reçu";
+                                            $cssalert = 5;
+                                        }
+                                        break;
+                                    case 18:
+                                        $icon = "glyphicon-home";
+                                        $cssalert = 5;
+                                        $helper = "Recu entrepot";
+                                        break;
+                                    case 19:
+                                        $icon = "glyphicon-time";
+                                        $helper = "Livraison programmée";
+                                        $cssalert = 6;
+                                        break;
+                                    case 20:
+                                        $icon = "glyphicon-ok";
+                                        $helper = "Livré";
+                                        $cssalert = 6;
+                                         $not_deliverable = true;
+                                        break;
+                                    case 21:
+                                        $icon = "glyphicon-wrench";
+                                        $helper = "Sav fournisseur";
+                                        $cssalert = 5;
+                                        break;
+                                    case 22:
+                                        $icon = "glyphicon-warning-sign";
+                                        $cssalert = 5;
+                                        $helper = "Casse interne";
+                                        break;
+                                    case 23:
+                                        $icon = "warning-sign";
+                                        $helper = "";
+                                        break;
+                                    default:
+                                        $cssalert = 0;
+                                        $icon = "";
+                                        $not_deliverable = false;
+                                        $helper = "";
+                                }
+                                ?>
+                                <tr id="<?= $OrderProduct["id_order_detail"] ?>">
 
-                                    <td colspan="3">
+                                    <td style="width:30px" class="text-center alert alert-<?= $cssalert ?>">
+                                        <span class="glyphicon <?= $icon ?>" data-toggle="tooltip" title="<?= $helper ?>"></span>
+                                    </td>
+                                    <td colspan="2">
+
+
                                         <?= $OrderProduct["product_quantity"] ?> x <?= $OrderProduct["product_name"] ?>
                                         <?
                                         if ($qte_remaining > 0) {
@@ -365,13 +426,13 @@ $trucks = $db->get("av_truck");
                                             ?>
 
                                             <?
-                                            if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"] || $OrderProduct["product_current_state"] == 19) {
+                                            if (isset($mytruck) && $truck ["id_truck"] != $mytruck["id_truck"] || $OrderProduct["product_current_state"] == 19 || $not_deliverable) {
                                                 ?>
                                                 <button name="addtruck" class="btn btn-xs btn-block btn-default" disabled="disabled"> <?= $truck["name"] ?> </button>
                                                 <?
                                             } else {
                                                 ?>
-                                                <button name="addtruck" class="add_<?= $OrderProduct["id_order"] ?> <?= ($mytruck["date_livraison"]) ? "btn btn-xs btn-block alert-success\" disabled=\"disabled\""  : "btn btn-block btn-primary btn-xs" ?>" value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?>                                                             
+                                                <button name="addtruck" class="add_<?= $OrderProduct["id_order"] ?> <?= ($mytruck["date_livraison"]) ? "btn btn-xs btn-block alert-success\" disabled=\"disabled\"" : "btn btn-block btn-primary btn-xs" ?>" value="add|<?= $truck["id_truck"] ?>|<?= $OrderProduct["id_order_detail"] ?>"> <?= $truck["name"] ?>                                                             
                                                     <?
                                                     if ($mytruck["date_livraison"]) {
                                                         ?>
@@ -489,12 +550,12 @@ $trucks = $db->get("av_truck");
                                     <td valign="top">
                                         <table  class="table-bordered">
                                             <tr>
-                                                <th><button class="emptytruck" value="<?= $truck["id_truck"] ?>" ><span class="glyphicon glyphicon-trash"></span></button></th>                
-                                                <th><?= $truck["imma"] ?></th>
-                                                <th><?= $truck["name"] ?></th>
+                                                <th><button class="emptytruck" value="<?= $truck["id_truck"] ?>" data-toggle="tooltip" title="Vider le camion"><span class="glyphicon glyphicon-trash"></span></button></th>                
+                                                <th colspan="2"><?= $truck["name"] ?></th>
                                                 <th>
 
-                                                    <a href ="av_truck_preview.php?id_truck=<?= $truck["id_truck"] ?>&planning=<?= $_GET["planning"] ?>"><button><span class="glyphicon glyphicon-eye-open"></span></button></a>
+                                                    <a href ="av_truck_preview.php?id_truck=<?= $truck["id_truck"] ?>&planning=<?= $_GET["planning"] ?>" data-toggle="tooltip" title="apercu du camion"><button><span class="glyphicon glyphicon-eye-open"></span></button></a>
+                                                    <a href ="#" onclick="javascript:location.reload()" data-toggle="tooltip" title="Rafraichir le camion"><button><span class="glyphicon glyphicon-refresh"></span></button></a>
                                                 </th>
                                             </tr>
                                             <tr>
@@ -536,7 +597,7 @@ $trucks = $db->get("av_truck");
                                                                 ?>
                                                                 <tr>
                                                                     <th colspan="5">
-                                                                        <a href="av_orders_view.php?id_order = <?= $OrderProduct["id_order"]
+                                                                        <a target="_blank" href="av_orders_view.php?id_order = <?= $OrderProduct["id_order"]
                                                                 ?>">
                                                                                <?= $OrderProduct["reference"] ?>
                                                                         </a>
@@ -650,163 +711,144 @@ $trucks = $db->get("av_truck");
 
 <script>
 
-    $(".addAllItems").click(function() {
-        id_order = $(this).val();
-        $(".add_" + id_order).each(function(index, element) {
-            $(element).click();
-        });
+                                                        $(".addAllItems").click(function() {
+                                                            id_order = $(this).val();
+                                                            $(".add_" + id_order).each(function(index, element) {
+                                                                $(element).click();
+                                                            });
 
-    });
+                                                        });
 
-    $(".emptytruck").click(function() {
-        id_truck = $(this).val();
-        $(".del_" + id_truck).each(function(index, element) {
-            $(element).click();
-        });
-    });
+                                                        $(".emptytruck").click(function() {
+                                                            id_truck = $(this).val();
+                                                            $(".del_" + id_truck).each(function(index, element) {
+                                                                $(element).click();
+                                                            });
+                                                        });
 
-    $("button[name='addtruck']").click(function() {
-        var btn = $(this);
-        var id_order_detail = $(this).closest("tr").attr("id");
-        var nb = $("#nb_" + id_order_detail).val();
-        var p = $(this).val() + "|" + $("#planning").val() + "|" + nb;
+                                                        $("button[name='addtruck']").click(function() {
+                                                            var btn = $(this);
+                                                            var id_order_detail = $(this).closest("tr").attr("id");
+                                                            var nb = $("#nb_" + id_order_detail).val();
+                                                            var p = $(this).val() + "|" + $("#planning").val() + "|" + nb;
 
-        var action = "add";
-        var module = "truckTournee";
-        var func = action + module;
+                                                            var action = "add";
+                                                            var module = "truckTournee";
+                                                            var func = action + module;
 
-        //console.log(p + " " + func + " nb " + nb);
+                                                            //console.log(p + " " + func + " nb " + nb);
 
-        $.ajax({
-            url: "functions/ajax_trucks.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                func: func,
-                id: p,
-            },
-            success: function(data) {
-                //console.log(data);
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
 
-                //console.log(btn.closest("td").find("button"));
-                btn.closest("td").find("button").each(function(index, element) {
-                    $(element).attr("disabled", "disabled");
-                });
-                btn.attr("disabled", "disabled");
-                btn.removeClass();
-                btn.addClass("btn btn-xs btn-block alert-success");
+                                                                    //console.log(btn.closest("td").find("button"));
+                                                                    btn.closest("td").find("button").each(function(index, element) {
 
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
-            }
-        });
+                                                                        console.log(element);
 
+                                                                        if (btn.text() !== $(element).text()) {
+                                                                            $(element).hide("slow");
+                                                                        }
 
+                                                                    });
+                                                                    btn.attr("disabled", "disabled");
+                                                                    btn.removeClass();
+                                                                    btn.addClass("btn btn-xs btn-block alert-success");
 
-        //location.reload();
-
-    });
-    $("button[name='delProduitTruck']").click(function() {
-        var btn = $(this);
-        var p = $(this).val();
-        var action = "del";
-        var module = "ProduitTournee";
-
-        var func = action + module;
-
-        $.ajax({
-            url: "functions/ajax_trucks.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                func: func,
-                id: p,
-            },
-            success: function(data) {
-                console.log(data);
-                btn.attr("disabled", "disabled");
-
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
-                btn.attr("disabled", "disabled");
-            }
-        });
-        //location.reload();
-    });
-    $("button[name='validTruck']").click(function() {
-        var p = $(this).val();
-        var action = "upd";
-        var module = "ValidTruck";
-
-        var func = action + module;
-
-        console.log(p + " " + func);
-
-        $.ajax({
-            url: "functions/ajax_trucks.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                func: func,
-                id: p,
-            },
-            success: function(data) {
-                console.log(data);
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
-            }
-        });
-        location.reload();
-    });
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                    btn.closest("td").find("button").each(function(index, element) {
+                                                                        $(element).attr("disabled", "disabled");
+                                                                        $(element).removeClass();
+                                                                        $(element).addClass("btn btn-xs btn-block alert-danger");
+                                                                    });
+                                                                }
+                                                            });
 
 
-    jQuery(function($) {
-        $.datepicker.regional['fr'] = {
-            closeText: 'Fermer',
-            prevText: '<Préc',
-            nextText: 'Suiv>',
-            currentText: 'Courant',
-            monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
-            monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
-                'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
-            dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
-            dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-            dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
-            weekHeader: 'Sm',
-            //dateFormat: 'dd/mm/yy',
-            dateFormat: 'yyyy-mm-dd',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: ''};
 
-        $.datepicker.setDefaults($.datepicker.regional['fr']);
-    });
+                                                            //location.reload();
 
-    $("#datepicker2").datepicker(
-            {
-                //minDate: 0,
-                onSelect: function() {
-                    var day1 = $("#datepicker").datepicker('getDate').getDate();
-                    var month1 = $("#datepicker").datepicker('getDate').getMonth() + 1;
-                    var year1 = $("#datepicker").datepicker('getDate').getFullYear();
-                    var fullDate = year1 + "-" + month1 + "-" + day1;
-                    var str_output = "<h1><center>" + day1 + "-" + month1 + "-" + year1 + "</center></h1>";
-                    //$("#planning").val(fullDate);
-                    //page_output.innerHTML = str_output;
-                }
-            });
+                                                        });
+                                                        $("button[name='delProduitTruck']").click(function() {
+                                                            var btn = $(this);
+                                                            var p = $(this).val();
+                                                            var action = "del";
+                                                            var module = "ProduitTournee";
+
+                                                            var func = action + module;
+
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
+                                                                    btn.attr("disabled", "disabled");
+
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                    btn.attr("disabled", "disabled");
+                                                                }
+                                                            });
+                                                            //location.reload();
+                                                        });
+                                                        $("button[name='validTruck']").click(function() {
+                                                            var p = $(this).val();
+                                                            var action = "upd";
+                                                            var module = "ValidTruck";
+
+                                                            var func = action + module;
+
+                                                            console.log(p + " " + func);
+
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                }
+                                                            });
+                                                            location.reload();
+                                                        });
+
+
+                                                        jQuery(function($) {
+
+<?= (isset($_GET["planning"])) ? "$('#datepicker2').val(\"" . $_GET["planning"] . "\")" : "" ?>
+
+                                                        });
+
+
 </script>

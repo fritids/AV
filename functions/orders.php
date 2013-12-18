@@ -271,7 +271,9 @@ function saveOrder() {
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
         "vat_rate" => ( $config["vat_rate"] - 1 ) * 100,
         "alert_sms" => $alert_sms,
-        "alert_sms_phone" => $alert_sms_phone
+        "alert_sms_phone" => $alert_sms_phone,
+        "total_discount" => @$_SESSION["cart_summary"]["total_discount"],
+        "order_voucher" => @$_SESSION["cart_summary"]["discount_code"]
     );
 
     $oid = $db->insert("av_orders", $order_summary);
@@ -354,7 +356,6 @@ function saveOrder() {
             $r = $db->where("id_order_detail", $odid)
                     ->update("av_order_detail", array("is_product_custom" => $is_product_custom));
         }
-
 
         // post update sur les details
         $param = array(

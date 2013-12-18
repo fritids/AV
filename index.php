@@ -16,6 +16,7 @@ require('functions/orders.php');
 require('functions/tools.php');
 require('functions/cms.php');
 require('functions/devis.php');
+require('functions/voucher.php');
 require('classes/CMCIC_Tpe.inc.php');
 require('classes/tcpdf.php');
 
@@ -374,6 +375,13 @@ if (isset($_GET["order-payment"])) {
 
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $extra_options = 1;
+    }
+    
+    if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
+        $extra_options = 1;
+    }
+    if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"]> 0) {
+        $extra_options -= $_SESSION["cart_summary"]["total_discount"];
     }
 
     saveorder();
@@ -744,10 +752,16 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
 
 if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
     $code = $_POST["voucher_code"];
+    $ko_msg = array("txt" => "Ce bon de réduction est erroné");
 
-    /* if(isset($_POST["voucher_code"]))
-      $code = getVoucherInfo($_POST["voucher_code"]);
-     */
+    if (isset($_POST["voucher_code"]))
+        $voucherInfo = getVoucherCode($code, $_SESSION["user"]["id_customer"]);
+
+    if (!empty($voucherInfo) && $voucherInfo["code"] == $code) {
+        $cart->addOrderVoucher($voucherInfo);
+        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+        $ko_msg = array();
+    }
 
     if ($code == "VICTOIREPAUC") {
         $cart->addVoucher(array(
@@ -758,10 +772,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
             "reduction" => 10)
         );
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-    } /* else {
-      $ko_msg = array("txt" => "Ce bon de réduction est erroné");
-      } */
-
+        $ko_msg = array();
+    }
 
     if ($code == "NOEL2013DV") {
         $cart->addVoucher(array(
@@ -772,9 +784,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
             "reduction" => 10)
         );
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-    } /* else {
-      $ko_msg = array("txt" => "Ce bon de réduction est erroné");
-      } */
+        $ko_msg = array();
+    }
 }
 
 // mot de passe oublié

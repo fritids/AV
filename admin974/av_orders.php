@@ -126,17 +126,34 @@ $opts['fdd']['current_state'] = array(
     "colattrs" => "name='order_state'",
     'sort' => true
 );
+$opts['fdd']['COMMANDE_INFO'] = array(
+    'name' => 'Commande Fournisseur',
+    'options' => 'L',
+    'select' => 'D',
+    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'sort' => true
+);
+
 $opts['fdd']['ARC_INFO'] = array(
     'name' => 'ARC',
     'options' => 'L',
     'select' => 'D',
     'maxlen' => 10,
+    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
     'sort' => true
 );
 $opts['fdd']['RECU_INFO'] = array(
     'name' => 'RECU Entrepot',
     'options' => 'L',
     'select' => 'D',
+    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'sort' => true
+);
+$opts['fdd']['LIV_INFO'] = array(
+    'name' => 'Livraison prog.',
+    'options' => 'L',
+    'select' => 'D',
+    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
     'sort' => true
 );
 

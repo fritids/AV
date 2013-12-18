@@ -161,11 +161,12 @@
 												<input name="passwd" id="login_pass" type="password" placeholder="Mon mot de passe" />
                                                 <input type="hidden" name="referer" value="/?my-account" />
 												<a class="oubli" href="" data-target="#LostPwd" data-toggle="modal">Mot de passe oublié ?</a>
-												<button id="login_submit" class="bouton_generique" type="submit" title="Se connecter">Se connecter</button>
+												<button id="login_submit" class="bouton_generique" type="submit" title="Se connecter" style="background-image:url('img/btn_compteclient.png');width:180px;height:20px;border:0;">Se connecter</button>
+												
 											</form>
 										</li>
 										<li>
-											<span><a href="/?register">Je n'ai pas de compte</a></span>
+											<span>Je n'ai pas de compte</span>
 											<a class="bouton_generique" href="/?register" title="Créer un compte client">Créer un compte client</a>
 										</li>
 									</ul>
@@ -187,7 +188,7 @@
                     <a href="/"><img id="logo" src="/img/logo.png" /></a>
                     <div id="header-droit">
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
-                        <span id="telephone">0 892 70 11 13</span>
+                        <span id="telephone" title="du lundi au vendredi de 9h à 12h et de 14h à 18h.">0 892 70 11 13</span>
                         <span id="telephone2">(0,34€TT/min)</span>                        
                     </div>
                     <div id="reseau-sociaux">
@@ -232,7 +233,7 @@
                             <input type="hidden" name="p" value="">
                             <input type="hidden" name="id" value="" id="search_product">
                             <input type="text" name="search_query" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
-                            <input type="submit" style="padding:3px 10px;" value="Valider">
+                             <input type="submit" style="background-image:url(img/btn_searchmod.png);width:204px;height:34px;margin:25px 0 0 25px;border:0;" value=""/>
                         </form>
                     </span>
                 </div>
@@ -260,7 +261,7 @@
                             </li>
 
                         </ul>
-                        <input type="submit" style="background-image:url(img/rechercher.png);width:195px;height:41px;margin-top:15px;" value=""/>
+                        <input type="submit" style="background-image:url(img/btn_searchmod.png);width:204px;height:34px;margin-top:25px;border:0;" value=""/>
                     </form>
                 </div>
 

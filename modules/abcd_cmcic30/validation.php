@@ -11,6 +11,7 @@ require('../../classes/tcpdf.php');
 require('../../classes/sms.inc.php');
 include ("../../functions/products.php");
 include ("../../functions/orders.php");
+include ("../../functions/voucher.php");
 
 $now = date("d-m-y");
 
@@ -156,6 +157,13 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
                     "category" => "sms_mail_commande",
                 );
                 $r = $db->insert("av_order_bdc", $param);
+            }
+            
+            // on retire 1 à nombre coupon utilisable
+            if ($orderinfo["order_voucher"] != "") {
+                $code = $orderinfo["order_voucher"];
+                $cid = $orderinfo["id_customer"];
+                updVoucherCodeQty($code, $cid);
             }
 
             break;

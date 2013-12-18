@@ -23,9 +23,9 @@
         <h3 class="clear-it">INFORMATION DE FACTURATION & LIVRAISON</h3>
         <div id="facturation">
             <label for="tel">Numéro de téléphone</label>
-            <input id="tel" name="invoice_phone" type="tel" value="{$user.invoice.phone}" required="true" /><br />
+            <input id="tel" name="invoice_phone" type="tel" value="{$user.invoice.phone}" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal} required="true" /><br />
             <label for="tel2">Numéro de téléphone 2</label>
-            <input id="tel2" name="invoice_phone_mobile" type="tel"  value="{$user.invoice.phone_mobile}" /><br />
+            <input id="tel2" name="invoice_phone_mobile" type="tel"  value="{$user.invoice.phone_mobile}" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal}/><br />
 
             <label for="adresse">Adresse de facturation *</label>
             <textarea id="adresse" name="invoice_address1" required="true">{$user.invoice.address1}</textarea><br />
@@ -37,9 +37,9 @@
         </div>
         <div id="livraison">
             <label for="tel">Numéro de téléphone</label>
-            <input id="tel" name="delivery_phone" type="tel" value="{$user.delivery.phone}" /><br />
+            <input id="tel" name="delivery_phone" type="tel" value="{$user.delivery.phone}" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal}/><br />
             <label for="tel2">Numéro de téléphone 2</label>
-            <input id="tel2" name="delivery_phone_mobile" type="tel"  value="{$user.delivery.phone_mobile}" /><br />
+            <input id="tel2" name="delivery_phone_mobile" type="tel"  value="{$user.delivery.phone_mobile}" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal}/><br />
 
             <label for="LIV_adresse">Adresse de livraison *</label>
             <textarea id="LIV_adresse"  name="delivery_address1">{$user.delivery.address1}</textarea><br />

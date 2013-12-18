@@ -14,6 +14,7 @@ require('../../classes/tcpdf.php');
 require('../../classes/sms.inc.php');
 include("../../functions/products.php");
 include("../../functions/orders.php");
+include("../../functions/voucher.php");
 
 
 $now = date("d-m-y");
@@ -149,7 +150,7 @@ if ($verified) {
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
 
         $orderinfo = getOrderInfos($oid);
-        
+
         $mail->AddAddress($orderinfo["customer"]["email"]);
         $mail->Subject = $confmail["commande_new"] . " " . $oid;
 
@@ -204,6 +205,13 @@ if ($verified) {
                 "category" => "sms_mail_commande",
             );
             $r = $db->insert("av_order_bdc", $param);
+        }
+
+        // on retire 1 à nombre coupon utilisable
+        if ($orderinfo["order_voucher"] != "") {
+            $code = $orderinfo["order_voucher"];
+            $cid = $orderinfo["id_customer"];
+            updVoucherCodeQty($code, $cid);
         }
     }
 } else {

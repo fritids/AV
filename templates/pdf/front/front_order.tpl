@@ -53,7 +53,9 @@
                                     <td width="10%" bgcolor="#f5f5f5">Prix TTC</td>
                                 </tr>
 
+                                {$tot_produit_ttc = 0}
                                 {foreach key=key item=detail from=$orderinfo.details}
+                                    {$tot_produit_ttc = $tot_produit_ttc + $detail.total_price_tax_incl}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}<br>
@@ -77,14 +79,40 @@
                             <br>
                             <br>
 
-                            {if $orderinfo.alert_sms}
-                                Option Alerte SMS : 1€ <br><br>
-                            {/if}
-                            Total produits HT: {(($orderinfo.total_paid-25)/(1+$orderinfo.vat_rate/100))|number_format:2} €<br>
-                            Total Tva ( {$orderinfo.vat_rate}% ): {($orderinfo.total_paid - ($orderinfo.total_paid-25)/(1+$orderinfo.vat_rate/100) - 25)|number_format:2} €<br>
-                            Total produits TTC: {$orderinfo.total_paid - 25} €<br>
-                            Frais de transport: 25€ <br>
-                            Total TTC :{$orderinfo.total_paid} €<br>
+                           
+                            <table>
+                                <tr>
+                                    <td>Total produits HT</td>
+                                    <td>{($tot_produit_ttc/(1+$orderinfo.vat_rate/100))|number_format:2} €</td>
+                                </tr>
+                                <tr>
+                                    <td>Frais de transport</td>
+                                    <td>25 €</td>
+                                </tr>
+                                {$sms=0}
+                                {if $orderinfo.alert_sms}
+                                    <tr>
+                                        <td>Option Alerte SMS</td>
+                                        <td>1 €</td>
+                                    </tr>
+                                    {$sms=1}
+                                {/if}
+                                {if $orderinfo.total_discount > 0}
+                                    <tr>
+                                        <td>Réduction</td>
+                                        <td>- {$orderinfo.total_discount} €</td>
+                                    </tr>
+                                {/if}                                
+                                <tr>
+                                    <td>Total TTC</td>
+                                    <td>{$orderinfo.total_paid} €</td>
+                                </tr>   
+                                <tr>
+                                    <td>dont TVA ({$orderinfo.vat_rate|number_format:2} %)</td>
+                                    <td>{($tot_produit_ttc - ($tot_produit_ttc/(1+$orderinfo.vat_rate/100)) + (25 - 25/(1+$orderinfo.vat_rate/100)) + ($sms - $sms/(1+$orderinfo.vat_rate/100)))|number_format:2} €</td>
+                                </tr>
+                            </table>     
+                               
                         </td>
                     </tr>
                 </table>

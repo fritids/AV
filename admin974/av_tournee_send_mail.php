@@ -47,7 +47,7 @@ $mail->CharSet = 'UTF-8';
 
 foreach ($r as $k => $contact) {
     $mail->ClearAllRecipients();
-    $mail->SetFrom($confmail["from"]);
+    $mail->SetFrom("livraison@allovitres.com");
 
     $mail->AddAddress($contact["email"]);
 

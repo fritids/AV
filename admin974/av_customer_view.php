@@ -89,6 +89,7 @@ $productStates = $db->where("id_level", 1)
             <ul class="nav nav-pills">
                 <li class="active"><a href="#commandes" data-toggle="tab">Commandes</a></li>
                 <li><a href="#devis" data-toggle="tab">Devis</a></li>
+                <li><a href="#voucher" data-toggle="tab">Coupons de réduction</a></li>
             </ul>
 
             <div class="tab-content">
@@ -322,11 +323,38 @@ $productStates = $db->where("id_level", 1)
                         ?>
                     </div>
                 </div>
+                <div class="tab-pane" id="voucher">
+                    <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
+                        <tr>
+                            <th class="text-center">Code</th>
+                            <th class="text-center">Début</th>
+                            <th class="text-center">Fin</th>                          
+                            <th class="text-center">Quantité</th>                          
+                            <th class="text-center">Montant réduction</th>                          
+                            <th class="text-center">Pourcentage réduction</th>                          
+                            <th class="text-center">Actif</th>                          
+                            <th class="text-center"></th>                          
+                        </tr>
+
+                        <?
+                        foreach ($customer_info["voucher"] as $voucher) {
+                            ?>
+                            <tr>
+                                <td><?= $voucher["code"] ?></td>
+                                <td><?= $voucher["start_date"] ?></td>
+                                <td><?= $voucher["end_date"] ?></td>
+                                <td><?= $voucher["quantity"] ?></td>
+                                <td><?= $voucher["reduction_amount"] ?></td>
+                                <td><?= $voucher["reduction_percent"] ?></td>
+                                <td><?= ($voucher["active"] == 0) ? "Non" : "Oui" ?></td>
+                                <td><a href="av_voucher.php?PME_sys_fl=1&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $voucher["id_voucher"] ?>"><span class="glyphicon glyphicon-edit"></span></a></td>
+                            </tr>
+                            <?
+                        }
+                        ?>
+                    </table> 
+                </div>
             </div>
-
-
         </div>
     </div>
-
-
 </div>

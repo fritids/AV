@@ -130,10 +130,11 @@ function getSearchResults($param1, $param2) {
     }
     return $o;
 }
+
 function getSearchResultsByName($param1) {
     global $db;
 
-    $r = $db->rawQuery("SELECT id_product FROM av_product WHERE active = 1 and lower(name) LIKE ? ", array("%".$param1."%"));
+    $r = $db->rawQuery("SELECT id_product FROM av_product WHERE active = 1 and lower(name) LIKE ? ", array("%" . $param1 . "%"));
 
     foreach ($r as $i => $product) {
         $o[$i] = getProductInfos($product["id_product"]);
@@ -178,6 +179,41 @@ function mapCustomAttribute($pCustomDetail) {
     }
 
     return $o;
+}
+
+function estFerie($j) { // Détermine si un jour (format Y-m-d) est férié
+    $res = 0;
+    // les jours fériés
+    $joursFeries = array("-01-01", "-05-01", "-05-08", "-07-14", "-08-15", "-11-01", "-11-11", "-12-25");
+    for ($i = 0; $i < count($joursFeries); $i++)
+        if ($j == (substr($j, 0, 4) . $joursFeries[$i])) {
+            $res = 1;
+        }
+    // Si c'est le lundi de paques
+    if ($j == date("Y-m-d", strtotime("+1 day", easter_date(substr($j, 0, 4))))) {
+        $res = 1;
+    }
+    // ascension
+    if ($j == date("Y-m-d", strtotime("+39 day", easter_date(substr($j, 0, 4))))) {
+        $res = 1;
+    }
+    return $res;
+}
+
+function getJours($datedeb, $datefin) {
+    $nb_jours = 0;
+    $dated = explode('-', $datedeb);
+    $datef = explode('-', $datefin);
+    $timestampcurr = mktime(0, 0, 0, $dated[1], $dated[2], $dated[0]);
+    $timestampf = mktime(0, 0, 0, $datef[1], $datef[2], $datef[0]);
+    while ($timestampcurr < $timestampf) {
+
+        if ((date('w', $timestampcurr) != 0) && (date('w', $timestampcurr) != 6) && estFerie(date('Y-m-d', $timestampcurr)) == 0) {
+            $nb_jours++;
+        }
+        $timestampcurr = mktime(0, 0, 0, date('m', $timestampcurr), (date('d', $timestampcurr) + 1), date('Y', $timestampcurr));
+    }
+    return $nb_jours;
 }
 
 ?>

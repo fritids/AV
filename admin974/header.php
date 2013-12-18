@@ -47,14 +47,14 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 theme_advanced_buttons3_add: "emotions,iespell,flash,advhr,separator,print",
                 theme_advanced_toolbar_location: "top",
                 theme_advanced_toolbar_align: "left",
-                theme_advanced_path_location: "bottom",                
+                theme_advanced_path_location: "bottom",
                 plugin_insertdate_dateFormat: "%Y-%m-%d",
                 plugin_insertdate_timeFormat: "%H:%M:%S",
                 extended_valid_elements: "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
 
             });
         </script>
-            
+
         <!-- /tinyMCE -->
 
         <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>        
@@ -63,6 +63,30 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <script src="js/bootstrap.min.js"></script>
 
         <script>
+            jQuery(function($) {
+                $.datepicker.regional['fr'] = {
+                    closeText: 'Fermer',
+                    prevText: '<Préc',
+                    nextText: 'Suiv>',
+                    currentText: 'Courant',
+                    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                    monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+                        'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                    dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+                    dayNamesShort: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                    dayNamesMin: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+                    weekHeader: 'Sm',
+                    //dateFormat: 'dd/mm/yy',
+                    dateFormat: 'yyyy-mm-dd',
+                    firstDay: 1,
+                    isRTL: false,
+                    showMonthAfterYear: false,
+                    yearSuffix: ''};
+
+                $.datepicker.setDefaults($.datepicker.regional['fr']);
+            });
+
             $(function() {
                 $("#datepicker").datepicker({
                     showButtonPanel: true
@@ -76,9 +100,9 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                     showButtonPanel: true
                 });
                 $("#datepicker2").datepicker("option", "dateFormat", "yy-mm-dd");
+                $("#datepicker2").datepicker("setDate", new Date());
 
-                $('#datepicker2').val("<?= @$_GET["planning"] ?>");
-                $('#datepicker').val("<?= @$_GET["invoice_date"] ?>");
+                
             });
         </script>
     </head>

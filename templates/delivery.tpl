@@ -67,9 +67,9 @@
             <p>Désirez vous bénéficier du suivi de commande par SMS ?<br/>
                 Ce service vous permet de recevoir un sms sur le numero de téléphone portable de votre choix à chaque étape de votre commande.<br/>Il vous permet notamment d'etre informé de la date et du créneau horaire de votre livraison dès que celle-ci est programmée.</p>
             <p><input type="checkbox" name="alert_sms" class="alert_sms" value="1" checked="checked"> SMS (1€) 
-                {literal}
-                    Tél: <input type="tel" name="alert_sms_phone" class="alert_sms_phone" required="required" pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$"> ( Format: 0612345678 )
-                {/literal}
+                
+                    Tél: <input type="tel" name="alert_sms_phone" class="alert_sms_phone" required="required" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal} > ( Format: 0612345678 )
+                
 
             </p>
         </div>

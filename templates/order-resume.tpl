@@ -95,7 +95,7 @@
     <div class="promo clearfix">
         <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount - {$smarty.session.cart_summary.total_discount} + $smarty.session.cart_summary.total_shipping}€</span></p>
     </div>
-    {if $smarty.session.cart_summary.total_discount == 0}
+    {if !$smarty.session.cart_summary.discount_title}
         <form action="/?action=add_voucher&order-resume" method="post">
             <div class="promo clearfix">
                 <p><span class="code_promo_label">Vous bénéficiez d’un code promotionnel :</span> 

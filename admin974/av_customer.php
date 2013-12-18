@@ -60,14 +60,14 @@ $opts['fdd']['email'] = array(
     'sort' => true
 );
 /*
-$opts['fdd']['passwd'] = array(
-    'name' => 'mot de passe',
-    'select' => 'T',
-    'maxlen' => 32,
-    'sort' => true,
-    //'sqlw' => 'AES_ENCRYPT(' . _COOKIE_KEY_ . '"$val_as")',
-    'sqlw' => 'md5("' . _COOKIE_KEY_ . '$val_as' . '")',
-);
+  $opts['fdd']['passwd'] = array(
+  'name' => 'mot de passe',
+  'select' => 'T',
+  'maxlen' => 32,
+  'sort' => true,
+  //'sqlw' => 'AES_ENCRYPT(' . _COOKIE_KEY_ . '"$val_as")',
+  'sqlw' => 'md5("' . _COOKIE_KEY_ . '$val_as' . '")',
+  );
  * 
  */
 $opts['fdd']['customer_group'] = array(
@@ -75,14 +75,14 @@ $opts['fdd']['customer_group'] = array(
     'select' => 'D',
     'maxlen' => 1,
     'sort' => true,
-    'values' => array(0, 1)
+    'values2' => array(0 => "Normal", 1 => "Pro")
 );
 $opts['fdd']['active'] = array(
     'name' => 'actif ?',
     'select' => 'D',
     'maxlen' => 1,
     'sort' => true,
-    'values' => array(0, 1)
+    'values' => array(0 => "Non", 1 => "Oui")
 );
 
 
@@ -100,6 +100,13 @@ require_once 'phpMyEdit.class.php';
 new phpMyEdit($opts);
 ?>
 
+
+
 <?
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+if (isset($_GET["PME_sys_rec"]))
+    $id = $_GET["PME_sys_rec"];
+if (isset($_POST["PME_sys_rec"]))
+    $id = $_POST["PME_sys_rec"];
+
+getChangeLog($opts['tb'], $id);
 ?>
