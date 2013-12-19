@@ -79,6 +79,8 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
         $customer = getOrderUserDetail($OrderProduct["id_customer"]);
         $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
+        $adresseInvoice = getUserOrdersAddress($OrderProduct["id_address_invoice"]);
+        $attributes = getOrdersDetailAttribute($OrderProduct["id_order_detail"]);
 
         $p_qty = $OrderProduct["nb_product_delivered"];
 
@@ -94,24 +96,36 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                             <tr>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["reference"] . '</th>
                             <th bgcolor = "#cccccc" >' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
-                            <th bgcolor = "#cccccc" >' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '</th>
-                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment1"] . '</th>
-                            <th bgcolor = "#cccccc" >' . $OrderProduct["comment3"] . '</th>
-                            <th bgcolor = "#cccccc" >' . $OrderProduct["horaire"] . '</th>
-                            <th bgcolor = "#cccccc" >Comm. client: ' . $OrderProduct["order_comment"] . '</th></tr>';
+                            <th bgcolor = "#cccccc" >
+                            liv.: ' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '<br>
+                                fact.:' . $adresseInvoice["phone_mobile"] . '<br>' . $adresseInvoice["phone"] . '</th>
+            <th bgcolor = "#cccccc" ></th>
+            <th bgcolor = "#cccccc" >' . $OrderProduct["comment1"] . '</th>
+            <th bgcolor = "#cccccc" >' . $OrderProduct["comment3"] . '</th>
+            <th bgcolor = "#cccccc" >' . $OrderProduct["horaire"] . '</th>
+            <th bgcolor = "#cccccc" >Comm. client: ' . $OrderProduct["order_comment"] . '</th></tr>';
 
             $tmpRef = $OrderProduct["reference"];
         }
+
+
+
         $pdf_roadmap .= '
-                        <tr>                        
-                        <td colspan = "4"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
+            <tr>
+            <td colspan = "4"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
                 ($OrderProduct["product_width"] != "" ? ' Largeur (mm) :' . $OrderProduct["product_width"] : '') .
-                ($OrderProduct["product_height"] != "" ? ', Longueur (mm) :' . $OrderProduct["product_height"] : '') .
-                '</td>
-                        <td>' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>    
-                        <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
-                        <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td>
-                        </tr>';
+                ($OrderProduct["product_height"] != "" ? ', Longueur (mm) :' . $OrderProduct["product_height"] : '') . "<br>";
+
+        foreach ($attributes as $attribute) {
+            $pdf_roadmap .= ' -' . $attribute["attribute_name"] . ': ' . $attribute["attribute_value"] . '<br>';
+        }
+        $pdf_roadmap .= '
+            </td>
+
+            <td>' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>
+            <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
+            <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td>
+            </tr>';
 
 
         $param = array(
@@ -148,9 +162,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="date_delivery" > Date livraison :
                             <select id="date_delivery" class="pme-input-0" name="date_delivery">
                                 <option value="--"  >--</option>
-                                <?
-                                foreach ($d as $rec) {
-                                    ?>
+    <?
+    foreach ($d as $rec) {
+        ?>
                                     <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
                                     <?
                                 }
@@ -162,9 +176,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="truck" > Camion :
                             <select id="truck" class="pme-input-0" name="id_truck">
                                 <option value="--"  >--</option>
-                                <?
-                                foreach ($t as $rec) {
-                                    ?>
+    <?
+    foreach ($t as $rec) {
+        ?>
                                     <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
                                     <?
                                 }

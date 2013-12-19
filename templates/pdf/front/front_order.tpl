@@ -109,7 +109,7 @@
                                 </tr>   
                                 <tr>
                                     <td>dont TVA ({$orderinfo.vat_rate|number_format:2} %)</td>
-                                    <td>{($tot_produit_ttc - ($tot_produit_ttc/(1+$orderinfo.vat_rate/100)) + (25 - 25/(1+$orderinfo.vat_rate/100)) + ($sms - $sms/(1+$orderinfo.vat_rate/100)))|number_format:2} €</td>
+                                    <td>{($orderinfo.total_paid - ($orderinfo.total_paid/(1+$orderinfo.vat_rate/100)))|number_format:2} €</td>
                                 </tr>
                             </table>     
                                

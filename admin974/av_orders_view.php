@@ -160,7 +160,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 $r = $db->where("id_order_detail", $id)
                         ->update("av_order_detail", array("product_current_state" => $state));
                 //casse ou SAV
-                if ($state == 21 || $state == 22) {
+                if ($state == 21 || $state == 22 || $state ==23) {
                     $r = $db->where("id_order_detail", $id)
                             ->delete("av_tournee");
 
@@ -192,7 +192,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 $r = $db->where("id_order_detail", $od["id_order_detail"])
                         ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
                 //casse ou SAV
-                if ($_POST["product_current_state"] == 21 || $_POST["product_current_state"] == 22) {
+                if ($_POST["product_current_state"] == 21 || $_POST["product_current_state"] == 22 || $_POST["product_current_state"] == 23) {
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
                             ->delete(("av_tournee"));
 

@@ -175,7 +175,7 @@ $orderStates = $db->where("id_level", 0)
             <th class="text-center">Address Liv.</th>            
             <th class="text-center" style="width:130px">Status</th>            
             <th class="text-center" style="width:90px">Montant</th>
-            <th class="text-center">Nb J.</th>
+            <th class="text-center">Nb jrs ouvrés</th>
             <th class="text-center" style="width:70px">COMM</th>
             <th class="text-center" style="width:70px">ARC</th>            
             <th class="text-center" style="width:70px">RECU</th>        
@@ -192,7 +192,7 @@ $orderStates = $db->where("id_level", 0)
                 <td class="text-center alert-<?= $row["current_state"] ?>"><?= $row["state_label"] ?></td>
                 <td class="text-center"><?= number_format($row["total_paid"], 2, ".", " ") ?> €</td>
                 <td class="text-center"><?= getJours($row["invoice_date"], date("Y-m-d")) ?> j</td>
-                <td class="text-center alert-<?= $row["COMMANDE_INFO"] ?>">
+                <td style="vertical-align: middle;" class="text-center alert-<?= $row["COMMANDE_INFO"] ?>">
                     <?
                     switch ($row["COMMANDE_INFO"]) {
                         case 5:
@@ -208,7 +208,7 @@ $orderStates = $db->where("id_level", 0)
                     }
                     ?>                        
                 </td>
-                <td class="text-center alert-<?= $row["ARC_INFO"] ?>">
+                <td style="vertical-align: middle;"  class="text-center alert-<?= $row["ARC_INFO"] ?>">
                     <?
                     switch ($row["ARC_INFO"]) {
                         case 5:
@@ -224,7 +224,7 @@ $orderStates = $db->where("id_level", 0)
                     }
                     ?>                        
                 </td>
-                <td class="text-center alert-<?= $row["RECU_INFO"] ?>">
+                <td style="vertical-align: middle;"  class="text-center alert-<?= $row["RECU_INFO"] ?>">
                     <?
                     switch ($row["RECU_INFO"]) {
                         case 5:
@@ -240,7 +240,7 @@ $orderStates = $db->where("id_level", 0)
                     }
                     ?>                        
                 </td>
-                <td class="text-center alert-<?= $row["LIV_INFO"] ?>">
+                <td style="vertical-align: middle;" class="text-center alert-<?= $row["LIV_INFO"] ?>">
                     <?
                     switch ($row["LIV_INFO"]) {
                         case 5:

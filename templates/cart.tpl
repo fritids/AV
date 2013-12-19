@@ -87,6 +87,9 @@
         {if empty($smarty.session.user.delivery.address1)}
             <p><font color="red">Merci de renseigner votre adresse complète de livraison.</font></p>
             <a href="?register">Mon compte</a>
+        {elseif empty($smarty.session.user.delivery.phone) && empty($smarty.session.user.delivery.phone_mobile)}
+            <p><font color="red">Merci de renseigner au moins un numéro de téléphone <b>dans l'adresse de livraison</b>.</font></p>
+            <a href="?register">Mon compte</a>
         {else}
             <a href="?delivery"><img src='/img/BTN-livraison.png'></a>
             {/if}

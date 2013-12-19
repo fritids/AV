@@ -760,7 +760,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
     if (!empty($voucherInfo) && $voucherInfo["code"] == $code) {
         $cart->addOrderVoucher($voucherInfo);
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-        $ko_msg = array();
+        $ko_msg = array();        
     }
 
     if ($code == "VICTOIREPAUC") {

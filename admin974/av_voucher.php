@@ -103,10 +103,6 @@ require_once 'phpMyEdit.class.php';
     <div class="page-header">
         <h1>Les bons de réductions</h1>
     </div>
-    <div class="alert alert-info">
-        <p>Vous pouvez ajouter les codes mais pas encore les distribuer,
-            Le fonctionnement est OK mais  l'affichage de la réduction sur la facture n'est pas encore OK</p>
-    </div>
     <?
     new phpMyEdit($opts);
 

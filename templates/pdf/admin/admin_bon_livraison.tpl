@@ -50,14 +50,27 @@
                         <td colspan="2" width="640">
                             <table width="620" border="0" align="center" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td width="76%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>
+                                    <td width="70%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>
                                     {*<td width="14%" bgcolor="#f5f5f5">Référence</td>*}
+                                    <td width="20%" bgcolor="#f5f5f5">Dimension</td>
                                     <td width="10%" bgcolor="#f5f5f5">Qté</td>
                                 </tr>
 
-                                {foreach key=key item=detail from=$orderdetails}
+                                {foreach key=key item=detail from=$orderinfo.details}
                                     <tr>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_name}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
+                                            {$detail.product_name}<br>
+                                            {if $detail.attributes}
+                                                {foreach key=key item=attribute from=$detail.attributes}
+                                                    {$attribute.attribute_name}: {$attribute.attribute_value} <br>
+                                                {/foreach}
+                                            {/if}
+                                        </td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
+                                            {if $detail.product_width}
+                                                {$detail.product_width} x {$detail.product_height} 
+                                            {/if}
+                                        </td>
                                         {*{$detail.product_width} {$detail.product_height} *}
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
                                     </tr>

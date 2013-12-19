@@ -383,7 +383,7 @@ $trucks = $db->get("av_truck");
                                         break;
                                     case 23:
                                         $icon = "warning-sign";
-                                        $helper = "";
+                                        $helper = "livraison annulé par le client";
                                         break;
                                     default:
                                         $cssalert = 0;
@@ -508,7 +508,7 @@ $trucks = $db->get("av_truck");
                                             <button class="addAllItems btn btn-block btn-warning" value="<?= $OrderProduct["id_order"] ?>">Toute la commande</button>
                                         </div>
                                     </td>
-
+                                    <td>&nbsp;</td>
                                 </tr>
                                 <?
                             }
