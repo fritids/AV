@@ -33,23 +33,35 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <script language="javascript" type="text/javascript" src="tiny_mce/tiny_mce.js"></script>
         <script language="javascript" type="text/javascript">
             tinyMCE.init({
-                mode: "specific_textareas",
-                auto_reset_designmode: true,
-                theme: "advanced",
-                width: "800",
-                height: "300",
-                plugins: "table,autosave,save,insertdatetime,preview,searchreplace,fullscreen,jbimages",
-                theme_advanced_buttons1_add_before: "save,separator",
-                theme_advanced_buttons1_add: "fontselect,fontsizeselect",
-                theme_advanced_buttons2_add: "insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",
-                theme_advanced_buttons2_add_before: "cut,copy,paste,separator,search,replace,separator",
-                theme_advanced_buttons3_add_before: "tablecontrols,separator",
-                theme_advanced_buttons3_add: "emotions,iespell,flash,advhr,separator,print",
-                theme_advanced_toolbar_location: "top",
-                theme_advanced_toolbar_align: "left",
-                theme_advanced_path_location: "bottom",
-                plugin_insertdate_dateFormat: "%Y-%m-%d",
-                plugin_insertdate_timeFormat: "%H:%M:%S",
+               // General options
+        mode : "textareas",
+        theme : "advanced",
+        plugins : "jbimages,autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+
+        // Theme options
+        theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+        theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+        theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+        theme_advanced_buttons4 : "jbimages,|,insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",        
+        
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_resizing : true,
+
+        // Skin options
+        skin : "o2k7",
+        skin_variant : "silver",
+
+
+        // Drop lists for link/image/media/template dialogs
+        template_external_list_url : "js/template_list.js",
+        external_link_list_url : "js/link_list.js",
+        external_image_list_url : "js/image_list.js",
+        media_external_list_url : "js/media_list.js",
+        
+        relative_urls : false
+        
                 
             });
         </script>
@@ -135,7 +147,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li><a href="av_product_images.php">Images</a></li>     
                                     <li class="divider"></li>
                                     <li><a href="av_category.php">Categories</a></li>
-                                    <li><a href="av_attributes.php">Attributs</a></li>                                    
+                                    <li><a href="av_attributes.php">Attributs</a></li>    
+                                                                    
                                 </ul>
                             </li>     
                             <?
@@ -186,7 +199,11 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li class="divider"></li>
                                     <li><a href="av_camion.php">Camions</a></li>                                
                                     <li class="divider"></li>
-                                    <li><a href="av_cms_lang.php">Contenu manager</a></li>                                    
+                                    <li><a href="av_cms_lang.php">Contenu manager</a></li>  
+                                    <li class="divider"></li>
+                                    <li><a href="av_stats.php">Statistiques & reporting</a></li>      
+                                    <li class="divider"></li>
+                                    <li><a href="av_voucher.php">Coupon de reduction</a></li>    
 
                                 </ul>
                             </li>  

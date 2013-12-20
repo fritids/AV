@@ -41,7 +41,25 @@ $productStates = $db->where("id_level", 1)
         <?
     }
     ?>
-    <h1><?= @$customer_info["firstname"] ?> <?= @$customer_info["lastname"] ?> </h1>
+    <div class="row">
+        <div class="col-xs-8">
+            <h1><span class="text-info"><?= @$customer_info["firstname"] ?> <?= @$customer_info["lastname"] ?> </span></h1>
+        </div>
+        <div class="col-xs-4">
+
+            <form class="form-horizontal"  method="get">
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span> </span>
+                    <input type="text" id ="ajax_customer" class="form-control" placeholder="Entrer le nom ou email client"/>
+                    <input type="hidden" name ="id_customer"  id ="id_customer"/>
+                    <span class="input-group-btn">
+                        <input type="submit" value="Go" class="btn btn-primary" >
+                    </span>
+
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xs-4">
             <div class="panel panel-default">
@@ -79,8 +97,39 @@ $productStates = $db->where("id_level", 1)
                 </div>
             </div> 
         </div>
-
     </div>
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">Son compte</div>
+                <div class="panel-body">
+
+                    <?
+                    $orders_count = 0;
+                    $orders_amount = 0;
+                    $orders_discount = 0;
+                    foreach ($orders as $order) {
+                        switch ($order["current_state"]) {
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                                $orders_count += 1;
+                                $orders_amount += $order["total_paid"];
+                                $orders_discount+= $order["total_discount"];
+                                break;
+                        }
+                    }
+                    ?>
+                    Nombre de commandes validés: <?= $orders_count ?> <br>
+                    Argent dépensés : <?= $orders_amount ?> €<br>
+                    Montant des réductions attribuées: <?= $orders_discount ?> €<br>
+                </div>
+            </div>  
+        </div>
+    </div>
+    <hr>
+
     <h1>Ses opérations</h1>
 
     <div class="row">
@@ -358,3 +407,14 @@ $productStates = $db->where("id_level", 1)
         </div>
     </div>
 </div>
+
+<script>
+    $(function() {
+        $("#ajax_customer").autocomplete({
+            source: 'functions/ajax_customer.php',
+            select: function(event, ui) {
+                $("#id_customer").val(ui.item.id_customer);
+            }
+        });
+    })
+</script>

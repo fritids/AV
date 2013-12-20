@@ -156,6 +156,17 @@ $trucks = $db->get("av_truck");
     </form>
 
     <div class = "row">        
+        
+        <div class = "col-xs-3">
+            <h5>Légende :</h5>
+            <span class="glyphicon glyphicon-phone"></span> Commandé chez le fournisseur <br>
+            <span class="glyphicon glyphicon-exclamation-sign"></span> Date ARC non valide <br>
+            <span class="glyphicon glyphicon-cog"></span> ARC reçu <br>
+            <span class="glyphicon glyphicon-home"></span> Recu entrepot <br>
+            <span class="glyphicon glyphicon-time"></span> Livraison programmée <br>
+            <span class="glyphicon glyphicon-wrench"></span> Sav fournisseur <br>
+            <span class="glyphicon glyphicon-warning-sign"></span> Casse interne <br>           
+        </div>
         <div class = "col-xs-9">
             <h5>Critères :</h5>
             <?

@@ -187,7 +187,7 @@ $orderStates = $db->where("id_level", 0)
             <tr>
                 <td class="text-center"><a href="av_orders_view.php?id_order=<?= $row["id_order"] ?>" target="_blank" ><?= $row["reference"] ?></a></td>
                 <td class="text-center"><?= strftime("%a %d %b %y %T", strtotime($row["invoice_date"])) ?></td>
-                <td class="text-center"><?= $row["lastname"] . " " . $row["firstname"] ?></td>
+                <td class="text-center"><a href="av_customer_view.php?id_customer=<?= $row["id_customer"] ?>" ><?= $row["lastname"] . " " . $row["firstname"] ?></a></td>
                 <td class="text-center"><?= $row["address1"] . " <br> " . $row["address2"] . " <br> " . $row["postcode"] . " " . $row["city"] ?></td>
                 <td class="text-center alert-<?= $row["current_state"] ?>"><?= $row["state_label"] ?></td>
                 <td class="text-center"><?= number_format($row["total_paid"], 2, ".", " ") ?> €</td>

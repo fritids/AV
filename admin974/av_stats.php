@@ -27,6 +27,9 @@ if ($stda != "" && $enda) {
 ?>
 
 <div class="container">
+    <div class="page-header">
+        <h1>Statistiques & reporting</h1>
+    </div>
     <div class="row">
         <div class="col-xs-6">
             <div class="panel panel-default">
@@ -64,7 +67,7 @@ if ($stda != "" && $enda) {
         $total_amount = 0;
         $total_nb_order = 0;
         ?>
-        <div class="row">
+        
             <table class="table table-condensed">
                 <tr>
                     <th>Date</th>
@@ -93,7 +96,7 @@ if ($stda != "" && $enda) {
                     <td><b><?= number_format($total_amount, 2, '.', ' ') ?> €</b></td>
                 </tr>
             </table>
-        </div>
+        
         <?
     }
     ?>

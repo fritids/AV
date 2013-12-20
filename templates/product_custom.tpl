@@ -2,7 +2,7 @@
     <div id="texte"></div>
     <div id="features">
         <div class="images">
-            <img src="" width="325" id="custom_img" />  
+            <img src="img/logo.png" width="325" id="custom_img" />  
             <div id="custom-pager"></div>
         </div>	
 
@@ -67,8 +67,7 @@
                                     <script>
                                         $(document).ready(function() {
                                             bindItemAdd();
-                                            $('.main_item option:eq(1)').prop('selected', true);
-                                            $('.main_item').change();
+                                           
                                         });</script> 
 
                                 {/if}
@@ -107,12 +106,12 @@
                 {/if}
 
 
-                <div class="row clearfix">
+                <div class="row clearfix"  style="display: none;">
                     <label for="width">Largeur</label>
                     <input type="text" id ="width" name="width" value="" class="text">
                     <span class="info">de {$product.min_width} à {$product.max_width} mm</span>
                 </div>	
-                <div class="row clearfix">
+                <div class="row clearfix"  style="display: none;">
                     <label for="height">longueur</label>
                     <input type="text" id ="height" name="height" value="" class="text">
                     <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
@@ -242,7 +241,7 @@
                         if (value.is_height === 1) {
                             $item_range.addClass("primary_height");
                         }
-                        $item_range.css("width", "100");
+                        $item_range.css("width", "250");
                         $item_input.css("width", "50");
                         $('#list_' + $id_item + '_' + $id_block).append("<div>");
                         $('#list_' + $id_item + '_' + $id_block).append(value.name + ": ");
@@ -287,11 +286,18 @@
             });
             $(".primary_height").change(function() {
 
+
                 A = $("input[side*='A']").val();
                 B = $("input[side*='B']").val();
                 C = $("input[side*='C']").val();
-
-                if ($id_sub_item == 4) {
+                
+                if ($id_sub_item == 2) {
+                    if (parseInt(A) > parseInt(B)) {
+                        $('#height').val(parseInt(A));
+                    } else {
+                        $('#height').val(parseInt(B));
+                    }
+                } else if ($id_sub_item == 4) {
                     $('#height').val(parseInt(A) + parseInt(C));
                 } else if ($id_sub_item == 5) {
                     $('#height').val(parseInt(A) * 2);
