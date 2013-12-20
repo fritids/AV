@@ -81,6 +81,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
         $adresse = getUserOrdersAddress($OrderProduct["id_address_delivery"]);
         $adresseInvoice = getUserOrdersAddress($OrderProduct["id_address_invoice"]);
         $attributes = getOrdersDetailAttribute($OrderProduct["id_order_detail"]);
+        $customs = getOrdersCustomMainItem($OrderProduct["id_order_detail"]);
 
         $p_qty = $OrderProduct["nb_product_delivered"];
 
@@ -108,20 +109,31 @@ if (!empty($date_delivery) && !empty($id_truck)) {
             $tmpRef = $OrderProduct["reference"];
         }
 
-
-
         $pdf_roadmap .= '
             <tr>
             <td colspan = "4"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
-                ($OrderProduct["product_width"] != "" ? ' Largeur (mm) :' . $OrderProduct["product_width"] : '') .
-                ($OrderProduct["product_height"] != "" ? ', Longueur (mm) :' . $OrderProduct["product_height"] : '') . "<br>";
+                ($OrderProduct["product_width"] != "" ? ' Largeur (mm): ' . $OrderProduct["product_width"] : '') .
+                ($OrderProduct["product_height"] != "" ? ', Longueur (mm): ' . $OrderProduct["product_height"] : '') . "<br>";
 
         foreach ($attributes as $attribute) {
-            $pdf_roadmap .= ' -' . $attribute["attribute_name"] . ': ' . $attribute["attribute_value"] . '<br>';
+            $pdf_roadmap .= '- ' . $attribute["attribute_name"] . ': ' . $attribute["attribute_value"] . '<br>';
         }
+        
+        if ($customs) {
+
+            foreach ($customs as $custom) {
+                $pdf_roadmap .= '- ' . $custom["main_item_name"];
+                foreach ($custom["sub_item"] as $sub_item) {
+                    $pdf_roadmap .= '- ' . $sub_item["sub_item_name"] . " : ";
+                    foreach ($sub_item["item_values"] as $item_value) {
+                        $pdf_roadmap .= $item_value["item_value_name"] . " : " . $item_value["custom_value"] . " - ";
+                    }
+                }
+            }
+        }
+
         $pdf_roadmap .= '
             </td>
-
             <td>' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>
             <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
             <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td>
@@ -162,9 +174,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="date_delivery" > Date livraison :
                             <select id="date_delivery" class="pme-input-0" name="date_delivery">
                                 <option value="--"  >--</option>
-    <?
-    foreach ($d as $rec) {
-        ?>
+                                <?
+                                foreach ($d as $rec) {
+                                    ?>
                                     <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
                                     <?
                                 }
@@ -176,9 +188,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="truck" > Camion :
                             <select id="truck" class="pme-input-0" name="id_truck">
                                 <option value="--"  >--</option>
-    <?
-    foreach ($t as $rec) {
-        ?>
+                                <?
+                                foreach ($t as $rec) {
+                                    ?>
                                     <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
                                     <?
                                 }

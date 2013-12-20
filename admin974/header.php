@@ -30,18 +30,18 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
         <link href="css/bootstrap.css" rel="stylesheet">
         <link rel="stylesheet" href="css/dragdrop.css">
         <!-- tinyMCE -->
-        <script language="javascript" type="text/javascript" src="tinymce/tinymce.min.js"></script>
+        <script language="javascript" type="text/javascript" src="tiny_mce/tiny_mce.js"></script>
         <script language="javascript" type="text/javascript">
             tinyMCE.init({
                 mode: "specific_textareas",
                 auto_reset_designmode: true,
-                theme: "modern",
+                theme: "advanced",
                 width: "800",
-                height: "200",
-                plugins: "textcolor,table,autosave, save,emoticons,insertdatetime,preview,searchreplace,image,fullscreen,hr,code",
+                height: "300",
+                plugins: "table,autosave,save,insertdatetime,preview,searchreplace,fullscreen,jbimages",
                 theme_advanced_buttons1_add_before: "save,separator",
                 theme_advanced_buttons1_add: "fontselect,fontsizeselect",
-                theme_advanced_buttons2_add: "separator,insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",
+                theme_advanced_buttons2_add: "insertdate,inserttime,preview,zoom,separator,forecolor,backcolor",
                 theme_advanced_buttons2_add_before: "cut,copy,paste,separator,search,replace,separator",
                 theme_advanced_buttons3_add_before: "tablecontrols,separator",
                 theme_advanced_buttons3_add: "emotions,iespell,flash,advhr,separator,print",
@@ -50,8 +50,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 theme_advanced_path_location: "bottom",
                 plugin_insertdate_dateFormat: "%Y-%m-%d",
                 plugin_insertdate_timeFormat: "%H:%M:%S",
-                extended_valid_elements: "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
-
+                
             });
         </script>
 

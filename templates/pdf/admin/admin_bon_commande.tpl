@@ -67,7 +67,7 @@
             <td>
                 {$detail.product_name}
                 {if $detail.is_product_custom == 1}
-                    forme spécifique voir annexe
+                    <b>forme spécifique voir annexe</b>
                 {/if}
             </td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
