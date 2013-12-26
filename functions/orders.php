@@ -38,6 +38,7 @@ function getOrderInfos($oid) {
             ->get("mv_orders");
 
     foreach ($r as $k => $order) {
+        $r[$k]["invoice"] = getUserOrdersInvoice($order["id_order"]);
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
         $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
@@ -111,6 +112,17 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
         $r[$k]["custom"] = getOrdersCustomMainItem($od["id_order_detail"]);
     }
     return $r;
+}
+
+function getUserOrdersInvoice($oid) {
+    global $db;
+
+    $r = $db->where("id_order", $oid)
+            ->get("av_order_invoice");
+
+    if ($r)
+        return str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
+    return null;
 }
 
 function getUserOrdersDetailHistory($oid) {
@@ -242,6 +254,19 @@ function validateOrder($oid, $orderValidateInfo) {
 
     $r = $db->where("id_order", $oid)
             ->update("av_orders", $order_validate);
+
+    updQuantity($oid);
+}
+
+function createInvoice($oid) {
+    global $db;
+
+    $params = array(
+        "id_order" => $oid,
+        "invoice_date" => date("y-m-d H:i:s")
+    );
+
+    $r = $db->insert("av_order_invoice", $params);
 }
 
 function saveOrder() {
@@ -438,52 +463,26 @@ function splitOrderDetail($odid, $qty_request) {
     return $oid;
 }
 
-/*
-  function setPreparationEncours($oid) {
-  global $db, $mail, $monitoringEmails, $smarty;
+function updQuantity($oid) {
+    global $db;
 
-  $orderinfo = getOrderInfos($oid);
+    $r = $db->where("id_order", $oid)
+            ->get("av_order_detail");
 
-  $order_mail_subject = "Allovitre - votre commande #" . $orderinfo["id_order"] . " est en cours de préparation";
-  $order_mail_from = "livraison@allovitres.com";
-  $order_mail_tpl = "notif_order_preparation";
+    foreach ($r as $item) {
 
-  $new_order_state = 3;
+        $qte_ordered = $item["product_quantity"];
+        $pid = $item["id_product"];
 
-  $r = $db->where("id_order", $oid)
-  ->update("av_orders", array("current_state" => $new_order_state));
+        $p = $db->where("id_product", $pid)
+                ->get("av_product");
 
-  $mail->ClearAllRecipients();
-  $mail->ClearAttachments();
+        $params = array("quantity" => $p[0]["quantity"] - $qte_ordered);
 
-  foreach ($monitoringEmails as $bccer) {
-  $mail->AddbCC($bccer);
-  }
-  $mail->AddAddress($orderinfo["customer"]["email"]);
+        $r = $db->where("stock_tracking", 1)
+                ->where("id_product", $pid)
+                ->update("av_product", $params);
+    }
+}
 
-  $mail->SetFrom($order_mail_from);
-  $mail->Subject = $order_mail_subject;
-  $mail_body = $smarty->fetch($order_mail_tpl . ".tpl");
-
-  $mail->MsgHTML($mail_body);
-
-  if ($mail->Send()) {
-
-  $param = array(
-  "id_order" => $orderinfo["id_order"],
-  "id_user" => $_SESSION["user_id"],
-  "category" => $order_mail_tpl,
-  );
-
-  addLog(array("tabs" => "mv_orders",
-  "rowkey" => $orderinfo["id_order"],
-  "col" => "current_state",
-  "operation" => "update",
-  "oldval" => $orderinfo["current_state"],
-  "newval" => $new_order_state
-  ));
-  $r = $db->insert("av_order_bdc", $param);
-  }
-  }
- */
 ?>

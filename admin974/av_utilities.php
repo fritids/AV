@@ -144,7 +144,7 @@ function getChangeLog($table, $key) {
 
     $r = $db->get("changelog");
 
-    if ($r) {
+    if ($r && isset($key)) {
         echo "<table class='table table-bordered table-condensed'>";
         echo "<tr><th>Opération</th><th>Date</th><th>Utilisateur</th><th>Référence</th><th>Colonne</th><th>Valeur</th></tr>";
         foreach ($r as $k => $v) {

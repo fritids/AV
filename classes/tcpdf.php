@@ -144,7 +144,7 @@ class MYPDF extends TCPDF {
         $this->SetFont('helvetica', 'I', 8);
         // Page number
         //$this->Cell(0, 5, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages() .'', 0, true, 'C', 0, '', 0, false, 'T', 'M');
-        $this->Cell(0, 5, 'ALLOVITRES.COM - Siège social ALLOVITRES BP 30016 13181 Aix-en-Provence France', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        $this->Cell(0, 5, 'ALLOVITRES.COM - Siège social ALLOVITRES BP 30016 13181 Aix-en-Provence France - RCS AIX 752 182 568 - FR 5075 2182 568', 0, false, 'C', 0, '', 0, false, 'T', 'M');
 
     }
 

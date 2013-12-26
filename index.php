@@ -335,6 +335,14 @@ if (isset($_GET["orders-list"])) {
     $breadcrumb = array("parent" => "Accueil", "fils" => "Historique");
     $smarty->assign('orders', $orders);
 }
+if (isset($_GET["order-error"])) {
+    $page = "order-error";
+    $page_type = "full";
+}
+if (isset($_GET["order-confirmation"])) {
+    $page = "order-confirmation";
+    $page_type = "full";
+}
 
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 $smarty->assign('CMCIC_CHECKOUT_FORM', '');
@@ -376,13 +384,15 @@ if (isset($_GET["order-payment"])) {
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $extra_options = 1;
     }
-    
+
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $extra_options = 1;
     }
-    if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"]> 0) {
+    if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"] > 0) {
         $extra_options -= $_SESSION["cart_summary"]["total_discount"];
     }
+
+    $total_paid = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
 
     saveorder();
 
@@ -470,6 +480,42 @@ if (isset($_GET["order-payment"])) {
     </form>';
 
     $smarty->assign('CMCIC_CHECKOUT_FORM', $CMCICCheckoutForm);
+
+
+
+    //Socgen
+    $parm = "merchant_id=075218256800011";
+    $parm = "$parm merchant_country=fr";
+    $parm = "$parm amount=" . $total_paid * 100;
+    $parm = "$parm transaction_id=" . $_SESSION["id_order"];
+    $parm = "$parm order_id=" . $_SESSION["id_order"];
+    $parm = "$parm currency_code=978";
+    $parm = "$parm pathfile=/trusttelecom.fr/paiement/param/pathfile";
+    $path_bin = "/trusttelecom.fr/paiement/bin/request";
+    $parm = escapeshellcmd($parm);
+    $result = exec("$path_bin $parm");
+    $tableau = explode("!", "$result");
+    $code = $tableau[1];
+    $error = $tableau[2];
+    $message = $tableau[3];
+
+
+    if (( $code == "" ) && ( $error == "" )) {
+        $ko_msg = array("txt" => "erreur appel request<BR> executable request non trouve $path_bin");
+    }
+    //	Erreur, affiche le message d'erreur
+    else if ($code != 0) {
+        //$ko_msg = array("txt" => "<h2>Erreur appel API de paiement.</h2><br><br><br> message erreur : $error <br>");
+        if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com") {
+            echo $error . "<br>" . $parm;
+        }
+    }
+    //	OK, affiche le formulaire HTML
+    else {
+        # OK, affichage du mode DEBUG si activé
+        //print (" $error <br>");
+        $smarty->assign('SOCGEN_CHECKOUT_FORM', $message);
+    }
 }
 
 /* new user */
@@ -629,7 +675,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
     //on redirige sur la listes des commandes
     $page = "order-confirmation";
 
-    $smarty->assign('reference', $_SESSION["reference "]);
+    $smarty->assign('reference', $_SESSION["reference"]);
     $smarty->assign('payment', $payment);
 
     //on flush le caddie
@@ -760,7 +806,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
     if (!empty($voucherInfo) && $voucherInfo["code"] == $code) {
         $cart->addOrderVoucher($voucherInfo);
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-        $ko_msg = array();        
+        $ko_msg = array();
     }
 
     if ($code == "VICTOIREPAUC") {

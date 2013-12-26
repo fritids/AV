@@ -108,15 +108,18 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
 
     $filename = "tmp/av_orders_" . $_POST["start_date"] . "-" . $_POST["end_date"] . ".xls";
 
-    $stmt = $db2->prepare("SELECT reference, invoice_date date_commande, lastname nom,firstname prenom,  email, address1, city ville, payment paiement, vat_rate Tva, 
-                        25 frais_de_port_TTC, 
-                        25/(1+vat_rate/100) frais_de_port_HT, 
-                        total_paid/(1+vat_rate/100) - 25/(1+vat_rate/100) total_produit_HT, (total_paid - 25) Total_produit_TTC,
-                        total_paid/(1+vat_rate/100) total_HT, total_paid Total_TTC
-                        FROM  mv_orders a, av_customer b, av_address c
+    $stmt = $db2->prepare("SELECT d.invoice_date date_commande, LPAD(reference, 9, '0') reference, lastname nom, firstname prenom, LPAD(d.id_order_invoice, 9, '0') facture, email, address1, city ville,   
+                        round(25/(1+vat_rate/100),2) frais_de_port_HT,                        
+                        round(total_paid/(1+vat_rate/100), 2) Total_HT,
+                        total_paid Total_TTT,
+                        vat_rate Tva,
+                        payment,
+                        '' compte
+                        FROM  mv_orders a, av_customer b, av_address c, av_order_invoice d
                         WHERE a.id_customer = b.id_customer
                         and a.id_address_invoice = c.id_address
-                        and date(invoice_date) between ? and ?
+                        and a.id_order = d.id_order
+                        and date(d.invoice_date) between ? and ?
                         and current_state not in (1,6,7,8)
                         ");
 
@@ -132,6 +135,25 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
     $excel->addRow($header);
 
     foreach ($r as $record) {
+        $payment = $record["payment"];
+        
+        if($payment == 'Chèque'){
+            $payment_account = "58500000";
+        }elseif ($payment == 'Virement Bancaire'){
+            $payment_account = "58200000";
+        }elseif ($payment == 'Credit card'){
+            $payment_account = "58300000";
+        }elseif ($payment == 'Carte credit'){
+            $payment_account = "58300000";
+        }elseif (strtolower ($payment) == 'paypal'){
+            $payment_account = "58400000";
+        }elseif ($payment == 'Manuel'){
+            $payment_account = "58300000";
+        }else{
+            $payment_account = "585000xx";
+        }  
+        
+        $record["compte"] = $payment_account;
         $excel->addRow($record);
     }
 

@@ -96,10 +96,12 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
                 "date_add" => date("Y-m-d H:i:s"),
             );
 
-
             $db->insert("av_order_payment", $order_payment);
 
             $orderinfo = getOrderInfos($oid);
+
+            updQuantity($oid);
+            createInvoice($oid);
 
             $mail->AddAddress($orderinfo["customer"]["email"]);
             $mail->Subject = $confmail["commande_new"] . " " . $oid;
@@ -158,7 +160,7 @@ if ($oHmac->computeHmac($cgi2_fields) == strtolower($CMCIC_bruteVars['MAC']) || 
                 );
                 $r = $db->insert("av_order_bdc", $param);
             }
-            
+
             // on retire 1 à nombre coupon utilisable
             if ($orderinfo["order_voucher"] != "") {
                 $code = $orderinfo["order_voucher"];

@@ -160,7 +160,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                 $r = $db->where("id_order_detail", $id)
                         ->update("av_order_detail", array("product_current_state" => $state));
                 //casse ou SAV
-                if ($state == 21 || $state == 22 || $state ==23) {
+                if ($state == 21 || $state == 22 || $state == 23) {
                     $r = $db->where("id_order_detail", $id)
                             ->delete("av_tournee");
 
@@ -338,6 +338,10 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
 
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("current_state" => $new_state));
+
+    if ($new_state == PAIEMENT_ACCEPTE) {
+        createInvoice($oid);
+    }
 
     addLog(array("tabs" => "mv_orders",
         "rowkey" => $orderinfo["id_order"],
@@ -688,6 +692,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                 <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
                     Référence :  <?= $orderinfo["reference"] ?><br>
+                    Facture :  <?= $orderinfo["invoice"] ?><br>
                     Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
                     Suivi SMS :  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
                     Total :  <?= $orderinfo["total_paid"] ?>€<br>
