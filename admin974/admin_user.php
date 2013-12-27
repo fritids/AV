@@ -22,73 +22,76 @@ $opts['inc'] = 15;
 // Options you wish to give the users
 // A - add,  C - change, P - copy, V - view, D - delete,
 // F - filter, I - initial sort suppressed
-
-
 // Number of lines to display on multiple selection filters
 $opts['multiple'] = '4';
 
 
 /* Get the user's default language and use it if possible or you can
-   specify particular one you want to use. Refer to official documentation
-   for list of available languages. */
+  specify particular one you want to use. Refer to official documentation
+  for list of available languages. */
 $opts['language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'] . '-UTF8';
 
 
 $opts['fdd']['id_admin'] = array(
-  'name'     => 'ID admin',
-  'select'   => 'T',
-  'options'  => 'AVCPDR', // auto increment
-  'maxlen'   => 11,
-  'default'  => '0',
-  'sort'     => true
+    'name' => 'ID admin',
+    'select' => 'T',
+    'options' => 'AVCPDR', // auto increment
+    'maxlen' => 11,
+    'default' => '0',
+    'sort' => true
 );
-$opts['fdd']['date'] = array(
-  'name'     => 'Date',
-  'select'   => 'T',
-  'maxlen'   => 19,
-  'sort'     => true
-);
+
 $opts['fdd']['email'] = array(
-  'name'     => 'Email',
-  'select'   => 'T',
-  'maxlen'   => 320,
-  'sort'     => true
+    'name' => 'Email',
+    'select' => 'T',
+    'maxlen' => 320,
+    'sort' => true
 );
 $opts['fdd']['mdp'] = array(
-  'name'     => 'Mdp',
-  'select'   => 'T',
-  'maxlen'   => 32,
-  'sort'     => true
+    'name' => 'Mdp',
+    'select' => 'T',
+    'maxlen' => 32,
+    'sort' => true
 );
 $opts['fdd']['nom'] = array(
-  'name'     => 'Nom',
-  'select'   => 'T',
-  'maxlen'   => 100,
-  'sort'     => true
+    'name' => 'Nom',
+    'select' => 'T',
+    'maxlen' => 100,
+    'sort' => true
 );
 $opts['fdd']['prenom'] = array(
-  'name'     => 'Prenom',
-  'select'   => 'T',
-  'maxlen'   => 100,
-  'sort'     => true
+    'name' => 'Prenom',
+    'select' => 'T',
+    'maxlen' => 100,
+    'sort' => true
 );
 $opts['fdd']['role'] = array(
-  'name'     => 'Roles',
-  'select'   => 'T',
-  'maxlen'   => 100,
-  'sort'     => true,
-  'values' => array("ADMIN","COMMANDE","LIVRAISON", "LOGISTIC")
+    'name' => 'Roles',
+    'select' => 'T',
+    'maxlen' => 100,
+    'sort' => true,
+    'values' => array("ADMIN", "COMMANDE", "LIVRAISON", "LOGISTIC")
 );
 
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les utilisateurs</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>Gestionnaire utilisateurs</h1>
+    </div>
+    <div>
+        <?
+        new phpMyEdit($opts);
+        ?>
+    </div>
+</div>
 <?
-new phpMyEdit($opts);
+if (isset($_GET["PME_sys_rec"]))
+    $id = $_GET["PME_sys_rec"];
+if (isset($_POST["PME_sys_rec"]))
+    $id = $_POST["PME_sys_rec"];
 
-?>
-<?
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+getChangeLog($opts['tb'], $id);
 ?>

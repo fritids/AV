@@ -1,5 +1,4 @@
 <?php
-
 include ("header.php");
 
 // MySQL host name, user name, password, database, and table
@@ -32,10 +31,26 @@ $opts['fdd']['id_product'] = array(
     'default' => '0',
     'sort' => true
 );
+
+$opts['fdd']['name'] = array(
+    'name' => 'Nom',
+    'select' => 'T',
+    'maxlen' => 150,
+    'size' => 60,
+    'sort' => true,
+    'URL' => 'av_product_attribute.php?p=$key'
+);
+$opts['fdd']['reference'] = array(
+    'name' => 'Ref.',
+    'select' => 'T',
+    'maxlen' => 32,
+    'sort' => true
+);
 $opts['fdd']['id_category'] = array(
     'name' => 'Catégorie',
     'select' => 'T',
     'maxlen' => 10,
+    'size' => 20,
     'values' => array(
         'table' => 'av_category',
         'column' => 'id_category',
@@ -58,23 +73,12 @@ $opts['fdd']['price'] = array(
     'sort' => true
 );
 
-$opts['fdd']['reference'] = array(
-    'name' => 'Ref.',
-    'select' => 'T',
-    'maxlen' => 32,
-    'sort' => true
-);
 
-$opts['fdd']['name'] = array(
-    'name' => 'Nom',
-    'select' => 'T',
-    'maxlen' => 150,
-    'sort' => true,
-    'URL' => 'av_product_attribute.php?p=$key'
-);
+
 $opts['fdd']['msg_dispo'] = array(
     'name' => 'msg dispo.',
-    'select' => 'T',
+    'options' => 'AC',
+    'select' => 'D',
     'maxlen' => 255,
     'sort' => true,
 );
@@ -94,7 +98,7 @@ $opts['fdd']['description'] = array(
 $opts['fdd']['description_short'] = array(
     'name' => 'Description courte',
     'select' => 'T',
-    'maxlen' => 65535,   
+    'maxlen' => 65535,
     'options' => 'AC',
     'textarea' => array(
         'html' => true,
@@ -120,66 +124,73 @@ $opts['fdd']['min_width'] = array(
 );
 $opts['fdd']['min_height'] = array(
     'name' => 'Hauteur Min.',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_width'] = array(
     'name' => 'Largeur Max',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_height'] = array(
     'name' => 'Hauteur Max',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['min_area_invoiced'] = array(
     'name' => 'Surface Min. facturé',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['max_area_invoiced'] = array(
     'name' => 'Surface Max. facturé',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['position'] = array(
     'name' => 'Position',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
     'sort' => true
 );
 $opts['fdd']['meta_title'] = array(
     'name' => 'Meta Titre',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 128,
     'sort' => true
 );
 $opts['fdd']['meta_description'] = array(
     'name' => 'meta description',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 255,
     'sort' => true
 );
 $opts['fdd']['meta_keywords'] = array(
     'name' => 'Meta mots clés',
-    'options' =>'AC',
+    'options' => 'AC',
     'select' => 'T',
     'maxlen' => 255,
     'sort' => true
+);
+$opts['fdd']['stock_tracking'] = array(
+    'name' => 'Gestion du stock',
+    'select' => 'D',
+    'maxlen' => 255,
+    'sort' => true,
+    'values2' => array(0 => "Non", 1 => "Oui")
 );
 
 
@@ -187,12 +198,21 @@ $opts['fdd']['meta_keywords'] = array(
 //require_once 'phpMyEdit.class.php';
 require_once 'extensions/phpMyEdit-mce-cal.class.php';
 ?>
-<h1>Les produits</h1>
+<div class="container">
+    <div class="page-header">
+        <h1>Les produits</h1>
+    </div>
+    <div>
+        <?
+        new phpMyEdit_mce_cal($opts);
+        ?>
+    </div>
+</div>
 <?
-new phpMyEdit_mce_cal($opts);
-?>
+if (isset($_GET["PME_sys_rec"]))
+    $id = $_GET["PME_sys_rec"];
+if (isset($_POST["PME_sys_rec"]))
+    $id = $_POST["PME_sys_rec"];
 
-<?
-
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
+getChangeLog($opts['tb'], $id);
 ?>

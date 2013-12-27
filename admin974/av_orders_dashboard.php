@@ -185,13 +185,13 @@ $orderStates = $db->where("id_level", 0)
         foreach ($r as $row) {
             ?>
             <tr>
-                <td class="text-center"><a href="av_orders_view.php?id_order=<?= $row["id_order"] ?>" target="_blank" ><?= $row["reference"] ?></a></td>
-                <td class="text-center"><?= strftime("%a %d %b %y %T", strtotime($row["invoice_date"])) ?></td>
-                <td class="text-center"><a href="av_customer_view.php?id_customer=<?= $row["id_customer"] ?>" ><?= $row["lastname"] . " " . $row["firstname"] ?></a></td>
-                <td class="text-center"><?= $row["address1"] . " <br> " . $row["address2"] . " <br> " . $row["postcode"] . " " . $row["city"] ?></td>
-                <td class="text-center alert-<?= $row["current_state"] ?>"><?= $row["state_label"] ?></td>
-                <td class="text-center"><?= number_format($row["total_paid"], 2, ".", " ") ?> €</td>
-                <td class="text-center"><?= getJours($row["invoice_date"], date("Y-m-d")) ?> j</td>
+                <td style="vertical-align: middle;" class="text-center"><a href="av_orders_view.php?id_order=<?= $row["id_order"] ?>" target="_blank" ><?= $row["reference"] ?></a></td>
+                <td style="vertical-align: middle;" class="text-center"><?= strftime("%a %d %b %y %T", strtotime($row["invoice_date"])) ?></td>
+                <td style="vertical-align: middle;" class="text-center"><a href="av_customer_view.php?id_customer=<?= $row["id_customer"] ?>" ><?= $row["lastname"] . " " . $row["firstname"] ?></a></td>
+                <td style="vertical-align: middle;" class="text-center"><?= $row["address1"] . " <br> " . $row["address2"] . " <br> " . $row["postcode"] . " " . $row["city"] ?></td>
+                <td style="vertical-align: middle;" class="text-center alert-<?= $row["current_state"] ?>"><?= $row["state_label"] ?></td>
+                <td style="vertical-align: middle;" class="text-center"><?= number_format($row["total_paid"], 2, ".", " ") ?> €</td>
+                <td style="vertical-align: middle;" class="text-center"><?= getJours(strftime("%y-%m-%d", strtotime($row["invoice_date"])), date("Y-m-d")) ?> j</td>
                 <td style="vertical-align: middle;" class="text-center alert-<?= $row["COMMANDE_INFO"] ?>">
                     <?
                     switch ($row["COMMANDE_INFO"]) {
