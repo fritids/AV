@@ -110,8 +110,8 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
 
     $stmt = $db2->prepare("SELECT d.invoice_date date_commande, LPAD(reference, 9, '0') reference, lastname nom, firstname prenom, LPAD(d.id_order_invoice, 9, '0') facture, email, address1, city ville,   
                         round(25/(1+vat_rate/100),2) frais_de_port_HT,                        
-                        round(total_paid/(1+vat_rate/100), 2) Total_HT,
-                        total_paid Total_TTT,
+                        round((total_paid-25)/(1+vat_rate/100), 2) Total_HT,
+                        total_paid Total_TTC,
                         vat_rate Tva,
                         payment,
                         '' compte

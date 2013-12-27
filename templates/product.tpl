@@ -76,10 +76,15 @@
                     </div>   
                     <div class="row clearfix">
                         <input type="button" value="Calculer" id="calculer" class="submit">	
+
+                    </div>
+                    <div class="row clearfix">
+                    </div>
+                    <div class="row clearfix">
                         {if isset($product.specific_combinations) && count($product.specific_combinations) > 0}
-                            <a href="/?product_custom&id={$product.id_product}">Formes spécifiques</a>
+                            <a href="/?product_custom&id={$product.id_product}" class="submit">Formes spécifiques</a>
                         {/if}
-                    </div>	
+                    </div>
                 {/if}
 
 

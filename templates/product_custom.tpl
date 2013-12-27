@@ -2,7 +2,7 @@
     <div id="texte"></div>
     <div id="features">
         <div class="images">
-            <img src="img/logo.png" width="325" id="custom_img" />  
+            <img src="/img/p/{$product.cover.filename}" width="325" id="custom_img" />
             <div id="custom-pager"></div>
         </div>	
 
@@ -67,7 +67,7 @@
                                     <script>
                                         $(document).ready(function() {
                                             bindItemAdd();
-                                           
+
                                         });</script> 
 
                                 {/if}
@@ -224,6 +224,16 @@
                             myid: key,
                             value: value.min_width
                         });
+
+                        if (value.is_width === 1 && value.max_width > max_width) {
+                            item_max_width = max_width;
+                        }else if (value.is_height === 1 && value.max_width > max_height) {
+                            item_max_width = max_height;
+                        }else{
+                            item_max_width = value.max_width;
+                        }
+                            
+
                         $item_range = $('<input />').attr({
                             type: 'range',
                             id: 'range_' + key,
@@ -232,7 +242,7 @@
                             name: 'custom[' + result.id_attribute + '][' + result.id_attributes_items + '][' + key + ']',
                             value: value.min_width,
                             min: value.min_width,
-                            max: value.max_width,
+                            max: item_max_width,
                             class: 'range_input'
                         });
                         if (value.is_width === 1) {
@@ -256,6 +266,7 @@
                             if ($(this).val() > $(this).attr("max")) {
                                 $(this).val($(this).attr("max"));
                             }
+
                             $("#range_" + $(this).attr("myid")).val($(this).val());
                             $(".range_input").change();
                         });
@@ -290,7 +301,7 @@
                 A = $("input[side*='A']").val();
                 B = $("input[side*='B']").val();
                 C = $("input[side*='C']").val();
-                
+
                 if ($id_sub_item == 2) {
                     if (parseInt(A) > parseInt(B)) {
                         $('#height').val(parseInt(A));
@@ -315,6 +326,7 @@
             $('.attribute').change();
             $(".primary_width").change();
             $(".primary_height").change();
+            $(".min_area_invoiced").text(min_area_invoiced);
         });
     }
 
@@ -324,9 +336,10 @@
         pheight = $('#height').val();
         coef = 1;
         if (pheight > 0 && pwidth > 0 && qte > 0) {
+            area_invoiced = (pwidth * pheight) / 1000000;
             area = (pwidth * pheight) / 1000000;
             if (area < min_area_invoiced) {
-                area = min_area_invoiced;
+                area_invoiced = min_area_invoiced;
             }
             if (area >= max_area_invoiced) {
                 coef = 1.5;
@@ -338,9 +351,9 @@
              console.log(area * unit_price * qte * shape_coef);
              console.log(unit_price);*/
             $('#surface').text(area.toFixed(2));
-            $('#total_poids').text((area * unit_weight * qte).toFixed(2));
-            $('#total_price').text((area * unit_price * qte * coef).toFixed(2));
-            $('#price').val((area * unit_price * qte * coef).toFixed(2));
+            $('#total_poids').text((area_invoiced * unit_weight * qte).toFixed(2));
+            $('#total_price').text((area_invoiced * unit_price * qte * coef).toFixed(2));
+            $('#price').val((area_invoiced * unit_price * qte * coef).toFixed(2));
         }
     }
 

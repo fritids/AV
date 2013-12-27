@@ -191,7 +191,7 @@ if (isset($_POST["devis_save"])) {
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
 
-                    $p_unit_price = $p["price"] ;
+                    $p_unit_price = $p["price"];
                     $p_unit_weight = $p["weight"];
 
                     $product_amount = $p["price"] * $p_qte[$k] * round($p_width[$k] * $p_height[$k] / 1000000, 2);
@@ -201,7 +201,7 @@ if (isset($_POST["devis_save"])) {
                         "id_product" => $product,
                         "product_name" => $p["name"],
                         "product_quantity" => $p_qte[$k],
-                        "product_price" => $p_unit_price ,
+                        "product_price" => $p_unit_price,
                         "product_width" => $p_width[$k],
                         "product_height" => $p_height[$k],
                         "product_weight" => $p_width[$k] * $p_height[$k] / 1000000 * $p_unit_weight * $p_qte[$k],
@@ -330,7 +330,7 @@ if (isset($_POST["devis_save"])) {
     var c = 0;
     $(function() {
         $table = $('#tab_devis2');
-        $table_exo = $('#tab_exotique');
+        $table_exo = $('#tab_exotique2');
 
         var $existRow = $table.find('tr').eq(1);
         /* bind to existing elements on page load*/
@@ -402,7 +402,7 @@ if (isset($_POST["devis_save"])) {
     }
 
     function addExoRow() {
-        var $row = $table_exo.find('tr:last').clone();
+        var $row = $table_exo.find('#template_exo').clone();
         var $input = $row.find('input').val("");
         $row.attr('id', 'id' + (++c));
 
@@ -414,7 +414,7 @@ if (isset($_POST["devis_save"])) {
         $row.find('.unit_weight').removeAttr('readonly');
 
 
-        $table_exo.append($row);
+        $("#tab_exotique").append($row);
 
         bindAutoComplete($row);
 
@@ -798,8 +798,8 @@ if (isset($_POST["devis_save"])) {
 
 <div class="container">
     <div class="row">          
-        <ul class=" col-xs-6 alert alert-success">
-            <li class="list-unstyled" style="text-decoration: line-through;">NE PLUS UTILISER DEVIS POUR PRODUIT NORMAUX, Refonte du module avec les nouveautées</li>
+        <ul class=" col-xs-6 alert alert-info">
+            <li class="list-unstyled">Le poids sur les produits exotiques est obligatoire</li>
         </ul>
     </div>
     <div class="row">
@@ -881,7 +881,6 @@ if (isset($_POST["devis_save"])) {
             <div class="col-md-12">
                 <h2>Produits</h2>
 
-
                 <table id="tab_devis2" style="display: none ">
                     <tr id="template2" >
 
@@ -946,7 +945,17 @@ if (isset($_POST["devis_save"])) {
 
                     <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
                     </tr>
+                </table>
 
+                <table id="tab_exotique2" style="display: none">
+                    <tr id="template_exo">
+                        <td><input type="text" name="exo_product_name[]" class="product_name col-xs-12"></td>
+                        <td><input type="text" name="exo_product_unit_price[]" class="unit_price" size="5" /> €</td>
+                        <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" required=""/> Kg</td>
+                        <td><input type="text" name="exo_product_quantity[]" class="product_quantity" size="2" /></td>                    
+                        <td><span class="poids"></span> Kg</td>  
+                        <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
+                    </tr>
                 </table>
 
 
@@ -987,27 +996,20 @@ if (isset($_POST["devis_save"])) {
                                     <th>Quantity</th>
                                     <th>Poids</th>                        
                                     <th>Prix TTC</th>
-                                    <th>Actions</th>
                                 </tr>
-                                <tr id="id0">
-                                    <td><input type="text" name="exo_product_name[]" class="product_name col-xs-12"></td>
-                                    <td><input type="text" name="exo_product_unit_price[]" class="unit_price" size="5" /> €</td>
-                                    <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" /> Kg</td>
-                                    <td><input type="text" name="exo_product_quantity[]" class="product_quantity" size="2" /></td>                    
-                                    <td><span class="poids"></span> Kg</td>  
-                                    <td><input type="text" class="prixttc" size="5" readonly="readonly"> €</td>
-                                    <td id="btn_action">
+                                <tr>
+                                    <td>
                                         <button type="button" id="newlines" onclick="javascript:addExoRow();"><span class="glyphicon glyphicon-plus"></span></button>
-                                        <? /* <button type="button" class="delline"><span class="glyphicon glyphicon-remove"></span></button> */ ?>
                                     </td>
                                 </tr>
+
                             </table>
                         </div>                       
                     </div>
-                    <div class="col-xs-6 pull-left">
-                        <textarea name="devis_comment"></textarea>
+                    <div class="col-xs-7 pull-left">
+                        <textarea name="devis_comment" cols="40"></textarea>
                     </div>
-                    <div class=" col-xs-6 pull-right">    
+                    <div class=" col-xs-5 pull-right">    
                         <div class="alert alert-info"> 
                             Les majorations de prix unitaires lorsque la surface < 0.35m² ou > 3.5m² ne sont pas prises en compte dans le montant calculé.
                         </div>

@@ -149,10 +149,11 @@ if ($verified) {
 
         mail($monitoringEmail, 'Valid IPN ' . $txn_id . " " . $_POST['invoice'], $listener->getTextReport());
 
+        createInvoice($oid);
+        
         $orderinfo = getOrderInfos($oid);
         
-        updQuantity($oid);
-        createInvoice($oid);
+        updQuantity($oid);        
 
         $mail->AddAddress($orderinfo["customer"]["email"]);
         $mail->Subject = $confmail["commande_new"] . " " . $oid;

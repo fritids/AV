@@ -178,10 +178,12 @@ if (( $code == "" ) && ( $error == "" )) {
 
         $db->insert("av_order_payment", $order_payment);
 
+        createInvoice($oid);
+        
         $orderinfo = getOrderInfos($oid);
 
         updQuantity($oid);
-        createInvoice($oid);
+        
 
         $mail->AddAddress($orderinfo["customer"]["email"]);
         $mail->Subject = $confmail["commande_new"] . " " . $oid;
