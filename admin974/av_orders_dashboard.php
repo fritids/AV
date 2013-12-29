@@ -11,6 +11,7 @@ $arc = 0;
 $recu = 0;
 $comm = 0;
 $liv = 0;
+$livree = 0;
 $reference = '';
 $invoice_stda_date = '1900-01-01';
 $invoice_enda_date = '2050-01-01';
@@ -22,8 +23,10 @@ if (isset($_POST["status_recu"]))
     $recu = $_POST["status_recu"];
 if (isset($_POST["status_comm"]))
     $comm = $_POST["status_comm"];
-if (isset($_POST["status_liv"]))
-    $liv = $_POST["status_liv"];
+if (isset($_POST["status_liv_prog"]))
+    $liv = $_POST["status_liv_prog"];
+if (isset($_POST["status_livree"]))
+    $livree = $_POST["status_livree"];
 if (isset($_POST["reference"]))
     $reference = $_POST["reference"];
 if (isset($_POST["current_state"]))
@@ -33,22 +36,24 @@ if (isset($_POST["invoice_stda_date"]) && $_POST["invoice_stda_date"] != '')
 if (isset($_POST["invoice_enda_date"]) && $_POST["invoice_enda_date"] != '')
     $invoice_enda_date = $_POST["invoice_enda_date"];
 
-$params = array($arc, $arc, $recu, $recu, $comm, $comm, $liv, $liv, $reference, '%' . $reference . '%', $current_state, $current_state, $invoice_stda_date, $invoice_stda_date, $invoice_enda_date);
+$params = array($arc, $arc, $recu, $recu, $comm, $comm, $liv, $liv, $livree, $livree, $reference, '%' . $reference . '%', $current_state, $current_state, $invoice_stda_date, $invoice_stda_date, $invoice_enda_date);
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $r = $db->rawQuery("select a.* , b.lastname, b.firstname, c.*
             from mv_orders a, av_customer b, av_address c 
             where a.id_customer = b.id_customer
             and a.id_address_delivery = c.id_address
+            and current_state not in (6)
             and (ARC_INFO > 0 or RECU_INFO > 0 or COMMANDE_INFO > 0 or LIV_INFO > 0)
             and (? = 0 or ARC_INFO = ? )
             and (? = 0 or RECU_INFO = ? )
             and (? = 0 or COMMANDE_INFO = ?)
             and (? = 0 or LIV_INFO = ?)
+            and (? = 0 or LIV_GLOBAL_INFO = ?)
             and (ifnull(?,0) = 0 or reference like ?)
             and (? = 0 or current_state = ?)
             and (ifnull(?,0) = 0 or date(a.invoice_date) between ? and ?)
-            and id_order not in (select id_order from mv_orders where (ARC_INFO = 5 and RECU_INFO = 5 and COMMANDE_INFO = 5 and LIV_INFO = 5))", $params);
+            and id_order not in (select id_order from mv_orders where (ARC_INFO = 5 and RECU_INFO = 5 and COMMANDE_INFO = 5 and LIV_INFO = 5 and LIV_GLOBAL_INFO = 5))", $params);
 
 $orderStates = $db->where("id_level", 0)
         ->get("av_order_status");
@@ -61,11 +66,9 @@ $orderStates = $db->where("id_level", 0)
 
     <div class="row">
         <form method="post">
-
             <div class="col-xs-10">
-
                 <div class="col-xs-6">
-                    <table class="table table-bordered">
+                    <table class="table table-condensed table-bordered">
                         <tr>
                             <td>Date commande</td>
                             <td> 
@@ -111,7 +114,7 @@ $orderStates = $db->where("id_level", 0)
                     </table>
                 </div>
                 <div class="col-xs-6">
-                    <table class="table table-bordered">
+                    <table class="table table-condensed table-bordered">
                         <tr>
                             <td>#</td>
                             <td class="text-center"><span class="glyphicon glyphicon-refresh"></span></td>
@@ -120,7 +123,7 @@ $orderStates = $db->where("id_level", 0)
                             <td class="text-center alert-8"><span class="glyphicon glyphicon-exclamation-sign"></span></td>
                         </tr>
                         <tr>
-                            <th>COMM</th>
+                            <th>COMMANDE FOURNISSEUR</th>
                             <td class="text-center"><input type="radio" name="status_comm" value="0" <?= (@$_POST["status_comm"] == 0) ? "checked" : "" ?>></td>
                             <td class="text-center"><input type="radio" name="status_comm" value="5" <?= (@$_POST["status_comm"] == 5) ? "checked" : "" ?>></td>
                             <td class="text-center"><input type="radio" name="status_comm" value="6" <?= (@$_POST["status_comm"] == 6) ? "checked" : "" ?>></td>
@@ -141,17 +144,21 @@ $orderStates = $db->where("id_level", 0)
                             <td class="text-center"><input type="radio" name="status_recu" value="8" <?= (@$_POST["status_recu"] == 8) ? "checked" : "" ?>></td>
                         </tr>
                         <tr>
-                            <th>LIV</th>
-                            <td class="text-center"><input type="radio" name="status_liv" value="0" <?= (@$_POST["status_liv"] == 0) ? "checked" : "" ?>></td>
-                            <td class="text-center"><input type="radio" name="status_liv" value="5" <?= (@$_POST["status_liv"] == 5) ? "checked" : "" ?>></td>
-                            <td class="text-center"><input type="radio" name="status_liv" value="6" <?= (@$_POST["status_liv"] == 6) ? "checked" : "" ?>></td>
-                            <td class="text-center"><input type="radio" name="status_liv" value="8" <?= (@$_POST["status_liv"] == 8) ? "checked" : "" ?>></td>
+                            <th>LIV. PROGRAMMEE</th>
+                            <td class="text-center"><input type="radio" name="status_liv_prog" value="0" <?= (@$_POST["status_liv_prog"] == 0) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_liv_prog" value="5" <?= (@$_POST["status_liv_prog"] == 5) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_liv_prog" value="6" <?= (@$_POST["status_liv_prog"] == 6) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_liv_prog" value="8" <?= (@$_POST["status_liv_prog"] == 8) ? "checked" : "" ?>></td>
+                        </tr>
+                        <tr>
+                            <th>LIVREE</th>
+                            <td class="text-center"><input type="radio" name="status_livree" value="0" <?= (@$_POST["status_livree"] == 0) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_livree" value="5" <?= (@$_POST["status_livree"] == 5) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_livree" value="6" <?= (@$_POST["status_livree"] == 6) ? "checked" : "" ?>></td>
+                            <td class="text-center"><input type="radio" name="status_livree" value="8" <?= (@$_POST["status_livree"] == 8) ? "checked" : "" ?>></td>
                         </tr>
                     </table>
                 </div>
-
-
-
             </div>
             <div class="col-xs-10">
                 <input type="submit" value="Filtrer" class="btn btn-primary btn-block ">
@@ -179,7 +186,8 @@ $orderStates = $db->where("id_level", 0)
             <th class="text-center" style="width:70px">COMM</th>
             <th class="text-center" style="width:70px">ARC</th>            
             <th class="text-center" style="width:70px">RECU</th>        
-            <th class="text-center" style="width:70px">LIV PROG.</th>        
+            <th class="text-center" style="width:70px">LIV. PROG.</th>        
+            <th class="text-center" style="width:70px">LIVREE</th>        
         </tr>
         <?
         foreach ($r as $row) {
@@ -256,7 +264,22 @@ $orderStates = $db->where("id_level", 0)
                     }
                     ?>                        
                 </td>
-
+                <td style="vertical-align: middle;" class="text-center alert-<?= $row["LIV_GLOBAL_INFO"] ?>">
+                    <?
+                    switch ($row["LIV_GLOBAL_INFO"]) {
+                        case 5:
+                            echo '<span class="glyphicon glyphicon-ok"></span>';
+                            break;
+                        case 6:
+                            echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                            break;
+                        case 8:
+                            echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                            break;
+                        default :
+                    }
+                    ?>                        
+                </td>
             </tr>
             <?
         }

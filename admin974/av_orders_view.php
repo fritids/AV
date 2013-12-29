@@ -15,6 +15,7 @@ require('../classes/sms.inc.php');
 define("COMMANDE_FOURNISSEUR", 16);
 define("PREPARATION_EN_COURS", 3);
 define("PAIEMENT_ACCEPTE", 2);
+define("LIVREE", 5);
 
 //SMS
 
@@ -225,6 +226,15 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
 //suite aux update on recharge les infos    
     $orderinfo = getOrderInfos($oid);
+}
+
+if ($orderinfo["LIV_GLOBAL_INFO"] == 5) {
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", array("current_state" => LIVREE));
+    if ($r) {
+        @$updated["text"] .= "La commande a été passé en statut LIVREE.<br>";
+        $orderinfo = getOrderInfos($oid);
+    }
 }
 
 
@@ -538,7 +548,8 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                     <th class="text-center" style="width: 50px">COMM.</th>
                     <th class="text-center" style="width: 50px">ARC</th>
                     <th class="text-center" style="width: 50px">RECU</th>
-                    <th class="text-center" style="width: 50px">LIV PROG</th>
+                    <th class="text-center" style="width: 50px">LIV. PROG</th>
+                    <th class="text-center" style="width: 50px">LIVREE</th>
                 </tr>
                 <tr>
                     <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
@@ -592,6 +603,22 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                     <td class="text-center alert-<?= $orderinfo["LIV_INFO"] ?>">
                         <?
                         switch ($orderinfo["LIV_INFO"]) {
+                            case 5:
+                                echo '<span class="glyphicon glyphicon-ok"></span>';
+                                break;
+                            case 6:
+                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                break;
+                            case 8:
+                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                break;
+                            default :
+                        }
+                        ?>                        
+                    </td>                   
+                    <td class="text-center alert-<?= $orderinfo["LIV_GLOBAL_INFO"] ?>">
+                        <?
+                        switch ($orderinfo["LIV_GLOBAL_INFO"]) {
                             case 5:
                                 echo '<span class="glyphicon glyphicon-ok"></span>';
                                 break;

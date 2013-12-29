@@ -40,6 +40,7 @@
             <ul>
                 <li>BO - Livraison - le retrait d'un produit du camion passe la commande en "préparation en cours" (bug du 27/12)</li>
                 <li>BO - Fournisseur - le système ne renverra pas une commande fournisseur si le produit est déjà en "commande fournisseur" (bug du 27/12)</li>
+                <li>BO - Commande - le système affectera "Livré" si tous les produits sont considérés "Livré" (demande 27/12)</li>
             </ul>
             <li>26 déc 2013</li>
             <ul>
