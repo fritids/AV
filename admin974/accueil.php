@@ -36,6 +36,11 @@
     <div class="col-xs-5">
         <h3>Les nouveautés: </h3>
         <ul class="list-unstyled">
+            <li>29 déc 2013</li>
+            <ul>
+                <li>BO - Livraison - le retrait d'un produit du camion passe la commande en "préparation en cours" (bug du 27/12)</li>
+                <li>BO - Fournisseur - le système ne renverra pas une commande fournisseur si le produit est déjà en "commande fournisseur" (bug du 27/12)</li>
+            </ul>
             <li>26 déc 2013</li>
             <ul>
                 <li>BO - Stats & reporting : modification export XLS</li>

@@ -32,12 +32,19 @@ function addtruckTournee($id) {
 
 function delProduitTournee($id) {
     global $db;
+    $r = $db->where("id_order_detail", $id)
+            ->get("av_order_detail");
+
+    $oid = $r[0]["id_order"];
 
     $r = $db->where("id_order_detail", $id)
             ->delete("av_tournee");
 
     $r = $db->where("id_order_detail", $id)
             ->update("av_order_detail", array("product_current_state" => 18));
+
+    $r = $db->where("id_order", $oid)
+            ->update("av_orders", array("current_state" => 3));
 
     if ($r)
         return(json_encode($id . "ok"));

@@ -104,7 +104,7 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
                         LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
                         LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
                         where id_order = ? 
-                        and (IFNULL(?,0) = 0 OR a.id_supplier = ?)
+                        and (IFNULL(?,0) = 0 OR (a.id_supplier = ? and product_current_state not in (16)))
                         ", $params);
 
     foreach ($r as $k => $od) {
@@ -158,7 +158,7 @@ function getOrdersDetailSupplier($oid) {
     $r = $db->rawQuery("SELECT distinct a.id_supplier, b.name, b.email
                         FROM av_order_detail a, av_supplier b 
                         where a.id_supplier = b.id_supplier 
-                        and id_order = ?                         
+                        and id_order = ?    
                         ", $params);
 
     return $r;

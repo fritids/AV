@@ -48,7 +48,7 @@ $opts['fdd']['reference'] = array(
 );
 $opts['fdd']['id_category'] = array(
     'name' => 'Catégorie',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 10,
     'size' => 20,
     'values' => array(

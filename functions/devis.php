@@ -109,6 +109,8 @@ function CreateOrder($did) {
 
     $r = $db->where("id_devis", $did)
             ->update("av_devis", array("current_state" => 4, "id_order" => $oid));
+    
+    createInvoice($oid);
 
     if ($r)
         echo "<div class='alert alert-success'>La commande " . $oid . " a été créée</div>";
