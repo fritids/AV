@@ -3,17 +3,11 @@
     <div class="texte_paiement">
 
     </div>
-
     <div class="type_paiement">
-        <div class="logo_pay"><img src="/img/carte.png" alt="Paiement par carte" /></div>
-        <div class="choix_pay">
-            {$CMCIC_CHECKOUT_FORM}
-        </div>
+        {$SOCGEN_CHECKOUT_FORM}<br><br>
         <div class="clear"></div>
     </div>
-    {if $smarty.session.user.email == 'stephane.alamichel@gmail.com'}
-       {$SOCGEN_CHECKOUT_FORM}<br><br>
-    {/if}
+    
     <div class="type_paiement">
         <div class="logo_pay"><img src="/img/paypal.png" alt="Paiement par Paypal" /></div>
         <div class="choix_pay">{$PAYPAL_CHECKOUT_FORM}</div>

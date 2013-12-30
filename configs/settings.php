@@ -27,8 +27,8 @@ $conf_shipping_amount = 25;
 
 $paypal["email_account"] = "contact@moka-web.net";
 
-$paypal["returnurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementok";
-$paypal["cancelurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?paiementko";
+$paypal["returnurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?order-confirmation";
+$paypal["cancelurl"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?order-error";
 $paypal["returnipn"] = "http://" . $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/modules/paypal/validationipn.php";
 
 

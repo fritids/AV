@@ -58,11 +58,14 @@
                                     {$tot_produit_ttc = $tot_produit_ttc + $detail.total_price_tax_incl}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
-                                            {$detail.product_name}<br>
+                                            {$detail.product_name}<br>                                            
                                             {if $detail.attributes}
                                                 {foreach key=key item=attribute from=$detail.attributes}
                                                     {$attribute.attribute_name}: {$attribute.attribute_value} <br>
                                                 {/foreach}
+                                            {/if}
+                                            {if $detail.is_product_custom == 1}
+                                                <b>forme spécifique voir annexe</b>
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
@@ -79,7 +82,7 @@
                             <br>
                             <br>
 
-                           
+
                             <table>
                                 <tr>
                                     <td>Total produits HT</td>
@@ -112,7 +115,7 @@
                                     <td>{($orderinfo.total_paid - ($orderinfo.total_paid/(1+$orderinfo.vat_rate/100)))|number_format:2} €</td>
                                 </tr>
                             </table>     
-                               
+
                         </td>
                     </tr>
                 </table>

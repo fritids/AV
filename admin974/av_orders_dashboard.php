@@ -50,7 +50,7 @@ $r = $db->rawQuery("select a.* , b.lastname, b.firstname, c.*
             and (? = 0 or COMMANDE_INFO = ?)
             and (? = 0 or LIV_INFO = ?)
             and (? = 0 or LIV_GLOBAL_INFO = ?)
-            and (ifnull(?,0) = 0 or reference like ?)
+            and (ifnull(?,0) = 0 or a.reference like ?)
             and (? = 0 or current_state = ?)
             and (ifnull(?,0) = 0 or date(a.invoice_date) between ? and ?)
             and id_order not in (select id_order from mv_orders where (ARC_INFO = 5 and RECU_INFO = 5 and COMMANDE_INFO = 5 and LIV_INFO = 5 and LIV_GLOBAL_INFO = 5))", $params);

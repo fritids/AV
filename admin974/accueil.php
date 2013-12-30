@@ -36,10 +36,16 @@
     <div class="col-xs-5">
         <h3>Les nouveautés: </h3>
         <ul class="list-unstyled">
+            <li>30 déc 2013</li>
+            <ul>
+                <li>FO - paiement - Mise en production socgenactif</li>
+                <li>BO - Tournéé - Amélioration chargement général</li>
+            </ul>
             <li>29 déc 2013</li>
             <ul>
                 <li>BO - Livraison - le retrait d'un produit du camion passe la commande en "préparation en cours" (bug du 27/12)</li>
                 <li>BO - Fournisseur - le système ne renverra pas une commande fournisseur si le produit est déjà en "commande fournisseur" (bug du 27/12)</li>
+                <li>BO - Fournisseur - correction envoi bdc sur 2450 (bug du 27/12)</li>
                 <li>BO - Commande - le système affectera "Livré" si tous les produits sont considérés "Livré" (demande 27/12)</li>
             </ul>
             <li>26 déc 2013</li>

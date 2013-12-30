@@ -50,6 +50,12 @@ function getOrderInfos($oid) {
     }
     return $r[0];
 }
+function getMvOrdersInfos($oid) {
+    global $db;
+    $r = $db->where("id_order", $oid)
+            ->get("mv_orders");   
+    return $r[0];
+}
 
 function getOrderUserDetail($id) {
     global $db;

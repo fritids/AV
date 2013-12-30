@@ -82,7 +82,17 @@ $opts['fdd']['id_customer'] = array(
     ),
     'sort' => true
 );
-
+$opts['fdd']['alert_sms'] = array(
+    'name' => 'Alert SMS',
+    'options' => 'VC',
+    'maxlen' => 10,    
+    'values2' => array(0 => "Non", 1 => "Oui")
+);
+$opts['fdd']['alert_sms_phone'] = array(
+    'name' => 'Alert Sms Tel ',
+    'options' => 'VC',
+    'maxlen' => 10,    
+);
 
 $opts['fdd']['id_address_invoice'] = array(
     'name' => 'Adresse facturation',
@@ -130,7 +140,7 @@ $opts['fdd']['COMMANDE_INFO'] = array(
     'name' => 'Commande Fournisseur',
     'options' => 'L',
     'select' => 'D',
-    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'values2' => array('0' => '', '5' => 'Complet', '6' => 'Partiellement', '8' => 'Rien'),
     'sort' => true
 );
 
@@ -139,21 +149,21 @@ $opts['fdd']['ARC_INFO'] = array(
     'options' => 'L',
     'select' => 'D',
     'maxlen' => 10,
-    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'values2' => array('0' => '', '5' => 'Complet', '6' => 'Partiellement', '8' => 'Rien'),
     'sort' => true
 );
 $opts['fdd']['RECU_INFO'] = array(
     'name' => 'RECU Entrepot',
     'options' => 'L',
     'select' => 'D',
-    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'values2' => array('0' => '', '5' => 'Complet', '6' => 'Partiellement', '8' => 'Rien'),
     'sort' => true
 );
 $opts['fdd']['LIV_INFO'] = array(
     'name' => 'Livraison prog.',
     'options' => 'L',
     'select' => 'D',
-    'values2' => array('0' => '', '5' => 'Complet','6' => 'Partiellement','8' => 'Rien'),
+    'values2' => array('0' => '', '5' => 'Complet', '6' => 'Partiellement', '8' => 'Rien'),
     'sort' => true
 );
 

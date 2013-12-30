@@ -82,7 +82,7 @@ $opts['fdd']['active'] = array(
     'select' => 'D',
     'maxlen' => 1,
     'sort' => true,
-    'values' => array(0 => "Non", 1 => "Oui")
+    'values2' => array(0 => "Non", 1 => "Oui")
 );
 
 

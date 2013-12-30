@@ -157,7 +157,7 @@ if (( $code == "" ) && ( $error == "" )) {
 
     $oid = $order_id;
 
-    if ($bank_response_code == "00") {
+    if($bank_response_code=='00' && $response_code=='00') {
 
         $status = 2;
 

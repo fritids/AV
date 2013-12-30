@@ -262,7 +262,7 @@ $trucks = $db->get("av_truck");
                         <?
                         foreach ($orders as $order) {
 
-                            $o = getOrderInfos($order["id_order"]);
+                            $o = getMvOrdersInfos($order["id_order"]);
 
                             if ($order)
                                 $customer = getOrderUserDetail($order["id_customer"]);
@@ -573,7 +573,7 @@ $trucks = $db->get("av_truck");
                                                 <td colspan="4">
                                                     <?
                                                     // on recupère les produits affectés au camion
-                                                    $listOrderProduct = $db->rawQuery("select a.id_order, a.reference, id_product, b.*, c.*
+                                                    $listOrderProduct = $db->rawQuery("select a.date_add, a.id_customer, a.id_order, a.reference, id_product, b.*, c.*
                                             from av_orders a, av_order_detail b, av_tournee c
                                             where a.id_order = b.id_order
                                             and b.id_order_detail = c.id_order_detail
@@ -595,7 +595,8 @@ $trucks = $db->get("av_truck");
                                                         //on boucle sur les produits
                                                         foreach ($listOrderProduct as $OrderProduct) {
                                                             $p_qty = $OrderProduct["nb_product_delivered"];
-                                                            $o_truck = getOrderInfos($OrderProduct["id_order"]);
+                                                            //$o_truck = getOrderInfos($OrderProduct["id_order"]);
+                                                            $o_customer = getUserOrdersCustomer($OrderProduct["id_customer"]);
 
                                                             $montant_produits += $OrderProduct["product_price"];
                                                             $nb_produits += $OrderProduct["nb_product_delivered"];
@@ -611,8 +612,8 @@ $trucks = $db->get("av_truck");
                                                                         <a target="_blank" href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>">
                                                                             <?= $OrderProduct["reference"] ?>
                                                                         </a>
-                                                                        <?= date("d/m", strtotime($o_truck["date_add"])) ?> 
-                                                                        <?= $o_truck["customer"]["firstname"] ?> <?= $o_truck["customer"]["lastname"] ?>
+                                                                        <?= date("d/m", strtotime($OrderProduct["date_add"])) ?> 
+                                                                        <?= $o_customer["firstname"] ?> <?= $o_customer["lastname"] ?>
 
                                                                     </th>
                                                                 </tr>
