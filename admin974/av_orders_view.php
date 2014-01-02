@@ -923,6 +923,15 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                                 <?
                                             }
                                             ?>
+                                            <?
+                                            if ($t["date_livraison"]) {
+                                                ?>
+                                                <button name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
+                                                    Retirer du camion
+                                                </button>
+                                                <?
+                                            }
+                                            ?>
                                         </td>
 
                                     </tr>
@@ -1090,4 +1099,35 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
         $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
         $("#idmsg").addClass("alert alert-info");
     })
+    $("button[name='delProduitTruck']").click(function() {
+        var btn = $(this);
+        var p = $(this).val();
+        var action = "del";
+        var module = "ProduitTournee";
+
+        var func = action + module;
+
+        $.ajax({
+            url: "functions/ajax_trucks.php",
+            type: "POST",
+            dataType: "json",
+            async: false,
+            data: {
+                func: func,
+                id: p,
+            },
+            success: function(data) {
+                console.log(data);
+                btn.attr("disabled", "disabled");
+
+            },
+            error: function(xhr, textStatus, error) {
+                console.log(xhr.statusText);
+                console.log(textStatus);
+                console.log(error);
+                btn.attr("disabled", "disabled");
+            }
+        });
+        location.reload();
+    });
 </script>

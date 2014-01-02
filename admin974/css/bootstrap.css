@@ -5120,6 +5120,11 @@ a.thumbnail:focus {
   border-color: #d6e9c6;
   text-decoration: line-through 
 }
+.alert-ticket-2 {
+  background-color: #FE6600;
+  border-color: #d6e9c6;
+  color: #fff;
+}
 
 .alert-1 {
   background-color: #f0ad4e;
