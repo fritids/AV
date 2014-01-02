@@ -52,7 +52,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     $roadmap_filename = md5(rand());
 
     // on recupère les produits affectés au camion
-    $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_order,
+    $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
                         a.reference, d.postcode, a.id_customer, b.*, c.*, e.name supplier_name, a.order_comment
                         from av_orders a, av_order_detail b , av_tournee c, av_address d, av_supplier e
                         where a.id_order = b.id_order
@@ -89,7 +89,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
         if ($adresse["address2"])
             $addrs .= $adresse["address2"] . "<br>";
         $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-
+     
 
         if ($tmpRef != $OrderProduct["reference"]) {
 
@@ -97,9 +97,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                             <tr>
                             <th bgcolor = "#cccccc" >' . $OrderProduct["reference"] . '</th>
                             <th bgcolor = "#cccccc" >' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
-                            <th bgcolor = "#cccccc" >
-                            liv.: ' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '<br>
-                                fact.:' . $adresseInvoice["phone_mobile"] . '<br>' . $adresseInvoice["phone"] . '</th>
+                            <th bgcolor = "#cccccc" >liv.: ' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '<br>fact.:' . $adresseInvoice["phone_mobile"] . '<br>' . $adresseInvoice["phone"] . '</th>
             <th bgcolor = "#cccccc" ></th>
             <th bgcolor = "#cccccc" >' . $OrderProduct["comment1"] . '</th>
             <th bgcolor = "#cccccc" >' . $OrderProduct["comment3"] . '</th>

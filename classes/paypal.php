@@ -173,7 +173,6 @@ class paypalcheckout {
                       <input type="hidden" name="item_name_' . $cpt . '" value="' . $fullname . '" />
                       <input type="hidden" name="quantity_' . $cpt . '" value="1" />
                       <input type="hidden" name="amount_' . $cpt . '" value="' . $total_amount . '" />
-                     <input type="hidden" name="shipping_' . $cpt . '" value="' . $item['shipping'] . '" />
                    </div>';
                 $cpt++;
             }

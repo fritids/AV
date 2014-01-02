@@ -44,10 +44,6 @@ class Panier {
         @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
         @$this->panier[$n][$refproduit]['name'] = $name;
 
-        if ($_SESSION["user"]["customer_group"] == 1) {
-            $this->applyProDiscount();
-        }
-
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
     }
@@ -187,18 +183,20 @@ class Panier {
     }
 
     public function addOrderVoucher($voucher) {
-        
-        if (!isset($_SESSION["cart_summary"]["total_discount"]))
-            $_SESSION["cart_summary"]["total_discount"] = 0;
 
-        if ($voucher["reduction_amount"] > 0)
-            $_SESSION["cart_summary"]["total_discount"] += $voucher["reduction_amount"];
+        if (!isset($_SESSION["cart_summary"]["discount_code"])) {
+            if (!isset($_SESSION["cart_summary"]["total_discount"]))
+                $_SESSION["cart_summary"]["total_discount"] = 0;
 
-        if ($voucher["reduction_percent"] > 0)
-            $_SESSION["cart_summary"]["total_discount"] += $voucher["reduction_percent"] / 100 * $_SESSION["cart_summary"]["total_amount"];
+            if ($voucher["reduction_amount"] > 0)
+                $_SESSION["cart_summary"]["total_discount"] += $voucher["reduction_amount"];
 
-        $_SESSION["cart_summary"]["discount_title"] = $voucher["title"];
-        $_SESSION["cart_summary"]["discount_code"] = $voucher["code"];
+            if ($voucher["reduction_percent"] > 0)
+                $_SESSION["cart_summary"]["total_discount"] += $voucher["reduction_percent"] / 100 * $_SESSION["cart_summary"]["total_amount"];
+
+            $_SESSION["cart_summary"]["discount_title"] = $voucher["title"];
+            $_SESSION["cart_summary"]["discount_code"] = $voucher["code"];
+        }
     }
 
     public function applyProDiscount() {
@@ -215,8 +213,7 @@ class Panier {
                         $discount = round($_SESSION["cart"][$i][$ref]["prixttc"] * $reduction / 100, 2);
                         $_SESSION["cart_summary"]["total_discount"] += $discount;
                         $_SESSION["cart"][$i][$ref]["discount"] = $discount;
-                        $_SESSION["cart"][$i][$ref]["pro_discounted"] = 1;
-                        echo $discount . "<br>";
+                        $_SESSION["cart"][$i][$ref]["pro_discounted"] = 1;                        
                     }
                 }
             }

@@ -104,19 +104,35 @@
                                               height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <script>
                                 {literal}
-                                (function(w, d, s, l, i) {
-                                    w[l] = w[l] || [];
-                                    w[l].push({'gtm.start':
-                                                new Date().getTime(), event: 'gtm.js'});
-                                    var f = d.getElementsByTagName(s)[0],
-                                            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
-                                    j.async = true;
-                                    j.src =
-                                            '//www.googletagmanager.com/gtm.js?id=' + i + dl;
-                                    f.parentNode.insertBefore(j, f);
-                                }
-                                )(window, document, 'script', 'dataLayer', 'GTM-595CL7');
-                                {/literal}</script>
+                                    (function(w, d, s, l, i) {
+                                        w[l] = w[l] || [];
+                                        w[l].push({'gtm.start':
+                                                    new Date().getTime(), event: 'gtm.js'});
+                                        var f = d.getElementsByTagName(s)[0],
+                                                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+                                        j.async = true;
+                                        j.src =
+                                                '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+                                        f.parentNode.insertBefore(j, f);
+                                    }
+                                    )(window, document, 'script', 'dataLayer', 'GTM-595CL7');
+                                {/literal}
+                            </script>
                             <!-- End Google Tag Manager -->
+                            <!-- Code Google de la balise de remarketing -->
+                            <script type="text/javascript">
+                                /* <![CDATA[ */
+                                var google_conversion_id = 964704059;
+                                var google_custom_params = window.google_tag_params;
+                                var google_remarketing_only = true;
+                                /* ]]> */
+                            </script>
+                            <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+                            </script>
+                            <noscript>
+                            <div style="display:inline;">
+                                <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/964704059/?value=0&amp;guid=ON&amp;script=0"/>
+                            </div>
+                            </noscript>
                             </body>
                             </html>

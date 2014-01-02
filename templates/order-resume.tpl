@@ -88,12 +88,12 @@
     </div>
     {if $smarty.session.cart_summary.total_discount > 0}
         <div  class="promo clearfix">
-            <p class="total">Total Réduction : <span class="prix">{$smarty.session.cart_summary.total_discount}€</span></p>
+            <p class="total">Total Réduction : <span class="prix">{$smarty.session.cart_summary.total_discount|number_format:2}€</span></p>
         </div>    
     {/if}
 
     <div class="promo clearfix">
-        <p class="total">Total de votre commande : <span class="prix">{$smarty.session.cart_summary.total_amount - {$smarty.session.cart_summary.total_discount} + $smarty.session.cart_summary.total_shipping}€</span></p>
+        <p class="total">Total de votre commande : <span class="prix">{($smarty.session.cart_summary.total_amount - {$smarty.session.cart_summary.total_discount} + $smarty.session.cart_summary.total_shipping)|number_format:2}€</span></p>
     </div>
     {if !$smarty.session.cart_summary.discount_title}
         <form action="/?action=add_voucher&order-resume" method="post">

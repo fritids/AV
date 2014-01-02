@@ -176,7 +176,6 @@ if (isset($_GET["cart"])) {
                 }
             }
 
-
             $_SESSION["cart_summary"]['total_shipping'] = $conf_shipping_amount;
         }
 
@@ -190,6 +189,7 @@ if (isset($_GET["cart"])) {
             $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface, $nitem);
             //$cart->removeCartItem($_POST["id_cart_item"]);
         }
+
         // on empecher de faire un F5
         if (empty($ko_msg))
             header("Location: index.php?cart");
@@ -198,6 +198,11 @@ if (isset($_GET["cart"])) {
 
 $cartItems = $cart->showCart();
 $cart_nb_items = count($cartItems);
+
+if ($cart_nb_items > 0)
+    if ($_SESSION["user"]["customer_group"] == 1) {
+        $cart->applyProDiscount();
+    }
 
 if (isset($_GET["p"])) {
     //array_splice($_SESSION["cart"],$_GET["p"]);
@@ -388,11 +393,10 @@ if (isset($_GET["order-payment"])) {
     if ($_SESSION["cart_summary"]["order_option"] == "SMS") {
         $extra_options = 1;
     }
-    if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"] > 0) {
-        $extra_options -= $_SESSION["cart_summary"]["total_discount"];
-    }
-
-    $total_paid = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
+    /* if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"] > 0) {
+      $extra_options -= $_SESSION["cart_summary"]["total_discount"];
+      } */
+    $total_paid = round($_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"] + $extra_options, 2);
 
     saveorder();
 
@@ -406,14 +410,20 @@ if (isset($_GET["order-payment"])) {
         'returntxt' => 'Retour au site', //What is written on the return button in paypal
         'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
         'returnipn' => $paypal["returnipn"], //Where to go if the user cancels.
-        'shipping' => $conf_shipping_amount + $extra_options, //Shipping Cost        
+        'shipping' => 0, //Shipping Cost        
         'invoice' => $_SESSION["id_order"], // order ref
         'custom' => ''                           //Custom attribute
     );
 
 
     $pp = new paypalcheckout($settings); //Create an instance of the class
-    $pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
+    //$pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
+    $pp->addSimpleItem(array(
+        "name" => "Commande Allovitres#" . $_SESSION["reference"],
+        "quantity" => 1,
+        "prixttc" => $total_paid,
+        "discount" => 0
+    )); //Add all the items to the cart in one go
     //$cartHTML = $pp->getCartContentAsHtml();
     $PaypalCheckoutForm = $pp->getCheckoutForm();
 
@@ -730,6 +740,24 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
         "id_customer" => @$_SESSION["user"]["id_customer"]
     );
 
+    if ($_FILES['pj']['tmp_name'] != '') {        
+        $tmp_name = $_FILES['pj']['tmp_name'];
+        $type = $_FILES['pj']['type'];
+        $file_name = $_FILES['pj']['name'];
+        $size = $_FILES['pj']['size'];
+        $uploaddir = './upload/';
+        $uploadfile = $uploaddir . basename($file_name);
+    }
+   
+    // if the upload succeded, the file will exist
+    if ($tmp_name != '') {
+        if (move_uploaded_file($tmp_name, $uploadfile)) {            
+            $mail->AddAttachment($uploadfile);   
+        } /*else {
+            echo "Attaque potentielle par téléchargement de fichiers.
+          Voici plus d'informations :\n";
+        }*/
+    }
     //envoie mail
     $mail->AddAddress($confmail["devis_contact"]);
     foreach ($monitoringEmails as $bccer) {
