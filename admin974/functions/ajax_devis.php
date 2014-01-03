@@ -12,7 +12,7 @@ mysql_select_db($bdd_name);
 
 $req = "SELECT name, id_product, weight, price, min_width , min_height , max_width ,max_height, min_area_invoiced, max_area_invoiced "
         . "FROM av_product "
-        . "WHERE name LIKE '%" . $_REQUEST['term'] . "%' ";
+        . "WHERE id_product = " . $_POST['id_product'];
 
 $query = mysql_query($req);
 
@@ -20,7 +20,7 @@ while ($row = mysql_fetch_array($query)) {
     
     $p = getProductInfos($row['id_product']);
     
-    $results[] = array(
+    $results = array(
         'label' => utf8_encode($row['name']),
         'id_product' => $row['id_product'],
         'price' => $row['price'],
