@@ -1,7 +1,13 @@
 
 <div id="produit" class="bloc_page_gauche clear-it">    
     <p class="rouge">{$product.msg_dispo}</p>
-    <h2>{$product.name|lower|ucfirst}</h2>
+    <h2>{$product.name|lower|ucfirst}
+        {if $product.is_promo ==1} 
+            <span style="color: red;"> 
+                en promotion
+            </span>
+        {/if}
+    </h2>
     <div id="texte"></div>
     <div id="features">
         <div class="images">

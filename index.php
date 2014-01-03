@@ -50,9 +50,12 @@ $mail = new PHPMailer();
 $mail->SetFrom($confmail["from"]);
 $mail->CharSet = 'UTF-8';
 
-$promo_id = array(79, 65, 49, 124);
-foreach ($promo_id as $id) {
-    $promos[] = getProductInfos($id);
+// récupère les produits en promo
+$r = $db->where("is_promo", 1)
+        ->get("av_product");
+
+foreach ($r as $p) {
+    $promos[] = getProductInfos($p["id_product"]);
 }
 
 /* vars */
@@ -740,7 +743,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
         "id_customer" => @$_SESSION["user"]["id_customer"]
     );
 
-    if ($_FILES['pj']['tmp_name'] != '') {        
+    if ($_FILES['pj']['tmp_name'] != '') {
         $tmp_name = $_FILES['pj']['tmp_name'];
         $type = $_FILES['pj']['type'];
         $file_name = $_FILES['pj']['name'];
@@ -748,15 +751,15 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
         $uploaddir = './upload/';
         $uploadfile = $uploaddir . basename($file_name);
     }
-   
+
     // if the upload succeded, the file will exist
     if ($tmp_name != '') {
-        if (move_uploaded_file($tmp_name, $uploadfile)) {            
-            $mail->AddAttachment($uploadfile);   
-        } /*else {
-            echo "Attaque potentielle par téléchargement de fichiers.
+        if (move_uploaded_file($tmp_name, $uploadfile)) {
+            $mail->AddAttachment($uploadfile);
+        } /* else {
+          echo "Attaque potentielle par téléchargement de fichiers.
           Voici plus d'informations :\n";
-        }*/
+          } */
     }
     //envoie mail
     $mail->AddAddress($confmail["devis_contact"]);
@@ -902,7 +905,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_facture") {
         $oid = $_POST["id_order"];
         $now = date("d-m-y");
         $orderinfo = getOrderInfos($oid);
-        if (!empty($orderinfo)) {
+        if (!empty($orderinfo) && $orderinfo["id_customer"] == $_SESSION["user"]["id_customer"]) {
             $smarty->assign("orderinfo", $orderinfo);
             $content_body = $smarty->fetch('front_order.tpl');
 
@@ -936,7 +939,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
         $did = $_POST["id_devis"];
         $now = date("d-m-y");
         $devisinfo = getDevis($did);
-        if (!empty($devisinfo[0])) {
+        if (!empty($devisinfo[0]) && $devisinfo[0]["id_customer"] == $_SESSION["user"]["id_customer"]) {
             $smarty->assign("devisinfo", $devisinfo[0]);
             $content_body = $smarty->fetch('front_devis.tpl');
 

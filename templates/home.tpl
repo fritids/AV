@@ -13,30 +13,36 @@
                         <img src="/img/p/{$product.cover.filename}" width="147">
                     </a>
                     <h3 class="titre">{$product.name}</h3>
-                    <p class="prix">{($product.price*$config.vat_rate)|round:2} €</p>
+                    <p class="prix">
+                        {if $product.is_promo ==1} 
+                            <span style="text-decoration: line-through;font-size: 25px;"> {($product.price_orig*$config.vat_rate)|round:"2"} €</span><br>
+                        {/if}
+                        {($product.price*$config.vat_rate)|round:2} €
+
+                    </p>
                     <p class="liens">
                         <a href="" class="panier indent">Panier</a>
-                        <a href="/?p&id={$product.id_product}" class="voir indent">Voir</a>
+                        <a href="{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html"" class="voir indent">Voir</a>
                     </p>
                 </div>                
             {/foreach}
         </div>
 
         <a href="/double-vitrage-sur-mesure/54-double-vitrage-avec-gaz-argon.html">
-		<div class="bloc-bas produit-du-mois">
-            <h3 class="indent">Produit du mois</h3>
-            <div class="produit">
-                <div class="infos">
-                    <img src="/img/zoom.png" alt="">
-                    <p class="desc"><span class="blue">DOUBLE VITRAGE</span><br>avec gaz argon</p>
-                    <p class="prix">à partir de <span class="blue">67,91 €</span></p>
-                    <img src="/img/thermique.png" alt="" style="text-align: left;float: left;">
+            <div class="bloc-bas produit-du-mois">
+                <h3 class="indent">Produit du mois</h3>
+                <div class="produit">
+                    <div class="infos">
+                        <img src="/img/zoom.png" alt="">
+                        <p class="desc"><span class="blue">DOUBLE VITRAGE</span><br>avec gaz argon</p>
+                        <p class="prix">à partir de <span class="blue">67,91 €</span></p>
+                        <img src="/img/thermique.png" alt="" style="text-align: left;float: left;">
+                    </div>
+                    <img src="/img/miroir.png" alt="">
+                    <p class="therme clearfix">Avantages thermiques</p>
                 </div>
-                <img src="/img/miroir.png" alt="">
-                <p class="therme clearfix">Avantages thermiques</p>
             </div>
-        </div>
-		</a>
+        </a>
     </div>
 </div>
 <div class="clearfix">&nbsp;</div>
@@ -44,10 +50,10 @@
 
     <div class="bloc-bas">
         {*
-		<img src="/img/Livraison-partout-en-France.png" alt="" style="margin-right: 15px;">
+        <img src="/img/Livraison-partout-en-France.png" alt="" style="margin-right: 15px;">
         <img src="/img/Service-de-pose.png" alt="">
         *}
-		<p class="clearfix"></p>
+        <p class="clearfix"></p>
         <div class="blocks">
 
             <div class="partenaires">

@@ -73,14 +73,24 @@ $opts['fdd']['price'] = array(
     'sort' => true
 );
 
-
-
 $opts['fdd']['msg_dispo'] = array(
     'name' => 'msg dispo.',
     'options' => 'AC',
     'select' => 'D',
     'maxlen' => 255,
     'sort' => true,
+);
+$opts['fdd']['description_short'] = array(
+    'name' => 'Description courte',
+    'select' => 'T',
+    'maxlen' => 65535,
+    'options' => 'AC',    
+    'textarea' => array(
+        'html' => true,
+        'rows' => 20,
+        'cols' => 100),
+    'sort' => true,
+    'width' => '200px'
 );
 $opts['fdd']['description'] = array(
     'name' => 'Description',
@@ -94,32 +104,12 @@ $opts['fdd']['description'] = array(
     'sort' => true,
     'css' => array('id' => 'test', 'page_type' => 'test')
 );
-
-$opts['fdd']['description_short'] = array(
-    'name' => 'Description courte',
-    'select' => 'T',
-    'maxlen' => 65535,
-    'options' => 'AC',
-    'textarea' => array(
-        'html' => true,
-        'rows' => 20,
-        'cols' => 100),
-    'sort' => true,
-    'width' => '200px'
-);
-
-$opts['fdd']['video'] = array(
-    'name' => 'Video.',
-    'options' => 'AC',
-    'select' => 'T',
-    'maxlen' => 255
-);
-
 $opts['fdd']['min_width'] = array(
     'name' => 'Largeur Min.',
     'options' => 'AC',
     'select' => 'T',
     'maxlen' => 11,
+    'tab' => 'Dimension',
     'sort' => true
 );
 $opts['fdd']['min_height'] = array(
@@ -157,18 +147,13 @@ $opts['fdd']['max_area_invoiced'] = array(
     'maxlen' => 11,
     'sort' => true
 );
-$opts['fdd']['position'] = array(
-    'name' => 'Position',
-    'options' => 'AC',
-    'select' => 'T',
-    'maxlen' => 11,
-    'sort' => true
-);
+
 $opts['fdd']['meta_title'] = array(
     'name' => 'Meta Titre',
     'options' => 'AC',
     'select' => 'T',
     'maxlen' => 128,
+    'tab' => 'SEO',
     'sort' => true
 );
 $opts['fdd']['meta_description'] = array(
@@ -185,12 +170,41 @@ $opts['fdd']['meta_keywords'] = array(
     'maxlen' => 255,
     'sort' => true
 );
+
 $opts['fdd']['stock_tracking'] = array(
     'name' => 'Gestion du stock',
     'select' => 'D',
-    'maxlen' => 255,
+    'maxlen' => 1,
     'sort' => true,
+    'tab' => 'Avancé',
     'values2' => array(0 => "Non", 1 => "Oui")
+);
+$opts['fdd']['video'] = array(
+    'name' => 'Video.',
+    'options' => 'AC',
+    'select' => 'T',
+    'maxlen' => 255
+);
+$opts['fdd']['position'] = array(
+    'name' => 'Position d\'affichage',
+    'options' => 'AC',
+    'select' => 'T',
+    'maxlen' => 11,
+    'sort' => true
+);
+$opts['fdd']['is_promo'] = array(
+    'name' => 'Promotion',
+    'select' => 'D',
+    'maxlen' => 1,
+    'sort' => true,
+    'tab' => 'Promotion',
+    'values2' => array(0 => "Non", 1 => "Oui")
+);
+$opts['fdd']['price_orig'] = array(
+    'name' => 'Prix initial',
+    'select' => 'D',
+    'maxlen' => 30,
+    'sort' => true
 );
 
 

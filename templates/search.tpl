@@ -22,8 +22,14 @@
                             <p>{$product.description_short}</p>
                         </div>
                         <div class="prix block">
-                            <span>{($product.price*$config.vat_rate)|round:"2"} €</span>
-							{if $product.id_category != 19 && !($product.width && $product.height)}
+                            <span>
+                                {($product.price*$config.vat_rate)|round:"2"} €
+                                {if $product.is_promo ==1} 
+                                    <span style="text-decoration: line-through;font-size: 15px;
+                                          color: red;"> {($product.price_orig*$config.vat_rate)|round:"2"} €</span>
+                                {/if}
+                            </span>
+                            {if $product.id_category != 19 && !($product.width && $product.height)}
                                 <span style="font-size: 14px;font-weight: none;">Prix au m²</span>
                             {/if}
                             <a href="/{$product.category.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html" class="indent">Voir le produit</a>
