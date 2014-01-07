@@ -41,9 +41,8 @@ from mv_orders_stock;
 
 CREATE OR REPLACE ALGORITHM = UNDEFINED
 VIEW  `mv_orders_stock` AS 
-SELECT a.* , d.id_order_detail, d.id_product, d.is_product_tracking, d.quantity_ordered, d.quantity_available ,c.title state_label, b.ARC_INFO, b.RECU_INFO, b.COMMANDE_INFO, b.LIV_INFO, b.LIV_GLOBAL_INFO
-FROM  `av_orders` a, mv_orders_pivot_arc_recu b, av_order_status c , mv_order_detail_stock d
-WHERE   a.id_order = b.id_order
-and a.current_state = c.id_statut
+SELECT a.* , d.id_order_detail, d.id_product, d.is_product_tracking, d.quantity_ordered, d.quantity_available ,c.title state_label
+FROM  `av_orders` a, av_order_status c , mv_order_detail_stock d
+WHERE a.current_state = c.id_statut
 and a.id_order = d.id_order
 and `current_state` <>  '';

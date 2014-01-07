@@ -216,4 +216,20 @@ function getJours($datedeb, $datefin) {
     return $nb_jours;
 }
 
+function getSupplierZone($idzone) {
+    global $db;
+
+    $r = $db->rawQuery("select a.* 
+                        from av_supplier a , av_supplier_zone b 
+                        where a.id_supplier = b.id_supplier
+                        and (b.id_zone = 0 or b.id_zone = ? )", array($idzone));
+
+    return $r;
+}
+
+function genSecureKey() {
+
+    return(md5(RandomString()));
+}
+
 ?>

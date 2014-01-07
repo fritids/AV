@@ -4,9 +4,9 @@
     <div class="bloc-titre"><h1 style="font-family: Arial;font-size: 14px;display:inline;">ALLOVITRES : Spécialiste de la miroiterie</h1></div>
     <div style="float: left;background: #fff;width: 100%">
         <div class="bloc-bas promotions">
-            <h3 id="promotions" class="indent">Promotions</h3>
+            <a href="?promotions"> <h3 id="promotions" class="indent">Promotions</h3></a>
             <p>Profitez du meilleur prix et de nos promos sur le verre laqué en couleur, les miroirs avec film anti-éclats et le double vitrage avec ou sans gaz argon.</p>
-            {foreach key=key item=product from=$promos name="promo"}
+            {foreach key=key item=product from=$promoshome name="promo"}
                 <div class="produit {if $smarty.foreach.promo.first}first{/if}">
                     <span class="promo"></span>
                     <a href="/?p&id={$product.id_product}">
@@ -14,7 +14,7 @@
                     </a>
                     <h3 class="titre">{$product.name}</h3>
                     <p class="prix">
-                        {if $product.is_promo ==1} 
+                        {if $product.is_promo ==1 && $product.price_orig > 0} 
                             <span style="text-decoration: line-through;font-size: 25px;"> {($product.price_orig*$config.vat_rate)|round:"2"} €</span><br>
                         {/if}
                         {($product.price*$config.vat_rate)|round:2} €

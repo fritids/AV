@@ -1,13 +1,13 @@
 
 <div id="categorie" class="bloc_page_gauche clear-it">
     <div class="page_titre">
-        <span class="titre">Recherche</span>
-        <span class="products_number">Il y a {$search_result|count} produits correspondants à votre recherche</span>
+        <span class="titre">Promotion</span>
+        <span class="products_number">Il y a {$promos|count} produits en promotion</span>
     </div>
 
     <div class="clearfix"></div>
 
-    {foreach key=key item=product from=$search_result}   
+    {foreach key=key item=product from=$promos}   
         <div class="item">
             <table>
                 <tr>

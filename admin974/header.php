@@ -161,6 +161,9 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li><a href="av_orders.php">Commandes</a></li>                                    
                                     <li><a href="av_customer.php">Clients</a></li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="av_stock_view.php">Etat du stock</a></li>
+                                    <li><a href="av_stock_dashboard.php">Ventes - Stock</a></li>
                                 </ul>
                             </li>  
                             <?
@@ -177,6 +180,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                     <li><a href="av_roadmap.php">Feuille de route</a></li> 
                                     <li class="divider"></li>
                                     <li><a href="av_supplier.php">Les fournisseurs</a></li>                                
+                                    <li><a href="av_supplier_zone.php">Les fournisseurs par zone de livraison</a></li>                                
                                 </ul>
                             </li>  <?
                         }

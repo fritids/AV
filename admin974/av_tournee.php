@@ -211,7 +211,7 @@ $trucks = $db->get("av_truck");
                     from av_orders a, av_order_detail b, av_address c, av_customer d
                     where a.id_order = b.id_order                   
                     and b.id_order_detail not in (select id_order_detail from av_tournee where status = 2)
-                    and b.product_current_state not in (20)
+                    and b.product_current_state not in (20, 23)
                     and a.id_address_delivery = c.id_address 
                     and a.id_customer = d.id_customer          
                     and current_state not in (5, 1, 6, 7 )
@@ -343,6 +343,9 @@ $trucks = $db->get("av_truck");
                                 $helper = "";
                                 $icon = "";
                                 $cssalert = "";
+                                $supplier_date_delivery = new DateTime($OrderProduct["supplier_date_delivery"]);
+                                $dateLivraison = new DateTime($date_livraison);
+
                                 switch ($OrderProduct["product_current_state"]) {
                                     case 15:
                                         $icon = "";
@@ -355,7 +358,7 @@ $trucks = $db->get("av_truck");
                                         $helper = "Commandé chez le fournisseur";
                                         break;
                                     case 17:
-                                        if ($OrderProduct["supplier_date_delivery"] == null) {
+                                        if ($OrderProduct["supplier_date_delivery"] == null || $supplier_date_delivery > $dateLivraison) {
                                             $helper = "attente date fournisseur";
                                             $icon = "glyphicon-exclamation-sign";
                                             $cssalert = 8;

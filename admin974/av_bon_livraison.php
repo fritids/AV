@@ -43,28 +43,19 @@ if (isset($_GET) && !(empty($_GET))) {
 
 if (!empty($date_delivery) && !empty($id_truck)) {
     $stmtOrder = $db2->prepare("
-                        SELECT distinct d.id_order
-                        FROM  av_tournee a, av_truck b, av_order_detail c, av_orders d, av_address e, av_customer f
-                        WHERE a.id_truck = b.id_truck
-                        AND a.id_order_detail = c.id_order_detail
-                        AND c.id_order = d.id_order
-                        AND d.id_address_delivery = e.id_address
-                        and a.date_livraison = ?
+                        SELECT distinct a.id_order
+                        FROM  av_tournee a
+                        WHERE a.date_livraison = ?
                         and a.id_truck = ?
-                        AND d.id_customer = f.id_customer
                         order by a.position
                         ");
 
-    $stmtOrderDetail = $db2->prepare(" select c.*
-                        FROM  av_tournee a, av_truck b, av_order_detail c, av_orders d, av_address e, av_customer f
-                        WHERE a.id_truck = b.id_truck
-                        AND a.id_order_detail = c.id_order_detail
-                        AND c.id_order = d.id_order
-                        AND d.id_address_delivery = e.id_address
+    $stmtOrderDetail = $db2->prepare("select c.id_order, c.id_order_detail
+                        FROM  av_tournee a, av_order_detail c
+                        WHERE a.id_order_detail = c.id_order_detail
                         and a.date_livraison = ?
                         and a.id_truck = ?
-                        and a.id_order = ?
-                        AND d.id_customer = f.id_customer
+                        and a.id_order = ?                        
                         ");
 
     $stmtOrder->execute(array($date_delivery, $id_truck));
@@ -87,6 +78,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     $bl_commande_filename = md5(rand());
 
     foreach ($r as $order) {
+        $OrderDetails = array();
         $pdf->AddPage();
 
         $orderinfo = getOrderInfos($order["id_order"]);
@@ -94,7 +86,13 @@ if (!empty($date_delivery) && !empty($id_truck)) {
         // print_r($orderinfo);                
 
         $stmtOrderDetail->execute(array($date_delivery, $id_truck, $oid));
-        $OrderDetails = $stmtOrderDetail->fetchAll(PDO::FETCH_ASSOC);
+        $tmpOds = $stmtOrderDetail->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($tmpOds as $ods){
+            $OrderDetails[] =  getOrdersDetail($ods["id_order_detail"]);
+        }
+        
+        //print_r($OrderDetails);
 
 
         $smarty->assign("orderinfo", $orderinfo);
@@ -105,7 +103,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
         $pdf->writeHTML($bl_pdf_body, true, false, true, false, '');
 
-        foreach ($OrderDetails as $k => $ods) {
+        foreach ($tmpOds as $k => $ods) {
             $param = array(
                 "id_order" => $oid,
                 "id_user" => $_SESSION["user_id"],
@@ -120,7 +118,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
     $pdf->lastPage();
 
     $path = "./ressources/bon_de_livraison";
-    $order_path = $path . "/" . $orderinfo["id_order"];
+    $order_path = $path ;
 //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
 
     @mkdir($order_path);

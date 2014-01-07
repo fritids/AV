@@ -90,23 +90,19 @@ $opts['fdd']['active'] = array(
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les comptes clients</h1>
-<p>
-    <strong>Codification :</strong><br>
-    groupe client : 0 = normal ; 1 = Pro<br>
-    Actif ? : 0 = désactivé ; 1 = actif<br>
-</p>
-<?
-new phpMyEdit($opts);
-?>
 
+<div class="container">
+    <div class="page-header">
+        <h1>Les comptes clients</h1>
+    </div>
+    <?
+    new phpMyEdit($opts);
 
+    if (isset($_GET["PME_sys_rec"]))
+        $id = $_GET["PME_sys_rec"];
+    if (isset($_POST["PME_sys_rec"]))
+        $id = $_POST["PME_sys_rec"];
 
-<?
-if (isset($_GET["PME_sys_rec"]))
-    $id = $_GET["PME_sys_rec"];
-if (isset($_POST["PME_sys_rec"]))
-    $id = $_POST["PME_sys_rec"];
-
-getChangeLog($opts['tb'], $id);
-?>
+    getChangeLog($opts['tb'], $id);
+    ?>
+</div>

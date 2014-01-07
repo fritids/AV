@@ -48,7 +48,7 @@
                         </div>
                         <div class="prix block">
                             <span>{($product.price*$config.vat_rate)|round:"2"} € 
-                                {if $product.is_promo ==1} 
+                                {if $product.is_promo ==1 && $product.price_orig > 0} 
                                     <span style="text-decoration: line-through;font-size: 15px;
                                           color: red;"> {($product.price_orig*$config.vat_rate)|round:"2"} €</span>
                                 {/if}

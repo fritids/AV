@@ -3,7 +3,7 @@
 function getPostCodeZone($postcode) {
     global $db;
 
-    $query = "select b.nom 
+    $query = "select b.nom
             from av_departements a , av_zone b
             where  a.id_zone = b.id_zone
             and  a.id_departement = ? ";
@@ -12,6 +12,19 @@ function getPostCodeZone($postcode) {
 
     if ($z)
         return ($z[0]["nom"]);
+}
+function getZoneInfos($postcode) {
+    global $db;
+
+    $query = "select b.*
+            from av_departements a , av_zone b
+            where  a.id_zone = b.id_zone
+            and  a.id_departement = ? ";
+
+    $z = $db->rawQuery($query, array(substr($postcode, 0, 2)));
+
+    if ($z)
+        return ($z[0]);
 }
 
 function getUserOrders($cid) {
@@ -42,7 +55,7 @@ function getOrderInfos($oid) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
         $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
-        $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);
+        $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);        
         if ($order["id_address_invoice"])
             $r[$k]["address"]["invoice"] = getUserOrdersAddress($order["id_address_invoice"]);
         if ($order["id_address_delivery"])
@@ -50,10 +63,11 @@ function getOrderInfos($oid) {
     }
     return $r[0];
 }
+
 function getMvOrdersInfos($oid) {
     global $db;
     $r = $db->where("id_order", $oid)
-            ->get("mv_orders");   
+            ->get("mv_orders");
     return $r[0];
 }
 
@@ -93,10 +107,11 @@ function getUserOrdersAddress($iaid) {
     global $db;
     $r = $db->where("id_address", $iaid)
             ->get("av_address");
-
-    if ($r[0]["postcode"])
+    
+    if ($r[0]["postcode"]){
         $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
-
+        $r[0]["warehouse"] = getZoneInfos($r[0]["postcode"]);
+    }
     if ($r)
         return $r[0];
 }
@@ -110,7 +125,24 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
                         LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
                         LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
                         where id_order = ? 
-                        and (IFNULL(?,0) = 0 OR (a.id_supplier = ? and product_current_state not in (16)))
+                        and (IFNULL(?,0) = 0 OR (a.id_supplier = ? and IFNULL(product_current_state,0) in (0,21, 22)))
+                        ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["attributes"] = getOrdersDetailAttribute($od["id_order_detail"]);
+        $r[$k]["custom"] = getOrdersCustomMainItem($od["id_order_detail"]);
+    }
+    return $r;
+}
+function getOrdersDetail($odid) {
+    global $db;
+    $params = array($odid);
+
+    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name
+                        FROM av_order_detail a
+                        LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
+                        LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
+                        where id_order_detail = ?
                         ", $params);
 
     foreach ($r as $k => $od) {
@@ -164,7 +196,8 @@ function getOrdersDetailSupplier($oid) {
     $r = $db->rawQuery("SELECT distinct a.id_supplier, b.name, b.email
                         FROM av_order_detail a, av_supplier b 
                         where a.id_supplier = b.id_supplier 
-                        and id_order = ?    
+                        and id_order = ?  
+                        order by a.id_supplier
                         ", $params);
 
     return $r;
@@ -262,6 +295,13 @@ function validateOrder($oid, $orderValidateInfo) {
             ->update("av_orders", $order_validate);
 
     updQuantity($oid);
+
+    // on retire 1 à nombre coupon utilisable
+    if (isset($_SESSION["cart_summary"]["discount_code"]) != "") {
+        $code = $_SESSION["cart_summary"]["discount_code"];
+        $cid = $_SESSION["user"]["id_customer"];
+        updVoucherCodeQty($code, $cid);
+    }
 }
 
 function createInvoice($oid) {

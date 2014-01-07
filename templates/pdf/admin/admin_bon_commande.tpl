@@ -3,7 +3,7 @@
 <table>
     <tr height="100">
         <td>MERCI DE REGROUPER <br>LES VERRES PAR ZONES<br>SUR LES CHARIOTS</td>
-        <td>SAS ALLOVITRES<br>1900 Avenue Paul Julien RN7<br>13100 Le Tholonet<br>email : contact@miroiteriedupaysdaix.com<br>SARL Miroiterie du Pays d'Aix - RC5522928845</td>
+        <td>{$orderinfo.address.delivery.warehouse.warehouse}</td>
     </tr>
 </table>
 <br>
@@ -71,28 +71,29 @@
                 {/if}
             </td>
             <td>{$detail.product_width} x {$detail.product_height}</td>
-                     
-   
+
+
             {for $i=0 to 5}
-                
-                {if $detail.attributes[$i].index_attribute == 1}
-                    <td>{$detail.attributes[$i].attribute_value}</td>
-                {elseif $detail.attributes[$i].index_attribute == 2}
-                    <td>{$detail.attributes[$i].attribute_value}</td>                        
-                {elseif $detail.attributes[$i].index_attribute == 3}
-                    <td>{$detail.attributes[$i].attribute_value}</td>                        
-                {elseif $detail.attributes[$i].index_attribute == 4}
-                    <td>{$detail.attributes[$i].attribute_value}</td>                        
-                {elseif $detail.attributes[$i].index_attribute == 5}
-                    <td>{$detail.attributes[$i].attribute_value}</td>                        
-                {elseif $detail.attributes[$i].index_attribute == 7}
-                    <td>{$detail.attributes[$i].attribute_value}</td>                        
-                {else}
-                    <td>&nbsp;</td>
+                {if isset($detail.attributes[$i].index_attribute)}
+                    {if $detail.attributes[$i].index_attribute == 1}
+                        <td>{$detail.attributes[$i].attribute_value}</td>
+                    {elseif $detail.attributes[$i].index_attribute == 2}
+                        <td>{$detail.attributes[$i].attribute_value}</td>                        
+                    {elseif $detail.attributes[$i].index_attribute == 3}
+                        <td>{$detail.attributes[$i].attribute_value}</td>                        
+                    {elseif $detail.attributes[$i].index_attribute == 4}
+                        <td>{$detail.attributes[$i].attribute_value}</td>                        
+                    {elseif $detail.attributes[$i].index_attribute == 5}
+                        <td>{$detail.attributes[$i].attribute_value}</td>                        
+                    {elseif $detail.attributes[$i].index_attribute == 7}
+                        <td>{$detail.attributes[$i].attribute_value}</td>                        
+                    {else}
+                        <td>&nbsp;</td>
+                    {/if}
                 {/if}
             {/for}   
 
-            {if $detail.is_product_custom == 1}
+            {if isset($detail.is_product_custom) && $detail.is_product_custom == 1}
                 <td>OUI</td>
             {/if}
         </tr>

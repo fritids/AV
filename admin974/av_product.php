@@ -72,6 +72,13 @@ $opts['fdd']['price'] = array(
     'default' => '0.000000',
     'sort' => true
 );
+$opts['fdd']['weight'] = array(
+    'name' => 'Poids m²',
+    'select' => 'T',
+    'maxlen' => 22,
+    'default' => '0.000000',
+    'sort' => true
+);
 
 $opts['fdd']['msg_dispo'] = array(
     'name' => 'msg dispo.',

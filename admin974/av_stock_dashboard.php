@@ -25,14 +25,13 @@ if (isset($_POST["invoice_stda_date"]) && $_POST["invoice_stda_date"] != '')
 if (isset($_POST["invoice_enda_date"]) && $_POST["invoice_enda_date"] != '')
     $invoice_enda_date = $_POST["invoice_enda_date"];
 
-$params = array($livree, $livree, $reference, '%' . $reference . '%', $current_state, $current_state, $invoice_stda_date, $invoice_stda_date, $invoice_enda_date);
+$params = array($reference, '%' . $reference . '%', $current_state, $current_state, $invoice_stda_date, $invoice_stda_date, $invoice_enda_date);
 
 
 $r = $db->rawQuery("select a.*, b.name, c.lastname, c.firstname
                     from mv_orders_stock a, av_product b, av_customer c
                     where a.id_product = b.id_product
                     and  a.id_customer = c.id_customer
-                    and (? = 0 or LIV_GLOBAL_INFO = ?)
                     and (ifnull(?,0) = 0 or a.reference like ?)
                     and (? = 0 or current_state = ?)
                     and current_state not in (6,5,7,8)
@@ -91,7 +90,7 @@ $orderStates = $db->where("id_level", 0)
         </form>
 
     </div>
-
+    <hr>
     <div>
         <table class="table table-bordered table-condensed">
             <tr>

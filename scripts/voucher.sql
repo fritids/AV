@@ -29,3 +29,6 @@ CHANGE  `voucher_code`  `voucher_code` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE 
 
 ALTER TABLE  `av_orders` ADD  `order_voucher` VARCHAR( 20 )  NULL AFTER  `payment`;
 ALTER TABLE  `av_orders` ADD  `total_discount` DECIMAL( 10, 2 ) NULL AFTER  `payment`;
+
+
+ALTER TABLE  `av_voucher` ADD  `id_category` INT NULL AFTER  `id_customer`;

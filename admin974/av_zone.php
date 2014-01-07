@@ -32,6 +32,12 @@ $opts['fdd']['nom'] = array(
   'maxlen'   => 255,
   'sort'     => true
 );
+$opts['fdd']['warehouse'] = array(
+  'name'     => 'Entrepot',
+  'select'   => 'T',
+  'maxlen'   => 255 ,
+  'sort'     => true
+);
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

@@ -17,7 +17,7 @@ require('functions/tools.php');
 require('functions/cms.php');
 require('functions/devis.php');
 require('functions/voucher.php');
-require('classes/CMCIC_Tpe.inc.php');
+//require('classes/CMCIC_Tpe.inc.php');
 require('classes/tcpdf.php');
 
 // classes declaration
@@ -51,9 +51,12 @@ $mail->SetFrom($confmail["from"]);
 $mail->CharSet = 'UTF-8';
 
 // récupère les produits en promo
-$r = $db->where("is_promo", 1)
-        ->get("av_product");
 
+$r = $db->rawQuery("select * from av_product where is_promo = 1 and id_product in (79, 65, 49, 124)");
+foreach ($r as $p) {
+    $promoshome[] = getProductInfos($p["id_product"]);
+}
+$r = $db->rawQuery("select * from av_product where is_promo = 1");
 foreach ($r as $p) {
     $promos[] = getProductInfos($p["id_product"]);
 }
@@ -351,6 +354,9 @@ if (isset($_GET["order-confirmation"])) {
     $page = "order-confirmation";
     $page_type = "full";
 }
+if (isset($_GET["promotions"])) {
+    $page = "promotions";
+}
 
 $smarty->assign('PAYPAL_CHECKOUT_FORM', '');
 $smarty->assign('CMCIC_CHECKOUT_FORM', '');
@@ -368,15 +374,11 @@ if (isset($_GET["order-resume"])) {
         $_SESSION["cart_summary"]["alert_sms_phone"] = $_POST["alert_sms_phone"];
     }
 
-
     // option déja souscrite on retire l'option
     if (!isset($_POST["alert_sms"]) && isset($_SESSION["cart_summary"]["order_option"])) {
         $_SESSION["cart_summary"]["total_amount"] -= 1;
         unset($_SESSION["cart_summary"]["order_option"]);
     }
-
-
-
 
     if (isset($_POST["order_comment"])) {
         $_SESSION["cart_summary"]["order_comment"] = $_POST["order_comment"];
@@ -433,67 +435,67 @@ if (isset($_GET["order-payment"])) {
     $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
     // fin paypal
     // CMCIC
-    $sOptions = "";
-    $sReference = $_SESSION["id_order"];
-    $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
-    $sDevise = "EUR";
-    $sDate = date("d/m/Y:H:i:s");
-    $sLangue = "FR";
-    $sTexteLibre = "Texte";
-    $sEmail = $_SESSION["user"]["email"];
+    /* $sOptions = "";
+      $sReference = $_SESSION["id_order"];
+      $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
+      $sDevise = "EUR";
+      $sDate = date("d/m/Y:H:i:s");
+      $sLangue = "FR";
+      $sTexteLibre = "Texte";
+      $sEmail = $_SESSION["user"]["email"];
 
-    $sNbrEch = "";
-    $sDateEcheance1 = "";
-    $sMontantEcheance1 = "";
-    $sDateEcheance2 = "";
-    $sMontantEcheance2 = "";
-    $sDateEcheance3 = "";
-    $sMontantEcheance3 = "";
-    $sDateEcheance4 = "";
-    $sMontantEcheance4 = "";
+      $sNbrEch = "";
+      $sDateEcheance1 = "";
+      $sMontantEcheance1 = "";
+      $sDateEcheance2 = "";
+      $sMontantEcheance2 = "";
+      $sDateEcheance3 = "";
+      $sMontantEcheance3 = "";
+      $sDateEcheance4 = "";
+      $sMontantEcheance4 = "";
 
-    $oTpe = new CMCIC_Tpe($sLangue);
-    $oHmac = new CMCIC_Hmac($oTpe);
+      $oTpe = new CMCIC_Tpe($sLangue);
+      $oHmac = new CMCIC_Hmac($oTpe);
 
-    // Data to certify
-    $PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS, $oTpe->sNumero, $sDate, $sMontant, $sDevise, $sReference, $sTexteLibre, $oTpe->sVersion, $oTpe->sLangue, $oTpe->sCodeSociete, $sEmail, $sNbrEch, $sDateEcheance1, $sMontantEcheance1, $sDateEcheance2, $sMontantEcheance2, $sDateEcheance3, $sMontantEcheance3, $sDateEcheance4, $sMontantEcheance4, $sOptions);
+      // Data to certify
+      $PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS, $oTpe->sNumero, $sDate, $sMontant, $sDevise, $sReference, $sTexteLibre, $oTpe->sVersion, $oTpe->sLangue, $oTpe->sCodeSociete, $sEmail, $sNbrEch, $sDateEcheance1, $sMontantEcheance1, $sDateEcheance2, $sMontantEcheance2, $sDateEcheance3, $sMontantEcheance3, $sDateEcheance4, $sMontantEcheance4, $sOptions);
 
-    // MAC computation
-    $sMAC = $oHmac->computeHmac($PHP1_FIELDS);
+      // MAC computation
+      $sMAC = $oHmac->computeHmac($PHP1_FIELDS);
 
-    $CMCICCheckoutForm = '
-    <form action="' . $oTpe->sUrlPaiement . '" method="post" id="PaymentRequest">
-        <p>
-            <input type="hidden" name="version"             id="version"        value="' . $oTpe->sVersion . '" />
-            <input type="hidden" name="TPE"                 id="TPE"            value="' . $oTpe->sNumero . '" />
-            <input type="hidden" name="date"                id="date"           value="' . $sDate . '" />
-            <input type="hidden" name="montant"             id="montant"        value="' . $sMontant . $sDevise . '" />
-            <input type="hidden" name="reference"           id="reference"      value="' . $sReference . '" />
-            <input type="hidden" name="MAC"                 id="MAC"            value="' . $sMAC . '" />
-            <input type="hidden" name="url_retour"          id="url_retour"     value="' . $oTpe->sUrlKO . '" />
-            <input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="' . $oTpe->sUrlOK . '" />
-            <input type="hidden" name="url_retour_err"      id="url_retour_err" value="' . $oTpe->sUrlKO . '" />
-            <input type="hidden" name="lgue"                id="lgue"           value="' . $oTpe->sLangue . '" />
-            <input type="hidden" name="societe"             id="societe"        value="' . $oTpe->sCodeSociete . '" />
-            <input type="hidden" name="texte-libre"         id="texte-libre"    value="' . HtmlEncode($sTexteLibre) . '" />
-            <input type="hidden" name="mail"                id="mail"           value="' . $sEmail . '" />
-            <!-- -->
-            <input type="hidden" name="nbrech"              id="nbrech"         value="" />
-            <input type="hidden" name="dateech1"            id="dateech1"       value="" />
-            <input type="hidden" name="montantech1"         id="montantech1"    value="" />
-            <input type="hidden" name="dateech2"            id="dateech2"       value="" />
-            <input type="hidden" name="montantech2"         id="montantech2"    value="" />
-            <input type="hidden" name="dateech3"            id="dateech3"       value="" />
-            <input type="hidden" name="montantech3"         id="montantech3"    value="" />
-            <input type="hidden" name="dateech4"            id="dateech4"       value="" />
-            <input type="hidden" name="montantech4"         id="montantech4"    value="" />
-            
-            <input type="submit" name="bouton"              id="bouton"         class ="pay_cb" value="Payer par carte bancaire" />
-        </p>
-    </form>';
+      $CMCICCheckoutForm = '
+      <form action="' . $oTpe->sUrlPaiement . '" method="post" id="PaymentRequest">
+      <p>
+      <input type="hidden" name="version"             id="version"        value="' . $oTpe->sVersion . '" />
+      <input type="hidden" name="TPE"                 id="TPE"            value="' . $oTpe->sNumero . '" />
+      <input type="hidden" name="date"                id="date"           value="' . $sDate . '" />
+      <input type="hidden" name="montant"             id="montant"        value="' . $sMontant . $sDevise . '" />
+      <input type="hidden" name="reference"           id="reference"      value="' . $sReference . '" />
+      <input type="hidden" name="MAC"                 id="MAC"            value="' . $sMAC . '" />
+      <input type="hidden" name="url_retour"          id="url_retour"     value="' . $oTpe->sUrlKO . '" />
+      <input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="' . $oTpe->sUrlOK . '" />
+      <input type="hidden" name="url_retour_err"      id="url_retour_err" value="' . $oTpe->sUrlKO . '" />
+      <input type="hidden" name="lgue"                id="lgue"           value="' . $oTpe->sLangue . '" />
+      <input type="hidden" name="societe"             id="societe"        value="' . $oTpe->sCodeSociete . '" />
+      <input type="hidden" name="texte-libre"         id="texte-libre"    value="' . HtmlEncode($sTexteLibre) . '" />
+      <input type="hidden" name="mail"                id="mail"           value="' . $sEmail . '" />
+      <!-- -->
+      <input type="hidden" name="nbrech"              id="nbrech"         value="" />
+      <input type="hidden" name="dateech1"            id="dateech1"       value="" />
+      <input type="hidden" name="montantech1"         id="montantech1"    value="" />
+      <input type="hidden" name="dateech2"            id="dateech2"       value="" />
+      <input type="hidden" name="montantech2"         id="montantech2"    value="" />
+      <input type="hidden" name="dateech3"            id="dateech3"       value="" />
+      <input type="hidden" name="montantech3"         id="montantech3"    value="" />
+      <input type="hidden" name="dateech4"            id="dateech4"       value="" />
+      <input type="hidden" name="montantech4"         id="montantech4"    value="" />
 
-    $smarty->assign('CMCIC_CHECKOUT_FORM', $CMCICCheckoutForm);
+      <input type="submit" name="bouton"              id="bouton"         class ="pay_cb" value="Payer par carte bancaire" />
+      </p>
+      </form>';
 
+      $smarty->assign('CMCIC_CHECKOUT_FORM', $CMCICCheckoutForm);
+     */
 
 
     //Socgen
@@ -543,7 +545,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
         "lastname" => $_POST["lastname"],
         "email" => $_POST["email"],
         "passwd" => md5(_COOKIE_KEY_ . $_POST["passwd"]),
-        "active" => 1,
+        "active" => 0,
+        "secure_key" => genSecureKey(),
         "date_add" => date("Y-m-d"),
         "date_upd" => date("Y-m-d"),
         "customer_group" => $group
@@ -623,22 +626,32 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             createNewAdresse($delivery_adresse);
 
             //auto login
-            checkUserLogin($_POST["email"], $_POST["passwd"]);
+            //checkUserLogin($_POST["email"], $_POST["passwd"]);
 
-            //envoie mail
+            $secure_key = getSecureKey($_POST["email"]);
+            $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
+
+            //envoi mail
             $mail->AddAddress($_POST["email"]);
             $mail->Subject = "Allovitres - " . $confmail["welcome"];
+            $smarty->assign("account_conf_link", $account_conf_link);
             $smarty->assign("email", $_POST["email"]);
             $smarty->assign("mdp", $_POST["passwd"]);
 
             $user_mail_body = $smarty->fetch('notif_new_account.tpl');
             $mail->MsgHTML($user_mail_body);
-            $mail->Send();
+            if ($mail->Send()) {
+                $page = "generic_page";
+                $page_type = "full";
+                $ok_msg = array("txt" => "Merci de confirmer votre compte en suivant les instructions envoyés par email");
+            } else {
+                $page = "generic_page";
+                $page_type = "full";
+                $ko_msg = array("txt" => "Une erreur est survenue lors de la création de votre compte.");
+            }
         } else { //error creation
             $ko_msg = array("txt" => "Le compte existe déjà, merci de faire une demande d'un nouveau mot de passe.");
-
             $page = "register";
-
             if ($group == 1)
                 $page = "register-pro";
         }
@@ -648,10 +661,32 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
 /* Login */
 if (isset($_GET["action"]) && $_GET["action"] == "login") {
     $res = checkUserLogin($_POST["email"], $_POST["passwd"]);
-    if (!$res) {
-        $ko_msg = array("txt" => "Mot de passe incorrect, demander un nouveau mot de passe");
-        $page = "identification";
-        $page_type = "full";
+    if ($res > 0) {
+        switch ($res) {
+            case 1:
+                $ko_msg = array("txt" => "Mot de passe incorrect, demander un nouveau mot de passe");
+                $page = "identification";
+                $page_type = "full";
+                break;
+            case 2:
+                $ko_msg = array("txt" => "Votre compte est inactif");
+                $page = "generic_page";
+                $page_type = "full";
+
+                $mail->AddAddress($_POST["email"]);
+                $mail->Subject = "Allovitre - confirmation de votre compte";
+                foreach ($monitoringEmails as $bccer) {
+                    $mail->AddBCC($bccer);
+                }
+                /*$secure_key = getSecureKey($_POST["email"]);
+                $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
+
+                $smarty->assign("account_conf_link", $account_conf_link);
+                $mail_body = $smarty->fetch("mail_account_confirm.tpl");
+                $mail->MsgHTML($mail_body);
+                $mail->Send();*/
+                break;
+        }
     } else {
         if (isset($_POST["referer"]) && !empty($_POST["referer"]))
             header("Location: " . $_POST["referer"]);
@@ -679,8 +714,6 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_validate") {
         $status = 1;
     } elseif ($payment == "Virement bancaire") {
         $status = 10;
-    } elseif ($payment == "Paypal") {
-        $status = 2;
     }
 
     validateOrder($_SESSION["id_order"], array("current_state" => $status, "payment" => $payment));
@@ -854,8 +887,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
 
     if ($code == "NOEL2013DV") {
         $cart->addVoucher(array(
-            "code" => "VICTOIREPAUC",
-            "title" => "VICTOIREPAUC",
+            "code" => "NOEL2013DV",
+            "title" => "NOEL2013DV",
             "group" => "category",
             "value" => 12,
             "reduction" => 10)
@@ -957,6 +990,14 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
         }
     }
 }
+if (isset($_GET["action"]) && $_GET["action"] == "conf_mail") {
+
+    $r = validAccount($_GET["email"], $_GET["secure_key"]);
+    if ($r) {
+        $page = "generic_page";
+        $ok_msg = array("txt" => "Votre compte a bien été activé");
+    }
+}
 
 /* Fichier pdf */
 
@@ -1004,7 +1045,7 @@ $smarty->assign('okmsg', $ok_msg);
 $smarty->assign('config', $config);
 $smarty->assign('meta', $meta);
 $smarty->assign('promos', $promos);
-$smarty->assign('previous_page', $previous_page);
+$smarty->assign('promoshome', $promoshome);
 $smarty->assign('searchs', $search);
 $smarty->assign('search_result', $search_result);
 

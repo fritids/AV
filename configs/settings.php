@@ -21,7 +21,7 @@ $opts['pw'] = $bdd_pwd;
 
 $config["payment"]["cheque_infos"] = "ALLOVITRE <br> adresse 1 <br> cp ville";
 $config["payment"]["virement_infos"] = "RIB ###### <br> IBAN ############";
-$config["vat_rate"] = 1.196;
+$config["vat_rate"] = 1.20;
 
 $conf_shipping_amount = 25;
 

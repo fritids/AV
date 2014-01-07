@@ -48,7 +48,6 @@ $updated = array();
 
 /* id client */
 $r = $db->rawQuery("select id_customer from av_orders where id_order = ?", array($oid));
-$suppliers = $db->get("av_supplier");
 $orderStates = $db->where("id_level", 0)
         ->get("av_order_status");
 $productStates = $db->where("id_level", 1)
@@ -60,14 +59,11 @@ $customer_info = getCustomerDetail($cid);
 
 //commande 
 $orderinfo = getOrderInfos($oid);
+$suppliers = getSupplierZone($orderinfo["address"]["delivery"]["warehouse"]["id_zone"]);
 
 
 //paiementtoi t
 $orderPayment = getOrderPayment($orderinfo["id_order"]);
-
-//Adresse
-$customer_delivery = getAdresseById($orderinfo["id_address_delivery"]);
-$customer_invoice = getAdresseById($orderinfo["id_address_invoice"]);
 
 // pour le system de nav.
 $a = $db->rawQuery("select id_order, current_state from mv_orders where ? > id_order  order by id_order desc", array($oid));
@@ -251,89 +247,100 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             $mail->AddbCC($bccer);
         }
         $mail->AddAddress($orderSupplier["email"]);
-        $mail->Subject = "Bon de commande : #" . $orderinfo["id_order"];
+        $mail->Subject = "Bon de commande: #" . $orderinfo["id_order"];
 
         $orderDetailSupplier = getUserOrdersDetail($oid, $orderSupplier["id_supplier"]);
         $orderDetailSupplierXLS = $orderDetailSupplier;
 
-        $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $pdf->SetCreator(PDF_CREATOR);
-        $pdf->SetAuthor('Allovitre');
-        $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetFont('times', '', 11);
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        $pdf->AddPage("L", "A4");
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-        $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
+        if (!empty($orderDetailSupplier)) {
+            $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+            $pdf->SetCreator(PDF_CREATOR);
+            $pdf->SetAuthor('Allovitre');
+            $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+            $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+            $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+            $pdf->SetFont('times', '', 11);
+            $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+            $pdf->AddPage("L", "A4");
+            $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+            $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
-        $smarty->assign("supplier", $orderSupplier);
-        $smarty->assign("orderinfo", $orderinfo);
-        $smarty->assign("user_email", $_SESSION["email"]);
-        $smarty->assign("orderdetail", $orderDetailSupplier);
-        $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
-        $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
-        $pdf->writeHTML($bdc_pdf_body, true, false, true, false, '');
-        if ($orderinfo["nb_custom_product"] > 0) {
-            $annexe_body = $smarty->fetch('front_annexe.tpl');
-            $pdf->AddPage('P', 'A4');
-            $pdf->writeHTML($annexe_body, true, false, true, false, '');
-        }
-        $pdf->lastPage();
+            //print_r($orderinfo);
 
-        $path = "./ressources/bon_de_commandes";
-        $order_path = $path . "/" . $orderinfo["id_order"];
-
-        //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
-        $bdc_commande_filename = md5(rand());
-        @mkdir($order_path);
-        $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
-
-        //Excel
-
-        $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
-        fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
-        fclose($fp);
-
-        // fin excel
-
-        $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
-        $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
-        $mail->MsgHTML($mail_body);
-
-        if ($mail->Send()) {
-            $tmp .= "<li> " . $orderSupplier["name"] . " ( " . count($orderDetailSupplier) . " article(s) commandé(s) )</li>";
-
-            $params = array("product_current_state" => COMMANDE_FOURNISSEUR);
-            $r = $db->where("id_order", $oid)
-                    ->where("id_supplier", $orderSupplier["id_supplier"])
-                    ->update("av_order_detail", $params);
-
-            addLog(array("tabs" => "av_order_detail",
-                "rowkey" => $od["id_order_detail"],
-                "col" => "product_current_state",
-                "operation" => "update",
-                "oldval" => '',
-                "newval" => COMMANDE_FOURNISSEUR
-            ));
-
-            foreach ($orderDetailSupplier as $k => $ods) {
-                $param = array(
-                    "id_order" => $oid,
-                    "id_user" => $_SESSION["user_id"],
-                    "id_order_detail" => $ods["id_order_detail"],
-                    "supplier_name" => $orderSupplier["name"],
-                    "bdc_filename" => $bdc_commande_filename
-                );
-                $r = $db->insert("av_order_bdc", $param);
+            $smarty->assign("supplier", $orderSupplier);
+            $smarty->assign("orderinfo", $orderinfo);
+            $smarty->assign("user_email", $_SESSION["email"]);
+            $smarty->assign("orderdetail", $orderDetailSupplier);
+            $mail_body = $smarty->fetch('admin_supplier_ask_order.tpl');
+            $bdc_pdf_body = $smarty->fetch('admin_bon_commande.tpl');
+            $pdf->writeHTML($bdc_pdf_body, true, false, true, false, '');
+            if ($orderinfo["nb_custom_product"] > 0) {
+                $annexe_body = $smarty->fetch('front_annexe.tpl');
+                $pdf->AddPage('P', 'A4');
+                $pdf->writeHTML($annexe_body, true, false, true, false, '');
             }
 
-            $orderinfo = getOrderInfos($oid);
+            $pdf->lastPage();
+
+            $path = "./ressources/bon_de_commandes";
+            $order_path = $path . "/" . $orderinfo["id_order"];
+
+            //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
+            $bdc_commande_filename = md5(rand());
+            @mkdir($order_path);
+            $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
+
+            //Excel
+
+            $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
+            fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
+            fclose($fp);
+
+            // fin excel
+
+            $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
+            $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
+            $mail->MsgHTML($mail_body);
+
+            if ($mail->Send()) {
+                $tmp .= "<li> " . $orderSupplier["name"] . " ( " . count($orderDetailSupplier) . " article(s) commandé(s) )</li>";
+
+                $params = array(COMMANDE_FOURNISSEUR, $oid, $orderSupplier["id_supplier"]);
+
+                $q = "update av_order_detail 
+                set product_current_state = " . COMMANDE_FOURNISSEUR . " 
+                where IFNULL(product_current_state,0) in (0,21, 22) 
+                and id_order = " . $oid . " 
+                and id_supplier =  " . $orderSupplier["id_supplier"];
+
+                mysql_query($q);
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $od["id_order_detail"],
+                    "col" => "product_current_state",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => COMMANDE_FOURNISSEUR
+                ));
+
+                foreach ($orderDetailSupplier as $k => $ods) {
+                    $param = array(
+                        "id_order" => $oid,
+                        "id_user" => $_SESSION["user_id"],
+                        "id_order_detail" => $ods["id_order_detail"],
+                        "supplier_name" => $orderSupplier["name"],
+                        "bdc_filename" => $bdc_commande_filename
+                    );
+                    $r = $db->insert("av_order_bdc", $param);
+                }
+
+                $orderinfo = getOrderInfos($oid);
+            }
         }
     }
-    $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s) : <ul>" . $tmp . "</ul>";
+    if ($tmp)
+        $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s): <ul>" . $tmp . "</ul>";
 }
 
 //maj status order  
@@ -388,7 +395,7 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
                 break;
 
 
-            default :
+            default:
                 $order_mail_subject = "";
                 $order_mail_from = "";
                 $order_mail_tpl = "";
@@ -564,7 +571,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             case 8:
                                 echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
                                 break;
-                            default :
+                            default:
                         }
                         ?>                        
                     </td>
@@ -580,7 +587,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             case 8:
                                 echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
                                 break;
-                            default :
+                            default:
                         }
                         ?>                        
                     </td>
@@ -596,7 +603,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             case 8:
                                 echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
                                 break;
-                            default :
+                            default:
                         }
                         ?>                        
                     </td>                   
@@ -612,7 +619,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             case 8:
                                 echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
                                 break;
-                            default :
+                            default:
                         }
                         ?>                        
                     </td>                   
@@ -628,7 +635,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             case 8:
                                 echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
                                 break;
-                            default :
+                            default:
                         }
                         ?>                        
                     </td>                   
@@ -670,35 +677,35 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                     </div>
                 </div>
                 <div class="panel-body">
-                    Nom :<?= @$customer_info["firstname"] ?> <br>
-                    Prénom : <?= @$customer_info["lastname"] ?> <br>                    
-                    Email : <?= @$customer_info["email"] ?> <br>                        
-                    Type : <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
+                    Nom:<?= @$customer_info["firstname"] ?> <br>
+                    Prénom: <?= @$customer_info["lastname"] ?> <br>                    
+                    Email: <?= @$customer_info["email"] ?> <br>                        
+                    Type: <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
                 </div>
             </div>            
         </div>
 
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_delivery["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["delivery"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
-                    <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_delivery["phone"] ?><br>
-                    <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_delivery["phone_mobile"] ?> <br>
-                    <?= @$customer_delivery["address1"] ?><br>
-                    <?= @$customer_delivery["address2"] ?><br>
-                    <?= @$customer_delivery["postcode"] ?> <?= @$customer_delivery["city"] ?><br>    
+                    <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
+                    <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["delivery"]["phone_mobile"] ?> <br>
+                    <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
+                    <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
+                    <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?> [ <?= $orderinfo["address"]["delivery"]["zone"] ?> ]
                 </div>
             </div>  
         </div>
         <div class="col-xs-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= @$customer_invoice["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["invoice"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
-                    <span class="glyphicon glyphicon-earphone" ></span> <?= @$customer_invoice["phone"] ?> <br>
-                    <span class="glyphicon glyphicon-phone" ></span> <?= @$customer_invoice["phone_mobile"] ?> <br>
-                    <?= @$customer_invoice["address1"] ?><br>
-                    <?= @$customer_invoice["address2"] ?><br>
-                    <?= @$customer_invoice["postcode"] ?> <?= @$customer_invoice["city"] ?><br>
+                    <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
+                    <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["invoice"]["phone_mobile"] ?> <br>
+                    <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
+                    <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
+                    <?= $orderinfo["address"]["invoice"]["postcode"] ?> <?= $orderinfo["address"]["invoice"]["city"] ?><br>
                 </div>
             </div> 
         </div>
@@ -718,11 +725,11 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
             <div class="panel panel-default">
                 <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                 <div class="panel-body">
-                    Référence :  <?= $orderinfo["reference"] ?><br>
-                    Facture :  <?= $orderinfo["invoice"] ?><br>
-                    Création :  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
-                    Suivi SMS :  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
-                    Total :  <?= $orderinfo["total_paid"] ?>€<br>
+                    Référence:  <?= $orderinfo["reference"] ?><br>
+                    Facture:  <?= $orderinfo["invoice"] ?><br>
+                    Création:  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
+                    Suivi SMS:  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
+                    Total:  <?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?>
                 </div>
             </div> 
         </div>
@@ -730,9 +737,9 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
             <div class="panel panel-default">
                 <div class="panel-heading">Paiement </div>
                 <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
-                    Mode : <?= $orderinfo["payment"] ?><br>                        
-                    Payé le : <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
-                    Total : <?= $orderPayment["amount"] ?> €<br>
+                    Mode: <?= $orderinfo["payment"] ?><br>                        
+                    Payé le: <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
+                    Total: <?= $orderPayment["amount"] ?> €<br>
                 </div>
             </div> 
         </div>       
@@ -764,7 +771,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                             </select>
                         </p>                        
                         <p>
-                            Fournisseur :
+                            Fournisseur:
                             <select name="id_supplier" class="pme-input-0">
                                 <option value=""></option>
                                 <?
@@ -775,6 +782,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                 }
                                 ?>
                             </select>
+
                         </p>
                         <p>Date liv. Fournisseur: 
                             <input type="text" style="width: 90px" class="datepicker" value="" name="supplier_date_delivery"> 
@@ -839,7 +847,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                             <?= $od["product_name"] ?> <br>
                                             <?
                                             foreach ($od["attributes"] as $attribute) {
-                                                echo " - " . $attribute["attribute_name"] . " : " . $attribute["attribute_value"] . "<br>";
+                                                echo " - " . $attribute["attribute_name"] . ": " . $attribute["attribute_value"] . "<br>";
                                             }
                                             ?>
                                             <font color="red">
@@ -849,7 +857,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                                 foreach ($custom["sub_item"] as $sub_item) {
                                                     echo " - " . $sub_item["sub_item_name"] . "<br>";
                                                     foreach ($sub_item["item_values"] as $item_value) {
-                                                        echo $item_value["item_value_name"] . " : " . $item_value["custom_value"] . "<br>";
+                                                        echo $item_value["item_value_name"] . ": " . $item_value["custom_value"] . "<br>";
                                                     }
                                                 }
                                             }
@@ -861,38 +869,65 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                         <td>
                                             <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
                                         </td>
-                                        <td nowrap><?= $od["total_price_tax_incl"] ?> €</td>
-                                        <td>
-                                            <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
-                                                <option value=""></option>
-                                                <?
-                                                foreach ($productStates as $pState) {
-                                                    ?>
-                                                    <option value="<?= $pState["id_statut"] ?>"
-                                                    <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
-                                                            ><?= $pState["title"] ?> </option>
-                                                            <?
-                                                        }
-                                                        ?>
-                                            </select>
+                                        <td nowrap>
+                                            <?= $od["total_price_tax_incl"] ?> €
+                                            <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?>
                                         </td>
                                         <td>
-                                            <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
-                                                <option value=""></option>
-                                                <?
-                                                foreach ($suppliers as $supplier) {
-                                                    ?>
-                                                    <option value="<?= $supplier["id_supplier"] ?>"
-                                                    <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
-                                                            ><?= $supplier["name"] ?> </option>
-                                                            <?
-                                                        }
+                                            <?
+                                            if ($od["product_current_state"] != 20) {
+                                                ?>
+                                                <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
+                                                    <option value=""></option>
+                                                    <?
+                                                    foreach ($productStates as $pState) {
                                                         ?>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
+                                                        <option value="<?= $pState["id_statut"] ?>"
+                                                        <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
+                                                                ><?= $pState["title"] ?> </option>
+                                                                <?
+                                                            }
+                                                            ?>
+                                                </select>
+                                                <?
+                                            } else {
+                                                echo $od["product_state_label"];
+                                            }
+                                            ?>
 
+                                        </td>
+                                        <td>
+                                            <?
+                                            if ($od["product_current_state"] != 20) {
+                                                ?>
+                                                <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
+                                                    <option value=""></option>
+                                                    <?
+                                                    foreach ($suppliers as $supplier) {
+                                                        ?>
+                                                        <option value="<?= $supplier["id_supplier"] ?>"
+                                                        <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
+                                                                ><?= $supplier["name"] ?> </option>
+                                                                <?
+                                                            }
+                                                            ?>
+                                                </select>
+                                                <?
+                                            } else {
+                                                echo $od["supplier_name"];
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?
+                                            if ($od["product_current_state"] != 20) {
+                                                ?>
+                                                <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
+                                                <?
+                                            } else {
+                                                echo $od["supplier_date_delivery"];
+                                            }
+                                            ?>
                                         </td>                                        
                                         <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
                                         <td><?= $t["horaire"] ?></td>
@@ -901,7 +936,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                         <td><?= $t["comment3"] ?></td>
                                         <td>
                                             <?
-                                            if ($od["product_quantity"] > 1) {
+                                            if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
                                                 ?>
                                                 <div class="input-group">
                                                     <span class="input-group-addon">
@@ -924,7 +959,7 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
                                             }
                                             ?>
                                             <?
-                                            if ($t["date_livraison"]) {
+                                            if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
                                                 ?>
                                                 <button name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
                                                     Retirer du camion
@@ -1130,4 +1165,5 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
         });
         location.reload();
     });
+
 </script>

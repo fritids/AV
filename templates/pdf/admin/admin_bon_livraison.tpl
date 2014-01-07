@@ -56,35 +56,37 @@
                                     <td width="10%" bgcolor="#f5f5f5">Qté</td>
                                 </tr>
 
-                                {foreach key=key item=detail from=$orderinfo.details}
-                                    <tr>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
-                                            {$detail.product_name}<br>
-                                            {if $detail.attributes}
-                                                {foreach key=key item=attribute from=$detail.attributes}
-                                                    {$attribute.attribute_name}: {$attribute.attribute_value} <br>
-                                                {/foreach}
-                                            {/if}
-                                            {if isset($detail.custom)} 
-                                                {foreach from=$detail.custom item=custom}
-                                                    {$custom.main_item_name}                                                    
-                                                    {foreach from=$custom.sub_item item=sub_item}
-                                                        {$sub_item.sub_item_name} <br>
-                                                        {foreach from=$sub_item.item_values item=item_value}
-                                                            {$item_value.item_value_name}: {$item_value.custom_value} <br>
+                                {foreach key=key item=details from=$orderdetails}
+                                    {foreach key=key item=detail from=$details}
+                                        <tr>
+                                            <td style=" border-bottom:1px #000000 solid; padding:3px;">
+                                                {$detail.product_name}<br>
+                                                {if $detail.attributes}
+                                                    {foreach key=key item=attribute from=$detail.attributes}
+                                                        {$attribute.attribute_name}: {$attribute.attribute_value} <br>
+                                                    {/foreach}
+                                                {/if}
+                                                {if isset($detail.custom)} 
+                                                    {foreach from=$detail.custom item=custom}
+                                                        {$custom.main_item_name}                                                    
+                                                        {foreach from=$custom.sub_item item=sub_item}
+                                                            {$sub_item.sub_item_name} <br>
+                                                            {foreach from=$sub_item.item_values item=item_value}
+                                                                {$item_value.item_value_name}: {$item_value.custom_value} <br>
+                                                            {/foreach} 
                                                         {/foreach} 
                                                     {/foreach} 
-                                                {/foreach} 
-                                            {/if}
-                                        </td>
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">
-                                            {if $detail.product_width}
-                                                {$detail.product_width} x {$detail.product_height} 
-                                            {/if}
-                                        </td>
-                                        {*{$detail.product_width} {$detail.product_height} *}
-                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
-                                    </tr>
+                                                {/if}
+                                            </td>
+                                            <td style=" border-bottom:1px #000000 solid; padding:3px;">
+                                                {if $detail.product_width}
+                                                    {$detail.product_width} x {$detail.product_height} 
+                                                {/if}
+                                            </td>
+                                            {*{$detail.product_width} {$detail.product_height} *}
+                                            <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
+                                        </tr>
+                                    {/foreach}
                                 {/foreach}
                             </table>
                         </td>

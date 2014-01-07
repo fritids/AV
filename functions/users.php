@@ -66,31 +66,13 @@ function checkUserLogin($email, $pwd) {
             ->get('av_customer');
 
     if (count($user) == 1) {
-        @session_start();
-        $_SESSION["user"] = $user[0];
-        $_SESSION["is_logged"] = true;
+        if ($user[0]["active"] == 0)
+            return(2);
 
-
-        // get adresse
-        $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
-        $_SESSION["user"]["invoice"] = getAdresse($user[0]["id_customer"], "invoice");
-
-
-        if (empty($_SESSION["user"]["delivery"])) {
-            $delivery_adresse = $_SESSION["user"]["invoice"];
-            $delivery_adresse["alias"] = 'delivery';
-            $delivery_adresse["date_add"] = date("Y-m-d");
-            $delivery_adresse["date_upd"] = date("Y-m-d");
-            unset($delivery_adresse["id_address"]);
-
-            createNewAdresse($delivery_adresse);
-
-            $_SESSION["user"]["delivery"] = getAdresse($user[0]["id_customer"], "delivery");
-        }
-
-        return(true);
+        userLogged($user[0]);
+        return(0);
     } else {
-        return(FALSE);
+        return(1);
     }
 }
 
@@ -110,6 +92,54 @@ function getCustomerDetail($id) {
     $r[0]["voucher"] = getVoucher($id);
 
     return $r[0];
+}
+
+function getSecureKey($email) {
+    global $db;
+    $r = $db->where("email", $email)
+            ->get("av_customer");
+
+    return $r[0]["secure_key"];
+}
+
+function validAccount($email, $secure_key) {
+    global $db;
+
+    if (getSecureKey($email) == $secure_key) {
+        $user = $db->where("email", $email)
+                ->get("av_customer");
+
+        $r = $db->where("email", $email)
+                ->where("secure_key", $secure_key)
+                ->update("av_customer", array("active" => 1, "date_upd" => date("Y-m-d H-i-s")));
+
+        if ($r) {
+            userLogged($user[0]);
+            return(true);
+        }
+    }
+}
+
+function userLogged($user) {
+    @session_start();
+    $_SESSION["user"] = $user;
+    $_SESSION["is_logged"] = true;
+
+    // get adresse
+    $_SESSION["user"]["delivery"] = getAdresse($user["id_customer"], "delivery");
+    $_SESSION["user"]["invoice"] = getAdresse($user["id_customer"], "invoice");
+
+    if (empty($_SESSION["user"]["delivery"])) {
+        $delivery_adresse = $_SESSION["user"]["invoice"];
+        $delivery_adresse["alias"] = 'delivery';
+        $delivery_adresse["date_add"] = date("Y-m-d");
+        $delivery_adresse["date_upd"] = date("Y-m-d");
+        unset($delivery_adresse["id_address"]);
+
+        createNewAdresse($delivery_adresse);
+
+        $_SESSION["user"]["delivery"] = getAdresse($user["id_customer"], "delivery");
+    }
 }
 
 ?>

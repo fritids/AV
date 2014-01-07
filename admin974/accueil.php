@@ -73,10 +73,10 @@
 
             $id = $r[0]["id_ticket"];
             $title = $r[0]["title"];
-            $description = "Bonjour, <br> 
-            Une mise à jour a été livré concernant cette demande.<br>
-            Commentaire : " . $_POST["ticket_pending_description"] . "<br>
-            Nous restons en attente de confirmation de votre part.<br>
+            $description = "Bonjour, <br><br>
+            Une mise à jour a été livré concernant cette demande.<br><br>
+            " . $_POST["ticket_pending_description"] . "<br><br>
+            Nous restons en attente de confirmation de votre part.<br><br>
             Cordialement";
 
             $mail->SetFrom($_SESSION['email']);
@@ -130,10 +130,14 @@
     <div class="col-xs-5" style="overflow:scroll; height: 400px">
         <h3>Les nouveautés</h3>
         <ul class="list-unstyled">
+            <li>03 jan 2014</li>
+            <ul>
+                <li>FO - Téléchargement facture - correction faille de sécurité.</li>
+            </ul>
             <li>02 jan 2014</li>
             <ul>
                 <li>BO - Commande - Ajout bouton retrait du camion (incidence#5)</li>                
-            </ul>
+            </ul>            
             <li>01 jan 2014</li>
             <ul>
                 <li><b>Bonne et heureuse année 2014 !!!</b></li>
@@ -263,7 +267,7 @@
                             ?>
                             <form action="" method="post">
                                 <input type="hidden" name="id_ticket" value="<?= $ticket["id_ticket"] ?>">
-                                <input type="text" name="ticket_pending_description" id="ticket_pending_description" placeholder="votre commentaire ici" required="required">
+                                <input type="text" name="ticket_pending_description" id="ticket_pending_description" placeholder="votre commentaire ici">
                                 <input type="submit" name="ticket_pending" value="Demander validation" class="btn btn-xs btn-default">
                             </form>
                             <?

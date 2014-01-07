@@ -36,8 +36,22 @@ $opts['fdd']['id_customer'] = array(
         'description' => array("columns" => array('lastname', 'firstname', 'email'),
             "divs" => array(' ', ' - ')),
     ),
+    'values2' => array("0" => "TOUS LES CLIENTS"),
     'sort' => true
 );
+$opts['fdd']['id_category'] = array(
+    'name' => 'ID category',
+    'select' => 'T',
+    'maxlen' => 10,
+    'values' => array(
+        'table' => 'av_category',
+        'column' => 'id_category',
+        'description' => array("columns" => array('name')),
+    ),
+    'values2' => array("0" => "TOUTES LES CATEGORIES"),
+    'sort' => true
+);
+
 $opts['fdd']['code'] = array(
     'name' => 'Code',
     'select' => 'T',
@@ -93,6 +107,7 @@ $opts['fdd']['active'] = array(
     'select' => 'T',
     'maxlen' => 1,
     'default' => '1',
+    'values2' => array("0" => "Non", "1" => "Oui"),
     'sort' => true
 );
 
