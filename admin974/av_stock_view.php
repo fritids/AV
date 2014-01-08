@@ -14,7 +14,7 @@ $r = $db->where("stock_tracking", 1)
 
 <div class="container">     
     <div class="page-header">
-        <h1>Stock</h1>
+        <h1>gestion du stock <small>etat des produits</small></h1>
     </div>
     <div>
 

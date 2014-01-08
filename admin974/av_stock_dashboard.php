@@ -46,7 +46,7 @@ $orderStates = $db->where("id_level", 0)
 
 <div class="container">     
     <div class="page-header">
-        <h1>Commandes <small>avec suivi de stock</small></h1>
+        <h1>Ventes<small> des produits en suivi de stock</small></h1>
     </div>
     <div>
         <p>Commande ayant au moins 1 produit dont le stock est à suivre</p>
