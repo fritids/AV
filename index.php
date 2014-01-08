@@ -113,6 +113,7 @@ if (isset($_GET["cart"])) {
         //$shipping_amount = $shipping_ratio * $pweight;
         //$shipping_amount = $conf_shipping_amount;
         $shipping_amount = 0;
+        $impact_coef = 1;
 
         if (isset($_POST["add"])) {
             $dimension = array();
@@ -142,7 +143,7 @@ if (isset($_GET["cart"])) {
                     "height" => $_POST["height"],
                     "depth" => $productInfos["depth"]
                 );
-            }
+            }          
 
             //Si option
             if (isset($_POST["custom"])) {
@@ -150,11 +151,10 @@ if (isset($_GET["cart"])) {
                     foreach ($mapCustomAttribute as $custom_item) {
                         if (is_array($custom_item)) {
                             foreach ($custom_item as $k => $sub_item) {
-                                if ($sub_item["price_impact_percentage"] > 0)
+                                if ($sub_item["price_impact_percentage"] > 0) {
                                     $productInfos["price"] *= $sub_item["price_impact_percentage"];
-
-                                if ($sub_item["price_impact_amount"] > 0)
-                                    $productInfos["price"] += $sub_item["price_impact_amount"] * $config["vate_rate"];
+                                    $impact_coef = $sub_item["price_impact_percentage"];
+                                }
                             }
                         }
                     }
@@ -401,7 +401,7 @@ if (isset($_GET["order-payment"])) {
     /* if (isset($_SESSION["cart_summary"]["total_discount"]) && $_SESSION["cart_summary"]["total_discount"] > 0) {
       $extra_options -= $_SESSION["cart_summary"]["total_discount"];
       } */
-    $total_paid = round($_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"] + $extra_options, 2);
+    $total_paid = round($_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"], 2);
 
     saveorder();
 
@@ -669,7 +669,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "login") {
                 $page_type = "full";
                 break;
             case 2:
-                $ko_msg = array("txt" => "Votre compte est inactif");
+                $ko_msg = array("txt" => "Votre compte est inactif, un mail d'activation vous a été envoyé sur " . $_POST["email"]);
                 $page = "generic_page";
                 $page_type = "full";
 
@@ -678,13 +678,13 @@ if (isset($_GET["action"]) && $_GET["action"] == "login") {
                 foreach ($monitoringEmails as $bccer) {
                     $mail->AddBCC($bccer);
                 }
-                /*$secure_key = getSecureKey($_POST["email"]);
+                $secure_key = getSecureKey($_POST["email"]);
                 $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
 
                 $smarty->assign("account_conf_link", $account_conf_link);
                 $mail_body = $smarty->fetch("mail_account_confirm.tpl");
                 $mail->MsgHTML($mail_body);
-                $mail->Send();*/
+                $mail->Send();
                 break;
         }
     } else {

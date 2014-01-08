@@ -179,8 +179,8 @@
     });</script>
 
 <script>
-    var min_area_invoiced;
-    var max_area_invoiced;
+    var min_area_invoiced = {$product.min_area_invoiced};
+    var max_area_invoiced = {$product.max_area_invoiced};
     var square = 0;
     var unit_weight = 1;
     var min_width = {$product.min_width};
@@ -206,16 +206,9 @@
                     id_product: $id_product
                 },
                 success: function(result) {
-                    //console.log(result);
-                    item_price_addition = 0;
+                    //console.log(result);                    
                     //console.log('#list_' + $id_item + '_' + $id_block);
-                    $('#list_' + $id_item + '_' + $id_block).text("");
-                    if (result.min_area_invoiced !== null) {
-                        min_area_invoiced = parseFloat(result.min_area_invoiced);
-                    }
-                    if (result.max_area_invoiced !== null) {
-                        max_area_invoiced = parseFloat(result.max_area_invoiced);
-                    }
+                    $('#list_' + $id_item + '_' + $id_block).text("");                    
                     if (result.picture !== null) {
                         $("#custom_img").attr("src", "/img/f/" + result.picture);
                     }
@@ -235,12 +228,12 @@
 
                         if (value.is_width === 1 && value.max_width > max_width) {
                             item_max_width = max_width;
-                        }else if (value.is_height === 1 && value.max_width > max_height) {
+                        } else if (value.is_height === 1 && value.max_width > max_height) {
                             item_max_width = max_height;
-                        }else{
+                        } else {
                             item_max_width = value.max_width;
                         }
-                            
+
 
                         $item_range = $('<input />').attr({
                             type: 'range',
@@ -354,8 +347,8 @@
             }
 
             /*console.log(pwidth);
-             console.log(pheight);
-             console.log(area);
+            console.log(pheight);
+            console.log(area);
              console.log(area * unit_price * qte * shape_coef);
              console.log(unit_price);*/
             $('#surface').text(area.toFixed(2));
@@ -384,7 +377,7 @@
             success: function(result) {
                 unit_price = result.price;
                 unit_weight = result.weight;
-                //console.log(unit_price);
+                console.log(unit_price);
                 $('#total_price').text(unit_price);
                 //$('#total_poids').text(unit_weight);
                 $('#price').val(unit_price);

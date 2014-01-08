@@ -73,11 +73,15 @@
 
             $id = $r[0]["id_ticket"];
             $title = $r[0]["title"];
+
             $description = "Bonjour, <br><br>
             Une mise à jour a été livré concernant cette demande.<br><br>
-            " . $_POST["ticket_pending_description"] . "<br><br>
             Nous restons en attente de confirmation de votre part.<br><br>
             Cordialement";
+
+            if ($_POST["ticket_pending_description"] != '')
+                $description = $_POST["ticket_pending_description"];
+
 
             $mail->SetFrom($_SESSION['email']);
             $mail->AddAddress($r[0]["email"]);

@@ -346,6 +346,9 @@ $trucks = $db->get("av_truck");
                                 $supplier_date_delivery = new DateTime($OrderProduct["supplier_date_delivery"]);
                                 $dateLivraison = new DateTime($date_livraison);
 
+                                if ($OrderProduct["supplier_date_delivery"] == null || $supplier_date_delivery > $dateLivraison)
+                                    $not_deliverable = true;
+
                                 switch ($OrderProduct["product_current_state"]) {
                                     case 15:
                                         $icon = "";
@@ -359,10 +362,9 @@ $trucks = $db->get("av_truck");
                                         break;
                                     case 17:
                                         if ($OrderProduct["supplier_date_delivery"] == null || $supplier_date_delivery > $dateLivraison) {
-                                            $helper = "attente date fournisseur";
+                                            $helper = "Pas disponible entrepot";
                                             $icon = "glyphicon-exclamation-sign";
                                             $cssalert = 8;
-                                            $not_deliverable = true;
                                         } else {
                                             $icon = "glyphicon-cog";
                                             $helper = "ARC reçu";
@@ -725,144 +727,144 @@ $trucks = $db->get("av_truck");
 
 <script>
 
-                                            $(".addAllItems").click(function() {
-                                                id_order = $(this).val();
-                                                $(".add_" + id_order).each(function(index, element) {
-                                                    $(element).click();
-                                                });
-
-                                            });
-
-                                            $(".emptytruck").click(function() {
-                                                id_truck = $(this).val();
-                                                $(".del_" + id_truck).each(function(index, element) {
-                                                    $(element).click();
-                                                });
-                                            });
-
-                                            $("button[name='addtruck']").click(function() {
-                                                var btn = $(this);
-                                                var id_order_detail = $(this).closest("tr").attr("id");
-                                                var nb = $("#nb_" + id_order_detail).val();
-                                                var p = $(this).val() + "|" + $("#planning").val() + "|" + nb;
-
-                                                var action = "add";
-                                                var module = "truckTournee";
-                                                var func = action + module;
-
-                                                //console.log(p + " " + func + " nb " + nb);
-
-                                                $.ajax({
-                                                    url: "functions/ajax_trucks.php",
-                                                    type: "POST",
-                                                    dataType: "json",
-                                                    async: false,
-                                                    data: {
-                                                        func: func,
-                                                        id: p,
-                                                    },
-                                                    success: function(data) {
-                                                        console.log(data);
-
-                                                        //console.log(btn.closest("td").find("button"));
-                                                        btn.closest("td").find("button").each(function(index, element) {
-
-                                                            console.log(element);
-
-                                                            if (btn.text() !== $(element).text()) {
-                                                                $(element).hide("slow");
-                                                            }
+                                                        $(".addAllItems").click(function() {
+                                                            id_order = $(this).val();
+                                                            $(".add_" + id_order).each(function(index, element) {
+                                                                $(element).click();
+                                                            });
 
                                                         });
-                                                        btn.attr("disabled", "disabled");
-                                                        btn.removeClass();
-                                                        btn.addClass("btn btn-xs btn-block alert-success");
 
-                                                    },
-                                                    error: function(xhr, textStatus, error) {
-                                                        console.log(xhr.statusText);
-                                                        console.log(textStatus);
-                                                        console.log(error);
-                                                        btn.closest("td").find("button").each(function(index, element) {
-                                                            $(element).attr("disabled", "disabled");
-                                                            $(element).removeClass();
-                                                            $(element).addClass("btn btn-xs btn-block alert-danger");
+                                                        $(".emptytruck").click(function() {
+                                                            id_truck = $(this).val();
+                                                            $(".del_" + id_truck).each(function(index, element) {
+                                                                $(element).click();
+                                                            });
                                                         });
-                                                    }
-                                                });
+
+                                                        $("button[name='addtruck']").click(function() {
+                                                            var btn = $(this);
+                                                            var id_order_detail = $(this).closest("tr").attr("id");
+                                                            var nb = $("#nb_" + id_order_detail).val();
+                                                            var p = $(this).val() + "|" + $("#planning").val() + "|" + nb;
+
+                                                            var action = "add";
+                                                            var module = "truckTournee";
+                                                            var func = action + module;
+
+                                                            //console.log(p + " " + func + " nb " + nb);
+
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
+
+                                                                    //console.log(btn.closest("td").find("button"));
+                                                                    btn.closest("td").find("button").each(function(index, element) {
+
+                                                                        console.log(element);
+
+                                                                        if (btn.text() !== $(element).text()) {
+                                                                            $(element).hide("slow");
+                                                                        }
+
+                                                                    });
+                                                                    btn.attr("disabled", "disabled");
+                                                                    btn.removeClass();
+                                                                    btn.addClass("btn btn-xs btn-block alert-success");
+
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                    btn.closest("td").find("button").each(function(index, element) {
+                                                                        $(element).attr("disabled", "disabled");
+                                                                        $(element).removeClass();
+                                                                        $(element).addClass("btn btn-xs btn-block alert-danger");
+                                                                    });
+                                                                }
+                                                            });
 
 
 
-                                                //location.reload();
+                                                            //location.reload();
 
-                                            });
-                                            $("button[name='delProduitTruck']").click(function() {
-                                                var btn = $(this);
-                                                var p = $(this).val();
-                                                var action = "del";
-                                                var module = "ProduitTournee";
+                                                        });
+                                                        $("button[name='delProduitTruck']").click(function() {
+                                                            var btn = $(this);
+                                                            var p = $(this).val();
+                                                            var action = "del";
+                                                            var module = "ProduitTournee";
 
-                                                var func = action + module;
+                                                            var func = action + module;
 
-                                                $.ajax({
-                                                    url: "functions/ajax_trucks.php",
-                                                    type: "POST",
-                                                    dataType: "json",
-                                                    async: false,
-                                                    data: {
-                                                        func: func,
-                                                        id: p,
-                                                    },
-                                                    success: function(data) {
-                                                        console.log(data);
-                                                        btn.attr("disabled", "disabled");
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
+                                                                    btn.attr("disabled", "disabled");
 
-                                                    },
-                                                    error: function(xhr, textStatus, error) {
-                                                        console.log(xhr.statusText);
-                                                        console.log(textStatus);
-                                                        console.log(error);
-                                                        btn.attr("disabled", "disabled");
-                                                    }
-                                                });
-                                                //location.reload();
-                                            });
-                                            $("button[name='validTruck']").click(function() {
-                                                var p = $(this).val();
-                                                var action = "upd";
-                                                var module = "ValidTruck";
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                    btn.attr("disabled", "disabled");
+                                                                }
+                                                            });
+                                                            //location.reload();
+                                                        });
+                                                        $("button[name='validTruck']").click(function() {
+                                                            var p = $(this).val();
+                                                            var action = "upd";
+                                                            var module = "ValidTruck";
 
-                                                var func = action + module;
+                                                            var func = action + module;
 
-                                                console.log(p + " " + func);
+                                                            console.log(p + " " + func);
 
-                                                $.ajax({
-                                                    url: "functions/ajax_trucks.php",
-                                                    type: "POST",
-                                                    dataType: "json",
-                                                    async: false,
-                                                    data: {
-                                                        func: func,
-                                                        id: p,
-                                                    },
-                                                    success: function(data) {
-                                                        console.log(data);
-                                                    },
-                                                    error: function(xhr, textStatus, error) {
-                                                        console.log(xhr.statusText);
-                                                        console.log(textStatus);
-                                                        console.log(error);
-                                                    }
-                                                });
-                                                location.reload();
-                                            });
+                                                            $.ajax({
+                                                                url: "functions/ajax_trucks.php",
+                                                                type: "POST",
+                                                                dataType: "json",
+                                                                async: false,
+                                                                data: {
+                                                                    func: func,
+                                                                    id: p,
+                                                                },
+                                                                success: function(data) {
+                                                                    console.log(data);
+                                                                },
+                                                                error: function(xhr, textStatus, error) {
+                                                                    console.log(xhr.statusText);
+                                                                    console.log(textStatus);
+                                                                    console.log(error);
+                                                                }
+                                                            });
+                                                            location.reload();
+                                                        });
 
 
-                                            jQuery(function($) {
+                                                        jQuery(function($) {
 
 <?= (isset($_GET["planning"])) ? "$('#datepicker2').val(\"" . $_GET["planning"] . "\")" : "" ?>
 
-                                            });
+                                                        });
 
 
 </script>

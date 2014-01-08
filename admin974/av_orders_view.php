@@ -470,700 +470,712 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 ?>
 
 
-
-<div class="container">    
-    <div class="row">
-        <div class="col-xs-1">
-            <?
-            if ($order_precedent) {
-                ?>
-                <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>" data-toggle="tooltip" title="Commande précédente"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                <?
-            }
-            ?>
-        </div>
-        <div class="col-xs-1">
-            <?
-            if ($order_suivant) {
-                ?>
-                <a href="?id_order=<?= $order_suivant[0]["id_order"] ?>" data-toggle="tooltip" title="Commande suivante"><span class="glyphicon glyphicon-arrow-right"></span></a>
-                <?
-            }
-            ?>
-        </div>
-        <div class="col-xs-10">
-            <ul class="pagination">
-                <?
-                for ($i = 5; $i >= 0; $i--) {
-                    if (isset($order_precedent[$i])) {
-                        ?>
-                        <li ><a href="?id_order=<?= $order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
-                        <?
-                    }
-                }
-                ?>
-
-                <li><a href="#" class="alert-<?= $orderinfo["current_state"] ?>"><strong><?= $oid ?></strong></a></li>
-                <?
-                for ($i = 0; $i <= 5; $i++) {
-                    if (isset($order_suivant[$i])) {
-                        ?>
-                        <li><a href="?id_order=<?= $order_suivant[$i]["id_order"] ?>" class="alert-<?= @$order_suivant[$i]["current_state"] ?>"><?= @$order_suivant[$i]["id_order"] ?></a></li>
-                        <?
-                    }
-                }
-                ?>
-
-            </ul>
-        </div>
-
-
-    </div>
-    <?
-    if (!empty($updated)) {
-        ?>
+<?
+if ($orderinfo) {
+    ?>
+    <div class="container">    
         <div class="row">
-            <div class="col-xs-12" >
-                <div class="alert alert-success">
-                    <?= $updated["text"] ?>
-                </div>                   
-
+            <div class="col-xs-1">
+                <?
+                if ($order_precedent) {
+                    ?>
+                    <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>" data-toggle="tooltip" title="Commande précédente"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                    <?
+                }
+                ?>
             </div>
+            <div class="col-xs-1">
+                <?
+                if ($order_suivant) {
+                    ?>
+                    <a href="?id_order=<?= $order_suivant[0]["id_order"] ?>" data-toggle="tooltip" title="Commande suivante"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                    <?
+                }
+                ?>
+            </div>
+            <div class="col-xs-10">
+                <ul class="pagination">
+                    <?
+                    for ($i = 5; $i >= 0; $i--) {
+                        if (isset($order_precedent[$i])) {
+                            ?>
+                            <li ><a href="?id_order=<?= $order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
+                            <?
+                        }
+                    }
+                    ?>
+
+                    <li><a href="#" class="alert-<?= $orderinfo["current_state"] ?>"><strong><?= $oid ?></strong></a></li>
+                    <?
+                    for ($i = 0; $i <= 5; $i++) {
+                        if (isset($order_suivant[$i])) {
+                            ?>
+                            <li><a href="?id_order=<?= $order_suivant[$i]["id_order"] ?>" class="alert-<?= @$order_suivant[$i]["current_state"] ?>"><?= @$order_suivant[$i]["id_order"] ?></a></li>
+                            <?
+                        }
+                    }
+                    ?>
+
+                </ul>
+            </div>
+
 
         </div>
         <?
-    }
-    ?>
-    <div class="row">
+        if (!empty($updated)) {
+            ?>
+            <div class="row">
+                <div class="col-xs-12" >
+                    <div class="alert alert-success">
+                        <?= $updated["text"] ?>
+                    </div>                   
 
-        <div class="col-xs-3">
-            <div class="alert">
-                <b class="h3">#<?= $oid ?></b>   
-            </div>
-        </div>  
-        <div class="col-xs-2">
-            <div class="alert">
-                <form action="av_download_pdf.php?order" method="post" target="blank">
-                    <input type="hidden" value="<?= $oid ?>" name="id_order">
-                    <button class="btn btn-default" data-toggle="tooltip" title="Télécharger la facture au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
-                </form> 
-            </div>
-        </div>
-        <div class="col-xs-3">
-            <table class="table table-condensed  table-bordered">
-                <tr class="text-center">
-                    <th class="text-center" style="width: 50px">COMM.</th>
-                    <th class="text-center" style="width: 50px">ARC</th>
-                    <th class="text-center" style="width: 50px">RECU</th>
-                    <th class="text-center" style="width: 50px">LIV. PROG</th>
-                    <th class="text-center" style="width: 50px">LIVREE</th>
-                </tr>
-                <tr>
-                    <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["COMMANDE_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default:
-                        }
-                        ?>                        
-                    </td>
-                    <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["ARC_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default:
-                        }
-                        ?>                        
-                    </td>
-                    <td class="text-center alert-<?= $orderinfo["RECU_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["RECU_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default:
-                        }
-                        ?>                        
-                    </td>                   
-                    <td class="text-center alert-<?= $orderinfo["LIV_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["LIV_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default:
-                        }
-                        ?>                        
-                    </td>                   
-                    <td class="text-center alert-<?= $orderinfo["LIV_GLOBAL_INFO"] ?>">
-                        <?
-                        switch ($orderinfo["LIV_GLOBAL_INFO"]) {
-                            case 5:
-                                echo '<span class="glyphicon glyphicon-ok"></span>';
-                                break;
-                            case 6:
-                                echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                break;
-                            case 8:
-                                echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                break;
-                            default:
-                        }
-                        ?>                        
-                    </td>                   
-
-                </tr>
-            </table>
-
-        </div>  
-
-        <div class="col-xs-4">
-            <div class="alert alert-<?= $orderinfo["current_state"] ?>">
-                <form method="post">
-                    <select name="current_state" class="pme-input-0">
-                        <option value="">--</option>
-                        <?
-                        foreach ($orderStates as $orderState) {
-                            ?>
-                            <option value="<?= $orderState["id_statut"] ?>"
-                            <?= ($orderinfo["current_state"] == $orderState["id_statut"]) ? "selected" : "" ?>
-                                    ><?= $orderState["title"] ?> </option>
-                                    <?
-                                }
-                                ?> 
-                    </select>
-
-                    <button type="submit" class="btn btn-sm" name="order_state">Ok</button>
-                </form>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="row">
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Contact <div class="pull-right">
-                        <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
-                        <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Modifier les infos personnelles"><span class="glyphicon glyphicon-edit"></span></a>
-                    </div>
                 </div>
-                <div class="panel-body">
-                    Nom:<?= @$customer_info["firstname"] ?> <br>
-                    Prénom: <?= @$customer_info["lastname"] ?> <br>                    
-                    Email: <?= @$customer_info["email"] ?> <br>                        
-                    Type: <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
-                </div>
-            </div>            
-        </div>
 
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["delivery"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
-                    <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["delivery"]["phone_mobile"] ?> <br>
-                    <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
-                    <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
-                    <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?> [ <?= $orderinfo["address"]["delivery"]["zone"] ?> ]
+            </div>
+            <?
+        }
+        ?>
+        <div class="row">
+
+            <div class="col-xs-3">
+                <div class="alert">
+                    <b class="h3">#<?= $oid ?></b>   
                 </div>
             </div>  
-        </div>
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["invoice"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
-                    <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["invoice"]["phone_mobile"] ?> <br>
-                    <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
-                    <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
-                    <?= $orderinfo["address"]["invoice"]["postcode"] ?> <?= $orderinfo["address"]["invoice"]["city"] ?><br>
-                </div>
-            </div> 
-        </div>
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Commentaire client <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    <?= $orderinfo["order_comment"] ?>
+            <div class="col-xs-2">
+                <div class="alert">
+                    <form action="av_download_pdf.php?order" method="post" target="blank">
+                        <input type="hidden" value="<?= $oid ?>" name="id_order">
+                        <button class="btn btn-default" data-toggle="tooltip" title="Télécharger la facture au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                    </form> 
                 </div>
             </div>
-        </div>
+            <div class="col-xs-3">
+                <table class="table table-condensed  table-bordered">
+                    <tr class="text-center">
+                        <th class="text-center" style="width: 50px">COMM.</th>
+                        <th class="text-center" style="width: 50px">ARC</th>
+                        <th class="text-center" style="width: 50px">RECU</th>
+                        <th class="text-center" style="width: 50px">LIV. PROG</th>
+                        <th class="text-center" style="width: 50px">LIVREE</th>
+                    </tr>
+                    <tr>
+                        <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
+                            <?
+                            switch ($orderinfo["COMMANDE_INFO"]) {
+                                case 5:
+                                    echo '<span class="glyphicon glyphicon-ok"></span>';
+                                    break;
+                                case 6:
+                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                    break;
+                                case 8:
+                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                    break;
+                                default:
+                            }
+                            ?>                        
+                        </td>
+                        <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
+                            <?
+                            switch ($orderinfo["ARC_INFO"]) {
+                                case 5:
+                                    echo '<span class="glyphicon glyphicon-ok"></span>';
+                                    break;
+                                case 6:
+                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                    break;
+                                case 8:
+                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                    break;
+                                default:
+                            }
+                            ?>                        
+                        </td>
+                        <td class="text-center alert-<?= $orderinfo["RECU_INFO"] ?>">
+                            <?
+                            switch ($orderinfo["RECU_INFO"]) {
+                                case 5:
+                                    echo '<span class="glyphicon glyphicon-ok"></span>';
+                                    break;
+                                case 6:
+                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                    break;
+                                case 8:
+                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                    break;
+                                default:
+                            }
+                            ?>                        
+                        </td>                   
+                        <td class="text-center alert-<?= $orderinfo["LIV_INFO"] ?>">
+                            <?
+                            switch ($orderinfo["LIV_INFO"]) {
+                                case 5:
+                                    echo '<span class="glyphicon glyphicon-ok"></span>';
+                                    break;
+                                case 6:
+                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                    break;
+                                case 8:
+                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                    break;
+                                default:
+                            }
+                            ?>                        
+                        </td>                   
+                        <td class="text-center alert-<?= $orderinfo["LIV_GLOBAL_INFO"] ?>">
+                            <?
+                            switch ($orderinfo["LIV_GLOBAL_INFO"]) {
+                                case 5:
+                                    echo '<span class="glyphicon glyphicon-ok"></span>';
+                                    break;
+                                case 6:
+                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+                                    break;
+                                case 8:
+                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+                                    break;
+                                default:
+                            }
+                            ?>                        
+                        </td>                   
 
-    </div>
+                    </tr>
+                </table>
 
-    <div class="row">
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    Référence:  <?= $orderinfo["reference"] ?><br>
-                    Facture:  <?= $orderinfo["invoice"] ?><br>
-                    Création:  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
-                    Suivi SMS:  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
-                    Total:  <?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?>
-                </div>
-            </div> 
-        </div>
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Paiement </div>
-                <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
-                    Mode: <?= $orderinfo["payment"] ?><br>                        
-                    Payé le: <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
-                    Total: <?= $orderPayment["amount"] ?> €<br>
-                </div>
-            </div> 
-        </div>       
+            </div>  
 
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">Commentaire interne livraison <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                <div class="panel-body">
-                    <?= $orderinfo["delivery_comment"] ?>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-3">
-            <div class="panel panel-default">
-                <div class="panel-heading"><strong>ACTION SUR TOUS PRODUITS</strong></div>
-                <div class="panel-body">
+            <div class="col-xs-4">
+                <div class="alert alert-<?= $orderinfo["current_state"] ?>">
                     <form method="post">
-                        <p>Statuts: 
-                            <select style="width: 150px"  name="product_current_state" class="pme-input-0">
-                                <option value=""></option>
-                                <?
-                                foreach ($productStates as $pstate) {
-                                    ?>
-                                    <option value="<?= $pstate["id_statut"] ?>"                                        
-                                            ><?= $pstate["title"] ?> </option>
-                                            <?
-                                        }
-                                        ?>
-                            </select>
-                        </p>                        
-                        <p>
-                            Fournisseur:
-                            <select name="id_supplier" class="pme-input-0">
-                                <option value=""></option>
-                                <?
-                                foreach ($suppliers as $supplier) {
-                                    ?>
-                                    <option value="<?= $supplier["id_supplier"] ?>"><?= $supplier["name"] ?> </option>
-                                    <?
-                                }
+                        <select name="current_state" class="pme-input-0">
+                            <option value="">--</option>
+                            <?
+                            foreach ($orderStates as $orderState) {
                                 ?>
-                            </select>
+                                <option value="<?= $orderState["id_statut"] ?>"
+                                <?= ($orderinfo["current_state"] == $orderState["id_statut"]) ? "selected" : "" ?>
+                                        ><?= $orderState["title"] ?> </option>
+                                        <?
+                                    }
+                                    ?> 
+                        </select>
 
-                        </p>
-                        <p>Date liv. Fournisseur: 
-                            <input type="text" style="width: 90px" class="datepicker" value="" name="supplier_date_delivery"> 
-                        </p>
-                        <p>
-                            <button type="submit" class="btn btn-sm btn-warning btn-block">Ok</button>
-                        </p>
+                        <button type="submit" class="btn btn-sm" name="order_state">Ok</button>
                     </form>
                 </div>
             </div>
+
         </div>
-    </div>
 
-    <?
-    if (!empty($orderinfo["details"])) {
-        ?>
         <div class="row">
-            <div class="col-xs-12">
-                <h2>Produits</h2>
-                <ul class="nav nav-pills">
-                    <li class="active"><a href="#Produits" data-toggle="tab">Produits</a></li>
-                    <li><a href="#bdc" data-toggle="tab">Bon de commande</a></li>
-                    <li><a href="#history_mail" data-toggle="tab">Historique e-mail</a></li>
-                    <li><a href="#history_mod" data-toggle="tab">Historique Modifications</a></li>
-                </ul>
-                <form method="post">
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="Produits">
-                            <input type="hidden" name="id_order" value="<?= $oid ?>">
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Contact <div class="pull-right">
+                            <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
+                            <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Modifier les infos personnelles"><span class="glyphicon glyphicon-edit"></span></a>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        Nom:<?= @$customer_info["firstname"] ?> <br>
+                        Prénom: <?= @$customer_info["lastname"] ?> <br>                    
+                        Email: <?= @$customer_info["email"] ?> <br>                        
+                        Type: <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
+                    </div>
+                </div>            
+            </div>
 
-                            <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
-                                <tr>
-                                    <th colspan="5" class="text-center">PRODUIT</th>
-                                    <th colspan="2" class="text-center">FOURNISSEUR</th>
-                                    <th colspan="6" class="text-center">LIVRAISON</th>                          
-                                </tr>
-                                <tr>
-                                    <th>Produit</th>
-                                    <th>Long x Larg</th>
-                                    <th>Qte</th>
-                                    <th>Prix TTC</th>
-                                    <th>Statuts</th>
-                                    <th>Fournisseur</th>
-                                    <th>Date Livraison</th>                                    
-                                    <th>Date Livraison camion</th>    
-                                    <th>Horaire</th>    
-                                    <th>commentaire</th>    
-                                    <th>commentaire</th>    
-                                    <th>commentaire</th>    
-                                    <th></th>    
-                                </tr>
-                                <?
-                                foreach ($orderinfo["details"] as $od) {
-                                    $t = getItemTourneeinfo($od["id_order_detail"]);
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["delivery"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+                        <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
+                        <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["delivery"]["phone_mobile"] ?> <br>
+                        <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
+                        <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
+                        <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?> [ <?= $orderinfo["address"]["delivery"]["zone"] ?> ]
+                    </div>
+                </div>  
+            </div>
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["invoice"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+                        <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
+                        <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["invoice"]["phone_mobile"] ?> <br>
+                        <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
+                        <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
+                        <?= $orderinfo["address"]["invoice"]["postcode"] ?> <?= $orderinfo["address"]["invoice"]["city"] ?><br>
+                    </div>
+                </div> 
+            </div>
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Commentaire client <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+                        <?= $orderinfo["order_comment"] ?>
+                    </div>
+                </div>
+            </div>
 
-                                    $isFournisseurOk = true;
-                                    $isFournisseurOk = ($od["id_supplier"] != '' ) ? true : false;
-                                    ?>
-                                    <tr id="id0">
+        </div>
 
-                                        <td nowrap> 
-                                            <?= $od["product_name"] ?> <br>
-                                            <?
-                                            foreach ($od["attributes"] as $attribute) {
-                                                echo " - " . $attribute["attribute_name"] . ": " . $attribute["attribute_value"] . "<br>";
-                                            }
-                                            ?>
-                                            <font color="red">
-                                            <?
-                                            foreach ($od["custom"] as $custom) {
-                                                echo " - " . $custom["main_item_name"];
-                                                foreach ($custom["sub_item"] as $sub_item) {
-                                                    echo " - " . $sub_item["sub_item_name"] . "<br>";
-                                                    foreach ($sub_item["item_values"] as $item_value) {
-                                                        echo $item_value["item_value_name"] . ": " . $item_value["custom_value"] . "<br>";
-                                                    }
-                                                }
-                                            }
-                                            ?>
-                                            </font>
-                                            <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
-                                        </td>
-                                        <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
-                                        <td>
-                                            <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
-                                        </td>
-                                        <td nowrap>
-                                            <?= $od["total_price_tax_incl"] ?> €
-                                            <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?>
-                                        </td>
-                                        <td>
-                                            <?
-                                            if ($od["product_current_state"] != 20) {
-                                                ?>
-                                                <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
-                                                    <option value=""></option>
-                                                    <?
-                                                    foreach ($productStates as $pState) {
-                                                        ?>
-                                                        <option value="<?= $pState["id_statut"] ?>"
-                                                        <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
-                                                                ><?= $pState["title"] ?> </option>
-                                                                <?
-                                                            }
-                                                            ?>
-                                                </select>
-                                                <?
-                                            } else {
-                                                echo $od["product_state_label"];
-                                            }
-                                            ?>
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+                        Référence:  <?= $orderinfo["reference"] ?><br>
+                        Facture:  <?= $orderinfo["invoice"] ?><br>
+                        Création:  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
+                        Suivi SMS:  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
+                        Total:  <?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?>
+                    </div>
+                </div> 
+            </div>
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Paiement </div>
+                    <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
+                        Mode: <?= $orderinfo["payment"] ?><br>                        
+                        Payé le: <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
+                        Total: <?= $orderPayment["amount"] ?> €<br>
+                    </div>
+                </div> 
+            </div>       
 
-                                        </td>
-                                        <td>
-                                            <?
-                                            if ($od["product_current_state"] != 20) {
-                                                ?>
-                                                <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
-                                                    <option value=""></option>
-                                                    <?
-                                                    foreach ($suppliers as $supplier) {
-                                                        ?>
-                                                        <option value="<?= $supplier["id_supplier"] ?>"
-                                                        <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
-                                                                ><?= $supplier["name"] ?> </option>
-                                                                <?
-                                                            }
-                                                            ?>
-                                                </select>
-                                                <?
-                                            } else {
-                                                echo $od["supplier_name"];
-                                            }
-                                            ?>
-                                        </td>
-                                        <td>
-                                            <?
-                                            if ($od["product_current_state"] != 20) {
-                                                ?>
-                                                <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
-                                                <?
-                                            } else {
-                                                echo $od["supplier_date_delivery"];
-                                            }
-                                            ?>
-                                        </td>                                        
-                                        <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
-                                        <td><?= $t["horaire"] ?></td>
-                                        <td><?= $t["comment1"] ?></td>
-                                        <td><?= $t["comment2"] ?></td>
-                                        <td><?= $t["comment3"] ?></td>
-                                        <td>
-                                            <?
-                                            if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
-                                                ?>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">
-                                                        <select name="qte[<?= $od["id_order_detail"] ?>]">
-                                                            <option></option>
-                                                            <?
-                                                            for ($n = 1; $n < $od["product_quantity"]; $n++) {
-                                                                ?>
-                                                                <option value="<?= $n ?>"><?= $n ?></option>
-                                                                <?
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                    </span>
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="submit" name="split_order">Split!</button>
-                                                    </span>
-                                                </div><!-- /input-group -->
-                                                <?
-                                            }
-                                            ?>
-                                            <?
-                                            if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
-                                                ?>
-                                                <button name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
-                                                    Retirer du camion
-                                                </button>
-                                                <?
-                                            }
-                                            ?>
-                                        </td>
-
-                                    </tr>
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Commentaire interne livraison <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+                        <?= $orderinfo["delivery_comment"] ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><strong>ACTION SUR TOUS PRODUITS</strong></div>
+                    <div class="panel-body">
+                        <form method="post">
+                            <p>Statuts: 
+                                <select style="width: 150px"  name="product_current_state" class="pme-input-0">
+                                    <option value=""></option>
                                     <?
-                                }
-                                ?>
-                            </table>                            
-                            <div class="col-xs-3 pull-right">
-                                <div class="col-xs-12" >
-                                    <p id="idmsg"></p>
-                                </div>
-                                <div class="col-xs-12" >
-                                    <p>
-                                        <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
-                                    </p>
-                                    <?
-                                    if ($isFournisseurOk) {
+                                    foreach ($productStates as $pstate) {
                                         ?>
-                                        <p>
-                                            <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"   class="btn-lg btn-block btn-primary" id="btn_send_supplier">
-                                        </p>
+                                        <option value="<?= $pstate["id_statut"] ?>"                                        
+                                                ><?= $pstate["title"] ?> </option>
+                                                <?
+                                            }
+                                            ?>
+                                </select>
+                            </p>                        
+                            <p>
+                                Fournisseur:
+                                <select name="id_supplier" class="pme-input-0">
+                                    <option value=""></option>
+                                    <?
+                                    foreach ($suppliers as $supplier) {
+                                        ?>
+                                        <option value="<?= $supplier["id_supplier"] ?>"><?= $supplier["name"] ?> </option>
                                         <?
                                     }
                                     ?>
-                                </div>
-                            </div>
-                        </div>
+                                </select>
 
-                        <div class="tab-pane" id="bdc">
-                            <table>
-                                <tr>
-                                    <th>Utilisateur</th>                                        
-                                    <th>Date envoi</th>
-                                    <th>Fournisseur</th>
-                                    <th>Bdc</th>
+                            </p>
+                            <p>Date liv. Fournisseur: 
+                                <input type="text" style="width: 90px" class="datepicker" value="" name="supplier_date_delivery"> 
+                            </p>
+                            <p>
+                                <button type="submit" class="btn btn-sm btn-warning btn-block">Ok</button>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                </tr>
-                                <?
-                                if ($orderinfo["history"])
-                                    foreach ($orderinfo["history"] as $odh) {
-                                        if ($odh["supplier_name"]) {
-                                            ?>
-                                            <tr>
-                                                <td><?= $odh["prenom"] ?></td>
-                                                <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
-                                                <td><?= $odh["supplier_name"] ?></td>
-                                                <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
-                                            </tr>
-                                            <?
-                                        }
-                                    }
-                                ?>
+        <?
+        if (!empty($orderinfo["details"])) {
+            ?>
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2>Produits</h2>
+                    <ul class="nav nav-pills">
+                        <li class="active"><a href="#Produits" data-toggle="tab">Produits</a></li>
+                        <li><a href="#bdc" data-toggle="tab">Bon de commande</a></li>
+                        <li><a href="#history_mail" data-toggle="tab">Historique e-mail</a></li>
+                        <li><a href="#history_mod" data-toggle="tab">Historique Modifications</a></li>
+                    </ul>
+                    <form method="post">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="Produits">
+                                <input type="hidden" name="id_order" value="<?= $oid ?>">
 
-                            </table>
+                                <table class="table table-bordered table-condensed col-xs-12" id="tab_devis">
+                                    <tr>
+                                        <th colspan="5" class="text-center">PRODUIT</th>
+                                        <th colspan="2" class="text-center">FOURNISSEUR</th>
+                                        <th colspan="6" class="text-center">LIVRAISON</th>                          
+                                    </tr>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Long x Larg</th>
+                                        <th>Qte</th>
+                                        <th>Prix TTC</th>
+                                        <th>Statuts</th>
+                                        <th>Fournisseur</th>
+                                        <th>Date Livraison</th>                                    
+                                        <th>Date Livraison camion</th>    
+                                        <th>Horaire</th>    
+                                        <th>commentaire</th>    
+                                        <th>commentaire</th>    
+                                        <th>commentaire</th>    
+                                        <th></th>    
+                                    </tr>
+                                    <?
+                                    foreach ($orderinfo["details"] as $od) {
+                                        $t = getItemTourneeinfo($od["id_order_detail"]);
 
-                        </div>
-                        <div class="tab-pane" id="history_mail">                           
-                            <table>
-                                <tr>
-                                    <th>Utilisateur</th>                                        
-                                    <th>Date envoi</th>
-                                    <th>Objet</th>
-                                    <th>Fichier</th>
-                                </tr>
-                                <?
-                                foreach ($orderinfo["history"] as $odh) {
-                                    if (empty($odh["supplier_name"])) {
+                                        $isFournisseurOk = true;
+                                        $isFournisseurOk = ($od["id_supplier"] != '' ) ? true : false;
                                         ?>
-                                        <tr>
-                                            <td><?= $odh["prenom"] ?></td>
-                                            <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
-                                            <td><?= $odh["category"] ?></td>  
-                                            <td>
+                                        <tr id="id0">
 
+                                            <td nowrap> 
+                                                <?= $od["product_name"] ?> <br>
                                                 <?
-                                                if ($odh["bdc_filename"]) {
-                                                    if ($odh["category"] == "roadmap")
-                                                        $folder = "roadmap";
-                                                    if ($odh["category"] == "bl")
-                                                        $folder = "bon_de_livraison";
+                                                foreach ($od["attributes"] as $attribute) {
+                                                    echo " - " . $attribute["attribute_name"] . ": " . $attribute["attribute_value"] . "<br>";
+                                                }
+                                                ?>
+                                                <font color="red">
+                                                <?
+                                                foreach ($od["custom"] as $custom) {
+                                                    echo " - " . $custom["main_item_name"];
+                                                    foreach ($custom["sub_item"] as $sub_item) {
+                                                        echo " - " . $sub_item["sub_item_name"] . "<br>";
+                                                        foreach ($sub_item["item_values"] as $item_value) {
+                                                            echo $item_value["item_value_name"] . ": " . $item_value["custom_value"] . "<br>";
+                                                        }
+                                                    }
+                                                }
+                                                ?>
+                                                </font>
+                                                <em>ref#<?= $od["id_order_detail"] ?> - <?= $od["id_product"] ?></em>
+                                            </td>
+                                            <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
+                                            <td>
+                                                <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
+                                            </td>
+                                            <td nowrap>
+                                                <?= $od["total_price_tax_incl"] ?> €
+                                                <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?>
+                                            </td>
+                                            <td>
+                                                <?
+                                                if ($od["product_current_state"] != 20) {
                                                     ?>
-                                                    <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
+                                                    <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
+                                                        <option value=""></option>
+                                                        <?
+                                                        foreach ($productStates as $pState) {
+                                                            ?>
+                                                            <option value="<?= $pState["id_statut"] ?>"
+                                                            <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
+                                                                    ><?= $pState["title"] ?> </option>
+                                                                    <?
+                                                                }
+                                                                ?>
+                                                    </select>
+                                                    <?
+                                                } else {
+                                                    echo $od["product_state_label"];
+                                                }
+                                                ?>
+
+                                            </td>
+                                            <td>
+                                                <?
+                                                if ($od["product_current_state"] != 20) {
+                                                    ?>
+                                                    <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
+                                                        <option value=""></option>
+                                                        <?
+                                                        foreach ($suppliers as $supplier) {
+                                                            ?>
+                                                            <option value="<?= $supplier["id_supplier"] ?>"
+                                                            <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
+                                                                    ><?= $supplier["name"] ?> </option>
+                                                                    <?
+                                                                }
+                                                                ?>
+                                                    </select>
+                                                    <?
+                                                } else {
+                                                    echo $od["supplier_name"];
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?
+                                                if ($od["product_current_state"] != 20) {
+                                                    ?>
+                                                    <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
+                                                    <?
+                                                } else {
+                                                    echo $od["supplier_date_delivery"];
+                                                }
+                                                ?>
+                                            </td>                                        
+                                            <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
+                                            <td><?= $t["horaire"] ?></td>
+                                            <td><?= $t["comment1"] ?></td>
+                                            <td><?= $t["comment2"] ?></td>
+                                            <td><?= $t["comment3"] ?></td>
+                                            <td>
+                                                <?
+                                                if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
+                                                    ?>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">
+                                                            <select name="qte[<?= $od["id_order_detail"] ?>]">
+                                                                <option></option>
+                                                                <?
+                                                                for ($n = 1; $n < $od["product_quantity"]; $n++) {
+                                                                    ?>
+                                                                    <option value="<?= $n ?>"><?= $n ?></option>
+                                                                    <?
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </span>
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default" type="submit" name="split_order">Split!</button>
+                                                        </span>
+                                                    </div><!-- /input-group -->
+                                                    <?
+                                                }
+                                                ?>
+                                                <?
+                                                if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
+                                                    ?>
+                                                    <button name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
+                                                        Retirer du camion
+                                                    </button>
                                                     <?
                                                 }
                                                 ?>
                                             </td>
+
                                         </tr>
                                         <?
                                     }
-                                }
-                                ?>
-                            </table>                            
-                        </div>
-                        <div class="tab-pane" id="history_mod">
-                            <?
-                            getChangeLog('mv_orders', $oid);
-                            //getChangeLog('av_order_detail', $oid);
-                            ?>
-                        </div>
-                    </div>
-                </form>
-                <form method="post">
-                    <input type="hidden" name="id_order" value="<?= $oid ?>">
-
-                    <h2>Bloc note</h2>
-                    <div class="col-xs-5 ">
-                        <table class="well">
-                            <?
-                            if ($orderinfo["notes"])
-                                foreach ($orderinfo["notes"] as $k => $on) {
                                     ?>
-                                    <tr>
-                                        <td><?= strftime("%a %d %b %y %T", strtotime($on["date_add"])) ?></td>
-                                        <td><?= $on["prenom"] ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2"><?= $on["message"] ?></td>
-                                    </tr>
+                                </table>                            
+                                <div class="col-xs-3 pull-right">
+                                    <div class="col-xs-12" >
+                                        <p id="idmsg"></p>
+                                    </div>
+                                    <div class="col-xs-12" >
+                                        <p>
+                                            <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
+                                        </p>
+                                        <?
+                                        if ($isFournisseurOk) {
+                                            ?>
+                                            <p>
+                                                <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"   class="btn-lg btn-block btn-primary" id="btn_send_supplier">
+                                            </p>
+                                            <?
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="tab-pane" id="bdc">
+                                <table>
+                                    <tr>
+                                        <th>Utilisateur</th>                                        
+                                        <th>Date envoi</th>
+                                        <th>Fournisseur</th>
+                                        <th>Bdc</th>
+
+                                    </tr>
                                     <?
-                                }
-                            ?>
-                        </table>
-                        <textarea name="order_note" cols="20" rows="5" ></textarea>
-                        <p>
-                            <button type="submit" name="add_notes" class="btn btn-lg btn-default btn-block ">Ajouter note</button> 
-                        </p>
-                    </div>
-                </form>
-            </div>
-        </div>        
-        <?
-    }
-    ?>
+                                    if ($orderinfo["history"])
+                                        foreach ($orderinfo["history"] as $odh) {
+                                            if ($odh["supplier_name"]) {
+                                                ?>
+                                                <tr>
+                                                    <td><?= $odh["prenom"] ?></td>
+                                                    <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
+                                                    <td><?= $odh["supplier_name"] ?></td>
+                                                    <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
+                                                </tr>
+                                                <?
+                                            }
+                                        }
+                                    ?>
 
+                                </table>
 
+                            </div>
+                            <div class="tab-pane" id="history_mail">                           
+                                <table>
+                                    <tr>
+                                        <th>Utilisateur</th>                                        
+                                        <th>Date envoi</th>
+                                        <th>Objet</th>
+                                        <th>Fichier</th>
+                                    </tr>
+                                    <?
+                                    foreach ($orderinfo["history"] as $odh) {
+                                        if (empty($odh["supplier_name"])) {
+                                            ?>
+                                            <tr>
+                                                <td><?= $odh["prenom"] ?></td>
+                                                <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
+                                                <td><?= $odh["category"] ?></td>  
+                                                <td>
 
-    <div class = "row">
-        <div class = "col-xs-3">
-            <?
-            foreach ($orderStates as $orderState) {
-                ?>
-                <div class="alert-<?= $orderState["id_statut"] ?>" >
-                    <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
+                                                    <?
+                                                    if ($odh["bdc_filename"]) {
+                                                        if ($odh["category"] == "roadmap")
+                                                            $folder = "roadmap";
+                                                        if ($odh["category"] == "bl")
+                                                            $folder = "bon_de_livraison";
+                                                        ?>
+                                                        <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
+                                                        <?
+                                                    }
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            <?
+                                        }
+                                    }
+                                    ?>
+                                </table>                            
+                            </div>
+                            <div class="tab-pane" id="history_mod">
+                                <?
+                                getChangeLog('mv_orders', $oid);
+                                //getChangeLog('av_order_detail', $oid);
+                                ?>
+                            </div>
+                        </div>
+                    </form>
+                    <form method="post">
+                        <input type="hidden" name="id_order" value="<?= $oid ?>">
+
+                        <h2>Bloc note</h2>
+                        <div class="col-xs-5 ">
+                            <table class="well">
+                                <?
+                                if ($orderinfo["notes"])
+                                    foreach ($orderinfo["notes"] as $k => $on) {
+                                        ?>
+                                        <tr>
+                                            <td><?= strftime("%a %d %b %y %T", strtotime($on["date_add"])) ?></td>
+                                            <td><?= $on["prenom"] ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><?= $on["message"] ?></td>
+                                        </tr>
+
+                                        <?
+                                    }
+                                ?>
+                            </table>
+                            <textarea name="order_note" cols="20" rows="5" ></textarea>
+                            <p>
+                                <button type="submit" name="add_notes" class="btn btn-lg btn-default btn-block ">Ajouter note</button> 
+                            </p>
+                        </div>
+                    </form>
                 </div>
+            </div>        
+            <?
+        }
+        ?>
+
+
+
+        <div class = "row">
+            <div class = "col-xs-3">
                 <?
-            }
-            ?>
+                foreach ($orderStates as $orderState) {
+                    ?>
+                    <div class="alert-<?= $orderState["id_statut"] ?>" >
+                        <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
+                    </div>
+                    <?
+                }
+                ?>
+            </div>
         </div>
+
     </div>
 
-</div>
-
-<script>
-    $(function() {
-        $(".datepicker").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: "yy-mm-dd"
+    <script>
+        $(function() {
+            $(".datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: "yy-mm-dd"
+            });
         });
-    });
 
-    $(".supplier").change(function() {
-        $("#btn_send_supplier").attr("disabled", "disabled");
-        $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
-        $("#idmsg").addClass("alert alert-info");
-    })
-    $("button[name='delProduitTruck']").click(function() {
-        var btn = $(this);
-        var p = $(this).val();
-        var action = "del";
-        var module = "ProduitTournee";
+        $(".supplier").change(function() {
+            $("#btn_send_supplier").attr("disabled", "disabled");
+            $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
+            $("#idmsg").addClass("alert alert-info");
+        })
+        $("button[name='delProduitTruck']").click(function() {
+            var btn = $(this);
+            var p = $(this).val();
+            var action = "del";
+            var module = "ProduitTournee";
 
-        var func = action + module;
+            var func = action + module;
 
-        $.ajax({
-            url: "functions/ajax_trucks.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                func: func,
-                id: p,
-            },
-            success: function(data) {
-                console.log(data);
-                btn.attr("disabled", "disabled");
+            $.ajax({
+                url: "functions/ajax_trucks.php",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    func: func,
+                    id: p,
+                },
+                success: function(data) {
+                    console.log(data);
+                    btn.attr("disabled", "disabled");
 
-            },
-            error: function(xhr, textStatus, error) {
-                console.log(xhr.statusText);
-                console.log(textStatus);
-                console.log(error);
-                btn.attr("disabled", "disabled");
-            }
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                    console.log(textStatus);
+                    console.log(error);
+                    btn.attr("disabled", "disabled");
+                }
+            });
+            location.reload();
         });
-        location.reload();
-    });
 
-</script>
+    </script>
+    <?
+} else {
+    ?>
+    <div class="container">
+        <div class="alert alert-info">Il n'existe pas de commande <?= $oid ?></div>
+    </div>
+
+    <?
+}
+?>

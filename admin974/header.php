@@ -130,7 +130,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav"> 
                         <li>
-                            <a href="index.php">Accueil</a>
+                            <a href="index.php"><span class="glyphicon glyphicon-home"></span></a>
                         </li>
 
                         <?
@@ -158,12 +158,13 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php">Commandes</a></li>                                    
-                                    <li><a href="av_customer.php">Clients</a></li>
+                                    <li><a href="av_orders.php">Commandes</a></li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="av_stock_view.php">Etat du stock</a></li>
-                                    <li><a href="av_stock_dashboard.php">Ventes - Stock</a></li>
+                                    <li class="divider"></li>                                    
+                                    <li><a href="av_stock_dashboard.php">Commande avec gestion de stock</a></li>
+                                    <li><a href="av_stock_view.php">Gestion du stock</a></li>                                    
+                                    <li class="divider"></li>                                    
+                                    <li><a href="av_customer.php">Clients</a></li>
                                 </ul>
                             </li>  
                             <?
@@ -184,32 +185,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 </ul>
                             </li>  <?
                         }
-                        ?>  
-
-                        <?
-                        if ($_SESSION['role'] == "ADMIN") {
-                            ?>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="admin_user.php">Utilisateurs</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="av_zone.php">Zones</a></li>
-                                    <li><a href="av_departements.php">Departement / Zones </a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="av_order_status.php">Statuts des commandes </a></li>                                
-                                    <li class="divider"></li>
-                                    <li><a href="av_camion.php">Camions</a></li>                                
-                                    <li class="divider"></li>
-                                    <li><a href="av_cms_lang.php">Contenu manager</a></li>                                          
-                                    <li class="divider"></li>
-                                    <li><a href="av_voucher.php">Coupon de reduction</a></li>    
-
-                                </ul>
-                            </li>  
-                            <?
-                        }
-                        ?>  
+                        ?>                           
                         <?
                         if ($_SESSION['role'] == "ADMIN" || $_SESSION['role'] == "COMMANDE" || $_SESSION['role'] == "LOGISTIC") {
                             ?>
@@ -236,12 +212,54 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <?
                         }
                         ?>  
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                        <?
+                        if ($_SESSION['role'] == "ADMIN") {
+                            ?>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="admin_user.php">Utilisateurs</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="av_zone.php">Zones</a></li>
+                                    <li><a href="av_departements.php">Departement / Zones </a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="av_order_status.php">Statuts des commandes </a></li>                                
+                                    <li class="divider"></li>
+                                    <li><a href="av_camion.php">Camions</a></li>                                
+                                    <li class="divider"></li>
+                                    <li><a href="av_cms_lang.php">Contenu manager</a></li>                                          
+                                    <li class="divider"></li>
+                                    <li><a href="av_voucher.php">Coupon de reduction</a></li>    
 
-                        <li><a href="logout.php">Deconnexion</a></li>                        
+                                </ul>
+                            </li>  
+                            <?
+                        }
+                        ?> 
                     </ul>
-                    
+                    <form action="index.php" method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group">                            
+                            <input type="text" class="form-control" required="required" placeholder="N° commande, client, devis" name="search_item" value="<?= @$_POST["search_item"] ?>">
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-search"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button type="submit" class="btn-block btn-default" name="search_id_order">par n° commande</button></li>
+                                <li><button type="submit" class="btn-block btn-default" name="search_id_customer">par n° client</button></li>
+                                <li><button type="submit" class="btn-block btn-default" name="search_id_devis">par n° devis</button></li>
+                                <li class="divider">
+                                <li><button type="submit" class="btn-block btn-default" name="search_customer_lastname">par nom client</button></li>                                
+                            </ul>
+                        </div>  
+                    </form>                    
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="logout.php"><span class="glyphicon glyphicon-off"></span></a></li>                        
+                    </ul>
+
                 </div><!--/.nav-collapse -->
             </div>
         </div>
