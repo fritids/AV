@@ -831,7 +831,7 @@ class phpMyEdit
 
 function '.$this->js['prefix'].'show_tab(tab_name)
 {';
-				if ($this->nav_up()) {
+				/*if ($this->nav_up()) {
 					echo '
 	document.getElementById('.$this->js['prefix'].'cur_tab+"_up_label").className = "',$css_class_name1,'";
 	document.getElementById('.$this->js['prefix'].'cur_tab+"_up_link").className = "',$css_class_name1,'";
@@ -844,7 +844,7 @@ function '.$this->js['prefix'].'show_tab(tab_name)
 	document.getElementById('.$this->js['prefix'].'cur_tab+"_down_link").className = "',$css_class_name1,'";
 	document.getElementById(tab_name+"_down_label").className = "',$css_class_name2,'";
 	document.getElementById(tab_name+"_down_link").className = "',$css_class_name2,'";';
-				}
+				}*/
 				echo '
 	document.getElementById('.$this->js['prefix'].'cur_tab).style.display = "none";
 	document.getElementById(tab_name).style.display = "block";
@@ -990,7 +990,7 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 		for ($i = ($this->tabs[0] == 'PMEtab0' ? 1 : 0); $i < count($this->tabs); $i++) {
 			$css_class_name = $this->getCSSclass($i != $this->cur_tab ? 'tab' : 'tab-selected', $position);
 			echo '<td class="',$css_class_name,'" id="'.$this->dhtml['prefix'].'tab',$i,'_',$position,'_label">';
-			echo '<a class="',$css_class_name,'" id="'.$this->dhtml['prefix'].'tab',$i,'_',$position,'_link';
+			echo '<a class="',$css_class_name,' btn btn-primary" id="'.$this->dhtml['prefix'].'tab',$i,'_',$position,'_link';
 			echo '" href="javascript:'.$this->js['prefix'].'show_tab(\''.$this->dhtml['prefix'].'tab',$i,'\')">';
 			echo $this->tabs[$i],'</a></td>',"\n";
 		}

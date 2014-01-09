@@ -28,12 +28,6 @@ $opts['fdd']['id_category'] = array(
     'default' => '0',
     'sort' => true
 );
-$opts['fdd']['id_parent'] = array(
-    'name' => 'ID parent',
-    'select' => 'T',
-    'maxlen' => 10,
-    'sort' => true
-);
 
 $opts['fdd']['name'] = array(
     'name' => 'Titre',
@@ -53,7 +47,8 @@ $opts['fdd']['description'] = array(
 $opts['fdd']['image'] = array(
     'name' => 'Nom Image',
     'select' => 'T',
-    'options' => 'F',
+    'input' => 'F',
+    'imagepath' => '../img/c/',
     'maxlen' => 128,
     'sort' => true
 );
@@ -77,20 +72,29 @@ $opts['fdd']['meta_keywords'] = array(
 );
 
 $opts['fdd']['active'] = array(
-    'name' => 'Actif ?',
-    'select' => 'T',
+    'name' => 'Actif',
+    'select' => 'D',
     'maxlen' => 128,
+    'values2' => array(0 => "Non", 1 => "Oui"),
     'sort' => true
 );
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les catégories</h1>
-<?
-new phpMyEdit($opts);
-?>
 
-<?
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
-?>
+<div class="container">
+    <div class="page-header">
+        <h1>Les catégories</h1>
+    </div>
+    <?
+    new phpMyEdit($opts);
+
+    if (isset($_GET["PME_sys_rec"]))
+        $id = $_GET["PME_sys_rec"];
+    if (isset($_POST["PME_sys_rec"]))
+        $id = $_POST["PME_sys_rec"];
+
+    getChangeLog($opts['tb'], $id);
+    ?>
+</div>
