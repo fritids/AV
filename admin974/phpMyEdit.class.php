@@ -223,8 +223,9 @@ class phpMyEdit
 	function tabs_enabled()   { return $this->display['tabs'] && count($this->tabs) > 0; }
 	function hidden($k)       { return stristr($this->fdd[$k]['input'],'H'); }
 	function password($k)     { return stristr($this->fdd[$k]['input'],'W'); }
-	function readonly($k)     { return stristr($this->fdd[$k]['input'],'R') || $this->virtual($k);     }
-	function virtual($k)      { return stristr($this->fdd[$k]['input'],'V') && $this->col_has_sql($k); }
+	function fileupload($k)   { return stristr($this->fdd[$k]['input'],'F'); }
+	function readonly($k)     { return stristr($this->fdd[$k]['input'],'R');}
+        function virtual($k)      { return stristr($this->fdd[$k]['input'],'V') && ($this->col_has_sql($k) || $this->fileupload($k)); }
 
 	function add_operation()    { return $this->operation == $this->labels['Add']    && $this->add_enabled();    }
 	function change_operation() { return $this->operation == $this->labels['Change'] && $this->change_enabled(); }
@@ -967,7 +968,7 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 
 		if ($this->display['form']) {
 			echo '<form class="',$this->getCSSclass('form'),'" method="post"';
-			echo ' action="',$page_name,'" name="'.$this->cgi['prefix']['sys'].'form">',"\n";
+			echo ' enctype="multipart/form-data" action="',$page_name,'" name="'.$this->cgi['prefix']['sys'].'form">',"\n";
 		}
 		return true;
 	} /* }}} */
@@ -1075,13 +1076,20 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 					$len_props .= ' maxlength="'.$maxlen.'"';
 				}
 				echo '<input class="',$css_class_name,'" ';
-				echo ($this->password($k) ? 'type="password"' : 'type="text"');
-				echo ($this->readonly($k) ? ' disabled' : '');
+				echo ($this->password($k) ? 'type="password"' : 'type="'.($this->fileupload($k) ? 'file' : 'text').'"');
+				echo ($this->readonly($k) ? 'disabled ' : ''),' name="',$this->cgi['prefix']['data'].$this->fds[$k],''.($this->fileupload($k) ? 'IMG' : '').'"';
 				echo ' name="',$this->cgi['prefix']['data'].$this->fds[$k],'"';
 				echo $len_props,' value="';
 				if($escape) echo htmlspecialchars($this->fdd[$k]['default']);
 			    else echo $this->fdd[$k]['default'];
-				echo '" />';
+				echo '"';
+                                 if ($this->fileupload($k)) {
+                                    echo ' onChange="extract(document.'.$this->cgi['prefix']['sys'].'form.'.$this->cgi['prefix']['data'].$this->fds[$k].'IMG.value,\''.$this->fds[$k].'\')"';
+                        	}
+                                echo '/>';
+                                if ($this->fileupload($k)) {
+                                    echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="">';
+				}
 			}
 			echo '</td>',"\n";
 			if ($this->guidance) {
@@ -1221,12 +1229,20 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 			if ($maxlen > 0) {
 				$len_props .= ' maxlength="'.$maxlen.'"';
 			}
-			echo '<input class="',$css_class_name,'" type="text"';
-			echo ($this->readonly($k) ? ' disabled' : '');
+			echo '<input class="',$css_class_name,'" type="'.($this->fileupload($k) ? 'file' : 'text').'"';
+			echo ($this->readonly($k) ? 'disabled ' : ''),' name="',$this->cgi['prefix']['data'].$this->fds[$k],''.($this->fileupload($k) ? 'IMG' : '').'"';
 			echo ' name="',$this->cgi['prefix']['data'].$this->fds[$k],'" value="';
 			if($escape) echo htmlspecialchars($row["qf$k"]);
-			else echo $row["qf$k"];
-			echo '"',$len_props,' />',"\n";
+                        else echo $row["qf$k"];
+			echo '"',$len_props;
+                        if ($this->fileupload($k)) {
+                            echo ' onChange="extract(document.'.$this->cgi['prefix']['sys'].'form.'.$this->cgi['prefix']['data'].$this->fds[$k].'IMG.value,\''.$this->fds[$k].'\')"';
+			}
+                        echo' />',"\n";
+                        if ($this->fileupload($k)) {
+                            echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="">';
+			}
+			
 		}
 		echo '</td>',"\n";
 	} /* }}} */

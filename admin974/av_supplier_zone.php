@@ -28,7 +28,7 @@ $opts['fdd']['id_supplier_zone'] = array(
 );
 $opts['fdd']['id_zone'] = array(
     'name' => 'Zone',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 10,
     'values' => array(
         'table' => 'av_zone',
@@ -40,7 +40,7 @@ $opts['fdd']['id_zone'] = array(
 );
 $opts['fdd']['id_supplier'] = array(
     'name' => 'Fournisseur',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 10,
     'values' => array(
         'table' => 'av_supplier',

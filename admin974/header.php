@@ -106,9 +106,19 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 });
                 $("#datepicker2").datepicker("option", "dateFormat", "yy-mm-dd");
                 $("#datepicker2").datepicker("setDate", new Date());
-
-
             });
+
+        </script>
+        <script language="JavaScript">
+
+            function extract(what, where) {
+                if (what.indexOf('/') > -1)
+                    answer = what.substring(what.lastIndexOf('/') + 1, what.length);
+                else
+                    answer = what.substring(what.lastIndexOf('\\') + 1, what.length);
+
+                document.getElementById(where).value = answer;
+            }
         </script>
     </head>
     <body>
@@ -141,12 +151,9 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                                 <ul class="dropdown-menu">
                                     <li><a href="av_product.php">Produits</a></li>                                    
                                     <li><a href="av_product_attribute.php">Caracteristiques</a></li>
-                                    <li><a href="av_product_caract.php">Options</a></li>
                                     <li><a href="av_product_images.php">Images</a></li>     
                                     <li class="divider"></li>
-                                    <li><a href="av_category.php">Categories</a></li>
-                                    <li><a href="av_attributes.php">Attributs</a></li>    
-
+                                    <li><a href="av_category.php">Categories</a></li>                                    
                                 </ul>
                             </li>     
                             <?

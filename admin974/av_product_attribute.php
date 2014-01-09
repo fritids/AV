@@ -46,7 +46,7 @@ $opts['fdd']['id_product_attribute'] = array(
 );
 $opts['fdd']['id_product'] = array(
   'name'     => 'ID product',
-  'select'   => 'T',
+  'select'   => 'D',
   'maxlen'   => 10,
   'values' => array(
     'table'  => 'av_product',
@@ -57,7 +57,7 @@ $opts['fdd']['id_product'] = array(
 );
 $opts['fdd']['id_attribute'] = array(
   'name'     => 'Attribut',
-  'select'   => 'T',
+  'select'   => 'D',
   'maxlen'   => 10,
   'values' => array(
     'table'  => 'av_attributes',
@@ -90,12 +90,19 @@ $opts['fdd']['weight'] = array(
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';
 ?>
-<h1>Les attributs produits</h1>
-<?
-new phpMyEdit($opts);
+<div class="container">
+    <div class="page-header">
+        <h1>Attributs produits</h1>
+    </div>
+    <?
+    new phpMyEdit($opts);
 
-?>
+    if (isset($_GET["PME_sys_rec"]))
+        $id = $_GET["PME_sys_rec"];
+    if (isset($_POST["PME_sys_rec"]))
+        $id = $_POST["PME_sys_rec"];
 
-<?
-getChangeLog($opts['tb'], @$_GET["PME_sys_rec"]);
-?>
+    getChangeLog($opts['tb'], $id);
+    ?>
+
+</div>

@@ -22,5 +22,8 @@ $opts['options'] = 'ACDF';
 
 $opts['cgi']['append']['PME_sys_fl'] = 1;
 
+$opts['triggers']['insert']['before'] = 'uploader.php';
+$opts['triggers']['update']['before'] = 'uploader.php';
+
 $opts['display'] = array('form' => true, 'num_pages' => true, 'num_records' => true, 'sort' => true, 'tabs' => true, 'time' => false);
 ?>

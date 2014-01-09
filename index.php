@@ -629,7 +629,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             //checkUserLogin($_POST["email"], $_POST["passwd"]);
 
             $secure_key = getSecureKey($_POST["email"]);
-            $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
+            $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
 
             //envoi mail
             $mail->AddAddress($_POST["email"]);
@@ -679,7 +679,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "login") {
                     $mail->AddBCC($bccer);
                 }
                 $secure_key = getSecureKey($_POST["email"]);
-                $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "/index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
+                $account_conf_link = $_SERVER["SERVER_NAME"] . dirname($_SERVER["REQUEST_URI"]) . "index.php?action=conf_mail&email=" . $_POST["email"] . "&secure_key=" . $secure_key;
 
                 $smarty->assign("account_conf_link", $account_conf_link);
                 $mail_body = $smarty->fetch("mail_account_confirm.tpl");

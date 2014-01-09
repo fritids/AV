@@ -16,7 +16,7 @@ $opts['sort_field'] = array('id_departement');
 
 // Number of records to display on the screen
 // Value of -1 lists all records in a table
-$opts['inc'] = 50;
+$opts['inc'] = 200;
 
 
 $opts['fdd']['id_departement'] = array(
@@ -38,7 +38,7 @@ $opts['fdd']['id_region'] = array(
 );
 $opts['fdd']['id_zone'] = array(
     'name' => 'Zone',
-    'select' => 'T',
+    'select' => 'D',
     'maxlen' => 10,
     'values' => array(
         'table' => 'av_zone',
@@ -62,18 +62,15 @@ require_once 'phpMyEdit.class.php';
     <div class="page-header">
         <h1>Les départements par zone</h1>
     </div>
-    <div>
-        <?
-        new phpMyEdit($opts);
-        ?>
-    </div>
+    <?
+    new phpMyEdit($opts);
+
+    if (isset($_GET["PME_sys_rec"]))
+        $id = $_GET["PME_sys_rec"];
+    if (isset($_POST["PME_sys_rec"]))
+        $id = $_POST["PME_sys_rec"];
+
+    getChangeLog($opts['tb'], $id);
+    ?>
+
 </div>
-
-<?
-if (isset($_GET["PME_sys_rec"]))
-    $id = $_GET["PME_sys_rec"];
-if (isset($_POST["PME_sys_rec"]))
-    $id = $_POST["PME_sys_rec"];
-
-getChangeLog($opts['tb'], $id);
-?>

@@ -209,6 +209,16 @@
     </div>
     <div class="clearfix"></div>
 
+    <div class="col-xs-6">
+        <table>
+            <tr>
+                <td class="alert-ticket-0">La demande est chez TT</td>                
+                <td class="alert-ticket-2">La demande est chez AV</td>
+                <td class="alert-ticket-1">La demande est cloturée</td> 
+            </tr>
+        </table>
+    </div>
+    <div class="clearfix"></div>
     <div class="col-xs-12">
         <h3>Les dernières incidences</h3>            
         <table class="table table-bordered table-condensed">
