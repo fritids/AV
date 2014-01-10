@@ -92,13 +92,12 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
 
 
 <div class="container">
-    
-     <div class="row">
-          
+    <!---
+     <div class="row">          
         <ul class=" col-xs-6 alert alert-success">
             <li class="list-unstyled">Nouveauté : possibilité d'annuler un devis en attente.</li>
         </ul>
-    </div>
+    </div>--->
     <form method="post"> 
         <div class="row">
 

@@ -26,7 +26,7 @@ function updateUserAddress($infos, $alias, $aid) {
     global $db;
     $r = $db->where("id_address", $aid)
             ->where("alias", $alias)
-            ->update("av_address", array("active" => 0));
+            ->update("av_address", array("active" => 0, "date_upd" => date("Y-m-d")));
 
     $infos["alias"] = $alias;
 

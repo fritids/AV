@@ -143,7 +143,7 @@ if (isset($_GET["cart"])) {
                     "height" => $_POST["height"],
                     "depth" => $productInfos["depth"]
                 );
-            }          
+            }
 
             //Si option
             if (isset($_POST["custom"])) {
@@ -571,6 +571,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "city" => @$_POST["invoice_city"],
             "phone" => $_POST["invoice_phone"],
             "phone_mobile" => $_POST["invoice_phone_mobile"],
+            "date_add" => date("Y-m-d"),
+            "date_upd" => date("Y-m-d"),
         );
 
         $delivery_adresse = array(
@@ -580,7 +582,9 @@ if (isset($_GET["action"]) && $_GET["action"] == "new_user") {
             "country" => "France",
             "city" => @$_POST["delivery_city"],
             "phone" => $_POST["delivery_phone"],
-            "phone_mobile" => $_POST["delivery_phone_mobile"]
+            "phone_mobile" => $_POST["delivery_phone_mobile"],
+            "date_add" => date("Y-m-d"),
+            "date_upd" => date("Y-m-d"),
         );
 
         updateUserAddress($invoice_adresse, "invoice", $_SESSION["user"]["invoice"]["id_address"]);

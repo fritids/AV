@@ -126,10 +126,15 @@
         }
     }
 
+    $filter = 1;
+    if (isset($_GET["filter"]))
+        $filter = 0;
+
     $t = $db->rawQuery("select * 
                         from av_ticket a, admin_user b 
                         where a.id_user= b.id_admin 
-                        order by date_add desc ");
+                        and (? = 0 or status not in (1))
+                        order by date_add desc ", array($filter));
     ?>
     <div class="col-xs-5" style="overflow:scroll; height: 400px">
         <h3>Les nouveautés</h3>
@@ -217,6 +222,10 @@
                 <td class="alert-ticket-1">La demande est cloturée</td> 
             </tr>
         </table>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-xs-6">
+        <a href="?filter" class="btn btn-info">Voir tous les tickets</a>
     </div>
     <div class="clearfix"></div>
     <div class="col-xs-12">

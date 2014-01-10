@@ -46,5 +46,5 @@ switch ($page) {
 
 include( $page . '.php');
 include( 'footer.php');
-print_r($_POST);
+
 ?>

@@ -66,7 +66,7 @@ $opts['fdd']['quantity'] = array(
     'sort' => true
 );
 $opts['fdd']['price'] = array(
-    'name' => 'Prix m²',
+    'name' => 'Prix m² HT',
     'select' => 'T',
     'maxlen' => 22,
     'default' => '0.000000',

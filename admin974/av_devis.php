@@ -132,7 +132,8 @@ if (isset($_POST["contact"])) {
             "city" => $_POST["delivery_city"],
             "postcode" => $_POST["delivery_postcode"],
             "phone" => $_POST["delivery_phone"],
-            "phone_mobile" => $_POST["delivery_phone_mobile"],
+            "phone_mobile" => $_POST["delivery_phone_mobile"],            
+            "date_upd" => date("Y-m-d")
         );
 
         $r = $db->where("id_address", $_POST["delivery_id"])
@@ -146,6 +147,7 @@ if (isset($_POST["contact"])) {
             "postcode" => $_POST["invoice_postcode"],
             "phone" => $_POST["invoice_phone"],
             "phone_mobile" => $_POST["invoice_phone_mobile"],
+            "date_upd" => date("Y-m-d")
         );
 
         $r = $db->where("id_address", $_POST["invoice_id"])
@@ -910,11 +912,11 @@ if (isset($_POST["devis_save"])) {
                         <select name="product_id" class="product" id="product">
                             <?
                             foreach ($pAll as $product) {
-                                if ($product["min_width"] > 0 && $product["min_height"] > 0) {
+                               // if ($product["min_width"] > 0 && $product["min_height"] > 0) {
                                     ?>
                                     <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?></option>
                                     <?
-                                }
+                                //}
                             }
                             ?>
                         </select>

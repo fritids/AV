@@ -1088,7 +1088,7 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
                         	}
                                 echo '/>';
                                 if ($this->fileupload($k)) {
-                                    echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="">';
+                                    echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="'.$this->fdd[$k]['default'].'">';
 				}
 			}
 			echo '</td>',"\n";
@@ -1240,7 +1240,7 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 			}
                         echo' />',"\n";
                         if ($this->fileupload($k)) {
-                            echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="">';
+                            echo '<input type="hidden" name="'.$this->cgi['prefix']['data'].$this->fds[$k].'" id="'.$this->fds[$k].'" value="'.$row["qf$k"].'">';
 			}
 			
 		}
