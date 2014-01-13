@@ -85,13 +85,13 @@ $opts['fdd']['id_customer'] = array(
 $opts['fdd']['alert_sms'] = array(
     'name' => 'Alert SMS',
     'options' => 'VC',
-    'maxlen' => 10,    
+    'maxlen' => 10,
     'values2' => array(0 => "Non", 1 => "Oui")
 );
 $opts['fdd']['alert_sms_phone'] = array(
     'name' => 'Alert Sms Tel ',
     'options' => 'VC',
-    'maxlen' => 10,    
+    'maxlen' => 10,
 );
 
 $opts['fdd']['id_address_invoice'] = array(
@@ -112,7 +112,7 @@ $opts['fdd']['id_address_delivery'] = array(
     'select' => 'T',
     'maxlen' => 10,
     'options' => 'VL',
-    'size' => 40,
+    'size' => 40,       
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -173,6 +173,7 @@ $opts['fdd']['total_paid'] = array(
     'select' => 'T',
     'maxlen' => 19,
     'default' => '0.00',
+    'mask' => '%01.2f €',
     'sort' => true,
     'URL' => 'av_orders_view.php?id_order=$key'
 );

@@ -20,7 +20,7 @@ $opts['pw'] = $bdd_pwd;
 
 
 $config["payment"]["cheque_infos"] = "ALLOVITRE <br> adresse 1 <br> cp ville";
-$config["payment"]["virement_infos"] = "RIB ###### <br> IBAN ############";
+$config["payment"]["virement_infos"] = "Banque Societe Générale<br>code banque : 30003<br>Code guichet : 00030<br>N°compte : 00027000532<br>Clé rib : 81";
 $config["vat_rate"] = 1.20;
 
 $conf_shipping_amount = 25;

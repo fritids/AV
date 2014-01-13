@@ -27,6 +27,20 @@
         </div>
         <div class="clear"></div>
     </div>
+    <div class="type_paiement">
+        <div class="logo_pay"><img src="/img/virement-bancaire.gif" alt="Paiement par virement bancaire" /></div>
+        <div class="choix_pay">
+            <p>
+                <label>
+                    <form action="/?action=order_validate" method="post">
+                        <input type='hidden' name="payment" value='Virement bancaire' />
+                        <input type='submit' value='Payer par virement bancaire' class="pay_cheque" />
+                    </form>
+                </label>
+            </p>
+        </div>
+        <div class="clear"></div>
+    </div>
 </form>
 <div class="back_to">
     <a href="/?order-resume" title="Revenir au r&eacute;capitulatif"><img src="/img/btn_retour.png" alt="&lt; Revenir au r&eacute;capitulatif" width="239" height="48" /></a>

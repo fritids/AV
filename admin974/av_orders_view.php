@@ -301,6 +301,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
+            $mail->AddStringAttachment(utf8_encode($mail_body), $bdc_commande_filename . ".html");
             $mail->MsgHTML($mail_body);
 
             if ($mail->Send()) {
@@ -316,15 +317,16 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
                 mysql_query($q);
 
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $od["id_order_detail"],
-                    "col" => "product_current_state",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => COMMANDE_FOURNISSEUR
-                ));
+
 
                 foreach ($orderDetailSupplier as $k => $ods) {
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $ods["id_order_detail"],
+                        "col" => "product_current_state",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => COMMANDE_FOURNISSEUR
+                    ));
                     $param = array(
                         "id_order" => $oid,
                         "id_user" => $_SESSION["user_id"],

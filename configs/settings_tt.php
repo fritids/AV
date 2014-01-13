@@ -18,7 +18,7 @@ $opts['pw'] = $bdd_pwd;
 @define('_COOKIE_KEY_', 'v91VNEVAhNhXtSMBDq7pZfzYgAWtohfhUonBn9KtdV5AnBnNguduBnFR');
 
 $config["payment"]["cheque_infos"] = "ALLOVITRE <br> adresse 1 <br> cp ville";
-$config["payment"]["virement_infos"] = "RIB ###### <br> IBAN ############";
+$config["payment"]["virement_infos"] = "Banque Societe Générale<br>code banque : 30003<br>Code guichet : 00030<br>N°compte : 00027000532<br>Clé rib : 81<br>";
 $config["vat_rate"] = 1.196;
 
 //$conf_shipping_amount= 25;

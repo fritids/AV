@@ -59,7 +59,7 @@ $opts['fdd']['code'] = array(
     'sort' => true
 );
 $opts['fdd']['title'] = array(
-    'name' => 'Title',
+    'name' => 'Titre',
     'select' => 'T',
     'maxlen' => 255,
     'sort' => true
@@ -71,39 +71,41 @@ $opts['fdd']['description'] = array(
     'sort' => true
 );
 $opts['fdd']['start_date'] = array(
-    'name' => 'Start date',
+    'name' => 'Date début (inclut)',
     'select' => 'T',
     'maxlen' => 19,
     'sort' => true
 );
 $opts['fdd']['end_date'] = array(
-    'name' => 'End date',
+    'name' => 'Date fin (exclut)',
     'select' => 'T',
     'maxlen' => 19,
     'sort' => true
 );
 
 $opts['fdd']['quantity'] = array(
-    'name' => 'Quantity',
+    'name' => 'Quantité',
     'select' => 'T',
     'maxlen' => 10,
     'default' => '1',
     'sort' => true
 );
 $opts['fdd']['reduction_percent'] = array(
-    'name' => 'Reduction pourcentage',
+    'name' => 'Réduction (%)',
     'select' => 'T',
     'maxlen' => 7,
+    'mask' => '%01.2f %%',
     'sort' => true
 );
 $opts['fdd']['reduction_amount'] = array(
-    'name' => 'Reduction montant',
+    'name' => 'réduction (€)',
     'select' => 'T',
     'maxlen' => 7,
+    'mask' => '%01.2f €',
     'sort' => true
 );
 $opts['fdd']['active'] = array(
-    'name' => 'Active',
+    'name' => 'Actif',
     'select' => 'T',
     'maxlen' => 1,
     'default' => '1',

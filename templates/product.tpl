@@ -15,7 +15,7 @@
                 <div class="cycle-slideshow"
                      data-cycle-timeout=0
                      data-cycle-pager="#custom-pager"
-                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" width=95 height=95></a>'
+                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" height=95></a>'
                      >
                 {/literal}
                 <img src="/img/p/{$product.cover.filename}" width="325" />  

@@ -889,7 +889,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ko_msg = array();
     }
 
-    if ($code == "NOEL2013DV") {
+    /*if ($code == "NOEL2013DV") {
         $cart->addVoucher(array(
             "code" => "NOEL2013DV",
             "title" => "NOEL2013DV",
@@ -899,7 +899,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         );
         $ok_msg = array("txt" => "Bon de réduction a été ajouté");
         $ko_msg = array();
-    }
+    }*/
 }
 
 // mot de passe oublié

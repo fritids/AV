@@ -70,11 +70,13 @@ $opts['fdd']['price'] = array(
     'select' => 'T',
     'maxlen' => 22,
     'default' => '0.000000',
+    'mask' => '%01.2f €',
     'sort' => true
 );
 $opts['fdd']['weight'] = array(
-    'name' => 'Poids m²',
+    'name' => 'Poids (kg/m²)',
     'select' => 'T',
+    'mask' => '%01.0f kg/m²',
     'maxlen' => 22,
     'default' => '0.000000',
     'sort' => true
@@ -208,9 +210,10 @@ $opts['fdd']['is_promo'] = array(
     'values2' => array(0 => "Non", 1 => "Oui")
 );
 $opts['fdd']['price_orig'] = array(
-    'name' => 'Prix initial',
-    'select' => 'D',
+    'name' => 'Prix initial HT',
+    'select' => 'T',
     'maxlen' => 30,
+    'mask' => '%01.2f €',
     'sort' => true
 );
 
