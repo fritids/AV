@@ -46,8 +46,7 @@ function delProduitTournee($id) {
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("current_state" => 3));
 
-    if ($r)
-        return(json_encode($id . "ok"));
+    return(json_encode(array($id => "ok")));
 }
 
 function updtruckStatus($id) {

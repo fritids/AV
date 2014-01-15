@@ -43,6 +43,10 @@ if (isset($_SESSION["nb_orders"]))
   $opts['filters'] = "PMEtable0.sessions_count > 200";
  */
 
+if (isset($_GET["filter"]) && $_GET["filter"]=="today") {
+    $opts['filters'] = "date(PMEtable0.date_add) = date(now())";
+}
+
 $opts['fdd']['id_order'] = array(
     'name' => 'ID order',
     'select' => 'T',
@@ -112,7 +116,7 @@ $opts['fdd']['id_address_delivery'] = array(
     'select' => 'T',
     'maxlen' => 10,
     'options' => 'VL',
-    'size' => 40,       
+    'size' => 40,
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -210,13 +214,15 @@ require_once 'phpMyEdit.class.php';
     </div>
     <div class="row">
         <form action="" method="text">
-            <div class="input-group">
-                Nb commandes par page:
-                <input type="text"  value="<?= $opts['inc'] ?>" name="nb_orders" class="input input-sm" style="width: 50px" placeholder="Nb commande"/>
-                <input type="submit" name="Valider" class="btn btn-sm btn-primary">
+            <div class="form-group">
+                <label>Nb commandes par page:</label>
+                <input type="text"  value="<?= $opts['inc'] ?>" name="nb_orders" class="input" style="width: 50px" placeholder="Nb commande"/>
+                <input type="submit" name="Valider" class="btn btn-primary">
             </div>
         </form> 
-        <br>
+        
+        <a href="?filter=today" class="btn btn-primary">Les commandes du jour</a>
+        <a href="?" class="btn btn-primary">Toutes les commandes</a>
     </div>
 </div>
 <center>

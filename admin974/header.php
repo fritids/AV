@@ -13,6 +13,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
 //require_once './extensions/phpMyEdit-report.class.php';
 //require_once './extensions/phpMyEdit-mce-cal.class.php';
 //require_once './extensions/phpMyEdit-slide.class';
+
+$r = $db->query("select count(1) nb_orders from av_orders where date(date_add)=date(now()) and current_state in (1,2,10)");
 ?>
 
 <!DOCTYPE html>
@@ -39,9 +41,9 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 plugins: "jbimages,autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
                 // Theme options
                 theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-                theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+                theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,jbimages,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
                 theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-                theme_advanced_buttons4: "jbimages,|,insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+                theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
                 theme_advanced_toolbar_location: "top",
                 theme_advanced_toolbar_align: "left",
                 theme_advanced_statusbar_location: "bottom",
@@ -54,7 +56,8 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                 external_link_list_url: "js/link_list.js",
                 external_image_list_url: "js/image_list.js",
                 media_external_list_url: "js/media_list.js",
-                relative_urls: false
+                relative_urls: true,
+                document_base_url: "http://www.allovitres.com/"
 
 
             });
@@ -165,7 +168,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php">Commandes</a></li>
+                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $r[0]["nb_orders"]?></span></a> </li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
                                     <li class="divider"></li>                                    
                                     <li><a href="av_stock_dashboard.php">Commande avec gestion de stock</a></li>

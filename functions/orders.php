@@ -16,16 +16,31 @@ function getPostCodeZone($postcode) {
 function getZoneInfos($postcode) {
     global $db;
 
-    $query = "select b.*
-            from av_departements a , av_zone b
+    $query = "select b.id_zone, b.nom, b.nom zone_name, c.address warehouse, c.id_warehouse, c.name warehouse_name, c.address warehouse_address
+            from av_departements a , av_zone b, av_warehouse c 
             where  a.id_zone = b.id_zone
-            and  a.id_departement = ? ";
+            and b.id_warehouse = c.id_warehouse 
+            and a.id_departement = ? ";
 
     $z = $db->rawQuery($query, array(substr($postcode, 0, 2)));
 
     if ($z)
         return ($z[0]);
 }
+/*
+function getWarehouseInfos($iwid) {
+    global $db;
+
+    $query = "select a
+            from av_warehouse a
+            where  a.id_warehouse
+            and  a.id_warehouse = ? ";
+
+    $z = $db->rawQuery($query, array($iwid));
+
+    if ($z)
+        return ($z[0]);
+}*/
 
 function getUserOrders($cid) {
     global $db;
@@ -55,7 +70,7 @@ function getOrderInfos($oid) {
         $r[$k]["details"] = getUserOrdersDetail($order["id_order"]);
         $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
-        $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);        
+        $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);
         if ($order["id_address_invoice"])
             $r[$k]["address"]["invoice"] = getUserOrdersAddress($order["id_address_invoice"]);
         if ($order["id_address_delivery"])
@@ -107,8 +122,8 @@ function getUserOrdersAddress($iaid) {
     global $db;
     $r = $db->where("id_address", $iaid)
             ->get("av_address");
-    
-    if ($r[0]["postcode"]){
+
+    if ($r[0]["postcode"]) {
         $r[0]["zone"] = getPostCodeZone($r[0]["postcode"]);
         $r[0]["warehouse"] = getZoneInfos($r[0]["postcode"]);
     }
@@ -503,8 +518,9 @@ function splitOrderDetail($odid, $qty_request) {
     $r = $db->where("id_order_detail", $odid)
             ->get("av_order_product_attributes");
     foreach ($r as $attribut) {
+        unset($attribut["id_order_prd_attr"]);
         $attribut["id_order_detail"] = $new_odid;
-        $db->insert("av_order_product_attributes", $attribut);
+        $prd_aid = $db->insert("av_order_product_attributes", $attribut);
     }
     return $oid;
 }
