@@ -263,10 +263,10 @@ $trucks = $db->get("av_truck");
                         foreach ($orders as $order) {
 
                             $o = getMvOrdersInfos($order["id_order"]);
-
                             if ($order)
                                 $customer = getOrderUserDetail($order["id_customer"]);
-                            $adresse = getAdresseById($order["id_address_delivery"]);
+                            $adresse = getUserOrdersAddress($order["id_address_delivery"]);                            
+                            
                             ?>
                             <tr>
                                 <th colspan="2" nowrap class="alert alert-info" >
@@ -274,13 +274,13 @@ $trucks = $db->get("av_truck");
                                     <?= date("d/m", strtotime($order["invoice_date"])) ?>
 
                                 </th>
-                                <th><?= getDeliveryZone($order["postcode"]) ?></th>
+                                <th><?= $adresse["warehouse"]["zone_name"] ?> <?= $adresse["warehouse"]["warehouse_name"] ?></th>
                                 <th>
                                     <?
                                     $addrs = $adresse["address1"] . "<br>";
                                     if ($adresse["address2"])
                                         $addrs .= $adresse["address2"] . "<br>";
-                                    $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                                    $addrs .= $adresse["postcode"] . " " . $adresse["city"] ;
                                     $addrs_link = str_replace(' ', '+', $addrs);
                                     $addrs_link = str_replace('<br>', '+', $addrs);
                                     ?>

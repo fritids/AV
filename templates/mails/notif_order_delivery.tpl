@@ -4,6 +4,16 @@ Bonjour,<br><br>
 
 Nous avons le plaisir de vous informer que votre livraison est prévue pour : {$tournee_livraison}<br><br>
 
+Voici la liste des produits concernés :<br>
+{foreach key=key item=detail from=$orderdetails}
+    - {$detail.product_quantity} x {$detail.product_name}                                          
+    {if $detail.product_width}
+        ( {$detail.product_width} x {$detail.product_height} )
+    {/if}
+    : {$detail.total_price_tax_incl} €
+    <br>
+{/foreach}
+<br>
 Pour que votre livraison se passe dans les meilleures conditions, nous nous permettons de vous rappeler deux points importants.<br><br>
 
 1- Toutes les livraisons de verre s’effectuent exclusivement en pied de maison ou d’immeuble.<br>

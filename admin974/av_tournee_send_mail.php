@@ -55,8 +55,18 @@ foreach ($r as $k => $contact) {
         $mail->AddBCC($bccer);
     }
 
+    // liste des produits à livrer
+    $orderDetails = $db->rawQuery("select b.*
+            from av_tournee a, av_order_detail b
+            where a.id_order_detail = b.id_order_detail
+            and a.id_truck = ?
+            and a.date_livraison = ? 
+            and a.id_order = ? ", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
+
     $mail->Subject = "Allovitres - Envoi de votre commande #" . $contact["id_order"];
     $smarty->assign("tournee_livraison", $contact["horaire"]);
+    $smarty->assign("orderdetails", $orderDetails);
+    
     $mail_body = $smarty->fetch('notif_order_delivery.tpl');
 
     $mail->MsgHTML($mail_body);
@@ -84,12 +94,6 @@ foreach ($r as $k => $contact) {
         ));
 
         /* on change le status des ligne de detail en livraison fixé */
-        $orderDetails = $db->rawQuery("select a.id_order_detail, b.product_current_state 
-            from av_tournee a, av_order_detail b
-            where a.id_order_detail = b.id_order_detail
-            and a.id_truck = ?
-            and a.date_livraison = ? 
-            and a.id_order = ? ", array($contact["id_truck"], $contact["date_livraison"], $contact["id_order"]));
 
         foreach ($orderDetails as $orderDetail) {
             $r = $db->where("id_order_detail", $orderDetail["id_order_detail"])
