@@ -14,7 +14,8 @@ $did = "";
 
 if (isset($_GET["create_order"]) && isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
-    $cid = CreateOrder($did);
+    $payment = $_POST["payment"];
+    $cid = CreateOrder($did, $payment);
 }
 if (isset($_GET["remove"]) && isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
@@ -93,37 +94,33 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
 
 <div class="container">
     <!---
-     <div class="row">          
-        <ul class=" col-xs-6 alert alert-success">
-            <li class="list-unstyled">Nouveauté : possibilité d'annuler un devis en attente.</li>
-        </ul>
-    </div>--->
+    <div class="row">          
+       <ul class=" col-xs-6 alert alert-success">
+           <li class="list-unstyled">Nouveauté : possibilité d'annuler un devis en attente.</li>
+       </ul>
+   </div>--->
+    <div class="page-header">
+        <h1>Consultation des devis</h1>
+    </div>
+
     <form method="post"> 
-        <div class="row">
+        <div class="col-xs-3" >
+            <label for="ajax_customer">Client :</label>
+            <input type="text" id ="ajax_customer" name="ajax_customer"  />
+            <input type="hidden" name ="id_customer"  id ="id_customer"/>
+        </div>
+        <div class="col-xs-3" >
+            <label for="id_devis">N° Devis :</label>
+            <input type="text" name ="id_devis"  />
 
-            <div class="col-xs-3" >
-                <label for="ajax_customer">Client :</label>
-                <input type="text" id ="ajax_customer" name="ajax_customer"  />
-                <input type="hidden" name ="id_customer"  id ="id_customer"/>
-
-
-            </div>
-            <div class="col-xs-3" >
-                <label for="id_devis">N° Devis :</label>
-                <input type="text" name ="id_devis"  />
-
-            </div>
-
-            <div class="col-xs-3" >
-                <input type="submit" class="btn btn-sm btn-primary">
-            </div>
         </div>
 
+        <div class="col-xs-3" >
+            <input type="submit" class="btn btn-sm btn-primary">
+        </div>
     </form>
+    <div class="clearfix">  </div>
     <hr>
-
-
-
     <?
     if (!empty($deviss)) {
         ?>
@@ -208,7 +205,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                                         echo "Validé";
                                                                         break;
                                                                     case 4:
-                                                                        echo "Convertie: " . $devis["id_order"];
+                                                                        echo "Converti: " . $devis["id_order"];
                                                                         break;
                                                                     case 5:
                                                                         echo "Annulé";
@@ -227,6 +224,11 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                     ?>
                                                     <form action="?create_order" method="post">
                                                         <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                        <select name="payment" required="required">
+                                                            <option value="Carte credit">Carte crédit</option>
+                                                            <option value="chèque">Chèque</option>
+                                                            <option value="Virement bancaire">Virement bancaire</option>                                                            
+                                                        </select>
                                                         <button class="btn btn-default" data-toggle="tooltip" title="Créer une commande à partir de ce devis"><span class="glyphicon glyphicon-shopping-cart"></span></button>
                                                     </form> 
                                                     <form action="?remove" method="post">
@@ -243,6 +245,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
 
                                                 <form action="av_download_pdf.php?devis" method="post" target="blank">
                                                     <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+
                                                     <button class="btn btn-default" data-toggle="tooltip" title="Télécharger le devis au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
                                                 </form> 
                                             </div>

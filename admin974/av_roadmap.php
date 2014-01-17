@@ -48,17 +48,17 @@ $pdf->AddPage('L', 'A4');
 <div class="container">
     <div class="page-header">
         <h1>Feuille de route</h1>
-        
+
     </div>
     <div class="text-center">
-        <?
-        if (!empty($date_delivery) && !empty($id_truck)) {
+<?
+if (!empty($date_delivery) && !empty($id_truck)) {
 
-            $roadmap_filename = md5(rand());
+    $roadmap_filename = md5(rand());
 
-            // on recupère les produits affectés au camion
-            $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
-                        a.reference, d.postcode, a.id_customer, b.*, c.*, e.name supplier_name, a.order_comment, a.delivery_comment
+    // on recupère les produits affectés au camion
+    $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
+                        a.reference, d.postcode, a.id_customer, b.*, c.*, e.name supplier_name, a.order_comment, a.delivery_comment, b.id_warehouse
                         from av_orders a, av_order_detail b , av_tournee c, av_address d, av_supplier e
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
@@ -68,7 +68,7 @@ $pdf->AddPage('L', 'A4');
                         and c.date_livraison = ?                                                                     
                         order by c.position
                         ", array($id_truck, $date_delivery))
-            ?>
+    ?>
 
             <?
             $camion = $db->where("id_truck", $id_truck)
@@ -93,8 +93,10 @@ $pdf->AddPage('L', 'A4');
                 $addrs = $adresse["address1"] . "<br>";
                 if ($adresse["address2"])
                     $addrs .= $adresse["address2"] . "<br>";
-                $addrs .= $adresse["postcode"] . " " . $adresse["city"] . "<br>[". $adresse["warehouse"]["zone_name"]."]<br>[". $adresse["warehouse"]["warehouse_name"]."]";
+                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                //$addrs .= $adresse["postcode"] . " " . $adresse["city"];
 
+                $w = getWarehouseInfos($OrderProduct["id_warehouse"]);
 
                 if ($tmpRef != $OrderProduct["reference"]) {
 
@@ -107,7 +109,7 @@ $pdf->AddPage('L', 'A4');
                 <th bgcolor = "#ccc">' . $OrderProduct["comment3"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["horaire"] . '</th>                       
                 <th bgcolor = "#ccc">Comm. client: ' . $OrderProduct["order_comment"] . '</th>
-                <th bgcolor = "#ccc">Comm. Interne:' . $OrderProduct["delivery_comment"] . '</th>
+                <th bgcolor = "#ccc">Comm. Interne:' . htmlspecialchars($OrderProduct["delivery_comment"]) . '</th>
                 </tr>';
 
                     $tmpRef = $OrderProduct["reference"];
@@ -115,10 +117,11 @@ $pdf->AddPage('L', 'A4');
 
                 $pdf_roadmap .= '
             <tr>
-            <td colspan = "4"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
+            <td colspan = "3"> ' . $p_qty . ' x ' . $OrderProduct["product_name"] . ' <br> ' .
                         ($OrderProduct["product_width"] != "" ? ' Largeur (mm): ' . $OrderProduct["product_width"] : '') .
                         ($OrderProduct["product_height"] != "" ? ', Longueur (mm): ' . $OrderProduct["product_height"] : '') . "<br>";
 
+                
                 foreach ($attributes as $attribute) {
                     $pdf_roadmap .= '- ' . $attribute["attribute_name"] . ': ' . $attribute["attribute_value"] . '<br>';
                 }
@@ -138,9 +141,9 @@ $pdf->AddPage('L', 'A4');
 
                 $pdf_roadmap .= '
             </td>
-            <td colspan="2">' . $OrderProduct["supplier_name"] . ' ' . $OrderProduct["supplier_date_delivery"] . ' </td>
+            <td colspan="2">' . $OrderProduct["supplier_name"] . ' ['. $w["name"] .'] ' . $OrderProduct["supplier_date_delivery"] . '</td>
             <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
-            <td>' . $p_qty * $OrderProduct["total_price_tax_incl"] . ' €</td>
+            <td>' . $OrderProduct["total_price_tax_incl"] . ' €</td>
             </tr>';
 
 
@@ -156,6 +159,8 @@ $pdf->AddPage('L', 'A4');
 
             $pdf_roadmap .= '</table></td></tr></table>';
 
+            //echo $pdf_roadmap;
+            
             $pdf->writeHTML($pdf_roadmap, true, false, true, false, '');
 
             $pdf->lastPage();
@@ -170,15 +175,15 @@ $pdf->AddPage('L', 'A4');
         } else {
             ?>
             <form action="" method="post">
-                
+
                 <div class="col-md-12"> 
                     <div class="col-md-3">
                         <label for="date_delivery" > Date livraison :
                             <select id="date_delivery" class="pme-input-0" name="date_delivery">
                                 <option value="--"  >--</option>
-                                <?
-                                foreach ($d as $rec) {
-                                    ?>
+    <?
+    foreach ($d as $rec) {
+        ?>
                                     <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
                                     <?
                                 }
@@ -190,9 +195,9 @@ $pdf->AddPage('L', 'A4');
                         <label for="truck" > Camion :
                             <select id="truck" class="pme-input-0" name="id_truck">
                                 <option value="--"  >--</option>
-                                <?
-                                foreach ($t as $rec) {
-                                    ?>
+    <?
+    foreach ($t as $rec) {
+        ?>
                                     <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
                                     <?
                                 }

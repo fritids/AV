@@ -43,7 +43,7 @@ if (isset($_SESSION["nb_orders"]))
   $opts['filters'] = "PMEtable0.sessions_count > 200";
  */
 
-if (isset($_GET["filter"]) && $_GET["filter"]=="today") {
+if (isset($_GET["filter"]) && $_GET["filter"] == "today") {
     $opts['filters'] = "date(PMEtable0.date_add) = date(now())";
 }
 
@@ -188,8 +188,9 @@ $opts['fdd']['order_comment'] = array(
     'options' => 'VC',
     'textarea' => array(
         'html' => true,
-        'rows' => 20,
+        'rows' => 10,
         'cols' => 100),
+    'css' => array("postfix" => " mceNoEditor"),
     'sort' => true,
 );
 $opts['fdd']['delivery_comment'] = array(
@@ -199,8 +200,9 @@ $opts['fdd']['delivery_comment'] = array(
     'options' => 'VC',
     'textarea' => array(
         'html' => true,
-        'rows' => 20,
+        'rows' => 10,
         'cols' => 100),
+    'css' => array("postfix" => " mceNoEditor"),
     'sort' => true,
 );
 
@@ -220,7 +222,7 @@ require_once 'phpMyEdit.class.php';
                 <input type="submit" name="Valider" class="btn btn-primary">
             </div>
         </form> 
-        
+
         <a href="?filter=today" class="btn btn-primary">Les commandes du jour</a>
         <a href="?" class="btn btn-primary">Toutes les commandes</a>
     </div>

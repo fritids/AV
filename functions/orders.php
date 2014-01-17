@@ -13,6 +13,7 @@ function getPostCodeZone($postcode) {
     if ($z)
         return ($z[0]["nom"]);
 }
+
 function getZoneInfos($postcode) {
     global $db;
 
@@ -27,11 +28,11 @@ function getZoneInfos($postcode) {
     if ($z)
         return ($z[0]);
 }
-/*
+
 function getWarehouseInfos($iwid) {
     global $db;
 
-    $query = "select a
+    $query = "select a.*
             from av_warehouse a
             where  a.id_warehouse
             and  a.id_warehouse = ? ";
@@ -40,7 +41,7 @@ function getWarehouseInfos($iwid) {
 
     if ($z)
         return ($z[0]);
-}*/
+}
 
 function getUserOrders($cid) {
     global $db;
@@ -135,10 +136,11 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
     global $db;
     $params = array($oid, $id_supplier, $id_supplier);
 
-    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name
+    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name, d.name warehouse_name
                         FROM av_order_detail a
                         LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
                         LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
+                        LEFT OUTER JOIN av_warehouse d on (a.id_warehouse = d.id_warehouse)
                         where id_order = ? 
                         and (IFNULL(?,0) = 0 OR (a.id_supplier = ? and IFNULL(product_current_state,0) in (0,21, 22)))
                         ", $params);
@@ -149,6 +151,7 @@ function getUserOrdersDetail($oid, $id_supplier = null) {
     }
     return $r;
 }
+
 function getOrdersDetail($odid) {
     global $db;
     $params = array($odid);

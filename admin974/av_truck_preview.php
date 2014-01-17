@@ -239,11 +239,11 @@ if (isset($_GET["planning"])) {
 
                                                 <tr>
                                                     <th colspan="2"><a href="av_orders_view.php?id_order=<?= $OrderProduct["id_order"] ?>"><?= $OrderProduct["reference"] ?></a> <br> <?= date("d/m", strtotime($o_truck["date_add"])) ?></th>
-                                                    <th colspan="2">
+                                                    <th>
                                                         <?= $customer["firstname"] . " " . $customer["lastname"] ?><br>
                                                         <a href="https://maps.google.fr/maps?q=<?= $addrs_link ?>" target="_blank" ><?= $addrs ?></a>
                                                     </th>
-
+                                                    <th><?=$adresse["zone"]?></th>
                                                     <th>temps de trajet <br><input type="text" value="<?= $OrderProduct["comment1"] ?>" name="comment1[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Heure de livraison<br><input type="text" value="<?= $OrderProduct["comment2"] ?>" name="comment2[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
                                                     <th>Informations <br><input type="text" value="<?= $OrderProduct["comment3"] ?>" name="comment3[<?= $OrderProduct["id_order"] ?>]"> </th>                                                                                                              
@@ -270,14 +270,16 @@ if (isset($_GET["planning"])) {
                                             ?>
                                             <tr>
 
-                                                <td colspan="7"><?= $p_qty ?> x <?= $OrderProduct["product_name"] ?></td>
+                                                <td colspan="6"><?= $p_qty ?> x <?= $OrderProduct["product_name"] ?></td>
+                                                <td>
+                                                    <?
+                                                    $w = getWarehouseInfos($OrderProduct["id_warehouse"]);
+                                                    echo $w["name"];
+                                                    ?> 
+                                                </td>
                                                 <td nowrap class="text-center"><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                                 <td class="text-center"><?= $p_qty * $OrderProduct["product_weight"] ?> Kg</td>                                                                                                                          
-
                                             </tr>
-
-
-
                                             <?
                                         }
                                         ?>

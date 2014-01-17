@@ -274,7 +274,9 @@ $trucks = $db->get("av_truck");
                                     <?= date("d/m", strtotime($order["invoice_date"])) ?>
 
                                 </th>
-                                <th><?= $adresse["warehouse"]["zone_name"] ?> <?= $adresse["warehouse"]["warehouse_name"] ?></th>
+                                <th>
+                                    <?= $adresse["warehouse"]["zone_name"] ?>
+                                </th>
                                 <th>
                                     <?
                                     $addrs = $adresse["address1"] . "<br>";
@@ -305,11 +307,11 @@ $trucks = $db->get("av_truck");
                             }
                             ?>
                             <?
-                            $queryOrderDetail = "select a.id_order, b.*,
-                                            product_quantity * product_weight tot_prod_weight
-                                            from av_orders a, av_order_detail b
-                                            where a.id_order = b.id_order                                            
-                                            and b.id_order_detail not in(select id_order_detail from av_tournee where status = 2)
+                            $queryOrderDetail = "select a.id_order, b.*, c.name warehouse_name, product_quantity * product_weight tot_prod_weight
+                                            from av_orders a
+                                            LEFT OUTER JOIN av_order_detail b on (a.id_order = b.id_order)
+                                            LEFT OUTER JOIN av_warehouse c on (b.id_warehouse = c.id_warehouse)
+                                            where b.id_order_detail not in(select id_order_detail from av_tournee where status = 2)
                                             and a.id_order = ?";
 
 
@@ -426,8 +428,9 @@ $trucks = $db->get("av_truck");
                                         ?>
                                     </td>
                                     <td>
-                                        <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
-                                        <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?>
+                                        Fournisseur : <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
+                                        <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?><br>
+                                        Entrepot: <?= $OrderProduct["warehouse_name"] ?>
                                     <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                     <td><?= $product_weight ?> kg</td>                                    
 

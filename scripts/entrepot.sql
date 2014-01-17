@@ -3,6 +3,8 @@ ALTER TABLE  `av_zone` ADD  `warehouse` VARCHAR( 255 ) NULL;
 
 ALTER TABLE  `av_zone` ADD  `id_warehouse` INT NOT NULL
 
+ALTER TABLE  `av_order_detail` ADD  `id_warehouse` INT NULL AFTER  `id_product` ;
+
 
 update av_zone set warehouse = 'SAS ALLOVITRES<br>1900 Avenue Paul Julien RN7<br>13100 Le Tholonet<br>email : contact@miroiteriedupaysdaix.com<br>SARL Miroiterie du Pays d''Aix - RC5522928845' ;
 

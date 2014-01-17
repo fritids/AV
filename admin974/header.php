@@ -37,6 +37,7 @@ $r = $db->query("select count(1) nb_orders from av_orders where date(date_add)=d
             tinyMCE.init({
                 // General options
                 mode: "textareas",
+                editor_deselector : "mceNoEditor",
                 theme: "advanced",
                 plugins: "jbimages,autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
                 // Theme options

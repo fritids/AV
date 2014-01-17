@@ -19,7 +19,7 @@ define("LIVREE", 5);
 
 //SMS
 
-$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-saccounts.com';
 $api_key = 'PLYvbMEbIhW5zfnQy0Xi';
 $sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
 $sms_mode = INSTANTANE; // ou encore DIFFERE
@@ -61,7 +61,7 @@ $customer_info = getCustomerDetail($cid);
 $orderinfo = getOrderInfos($oid);
 $suppliers = getSupplierZone($orderinfo["address"]["delivery"]["warehouse"]["id_zone"]);
 
-
+//print_r($orderinfo);
 //paiementtoi t
 $orderPayment = getOrderPayment($orderinfo["id_order"]);
 
@@ -162,7 +162,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->delete("av_tournee");
 
                     $r = $db->where("id_order_detail", $id)
-                            ->update("av_order_detail", array("supplier_date_delivery" => null));
+                            ->update("av_order_detail", array("supplier_date_delivery" => null/*, "id_warehouse" => null*/));
 
                     $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
@@ -194,7 +194,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->delete(("av_tournee"));
 
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
-                            ->update("av_order_detail", array("supplier_date_delivery" => null));
+                            ->update("av_order_detail", array("supplier_date_delivery" => null/*, "id_warehouse" => null*/));
 
                     $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
@@ -301,7 +301,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
 
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
-            $mail->AddStringAttachment(utf8_encode($mail_body), $bdc_commande_filename . ".html");
+            //$mail->AddStringAttachment(utf8_encode($mail_body), $bdc_commande_filename . ".html");
             $mail->MsgHTML($mail_body);
 
             if ($mail->Send()) {
@@ -310,7 +310,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                 $params = array(COMMANDE_FOURNISSEUR, $oid, $orderSupplier["id_supplier"]);
 
                 $q = "update av_order_detail 
-                set product_current_state = " . COMMANDE_FOURNISSEUR . " 
+                set product_current_state = " . COMMANDE_FOURNISSEUR . ", 
+                    id_warehouse = " . $orderinfo["address"]["invoice"]["warehouse"]["id_warehouse"] . "
                 where IFNULL(product_current_state,0) in (0,21, 22) 
                 and id_order = " . $oid . " 
                 and id_supplier =  " . $orderSupplier["id_supplier"];
@@ -679,13 +680,25 @@ if ($orderinfo) {
                             <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
                             <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Modifier les infos personnelles"><span class="glyphicon glyphicon-edit"></span></a>
                         </div>
-                    </div>
-                    <div class="panel-body">
-                        Nom:<?= @$customer_info["firstname"] ?> <br>
-                        Prénom: <?= @$customer_info["lastname"] ?> <br>                    
-                        Email: <?= @$customer_info["email"] ?> <br>                        
-                        Type: <?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?> <br>                        
-                    </div>
+                    </div>                    
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Nom</td>
+                            <td><?= @$customer_info["firstname"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Prénom</td>
+                            <td><?= @$customer_info["lastname"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td><?= @$customer_info["email"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Type</td>
+                            <td><?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?></td>
+                        </tr>
+                    </table>
                 </div>            
             </div>
 
@@ -693,19 +706,24 @@ if ($orderinfo) {
                 <div class="panel panel-default">
                     <div class="panel-heading">Adresse Livraison <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["delivery"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de livraison"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                     <div class="panel-body">
-                        <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
+                        <span class="glyphicon glyphicon-phone-alt" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
                         <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["delivery"]["phone_mobile"] ?> <br>
                         <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
                         <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
-                        <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?> [ <?= $orderinfo["address"]["delivery"]["zone"] ?> ]
-                    </div>
-                </div>  
+                        <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?>
+                    </div> 
+                    <table class="table table-condensed">
+                        <tr>
+                            <td class="text-center"><?= $orderinfo["address"]["delivery"]["zone"] ?></td>                            
+                        </tr>
+                    </table>
+                </div>
             </div>
             <div class="col-xs-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">Adresse Facturation <div class="pull-right"><a href="av_address.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["address"]["invoice"]["id_address"] ?>" data-toggle="tooltip" title="Modifier l'adresse de facturation"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                     <div class="panel-body">
-                        <span class="glyphicon glyphicon-earphone" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
+                        <span class="glyphicon glyphicon-phone-alt" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
                         <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["invoice"]["phone_mobile"] ?> <br>
                         <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
                         <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
@@ -728,23 +746,47 @@ if ($orderinfo) {
             <div class="col-xs-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                    <div class="panel-body">
-                        Référence:  <?= $orderinfo["reference"] ?><br>
-                        Facture:  <?= $orderinfo["invoice"] ?><br>
-                        Création:  <?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?><br>                     
-                        Suivi SMS:  <?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?><br>
-                        Total:  <?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?>
-                    </div>
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Référence</td>
+                            <td><?= $orderinfo["reference"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Facture</td>
+                            <td><?= $orderinfo["invoice"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Création</td>
+                            <td><?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?></td>
+                        </tr>
+                        <tr>
+                            <td>Suivi SMS</td>
+                            <td><?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?></td>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td><?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?></td>
+                        </tr>
+                    </table>
                 </div> 
             </div>
             <div class="col-xs-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">Paiement </div>
-                    <div class="panel-body <?= ($orderinfo["current_state"] == 2) ? 'alert alert-2' : ''; ?>">
-                        Mode: <?= $orderinfo["payment"] ?><br>                        
-                        Payé le: <?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?><br>
-                        Total: <?= $orderPayment["amount"] ?> €<br>
-                    </div>
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Mode</td>
+                            <td><?= $orderinfo["payment"] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Date paiement:</td>
+                            <td><?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?></td>
+                        </tr>
+                        <tr>
+                            <td>Montant</td>
+                            <td><?= $orderPayment["amount"] ?> €</td>
+                        </tr>
+                    </table>
                 </div> 
             </div>       
 
@@ -897,8 +939,7 @@ if ($orderinfo) {
                                                 } else {
                                                     echo $od["product_state_label"];
                                                 }
-                                                ?>
-
+                                                ?>                                                
                                             </td>
                                             <td>
                                                 <?
@@ -921,6 +962,7 @@ if ($orderinfo) {
                                                     echo $od["supplier_name"];
                                                 }
                                                 ?>
+                                                <?= $od["warehouse_name"] ?>
                                             </td>
                                             <td>
                                                 <?
@@ -965,7 +1007,7 @@ if ($orderinfo) {
                                                 <?
                                                 if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
                                                     ?>
-                                                    <button name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
+                                                    <button type="button" name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
                                                         Retirer du camion
                                                     </button>
                                                     <?
@@ -1160,12 +1202,6 @@ if ($orderinfo) {
                     btn.attr("disabled", "disabled");
 
                 },
-                error: function(xhr, textStatus, error) {
-                    console.log(xhr.statusText);
-                    console.log(textStatus);
-                    console.log(error);
-                    btn.attr("disabled", "disabled");
-                }
             });
             location.reload();
         });
