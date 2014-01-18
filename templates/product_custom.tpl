@@ -62,7 +62,7 @@
                                     <div><a href="#" id="{$key}" class="add_item"> Ajouter un {$combination.name}  </a></div>
                                 {else}
                                     <div id="i_{$key}" >
-                                        <select name="custom[{$key}][]" id="{$key}" class="main_item">                                
+                                        <select id="{$key}" name="main_item" class="main_item">                                
                                             <option></option>
                                             {foreach key=key2 item=combination_item from=$combination.items}
                                                 <option value='{$combination_item.id_attributes_items}'>{$combination_item.name}</option>                            
@@ -80,7 +80,7 @@
 
                                 {/if}
                                 <div id="template_{$key}" style="display: none;">
-                                    <select name="custom[{$key}][]" id="{$key}" class="main_item">                                
+                                    <select  id="{$key}" class="main_item">                                
                                         <option></option>
                                         {foreach key=key2 item=combination_item from=$combination.items}
                                             <option value='{$combination_item.id_attributes_items}'>{$combination_item.name}</option>                            
@@ -133,27 +133,42 @@
     </div>
 </div>
 <script>
-    myArray = $('.attribute');
-    //console.log($('.attribute').serializeArray());
-    $.ajax({
-        url: "/functions/ajax_declinaison.php",
-        type: "POST",
-        dataType: "json",
-        async: false,
-        data: {
-            id: this.value,
-            id_product: {$product.id_product},
-            ids: $('.attribute').serializeArray()
-        },
-        success: function(result) {
-            unit_price = result.price;
-            unit_weight = result.weight;
-            //console.log(unit_price);
-            $('#total_price').text(unit_price);
-            //$('#total_poids').text(unit_weight);
-            $('#price').val(unit_price);
-            //$('#texte').text(unit_price);
-        }
+    option_price = 0;
+    unit_price = 0;
+    unit_weight = 0;
+
+    function getAjaxPrice() {
+        $.ajax({
+            url: "/functions/ajax_declinaison.php",
+            type: "POST",
+            dataType: "json",
+            async: false,
+            data: {
+                id: this.value,
+                id_product: {$product.id_product},
+                ids: $('.attribute').serializeArray(),
+                subItems: $('.main_item').serializeArray(),
+                main_item_ids: $('.main_item').serializeArray(),
+            },
+            success: function(result) {
+                unit_price = result.price;
+                option_price = result.price_option;
+                unit_weight = result.weight;
+                //console.log(result);
+                $('#total_price').text(unit_price);
+                //$('#total_poids').text(unit_weight);
+                $('#price').val(unit_price);
+                //$('#texte').text(unit_price);
+            }
+        });
+    }
+    $(document).ready(function() {
+        getAjaxPrice();
+    });
+
+    $(".submit").click(function() {
+        getAjaxPrice();
+        calculateprice();
     });
 </script>
 
@@ -187,6 +202,7 @@
     var max_width = {$product.max_width};
     var min_height = {$product.min_height};
     var max_height = {$product.max_height};
+    var c = 0;
     function bindItemAdd() {
         $('.main_item').change(function() {
             //console.log($(this).parent().attr("id"));
@@ -206,23 +222,28 @@
                     id_product: $id_product
                 },
                 success: function(result) {
-                    //console.log(result);                    
+                    //console.log(result);
                     //console.log('#list_' + $id_item + '_' + $id_block);
-                    $('#list_' + $id_item + '_' + $id_block).text("");                    
-                    if (result.picture !== null) {
+                    $('#list_' + $id_item + '_' + $id_block).text("");
+                    if (result.picture.length !== 0) {
                         $("#custom_img").attr("src", "/img/f/" + result.picture);
                     }
 
                     calculateprice();
+
+                    ++c;
+
                     $.each(result.item_values, function(key, value) {
+                        i++;
 
                         //console.log(value);
                         /*$("#list_Formes").append($('<input />').attr({'type':'text', 'id':'url' + key}));*/
                         $item_input = $('<input />').attr({
                             type: 'text',
-                            id: 'view_' + key,
+                            id: 'view_' + i,
                             class: 'range_text',
-                            myid: key,
+                            name: 'custom[' + result.id_attribute + '][' + result.id_attributes_items + '][' + c + '][' + key + ']',
+                            myid: i,
                             value: value.min_width
                         });
 
@@ -237,10 +258,10 @@
 
                         $item_range = $('<input />').attr({
                             type: 'range',
-                            id: 'range_' + key,
-                            myid: key,
+                            id: 'range_' + i,
+                            myid: i,
                             side: value.name,
-                            name: 'custom[' + result.id_attribute + '][' + result.id_attributes_items + '][' + key + ']',
+                            //name: 'custom[' + result.id_attribute + '][' + result.id_attributes_items + '][' + key + ']',
                             value: value.min_width,
                             min: value.min_width,
                             max: item_max_width,
@@ -320,18 +341,22 @@
                     $('#width').val(parseInt(B));
                 } else {
                     $('#height').val($(this).val());
-                }
-
+                }                
                 calculateprice();
             });
             $('.attribute').change();
             $(".primary_width").change();
             $(".primary_height").change();
             $(".min_area_invoiced").text(min_area_invoiced);
+
         });
+
     }
 
     function calculateprice() {
+
+        //getAjaxPrice();
+
         qte = $('#quantity').val();
         pwidth = $('#width').val();
         pheight = $('#height').val();
@@ -347,43 +372,21 @@
             }
 
             /*console.log(pwidth);
-            console.log(pheight);
-            console.log(area);
+             console.log(pheight);
+             console.log(area);
              console.log(area * unit_price * qte * shape_coef);
              console.log(unit_price);*/
             $('#surface').text(area.toFixed(2));
             $('#total_poids').text((area_invoiced * unit_weight * qte).toFixed(2));
-            $('#total_price').text((area_invoiced * unit_price * qte * coef).toFixed(2));
-            $('#price').val((area_invoiced * unit_price * qte * coef).toFixed(2));
+            $('#total_price').text((parseFloat(option_price) + area_invoiced * unit_price * qte * coef).toFixed(2));
+            $('#price').val((parseFloat(option_price) + area_invoiced * unit_price * qte * coef).toFixed(2));
         }
     }
 
 
 
     $('.attribute').change(function() {
-        myArray = $('.attribute');
-        //console.log($('.attribute').serializeArray());
-        $.ajax({
-            url: "/functions/ajax_declinaison.php",
-            type: "POST",
-            dataType: "json",
-            async: false,
-            data: {
-                id: this.value,
-                id_product: {$product.id_product},
-                ids: $('.attribute').serializeArray(),
-                subItems: $('.main_item').serializeArray()
-            },
-            success: function(result) {
-                unit_price = result.price;
-                unit_weight = result.weight;
-                console.log(unit_price);
-                $('#total_price').text(unit_price);
-                //$('#total_poids').text(unit_weight);
-                $('#price').val(unit_price);
-                //$('#texte').text(unit_price);
-            }
-        });
+        getAjaxPrice();
         calculateprice();
     });
     $('#width').change(function() {

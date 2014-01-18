@@ -6,7 +6,7 @@ class Panier {
     private $nbItems = 0;
     private $vat_rate = 0;
 
-    // constructeur
+// constructeur
     function __construct() { // constructeur
         global $config;
 
@@ -22,13 +22,30 @@ class Panier {
         $this->vat_rate = $config["vat_rate"];
     }
 
-    // ajouter un article $refproduit
+// ajouter un article $refproduit
     public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension, $productInfos, $n) {
 
         if (empty($dimension))
             $surface = 1;
 
-        $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
+//Ajout des impacts de forme
+        if (isset($productInfos["custom_label"])) {
+            foreach ($productInfos["custom_label"] as $k => $main_attribute) {
+                if (is_array($main_attribute)) {
+                    foreach ($main_attribute as $l => $sub_attributes) {
+                        if (is_array($sub_attributes)) {
+                            foreach ($sub_attributes as $l => $sub_attribute) {
+                                if ($sub_attribute["price_impact_amount"] > 0) {
+                                    $total_price_impact_amount += $sub_attribute["price_impact_amount"] * $this->vat_rate;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate + $total_price_impact_amount;
 
         @$this->panier[$n][$refproduit]['quantity'] += $nb;
         @$this->panier[$n][$refproduit]['dimension'] = $dimension;
@@ -44,11 +61,12 @@ class Panier {
         @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
         @$this->panier[$n][$refproduit]['name'] = $name;
 
+
         if ($nb <= 0)
             unset($this->panier[$refproduit]);
     }
 
-    // ajouter un article $refproduit
+// ajouter un article $refproduit
     public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension, $n) {
 
         $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
@@ -71,7 +89,7 @@ class Panier {
             unset($this->panier[$n][$refproduit]["options"][$refoption]);
     }
 
-    // ajouter un article $refproduit
+// ajouter un article $refproduit
     public function addItemCustom($refproduit = "", $refcustom = "", $nb = 1, $price = 0, $name, $surface, $dimension, $n) {
 
         $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
@@ -92,10 +110,10 @@ class Panier {
             unset($this->panier[$n][$refproduit]["custom"][$refcustom]);
     }
 
-    // supprimer un article $refproduit
+// supprimer un article $refproduit
     public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface, $n) {
 
-        $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
+        $montant_produit_ttc = $price; //$nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
 
         @$this->panier[$n][$refproduit]['quantity'] -= $nb;
         @$this->panier[$n][$refproduit]['surface'] = round($surface, 2);
@@ -111,7 +129,7 @@ class Panier {
         }
 
         if ($this->panier[$n][$refproduit]['quantity'] <= 0) {
-            //remove option
+//remove option
             $option_amount = 0;
             if (isset($this->panier[$n][$refproduit]['options']))
                 foreach ($this->panier[$n][$refproduit]['options'] as $k => $option) {
@@ -129,7 +147,7 @@ class Panier {
                 $this->panier_summary['total_taxes'] = 0;
 
             unset($this->panier[$n][$refproduit]);
-            //array_splice($this->panier,1);
+//array_splice($this->panier,1);
             /* $this->panier_summary['total_amount'] = 0;
               $this->panier_summary['total_shipping'] = 0;
               $this->panier_summary['total_taxes'] = 0;
@@ -137,16 +155,16 @@ class Panier {
         }
     }
 
-    // choisir la quantit? d'article $refproduit
+// choisir la quantit? d'article $refproduit
     public function setQuantity($refproduit = "", $toSet = "") {
         @$this->panier[$refproduit]['quantity'] = $toSet;
         if ($toSet <= 0)
             unset($this->panier[$refproduit]);
     }
 
-    // afficher la quantit? de produits dans le panier
-    // param?tre : $refproduit : permet d'afficher la quantit? pour le produit de cette r?f?rence
-    // si le param?tre est vide, on affiche la quantit? totale de produit
+// afficher la quantit? de produits dans le panier
+// param?tre : $refproduit : permet d'afficher la quantit? pour le produit de cette r?f?rence
+// si le param?tre est vide, on affiche la quantit? totale de produit
     public function showQuantity($refproduit = "") {
         if ($refproduit) {
             return $this->panier[$refproduit]['quantity'];
@@ -227,11 +245,11 @@ class Panier {
         }
     }
 
-    // afficher la liste des articles (et accessoirement, leur quantit?)
+// afficher la liste des articles (et accessoirement, leur quantit?)
 
     public function showCart() {
         $list = array();
-        //$i = 1;
+//$i = 1;
         foreach ($this->panier as $i => $items) {
             foreach ($items as $ref => $data) {
                 if (!empty($ref)) {
@@ -249,7 +267,7 @@ class Panier {
                     $list[$i]["pro_discounted"] = $data['pro_discounted'];
                     $list[$i]["custom"] = $data['productinfos']['custom'];
 
-                    //les options
+//les options
                     if (!empty($this->panier[$i][$ref]['options'])) {
                         foreach ($this->panier[$i][$ref]["options"] as $oref => $option) {
                             if (!empty($option['quantity']) && $option['quantity'] > 0) {
@@ -261,7 +279,7 @@ class Panier {
                                     "o_shipping" => $option['shipping'],
                                     "o_prixttc" => $option['prixttc'],
                                 );
-                                //$list[$i]["options"][] = $option;
+//$list[$i]["options"][] = $option;
                             }
                         }
                     }

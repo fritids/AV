@@ -89,10 +89,10 @@
                     {elseif $detail.attributes[$i].index_attribute == 5}
                         <td>{$detail.attributes[$i].attribute_value}</td>                        
                     {elseif $detail.attributes[$i].index_attribute == 7}
-                        <td>{$detail.attributes[$i].attribute_value}</td>                        
-                    {else}
-                        <td>&nbsp;</td>
+                        <td>{$detail.attributes[$i].attribute_value}</td>
                     {/if}
+                {else}
+                    <td>&nbsp;</td>
                 {/if}
             {/for}   
 

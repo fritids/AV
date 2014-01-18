@@ -96,9 +96,9 @@
                     </tr>
                     <tr>
                         <td>
-                            Total produits TTc :{($devisinfo.total_paid*1.20)|round:"2"} €<br>
-                            Frais de transport : 25€ <br>
-                            Total TTc :{($devisinfo.total_paid*1.20+25)|round:"2"} €<br>
+                            Total produits TTC: {($devisinfo.total_paid*1.20)|round:"2"} €<br>
+                            Frais de transport: 25€ <br>
+                            Total TTC: {($devisinfo.total_paid*1.20+25)|round:"2"} €<br>
                         </td>
                     </tr>
                 </table>

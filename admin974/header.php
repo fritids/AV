@@ -14,7 +14,7 @@ $_SERVER['REMOTE_USER'] = $_SESSION["email"];
 //require_once './extensions/phpMyEdit-mce-cal.class.php';
 //require_once './extensions/phpMyEdit-slide.class';
 
-$r = $db->query("select count(1) nb_orders from av_orders where date(date_add)=date(now()) and current_state in (1,2,10)");
+$nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=date(now()) and current_state in (1,2,10)");
 ?>
 
 <!DOCTYPE html>
@@ -169,7 +169,7 @@ $r = $db->query("select count(1) nb_orders from av_orders where date(date_add)=d
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $r[0]["nb_orders"]?></span></a> </li>
+                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $nb[0]["nb_orders"]?></span></a> </li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
                                     <li class="divider"></li>                                    
                                     <li><a href="av_stock_dashboard.php">Commande avec gestion de stock</a></li>

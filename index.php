@@ -150,10 +150,12 @@ if (isset($_GET["cart"])) {
                 if (is_array($_POST["custom"])) {
                     foreach ($mapCustomAttribute as $custom_item) {
                         if (is_array($custom_item)) {
-                            foreach ($custom_item as $k => $sub_item) {
-                                if ($sub_item["price_impact_percentage"] > 0) {
-                                    $productInfos["price"] *= $sub_item["price_impact_percentage"];
-                                    $impact_coef = $sub_item["price_impact_percentage"];
+                            foreach ($custom_item as $k => $sub_items) {
+                                foreach ($sub_items as $l => $sub_item) {
+                                    if ($sub_item["price_impact_percentage"] > 0) {
+                                        $productInfos["price"] *= $sub_item["price_impact_percentage"];
+                                        $impact_coef = $sub_item["price_impact_percentage"];
+                                    }
                                 }
                             }
                         }
@@ -190,7 +192,7 @@ if (isset($_GET["cart"])) {
 
             $surface = $_SESSION["cart"][$nitem][$pid]["surface"];
             $pqte = $_SESSION["cart"][$nitem][$pid]["quantity"];
-            $price = $_SESSION["cart"][$nitem][$pid]["price"];
+            $price = $_SESSION["cart"][$nitem][$pid]["prixttc"];
 
             $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface, $nitem);
             //$cart->removeCartItem($_POST["id_cart_item"]);
@@ -889,17 +891,17 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ko_msg = array();
     }
 
-    /*if ($code == "NOEL2013DV") {
-        $cart->addVoucher(array(
-            "code" => "NOEL2013DV",
-            "title" => "NOEL2013DV",
-            "group" => "category",
-            "value" => 12,
-            "reduction" => 10)
-        );
-        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-        $ko_msg = array();
-    }*/
+    /* if ($code == "NOEL2013DV") {
+      $cart->addVoucher(array(
+      "code" => "NOEL2013DV",
+      "title" => "NOEL2013DV",
+      "group" => "category",
+      "value" => 12,
+      "reduction" => 10)
+      );
+      $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+      $ko_msg = array();
+      } */
 }
 
 // mot de passe oublié

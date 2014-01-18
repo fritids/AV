@@ -29,7 +29,7 @@
                                             <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                                 {foreach from=$detail.custom item=custom}
                                                     {foreach from=$custom.sub_item item=sub_item}
-                                                        {if (isset($sub_item.picture))}
+                                                        {if (isset($sub_item.picture)) && {$sub_item.picture} != ""}
                                                             <img src="img/f/{$sub_item.picture}">
                                                         {/if}
                                                     {/foreach} 

@@ -333,6 +333,13 @@ function createInvoice($oid) {
     $r = $db->insert("av_order_invoice", $params);
 }
 
+function getOptionWeight($ipaid) {
+    global $db;
+    $r = $db->where("id_product_attribute", $ipaid)
+            ->get("av_product_attribute");
+    return $r[0];
+}
+
 function saveOrder() {
 
     global $db, $cartItems, $config;
@@ -400,9 +407,14 @@ function saveOrder() {
 
         // on rajoute les options
         if (isset($item["options"])) {
+            $option_unit_weight = 0;
             $option_weight = 0;
+            $options_weight = 0;
             foreach ($item["options"] as $k => $option) {
-                //$option_weight += getOptionWeight($option["o_id"]);
+                $option_unit_weight = getOptionWeight($option["o_id"]);
+                $o_surface = $option["o_surface"];
+                $option_weight = $o_surface * $option_unit_weight["weight"];
+                $options_weight = $option_weight;
 
                 $order_product_attributes = array(
                     "id_order" => $oid,
@@ -420,22 +432,26 @@ function saveOrder() {
         // on rajoute les options personalisé
         if (isset($item["custom"])) {
             foreach ($item["custom"] as $k => $main_attribute) {
+                $nb_custom_product += 1;
                 if (is_array($main_attribute)) {
                     $order_custom_attributes["id_attribute"] = $k;
                     foreach ($main_attribute as $l => $sub_attribute) {
                         if (is_array($sub_attribute)) {
                             $order_custom_attributes["id_attributes_items"] = $l;
 
-                            foreach ($sub_attribute as $m => $item_value) {
-                                $nb_custom_product += 1;
-                                $order_custom_attributes["id_attributes_items_values"] = $m;
-                                $order_custom_attributes["id_order"] = $oid;
-                                $order_custom_attributes["id_order_detail"] = $odid;
-                                $order_custom_attributes["id_product"] = $item["id"];
-                                $order_custom_attributes["custom_value"] = $item_value;
+                            foreach ($sub_attribute as $m => $item_values) {
+                                if (is_array($item_values)) {
+                                    foreach ($item_values as $n => $item_value) {                                       
+                                        $order_custom_attributes["id_attributes_items_values"] = $n;
+                                        $order_custom_attributes["id_order"] = $oid;
+                                        $order_custom_attributes["id_order_detail"] = $odid;
+                                        $order_custom_attributes["id_product"] = $item["id"];
+                                        $order_custom_attributes["custom_value"] = $item_value;
 
-                                $db->insert("av_order_product_custom", $order_custom_attributes);
-                                $is_product_custom = 1;
+                                        $db->insert("av_order_product_custom", $order_custom_attributes);
+                                        $is_product_custom = 1;
+                                    }
+                                }
                             }
                         }
                     }
@@ -448,7 +464,7 @@ function saveOrder() {
 
         // post update sur les details
         $param = array(
-            "product_weight" => ($p["weight"] + $option_weight) * $item["surface"]
+            "product_weight" => ($p["weight"] * $item["surface"] + $option_weight)
         );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);

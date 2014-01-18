@@ -19,7 +19,7 @@ define("LIVREE", 5);
 
 //SMS
 
-$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-saccounts.com';
+$user_login = 'pei73hyl8trvtivx8rduvg2p@sms-accounts.com';
 $api_key = 'PLYvbMEbIhW5zfnQy0Xi';
 $sms_type = QUALITE_PRO; // ou encore QUALITE_PRO
 $sms_mode = INSTANTANE; // ou encore DIFFERE
@@ -917,7 +917,8 @@ if ($orderinfo) {
                                             </td>
                                             <td nowrap>
                                                 <?= $od["total_price_tax_incl"] ?> €
-                                                <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?>
+                                                <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?><br>
+                                                <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
                                             </td>
                                             <td>
                                                 <?

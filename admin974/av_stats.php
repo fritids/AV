@@ -16,13 +16,20 @@ if (isset($_POST["enda"]))
     $enda = $_POST["enda"];
 
 
-if ($stda != "" && $enda) {
-    $r = $db->rawQuery("SELECT date(invoice_date) invoice_date, payment, count(1) nb_orders, sum(total_paid)  total_paid
+if ($stda != "" && $enda != '') {
+    $r1 = $db->rawQuery("SELECT date(invoice_date) invoice_date, payment, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
     FROM `av_orders` 
     where ifnull(current_state,0) > 0 
     and date(invoice_date) between ? and ?
     and current_state not in (1,6,7,8)
     group by date(invoice_date), payment  ", array($stda, $enda));
+
+    $r2 = $db->rawQuery("SELECT date(invoice_date) invoice_date, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
+    FROM `av_orders` 
+    where ifnull(current_state,0) > 0 
+    and date(invoice_date) between ? and ?
+    and current_state not in (1,6,7,8)
+    group by date(invoice_date) ", array($stda, $enda));
 }
 ?>
 
@@ -46,8 +53,7 @@ if ($stda != "" && $enda) {
         <div class="col-xs-6">
             <div class="panel panel-default">
                 <div class="panel-heading">Reporting</div>
-                <div class="panel-body">
-                    
+                <div class="panel-body">                
                     <form action="av_download_pdf.php" method="post"  target="blank">
                         <div>
                             <input type="radio"  name="extract" value="1"> Excel
@@ -61,29 +67,35 @@ if ($stda != "" && $enda) {
             </div>
         </div>
     </div>
+    <hr>
 
     <?
-    if (!empty($r)) {
+    if (!empty($r1)) {
         $total_amount = 0;
+        $total_produit_ht = 0;
         $total_nb_order = 0;
         ?>
-        
-            <table class="table table-condensed">
+        <div class="col-xs-6">
+            <h2>Aggrégé par date et mode de paiement</h2>
+            <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th>Date</th>
                     <th>Mode de paiement</th>
                     <th>Nb commandes</th>
+                    <th>Montant produit HT (hors fdp)</th>
                     <th>Montant TTC</th>
                 </tr>
                 <?
-                foreach ($r as $row) {
+                foreach ($r1 as $row) {
                     $total_amount += $row["total_paid"];
+                    $total_produit_ht += $row["total_produit_ht"];
                     $total_nb_order +=$row["nb_orders"];
                     ?>
                     <tr>
                         <td><?= $row["invoice_date"] ?></td>
                         <td><?= $row["payment"] ?></td>
                         <td><?= $row["nb_orders"] ?></td>
+                        <td><?= number_format($row["total_produit_ht"], 2, '.', ' ') ?> €</td>
                         <td><?= number_format($row["total_paid"], 2, '.', ' ') ?> €</td>
                     </tr>
                     <?
@@ -93,10 +105,56 @@ if ($stda != "" && $enda) {
                     <td><b>Total sur la période</b></td>
                     <td></td>
                     <td><b><?= $total_nb_order ?> </b></td>
+                    <td><b><?= number_format($total_produit_ht, 2, '.', ' ') ?> €</b></td>
                     <td><b><?= number_format($total_amount, 2, '.', ' ') ?> €</b></td>
                 </tr>
             </table>
-        
+        </div>
+        <?
+    }
+    ?>
+
+    <?
+    if (!empty($r2)) {
+        $total_amount = 0;
+        $total_produit_ht = 0;
+        $total_nb_order = 0;
+        ?>  
+
+        <div class="col-xs-6">
+            <h2>Aggrégé par date</h2>
+            <table class="table table-bordered table-condensed table-striped">
+                <tr>
+                    <th>Date</th>
+                    <th>Nb commandes</th>
+                    <th>Montant produit HT (hors fdp)</th>
+                    <th>Montant TTC</th>
+                </tr>
+                <?
+                foreach ($r2 as $row) {
+                    $total_amount += $row["total_paid"];
+                    $total_produit_ht += $row["total_produit_ht"];
+                    $total_nb_order +=$row["nb_orders"];
+                    ?>
+                    <tr>
+                        <td><?= $row["invoice_date"] ?></td>
+                        <td><?= $row["nb_orders"] ?></td>
+                        <td><?= number_format($row["total_produit_ht"], 2, '.', ' ') ?> €</td>
+                        <td><?= number_format($row["total_paid"], 2, '.', ' ') ?> €</td>
+                    </tr>
+                    <?
+                }
+                ?>
+                <tr class="alert-info">
+                    <td><b>Total sur la période</b></td>                    
+                    <td><b><?= $total_nb_order ?> </b></td>
+                    <td><b><?= number_format($total_produit_ht, 2, '.', ' ') ?> €</b></td>
+                    <td><b><?= number_format($total_amount, 2, '.', ' ') ?> €</b></td>
+                </tr>
+            </table>
+        </div>
+
+
         <?
     }
     ?>
