@@ -162,7 +162,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->delete("av_tournee");
 
                     $r = $db->where("id_order_detail", $id)
-                            ->update("av_order_detail", array("supplier_date_delivery" => null/*, "id_warehouse" => null*/));
+                            ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
 
                     $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
@@ -194,7 +194,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->delete(("av_tournee"));
 
                     $r = $db->where("id_order_detail", $od["id_order_detail"])
-                            ->update("av_order_detail", array("supplier_date_delivery" => null/*, "id_warehouse" => null*/));
+                            ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
 
                     $r = $db->where("id_order", $oid)
                             ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
@@ -214,6 +214,23 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     "operation" => "update",
                     "oldval" => $od["product_current_state"],
                     "newval" => $_POST["product_current_state"]
+                ));
+            }
+        }
+    if (isset($_POST["product_supplier_comment"]) && !empty($_POST["product_supplier_comment"]))
+        if (is_array($_POST["product_supplier_comment"])) {
+            foreach ($_POST["product_supplier_comment"] as $id => $product_supplier_comment) {
+
+                $r = $db->where("id_order_detail", $id)
+                        ->update("av_order_detail", array("product_supplier_comment" => $product_supplier_comment));
+
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $id,
+                    "col" => "product_supplier_comment",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $product_supplier_comment
                 ));
             }
         }
@@ -924,7 +941,7 @@ if ($orderinfo) {
                                                 <?
                                                 if ($od["product_current_state"] != 20) {
                                                     ?>
-                                                    <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="pme-input-0">
+                                                    <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="product_current_state pme-input-0">
                                                         <option value=""></option>
                                                         <?
                                                         foreach ($productStates as $pState) {
@@ -936,6 +953,9 @@ if ($orderinfo) {
                                                                 }
                                                                 ?>
                                                     </select>
+
+                                                    <input type="text" value="<?= $od["product_supplier_comment"] ?>" name="product_supplier_comment[<?= $od["id_order_detail"] ?>]" class="product_supplier_comment" maxlength="128">
+
                                                     <?
                                                 } else {
                                                     echo $od["product_state_label"];
@@ -1175,6 +1195,12 @@ if ($orderinfo) {
                 dateFormat: "yy-mm-dd"
             });
         });
+
+        $(".product_current_state").change(function() {
+            if ($(this).val() === 21 || $(this).val() === 22) {
+                $(".product_supplier_comment").show("slow");
+            }
+        })
 
         $(".supplier").change(function() {
             $("#btn_send_supplier").attr("disabled", "disabled");

@@ -139,6 +139,10 @@
     <div class="col-xs-5" style="overflow:scroll; height: 400px">
         <h3>Les nouveautés</h3>
         <ul class="list-unstyled">
+            <li>20 jan 2014</li>
+            <ul>
+                <li>FO - Forme spécifique - Ajout forme rond v2</li>
+            </ul>
             <li>03 jan 2014</li>
             <ul>
                 <li>FO - Téléchargement facture - correction faille de sécurité.</li>

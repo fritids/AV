@@ -44,6 +44,7 @@
     <tr>
         <th width="50">Zone</th>
         <th width="110">Référence Client</th>
+        <th width="110">Com. AV</th>
         <th width="30">Qte</th>
         <th width="200">Designation</th>        
         <th width="50">Dimension</th>    
@@ -62,45 +63,49 @@
     {foreach key=key item=detail from=$orderdetail name=orderdetail}
         <tr>
             <td>{$orderinfo.address.delivery.zone}</td>
-            <td>{if $detail.product_current_state == 21}SAV&nbsp;{/if}
-                {if $detail.product_current_state == 22}CASSE&nbsp;{/if}
-                {$orderinfo.customer.lastname} {$orderinfo.customer.firstname} AV
-            </td>
-            <td>{$detail.product_quantity}</td>
             <td>
-                {$detail.product_name}
-                {if $detail.is_product_custom == 1}
-                    <b>forme spécifique voir annexe</b>
-                {/if}
-            </td>
-            <td>{$detail.product_width} x {$detail.product_height}</td>
-
-
-            {for $i=0 to 5}
-                {if isset($detail.attributes[$i].index_attribute)}
-                    {if $detail.attributes[$i].index_attribute == 1}
-                        <td>{$detail.attributes[$i].attribute_value}</td>
-                    {elseif $detail.attributes[$i].index_attribute == 2}
-                        <td>{$detail.attributes[$i].attribute_value}</td>                        
-                    {elseif $detail.attributes[$i].index_attribute == 3}
-                        <td>{$detail.attributes[$i].attribute_value}</td>                        
-                    {elseif $detail.attributes[$i].index_attribute == 4}
-                        <td>{$detail.attributes[$i].attribute_value}</td>                        
-                    {elseif $detail.attributes[$i].index_attribute == 5}
-                        <td>{$detail.attributes[$i].attribute_value}</td>                        
-                    {elseif $detail.attributes[$i].index_attribute == 7}
-                        <td>{$detail.attributes[$i].attribute_value}</td>
-                    {/if}
-                {else}
-                    <td>&nbsp;</td>
-                {/if}
-            {/for}   
-
-            {if isset($detail.is_product_custom) && $detail.is_product_custom == 1}
-                <td>OUI</td>
+            {$orderinfo.customer.lastname} {$orderinfo.customer.firstname} AV
+        </td>
+        <td>
+            {if $detail.product_current_state == 21}SAV&nbsp;{/if}
+            {if $detail.product_current_state == 22}CASSE&nbsp;{/if}
+            {$detail.product_supplier_comment}
+        </td>
+        <td>{$detail.product_quantity}</td>
+        <td>
+            {$detail.product_name}
+            {if $detail.is_product_custom == 1}
+                <b>forme spécifique voir annexe</b>
             {/if}
-        </tr>
-    {/foreach}
+        </td>
+        <td>{$detail.product_width} x {$detail.product_height}</td>
+
+
+        {for $i=0 to 5}
+            {if isset($detail.attributes[$i].index_attribute)}
+                {if $detail.attributes[$i].index_attribute == 1}
+                    <td>{$detail.attributes[$i].attribute_value}</td>
+                {elseif $detail.attributes[$i].index_attribute == 2}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 3}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 4}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 5}
+                    <td>{$detail.attributes[$i].attribute_value}</td>                        
+                {elseif $detail.attributes[$i].index_attribute == 7}
+                    <td>{$detail.attributes[$i].attribute_value}</td>
+                {/if}
+            {else}
+                <td>&nbsp;</td>
+            {/if}
+        {/for}   
+
+        {if isset($detail.is_product_custom) && $detail.is_product_custom == 1}
+            <td>OUI</td>
+        {/if}
+    </tr>
+{/foreach}
 </table>
 
 {include file='../pdf_footer.tpl'}

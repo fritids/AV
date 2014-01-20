@@ -50,6 +50,8 @@ $opts['fdd']['name'] = array(
 $opts['fdd']['picture'] = array(
     'name' => 'Picture',
     'select' => 'T',
+    'input' => 'F',
+    'imagepath' => '../img/f/',
     'maxlen' => 128,
     'sort' => true
 );
@@ -86,6 +88,14 @@ $opts['fdd']['position'] = array(
     'maxlen' => 2,
     'sort' => true
 );
+$opts['fdd']['active'] = array(
+    'name' => 'Actif',
+    'select' => 'D',
+    'maxlen' => 1,
+    'sort' => true,
+    'values2' => array(0 => "Non", 1 => "Oui")
+);
+
 
 // Now important call to phpMyEdit
 require_once 'phpMyEdit.class.php';

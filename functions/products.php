@@ -135,7 +135,7 @@ function getProductCustomAttribut($pid) {
 
     $r = $db->rawQuery("select b.*
         from av_product_custom a , av_attributes b 
-        where a.id_attribute = b.id_attribute 
+        where a.id_attribute = b.id_attribute
         and id_product = ? ", array($pid));
 
     foreach ($r as $k => $attribut) {
@@ -156,6 +156,7 @@ function getProductCustomAttributItem($pid, $piad) {
         where a.id_attributes_items = b.id_attributes_items         
         and a.id_product = ? 
         and a.id_attribute = ? 
+        and b.active = 1
         order by position
         ", array($pid, $piad));     
 

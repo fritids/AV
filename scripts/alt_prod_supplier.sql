@@ -1,0 +1,1 @@
+ALTER TABLE  `av_order_detail` ADD  `product_supplier_comment` VARCHAR( 128 ) NULL;

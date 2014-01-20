@@ -185,6 +185,7 @@ if (isset($_POST["devis_save"])) {
                 $p_qte = $_POST["product_quantity"];
                 $p_width = $_POST["product_width"];
                 $p_height = $_POST["product_height"];
+                $p_product_custom_names = $_POST["product_custom_name"];
 
                 $attributes_amount = 0;
                 $devis_product_attributes = array();
@@ -210,7 +211,7 @@ if (isset($_POST["devis_save"])) {
                     $devis_detail = array(
                         "id_devis" => $did,
                         "id_product" => $product,
-                        "product_name" => $p["name"],
+                        "product_name" => ($p_product_custom_names[$k] != "" ? $p_product_custom_names[$k] . "-" : "") . $p["name"],
                         "product_quantity" => $p_qte[$k],
                         "product_price" => $p_unit_price,
                         "product_width" => $p_width[$k],
@@ -279,7 +280,8 @@ if (isset($_POST["devis_save"])) {
         foreach ($_POST["fixe_product_id"] as $k => $product) {
             if (!empty($product)) {
                 $p_qte = $_POST["fixe_product_quantity"];
-
+                $p_product_custom_names = $_POST["product_custom_name"];
+                
                 // la quantité de la ligne est présent
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
@@ -291,7 +293,7 @@ if (isset($_POST["devis_save"])) {
                     $devis_detail = array(
                         "id_devis" => $did,
                         "id_product" => $product,
-                        "product_name" => $p["name"],
+                        "product_name" => ($p_product_custom_names[$k] != "" ? $p_product_custom_names[$k] . "-" : "") . $p["name"],
                         "product_quantity" => $p_qte[$k],
                         "product_price" => $p_unit_price
                     );
@@ -405,6 +407,7 @@ if (isset($_POST["devis_save"])) {
         $row.find('.attr6_price').val(0);
         $row.find('.attr7_price').val(0);
         $row.find('.prod_price').val();
+        $row.find('.product_custom_name').val();
 
         //$row.addClass('dupe');
         //$row.attr('id', 'duplicate' + $('#tab_devis tr.dupe').length);
@@ -438,6 +441,8 @@ if (isset($_POST["devis_save"])) {
         $row.find(".product_width").attr('name', $row.find(".product_width").attr('name') + "[" + c + "]");
         $row.find(".product_height").attr('name', $row.find(".product_height").attr('name') + "[" + c + "]");
         $row.find(".product_quantity").attr('name', $row.find(".product_quantity").attr('name') + "[" + c + "]");
+
+        $row.find(".product_custom_name").attr('name', $row.find(".product_custom_name").attr('name') + "[" + c + "]");
 
 
         $row.show();
@@ -865,10 +870,10 @@ if (isset($_POST["devis_save"])) {
     <div class="row">
         <div class="col-md-3">
             <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Recherche un client</h3>
-                    </div>  
-                </div>
+                <div class="panel-heading">
+                    <h3 class="panel-title">Recherche un client</h3>
+                </div>  
+            </div>
             <form class="form form-horizontal" role="form" method="post">
                 <input type="text" id ="ajax_customer" class="form-control"/>
                 <input type="hidden" name ="id_customer"  id ="id_customer"/>
@@ -986,7 +991,8 @@ if (isset($_POST["devis_save"])) {
                                 }
                             }
                             ?>
-                        </select>
+                        </select><br>
+                        Préfix : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" >
                     </td>
 
                     <td>

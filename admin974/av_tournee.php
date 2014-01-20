@@ -205,8 +205,7 @@ $trucks = $db->get("av_truck");
                           and (ifnull(?,0) = 0 or id_truck = ?) ", array($date_livraison, $filter_truck, $filter_truck));
 
 
-        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,
-                    round(sum(product_quantity * ( product_width * product_height * product_depth) / 1000000000),2) order_volume,
+        $queryOrder = "select a.id_order, id_address_delivery, a.reference, a.id_customer, total_paid, c.postcode, a.invoice_date,                    
                     sum(product_quantity * product_weight) tot_weight
                     from av_orders a, av_order_detail b, av_address c, av_customer d
                     where a.id_order = b.id_order                   

@@ -1,0 +1,1 @@
+ALTER TABLE  `av_attributes_items` ADD  `active` TINYINT( 1 ) NOT NULL default 1;

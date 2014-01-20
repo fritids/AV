@@ -26,25 +26,7 @@ if (isset($_POST["ids"])) {
         }
     }
 }
-if (isset($_POST["subItems"])) {
-    foreach ($_POST["subItems"] as $sub_item) {
-        if ($sub_item["value"] > 0) {
-            $req = "SELECT * "
-                    . " FROM av_attributes_items "
-                    . " WHERE id_attributes_items = " . $sub_item["value"];
 
-            $query = mysql_query($req);
-            $rows = mysql_fetch_array($query);
-
-            if ($rows["price_impact_percentage"] > 0) {
-                $impact_coef = $rows["price_impact_percentage"];
-            }
-            if ($rows["price_impact_amount"] > 0) {
-                $priceOption += $rows["price_impact_amount"] * $config["vat_rate"];
-            }
-        }
-    }
-}
 if (isset($_POST["main_item_ids"])) {
     foreach ($_POST["main_item_ids"] as $sub_item) {
         if ($sub_item["value"] > 0) {
@@ -75,6 +57,15 @@ $rows = mysql_fetch_array($query);
 $productPrice = $rows["price"] * $impact_coef * $config["vat_rate"];
 $productweight = $rows["weight"];
 
-echo json_encode(array("price" => $priceAttribut * $impact_coef + $productPrice, "price_option" => $priceOption, "weight" => $weightAttribut + $productweight));
+echo json_encode(
+        array(
+            "price" => $priceAttribut * $impact_coef + $productPrice,
+            "price_option" => $priceOption,
+            "weight" => $weightAttribut + $productweight,
+            "post" => $_POST,
+            "impact_coef" => $impact_coef,
+            "priceAttribut" => $priceAttribut
+        )
+);
 //echo json_encode(array("price" => $text));
 ?>

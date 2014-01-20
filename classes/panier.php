@@ -130,7 +130,7 @@ class Panier {
 
         if ($this->panier[$n][$refproduit]['quantity'] <= 0) {
 //remove option
-            $option_amount = 0;
+            /*$option_amount = 0;
             if (isset($this->panier[$n][$refproduit]['options']))
                 foreach ($this->panier[$n][$refproduit]['options'] as $k => $option) {
                     $option_amount += $option["quantity"] * $option["price"] * $this->vat_rate * $option["surface"] + $option['shipping'];
@@ -142,7 +142,7 @@ class Panier {
             $this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($option_amount_produit, 2);
             $this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($option['shipping'], 2);
 
-
+*/
             if ($this->panier_summary['total_taxes'] < 0)
                 $this->panier_summary['total_taxes'] = 0;
 

@@ -179,7 +179,7 @@ if (isset($_GET["cart"])) {
                         //$shipping_amount = $shipping_ratio * $option_weight;
                         $shipping_amount = 0;
 
-                        $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                        $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
                     }
                 }
             }

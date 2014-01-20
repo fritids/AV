@@ -80,7 +80,7 @@
 
                                 {/if}
                                 <div id="template_{$key}" style="display: none;">
-                                    <select  id="{$key}" class="main_item">                                
+                                    <select  id="{$key}" name="main_item" class="main_item">                                
                                         <option></option>
                                         {foreach key=key2 item=combination_item from=$combination.items}
                                             <option value='{$combination_item.id_attributes_items}'>{$combination_item.name}</option>                            
