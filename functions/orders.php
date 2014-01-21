@@ -33,9 +33,9 @@ function getWarehouseInfos($iwid) {
     global $db;
 
     $query = "select a.*
-            from av_warehouse a
-            where  a.id_warehouse
-            and  a.id_warehouse = ? ";
+            from av_warehouse a, av_supplier_warehouse b
+            where a.id_warehouse = b.id_warehouse
+            and  b.id_supplier_warehouse = ? ";
 
     $z = $db->rawQuery($query, array($iwid));
 
@@ -132,22 +132,25 @@ function getUserOrdersAddress($iaid) {
         return $r[0];
 }
 
-function getUserOrdersDetail($oid, $id_supplier = null) {
+function getUserOrdersDetail($oid, $id_supplier_warehouse = null) {
     global $db;
-    $params = array($oid, $id_supplier, $id_supplier);
+    $params = array($oid,$id_supplier_warehouse, $id_supplier_warehouse);
 
-    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name, d.name warehouse_name
-                        FROM av_order_detail a
-                        LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
-                        LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
-                        LEFT OUTER JOIN av_warehouse d on (a.id_warehouse = d.id_warehouse)
+    $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name, a.id_supplier_warehouse
+                        FROM av_order_detail a                        
+                        LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)                        
+                        LEFT OUTER JOIN av_supplier_warehouse d on (a.id_supplier_warehouse = d.id_supplier_warehouse)                                                
+                        LEFT OUTER JOIN av_supplier b on (d.id_supplier = b.id_supplier)                        
                         where id_order = ? 
-                        and (IFNULL(?,0) = 0 OR (a.id_supplier = ? and IFNULL(product_current_state,0) in (0,21, 22)))
+                        and (IFNULL(?,0) = 0 OR (a.id_supplier_warehouse = ? and IFNULL(product_current_state,0) in (0,21, 22)))                        
                         ", $params);
 
     foreach ($r as $k => $od) {
+        $w = getWarehouseInfos($od["id_supplier_warehouse"]);
+        
         $r[$k]["attributes"] = getOrdersDetailAttribute($od["id_order_detail"]);
         $r[$k]["custom"] = getOrdersCustomMainItem($od["id_order_detail"]);
+        $r[$k]["id_warehouse"] = $w["id_warehouse"];
     }
     return $r;
 }
@@ -211,11 +214,12 @@ function getOrdersDetailSupplier($oid) {
     global $db;
     $params = array($oid);
 
-    $r = $db->rawQuery("SELECT distinct a.id_supplier, b.name, b.email
-                        FROM av_order_detail a, av_supplier b 
-                        where a.id_supplier = b.id_supplier 
-                        and id_order = ?  
-                        order by a.id_supplier
+    $r = $db->rawQuery("SELECT distinct a.id_supplier_warehouse, b.id_supplier, c.name, c.email
+                        FROM av_order_detail a, av_supplier_warehouse b, av_supplier c
+                        where a.id_supplier_warehouse = b.id_supplier_warehouse
+                        and b.id_supplier = c.id_supplier
+                        and a.id_order = ?  
+                        order by a.id_supplier_warehouse, a.id_supplier
                         ", $params);
 
     return $r;

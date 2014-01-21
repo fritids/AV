@@ -59,8 +59,11 @@ $customer_info = getCustomerDetail($cid);
 
 //commande 
 $orderinfo = getOrderInfos($oid);
-$suppliers = getSupplierZone($orderinfo["address"]["delivery"]["warehouse"]["id_zone"]);
 
+$suppliers = $db->get("av_supplier");
+$suppliersWarehouse = getSupplierWarehouses();
+$warehouses = $db->get("av_warehouse");
+//$suppliers = getSupplierZone($orderinfo["address"]["delivery"]["warehouse"]["id_zone"]);
 //print_r($orderinfo);
 //paiementtoi t
 $orderPayment = getOrderPayment($orderinfo["id_order"]);
@@ -121,6 +124,33 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     "operation" => "update",
                     "oldval" => $od["id_supplier"],
                     "newval" => $_POST["id_supplier"]
+                ));
+            }
+        }
+    if (isset($_POST["id_supplier_warehouse"]) && !empty($_POST["id_supplier_warehouse"]))
+        if (is_array($_POST["id_supplier_warehouse"])) {
+            foreach ($_POST["id_supplier_warehouse"] as $id => $warehouse) {
+                $r = $db->where("id_order_detail", $id)
+                        ->update("av_order_detail", array("id_supplier_warehouse" => $warehouse));
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $id,
+                    "col" => "id_supplier_warehouse",
+                    "operation" => "update",
+                    "oldval" => '',
+                    "newval" => $warehouse
+                ));
+            }
+        } else {
+            foreach ($orderinfo["details"] as $od) {
+                $r = $db->where("id_order_detail", $od["id_order_detail"])
+                        ->update("av_order_detail", array("id_supplier_warehouse" => $_POST["id_supplier_warehouse"]));
+
+                addLog(array("tabs" => "av_order_detail",
+                    "rowkey" => $od["id_order_detail"],
+                    "col" => "id_supplier_warehouse",
+                    "operation" => "update",
+                    "oldval" => $od["id_supplier_warehouse"],
+                    "newval" => $_POST["id_supplier_warehouse"]
                 ));
             }
         }
@@ -257,6 +287,8 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
     $tmp = "";
     foreach ($orderSuppliers as $k => $orderSupplier) {
 
+        $id_supplier_warehouse = $orderSupplier["id_supplier_warehouse"];
+
         $mail->ClearAllRecipients();
         $mail->ClearAttachments();
         $mail->SetFrom($confmail["from"]);
@@ -266,7 +298,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $mail->AddAddress($orderSupplier["email"]);
         $mail->Subject = "Bon de commande: #" . $orderinfo["id_order"];
 
-        $orderDetailSupplier = getUserOrdersDetail($oid, $orderSupplier["id_supplier"]);
+        $orderDetailSupplier = getUserOrdersDetail($oid, $id_supplier_warehouse);
         $orderDetailSupplierXLS = $orderDetailSupplier;
 
 
@@ -286,6 +318,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             //print_r($orderinfo);
 
             $smarty->assign("supplier", $orderSupplier);
+            $smarty->assign("warehouse", getWarehouseInfos($id_supplier_warehouse));
             $smarty->assign("orderinfo", $orderinfo);
             $smarty->assign("user_email", $_SESSION["email"]);
             $smarty->assign("orderdetail", $orderDetailSupplier);
@@ -327,15 +360,12 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
                 $params = array(COMMANDE_FOURNISSEUR, $oid, $orderSupplier["id_supplier"]);
 
                 $q = "update av_order_detail 
-                set product_current_state = " . COMMANDE_FOURNISSEUR . ", 
-                    id_warehouse = " . $orderinfo["address"]["invoice"]["warehouse"]["id_warehouse"] . "
+                set product_current_state = " . COMMANDE_FOURNISSEUR . "
                 where IFNULL(product_current_state,0) in (0,21, 22) 
-                and id_order = " . $oid . " 
-                and id_supplier =  " . $orderSupplier["id_supplier"];
+                and id_order = " . $oid . "                 
+                and id_supplier_warehouse =  " . $id_supplier_warehouse;
 
                 mysql_query($q);
-
-
 
                 foreach ($orderDetailSupplier as $k => $ods) {
                     addLog(array("tabs" => "av_order_detail",
@@ -835,7 +865,7 @@ if ($orderinfo) {
                             </p>                        
                             <p>
                                 Fournisseur:
-                                <select name="id_supplier" class="pme-input-0">
+                                <select name="id_supplier" class="pme-input-0" disabled="disabled">
                                     <option value=""></option>
                                     <?
                                     foreach ($suppliers as $supplier) {
@@ -902,7 +932,7 @@ if ($orderinfo) {
                                         $t = getItemTourneeinfo($od["id_order_detail"]);
 
                                         $isFournisseurOk = true;
-                                        $isFournisseurOk = ($od["id_supplier"] != '' ) ? true : false;
+                                        $isFournisseurOk = ($od["id_supplier_warehouse"] != '' ) ? true : false;
                                         ?>
                                         <tr id="id0">
 
@@ -941,8 +971,8 @@ if ($orderinfo) {
                                                 <?
                                                 if ($od["product_current_state"] != 20) {
                                                     ?>
-                                                    <select style="width: 120px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="product_current_state pme-input-0">
-                                                        <option value=""></option>
+                                                    <select style="width: 150px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="product_current_state form-control input-sm">
+                                                        <option value="">--</option>
                                                         <?
                                                         foreach ($productStates as $pState) {
                                                             ?>
@@ -954,7 +984,7 @@ if ($orderinfo) {
                                                                 ?>
                                                     </select>
 
-                                                    <input type="text" value="<?= $od["product_supplier_comment"] ?>" name="product_supplier_comment[<?= $od["id_order_detail"] ?>]" class="product_supplier_comment" maxlength="128">
+                                                    <input type="text" value="<?= $od["product_supplier_comment"] ?>" name="product_supplier_comment[<?= $od["id_order_detail"] ?>]" class="form-control input-sm product_supplier_comment" maxlength="128" placeholder="Comm. SAV/CASSE">
 
                                                     <?
                                                 } else {
@@ -966,30 +996,44 @@ if ($orderinfo) {
                                                 <?
                                                 if ($od["product_current_state"] != 20) {
                                                     ?>
-                                                    <select name="id_supplier[<?= $od["id_order_detail"] ?>]" class="pme-input-0 supplier">
-                                                        <option value=""></option>
+                                                    <select style="width: 120px"  name="id_warehouse[<?= $od["id_order_detail"] ?>]" id="warehouse_<?= $od["id_order_detail"] ?>" class="form-control input-sm warehouse">
+                                                        <option value="">--</option>
                                                         <?
-                                                        foreach ($suppliers as $supplier) {
+                                                        foreach ($warehouses as $warehouse) {
                                                             ?>
-                                                            <option value="<?= $supplier["id_supplier"] ?>"
-                                                            <?= ($od["id_supplier"] == $supplier["id_supplier"]) ? "selected" : "" ?>
-                                                                    ><?= $supplier["name"] ?> </option>
+                                                            <option value="<?= $warehouse["id_warehouse"] ?>"
+                                                            <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
+                                                                    ><?= $warehouse["name"] ?> </option>
+                                                                    <?
+                                                                }
+                                                                ?>
+                                                    </select>                                                    
+                                                    <select name="id_supplier_warehouse[<?= $od["id_order_detail"] ?>]" id="supplier_<?= $od["id_order_detail"] ?>" class="form-control input-sm supplier">
+                                                        <option value="">--</option>
+                                                        <?
+                                                        foreach ($suppliersWarehouse as $supplier) {
+                                                            ?>
+                                                            <option class="<?= $supplier["id_warehouse"] ?>" value="<?= $supplier["id_supplier_warehouse"] ?>"
+                                                            <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
+                                                                    ><?= $supplier["supplier_name"] ?> </option>
                                                                     <?
                                                                 }
                                                                 ?>
                                                     </select>
+
                                                     <?
                                                 } else {
-                                                    echo $od["supplier_name"];
+                                                    echo getSupplierName($od["id_supplier_warehouse"])."<br>";
+                                                    echo getWarehouseName($od["id_supplier_warehouse"]);
                                                 }
                                                 ?>
-                                                <?= $od["warehouse_name"] ?>
+
                                             </td>
                                             <td>
                                                 <?
                                                 if ($od["product_current_state"] != 20) {
                                                     ?>
-                                                    <input type="text" style="width: 75px" class="datepicker" value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]"> 
+                                                    <input type="text" style="width: 100px" class="datepicker form-control input-sm " value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]" placeholder="Date ARC"> 
                                                     <?
                                                 } else {
                                                     echo $od["supplier_date_delivery"];
@@ -1037,6 +1081,9 @@ if ($orderinfo) {
                                             </td>
 
                                         </tr>
+                                        <script>
+                                            $("#supplier_<?= $od["id_order_detail"] ?>").chainedTo("#warehouse_<?= $od["id_order_detail"] ?>");
+                                        </script>
                                         <?
                                     }
                                     ?>
@@ -1232,6 +1279,7 @@ if ($orderinfo) {
             });
             location.reload();
         });
+
 
     </script>
     <?

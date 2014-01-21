@@ -37,7 +37,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
             tinyMCE.init({
                 // General options
                 mode: "textareas",
-                editor_deselector : "mceNoEditor",
+                editor_deselector: "mceNoEditor",
                 theme: "advanced",
                 plugins: "jbimages,autolink,lists,spellchecker,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
                 // Theme options
@@ -169,7 +169,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $nb[0]["nb_orders"]?></span></a> </li>
+                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $nb[0]["nb_orders"] ?></span></a> </li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
                                     <li class="divider"></li>                                    
                                     <li><a href="av_stock_dashboard.php">Commande avec gestion de stock</a></li>
@@ -192,7 +192,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                                     <li><a href="av_roadmap.php">Feuille de route</a></li> 
                                     <li class="divider"></li>
                                     <li><a href="av_supplier.php">Les fournisseurs</a></li>                                
-                                    <li><a href="av_supplier_zone.php">Les fournisseurs par zone de livraison</a></li>                                
+                                    <li><a href="av_supplier_warehouse.php">Les fournisseurs par entrepôt</a></li>                           
                                 </ul>
                             </li>  <?
                         }
@@ -241,7 +241,9 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                                     <li><a href="av_cms_lang.php">Contenu manager</a></li>                                          
                                     <li class="divider"></li>
                                     <li><a href="av_voucher.php">Coupon de reduction</a></li>    
-
+                                    <li class="divider"></li>
+                                    <li><a href="av_warehouse.php">Entrepôts</a></li>    
+                                    <li><a href="av_zone.php">Entrepôts par zone</a></li>    
                                 </ul>
                             </li>  
                             <?

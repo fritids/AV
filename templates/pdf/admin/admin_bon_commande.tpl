@@ -3,7 +3,7 @@
 <table>
     <tr height="100">
         <td>MERCI DE REGROUPER <br>LES VERRES PAR ZONES<br>SUR LES CHARIOTS</td>
-        <td>{$orderinfo.address.delivery.warehouse.warehouse}</td>
+        <td>{$warehouse.address}</td>
     </tr>
 </table>
 <br>

@@ -12,4 +12,7 @@ CREATE TABLE IF NOT EXISTS `av_warehouse` (
   PRIMARY KEY (`id_warehouse`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-ALTER TABLE  `av_order_detail` ADD  `id_supplier_warehouse` INT NULL AFTER  `id_supplier`
+ALTER TABLE  `av_order_detail` ADD  `id_supplier_warehouse` INT NULL AFTER  `id_product`;
+
+
+ALTER TABLE  `av_order_detail` CHANGE  `id_warehouse`  `id_supplier_warehouse` INT( 11 ) NULL DEFAULT NULL;

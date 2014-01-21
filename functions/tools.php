@@ -229,6 +229,16 @@ function getSupplierZone($idzone) {
     return $r;
 }
 
+function getSupplierWarehouses() {
+    global $db;
+
+    $r = $db->rawQuery("select b.id_supplier, b.id_warehouse, b.id_supplier_warehouse, a.name supplier_name
+                        from av_supplier a , av_supplier_warehouse b 
+                        where a.id_supplier = b.id_supplier");
+
+    return $r;
+}
+
 function genSecureKey() {
 
     return(md5(RandomString()));

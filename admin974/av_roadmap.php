@@ -6,6 +6,7 @@ include ("../functions/orders.php");
 include ("../functions/users.php");
 require('../libs/Smarty.class.php');
 require('../classes/tcpdf.php');
+require("./functions/supplier.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
@@ -51,24 +52,23 @@ $pdf->AddPage('L', 'A4');
 
     </div>
     <div class="text-center">
-<?
-if (!empty($date_delivery) && !empty($id_truck)) {
+        <?
+        if (!empty($date_delivery) && !empty($id_truck)) {
 
-    $roadmap_filename = md5(rand());
+            $roadmap_filename = md5(rand());
 
-    // on recupère les produits affectés au camion
-    $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
-                        a.reference, d.postcode, a.id_customer, b.*, c.*, e.name supplier_name, a.order_comment, a.delivery_comment, b.id_warehouse
-                        from av_orders a, av_order_detail b , av_tournee c, av_address d, av_supplier e
+            // on recupère les produits affectés au camion
+            $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
+                        a.reference, d.postcode, a.id_customer, b.*, c.*, a.order_comment, a.delivery_comment
+                        from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
                         and a.id_address_delivery = d.id_address
-                        and b.id_supplier = e.id_supplier
                         and c.id_truck = ? 
                         and c.date_livraison = ?                                                                     
                         order by c.position
                         ", array($id_truck, $date_delivery))
-    ?>
+            ?>
 
             <?
             $camion = $db->where("id_truck", $id_truck)
@@ -87,6 +87,8 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                 $adresseInvoice = getUserOrdersAddress($OrderProduct["id_address_invoice"]);
                 $attributes = getOrdersDetailAttribute($OrderProduct["id_order_detail"]);
                 $customs = getOrdersCustomMainItem($OrderProduct["id_order_detail"]);
+                $SupplierName = getSupplierName($OrderProduct["id_supplier_warehouse"]);
+                $WarehouseName = getWarehouseName($OrderProduct["id_supplier_warehouse"]);
 
                 $p_qty = $OrderProduct["nb_product_delivered"];
 
@@ -95,8 +97,6 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                     $addrs .= $adresse["address2"] . "<br>";
                 $addrs .= $adresse["postcode"] . " " . $adresse["city"];
                 //$addrs .= $adresse["postcode"] . " " . $adresse["city"];
-
-                $w = getWarehouseInfos($OrderProduct["id_warehouse"]);
 
                 if ($tmpRef != $OrderProduct["reference"]) {
 
@@ -121,7 +121,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         ($OrderProduct["product_width"] != "" ? ' Largeur (mm): ' . $OrderProduct["product_width"] : '') .
                         ($OrderProduct["product_height"] != "" ? ', Longueur (mm): ' . $OrderProduct["product_height"] : '') . "<br>";
 
-                
+
                 foreach ($attributes as $attribute) {
                     $pdf_roadmap .= '- ' . $attribute["attribute_name"] . ': ' . $attribute["attribute_value"] . '<br>';
                 }
@@ -141,7 +141,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
 
                 $pdf_roadmap .= '
             </td>
-            <td colspan="2">' . $OrderProduct["supplier_name"] . ' ['. $w["name"] .'] ' . $OrderProduct["supplier_date_delivery"] . '</td>
+            <td colspan="2">' . $SupplierName . ' [' . $WarehouseName . '] ' . $OrderProduct["supplier_date_delivery"] . '</td>
             <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
             <td>' . $OrderProduct["total_price_tax_incl"] . ' €</td>
             </tr>';
@@ -160,7 +160,7 @@ if (!empty($date_delivery) && !empty($id_truck)) {
             $pdf_roadmap .= '</table></td></tr></table>';
 
             //echo $pdf_roadmap;
-            
+
             $pdf->writeHTML($pdf_roadmap, true, false, true, false, '');
 
             $pdf->lastPage();
@@ -181,9 +181,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="date_delivery" > Date livraison :
                             <select id="date_delivery" class="pme-input-0" name="date_delivery">
                                 <option value="--"  >--</option>
-    <?
-    foreach ($d as $rec) {
-        ?>
+                                <?
+                                foreach ($d as $rec) {
+                                    ?>
                                     <option value="<?= $rec["date_livraison"] ?>"  ><?= $rec["date_livraison"] ?></option>
                                     <?
                                 }
@@ -195,9 +195,9 @@ if (!empty($date_delivery) && !empty($id_truck)) {
                         <label for="truck" > Camion :
                             <select id="truck" class="pme-input-0" name="id_truck">
                                 <option value="--"  >--</option>
-    <?
-    foreach ($t as $rec) {
-        ?>
+                                <?
+                                foreach ($t as $rec) {
+                                    ?>
                                     <option value="<?= $rec["id_truck"] ?>" class="<?= $rec["date_livraison"] ?>" ><?= $rec["name"] ?></option>
                                     <?
                                 }

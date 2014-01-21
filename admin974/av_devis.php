@@ -479,8 +479,11 @@ if (isset($_POST["devis_save"])) {
 
         $row.find('.unit_price').text("");
         $row.find('.prixttc').val("");
+        $row.find('.product_custom_name').val("");
+        
         $row.find(".product").attr('name', $row.find(".product").attr('name') + "[" + c + "]");
         $row.find(".product_quantity").attr('name', $row.find(".product_quantity").attr('name') + "[" + c + "]");
+        $row.find(".product_custom_name").attr('name', $row.find(".product_custom_name").attr('name') + "[" + c + "]");
 
         $("#tab_fixe").append($row);
 
@@ -992,7 +995,7 @@ if (isset($_POST["devis_save"])) {
                             }
                             ?>
                         </select><br>
-                        Préfix : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" >
+                        Préfixe : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" >
                     </td>
 
                     <td>
@@ -1074,9 +1077,10 @@ if (isset($_POST["devis_save"])) {
                                         <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?></option>
                                         <?
                                     }
-                                }
-                                ?>
-                            </select>
+                                }                                
+                                ?>                                        
+                            </select><br>
+                            Préfix : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10">
                         </td>
                         <td><input type="text" name="fixe_product_unit_price" class="unit_price" size="5" readonly="readonly" /></td>
                         <td><input type="text" name="fixe_product_quantity" class="product_quantity" size="2" /></td>                    

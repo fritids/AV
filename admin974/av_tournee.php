@@ -4,6 +4,7 @@ include ("header.php");
 include ("../functions/products.php");
 include ("../functions/orders.php");
 include ("../functions/users.php");
+include ("functions/supplier.php");
 
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 
@@ -28,14 +29,6 @@ function getDeliveryZone($postcode) {
     return ('');
 }
 
-function getSupplierName($id_sup) {
-    global $db;
-    $s = $db->where("id_supplier", $id_sup)
-            ->get("av_supplier");
-
-    if ($s)
-        return ($s[0]["name"]);
-}
 
 function getProductTruck($id_order_detail, $date_delivery) {
     global $db;
@@ -306,10 +299,9 @@ $trucks = $db->get("av_truck");
                             }
                             ?>
                             <?
-                            $queryOrderDetail = "select a.id_order, b.*, c.name warehouse_name, product_quantity * product_weight tot_prod_weight
+                            $queryOrderDetail = "select a.id_order, b.*, product_quantity * product_weight tot_prod_weight
                                             from av_orders a
-                                            LEFT OUTER JOIN av_order_detail b on (a.id_order = b.id_order)
-                                            LEFT OUTER JOIN av_warehouse c on (b.id_warehouse = c.id_warehouse)
+                                            LEFT OUTER JOIN av_order_detail b on (a.id_order = b.id_order)                                            
                                             where b.id_order_detail not in(select id_order_detail from av_tournee where status = 2)
                                             and a.id_order = ?";
 
@@ -427,9 +419,9 @@ $trucks = $db->get("av_truck");
                                         ?>
                                     </td>
                                     <td>
-                                        Fournisseur : <?= getSupplierName($OrderProduct["id_supplier"]) ?> 
+                                        Fournisseur : <?= getSupplierName($OrderProduct["id_supplier_warehouse"]) ?> 
                                         <? if ($OrderProduct["supplier_date_delivery"] != null) echo date("d/m/Y", strtotime($OrderProduct["supplier_date_delivery"])) ?><br>
-                                        Entrepot: <?= $OrderProduct["warehouse_name"] ?>
+                                        Entrepot: <?= getWarehouseName($OrderProduct["id_supplier_warehouse"]) ?>
                                     <td><?= $OrderProduct["product_width"] ?> x <?= $OrderProduct["product_height"] ?></td>
                                     <td><?= $product_weight ?> kg</td>                                    
 

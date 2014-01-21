@@ -821,12 +821,15 @@ if (isset($_GET["action"]) && $_GET["action"] == "send_devis") {
 
 if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
     $orderDevis = getDevis($_POST["id_devis"]);
-    $shipping_amount = 0;
-    $surface = 0;
-    $dimension = array();
-    $productInfos = array();
+
+
 
     foreach ($orderDevis[0]["details"] as $k => $odd) {
+        $dimension = array();
+        $productInfos = array();
+        $shipping_amount = 0;
+        $surface = 0;
+
         $nbItem = $cart->getNbItems() + 1;
         $pqte = $odd["product_quantity"];
 
@@ -837,10 +840,17 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
             $productInfos = getProductInfos($pid);
             $surface = ($odd["product_width"] * $odd["product_height"]) / 1000000;
 
-            $dimension = array(
-                "width" => $odd["product_width"],
-                "height" => $odd["product_height"]
-            );
+            if ($surface < $productInfos["min_area_invoiced"])
+                $surface = $productInfos["min_area_invoiced"];
+            if ($surface >= $productInfos["max_area_invoiced"])
+                $odd["product_price"] = $odd["product_price"] * 1.5;
+
+            if ($odd["product_width"] > 0 && $odd["product_height"]) {
+                $dimension = array(
+                    "width" => $odd["product_width"],
+                    "height" => $odd["product_height"]
+                );
+            }
 
             $cart->addItem($pid, $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
             foreach ($odd["combinations"] as $i => $attribute) {
