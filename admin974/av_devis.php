@@ -65,6 +65,7 @@ if (isset($_POST["id_customer"]) && $_POST["id_customer"] != "") {
     }
 }
 
+
 /*
   print_r($_POST);
   print_r($customer_info);
@@ -84,38 +85,42 @@ if (isset($_POST["contact"])) {
             "date_upd" => date("Y-m-d"));
         $cid = createNewAccount($customer_info);
 
-        $customer_invoice = array(
-            "alias" => 'invoice',
-            "id_customer" => $cid,
-            "address1" => @$_POST["invoice_address1"],
-            "postcode" => @$_POST["invoice_postcode"],
-            "city" => @$_POST["invoice_city"],
-            "country" => 'France',
-            "phone" => $_POST["invoice_phone"],
-            "phone_mobile" => $_POST["invoice_phone_mobile"],
-            "active" => 1,
-            "date_add" => date("Y-m-d"),
-            "date_upd" => date("Y-m-d"));
+        if($cid > 0) {
+            $customer_invoice = array(
+                "alias" => 'invoice',
+                "id_customer" => $cid,
+                "address1" => @$_POST["invoice_address1"],
+                "postcode" => @$_POST["invoice_postcode"],
+                "city" => @$_POST["invoice_city"],
+                "country" => 'France',
+                "phone" => $_POST["invoice_phone"],
+                "phone_mobile" => $_POST["invoice_phone_mobile"],
+                "active" => 1,
+                "date_add" => date("Y-m-d"),
+                "date_upd" => date("Y-m-d"));
 
-        $customer_delivery = array(
-            "alias" => 'delivery',
-            "id_customer" => $cid,
-            "address1" => @$_POST["delivery_address1"],
-            "postcode" => @$_POST["delivery_postcode"],
-            "city" => @$_POST["delivery_city"],
-            "country" => 'France',
-            "phone" => $_POST["delivery_phone"],
-            "phone_mobile" => $_POST["delivery_phone_mobile"],
-            "active" => 1,
-            "date_add" => date("Y-m-d"),
-            "date_upd" => date("Y-m-d"));
+            $customer_delivery = array(
+                "alias" => 'delivery',
+                "id_customer" => $cid,
+                "address1" => @$_POST["delivery_address1"],
+                "postcode" => @$_POST["delivery_postcode"],
+                "city" => @$_POST["delivery_city"],
+                "country" => 'France',
+                "phone" => $_POST["delivery_phone"],
+                "phone_mobile" => $_POST["delivery_phone_mobile"],
+                "active" => 1,
+                "date_add" => date("Y-m-d"),
+                "date_upd" => date("Y-m-d"));
 
-        createNewAdresse($customer_invoice);
-        createNewAdresse($customer_delivery);
+            createNewAdresse($customer_invoice);
+            createNewAdresse($customer_delivery);
 
-        $btn_txt = "Modifier";
+            $btn_txt = "Modifier";
 
-        $isNewCustomer = 1;
+            $isNewCustomer = 1;
+        }else{
+            echo '<div class="alert alert-danger text-center">Ce compte existe déjà merci de rechercher le contact</div>';
+        }
     }
     if ($_POST["contact"] == "Modifier") {
         $customer_info = array(
@@ -281,7 +286,7 @@ if (isset($_POST["devis_save"])) {
             if (!empty($product)) {
                 $p_qte = $_POST["fixe_product_quantity"];
                 $p_product_custom_names = $_POST["product_custom_name"];
-                
+
                 // la quantité de la ligne est présent
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
@@ -480,7 +485,7 @@ if (isset($_POST["devis_save"])) {
         $row.find('.unit_price').text("");
         $row.find('.prixttc').val("");
         $row.find('.product_custom_name').val("");
-        
+
         $row.find(".product").attr('name', $row.find(".product").attr('name') + "[" + c + "]");
         $row.find(".product_quantity").attr('name', $row.find(".product_quantity").attr('name') + "[" + c + "]");
         $row.find(".product_custom_name").attr('name', $row.find(".product_custom_name").attr('name') + "[" + c + "]");
@@ -1077,7 +1082,7 @@ if (isset($_POST["devis_save"])) {
                                         <option value="<?= $product["id_product"] ?>"><?= $product["name"] ?></option>
                                         <?
                                     }
-                                }                                
+                                }
                                 ?>                                        
                             </select><br>
                             Préfix : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10">
