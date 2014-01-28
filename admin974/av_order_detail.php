@@ -77,115 +77,162 @@ if (isset($_GET["o"]))
  */
 
 $opts['fdd']['id_order_detail'] = array(
-    'name' => 'ID order detail',
-    'select' => 'T',
-    'options' => 'AVCPDR', // auto increment
-    'maxlen' => 10,
-    'default' => '0',
-    'sort' => true
-);
-$opts['fdd']['id_order_detail'] = array(
-    'name' => 'Seq',
-    'select' => 'T',
-    'maxlen' => 10,
-    'default' => '0',
-    'sort' => true
+  'name'     => 'ID order detail',
+  'select'   => 'T',
+  'options'  => 'AVCPDR', // auto increment
+  'maxlen'   => 10,
+  'default'  => '0',
+  'sort'     => true
 );
 $opts['fdd']['id_order'] = array(
-    'name' => 'Référence',
-    'select' => 'T',
-    'maxlen' => 10,
-    'values' => array(
-        'table' => 'av_orders',
-        'column' => 'id_order',
-        'description' => 'reference'
-    ),
-    'sort' => true
+  'name'     => 'ID order',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
 );
-
 $opts['fdd']['id_supplier'] = array(
-    'name' => 'Founisseur',
-    'select' => 'T',
-    'maxlen' => 255,
-    'values' => array(
-        'table' => 'av_supplier',
-        'column' => 'id_supplier',
-        'description' => 'name'
-    ),
-    'sort' => true    
+  'name'     => 'ID supplier',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
 );
-
-$opts['fdd']['supplier_date_delivery'] = array(
-    'name' => 'Date livraison Fournisseur',
-    'select' => 'T',    
-    'sort' => true    
+$opts['fdd']['id_product'] = array(
+  'name'     => 'ID product',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
 );
-
-$opts['fdd']['product_name'] = array(
-    'name' => 'Nom produit',
-    'select' => 'T',
-    'maxlen' => 255,
-    'sort' => true
+$opts['fdd']['id_supplier_warehouse'] = array(
+  'name'     => 'ID supplier warehouse',
+  'select'   => 'T',
+  'maxlen'   => 11,
+  'sort'     => true
 );
-$opts['fdd']['product_quantity'] = array(
-    'name' => 'Quantité',
-    'select' => 'T',
-    'maxlen' => 11,
-    'default' => '0.00',
-    'sort' => true
+$opts['fdd']['date_upd'] = array(
+  'name'     => 'Date upd',
+  'select'   => 'T',
+  'maxlen'   => 19,
+  'sort'     => true
 );
-$opts['fdd']['product_price'] = array(
-    'name' => 'Prix (€)',
-    'select' => 'T',
-    'maxlen' => 22,
-    'default' => '0.000000',
-    'sort' => true
-);
-$opts['fdd']['product_shipping'] = array(
-    'name' => 'Frais de port (€)',
-    'select' => 'T',
-    'maxlen' => 22,
-    'default' => '0.000000',
-    'sort' => true
-);
-$opts['fdd']['attribute_name'] = array(
-    'name' => 'Option',
-    'select' => 'T',
-    'maxlen' => 255,
-    'sort' => true
-);
-$opts['fdd']['attribute_price'] = array(
-    'name' => 'Option - Prix (€)',
-    'select' => 'T',
-    'maxlen' => 22,
-    'default' => '0.000000',
-    'sort' => true
-);
-$opts['fdd']['attribute_shipping'] = array(
-    'name' => 'Option - FdP (€)',
-    'select' => 'T',
-    'maxlen' => 22,
-    'default' => '0.000000',
-    'sort' => true
-);
-$opts['fdd']['total_price_tax_incl'] = array(
-    'name' => 'Prix TTC (€)',
-    'select' => 'T',
-    'maxlen' => 22,
-    'default' => '0.000000',
-    'sort' => true
+$opts['fdd']['product_attribute_id'] = array(
+  'name'     => 'Product attribute ID',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
 );
 $opts['fdd']['product_current_state'] = array(
-    'name' => 'Etat',
-    'select' => 'D',
-    'maxlen' => 22,
-    'values' => array(
-        'table' => 'av_order_status',
-        'column' => 'id_statut',
-        'description' => 'title'
-    ),
-    "colattrs" => "name='product_current_state'",
-    'sort' => true
+  'name'     => 'Product current state',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
+);
+$opts['fdd']['product_name'] = array(
+  'name'     => 'Product name',
+  'select'   => 'T',
+  'maxlen'   => 255,
+  'sort'     => true
+);
+$opts['fdd']['product_quantity'] = array(
+  'name'     => 'Product quantity',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'default'  => '0',
+  'sort'     => true
+);
+$opts['fdd']['product_price'] = array(
+  'name'     => 'Product price',
+  'select'   => 'T',
+  'maxlen'   => 22,
+  'default'  => '0.00',
+  'sort'     => true
+);
+$opts['fdd']['product_shipping'] = array(
+  'name'     => 'Product shipping',
+  'select'   => 'T',
+  'maxlen'   => 22,
+  'default'  => '0.00',
+  'sort'     => true
+);
+$opts['fdd']['produit_surface'] = array(
+  'name'     => 'Produit surface',
+  'select'   => 'T',
+  'maxlen'   => 22,
+  'sort'     => true
+);
+$opts['fdd']['product_width'] = array(
+  'name'     => 'Product width',
+  'select'   => 'T',
+  'maxlen'   => 11,
+  'sort'     => true
+);
+$opts['fdd']['product_height'] = array(
+  'name'     => 'Product height',
+  'select'   => 'T',
+  'maxlen'   => 11,
+  'sort'     => true
+);
+$opts['fdd']['product_depth'] = array(
+  'name'     => 'Product depth',
+  'select'   => 'T',
+  'maxlen'   => 11,
+  'sort'     => true
+);
+$opts['fdd']['product_weight'] = array(
+  'name'     => 'Product weight',
+  'select'   => 'T',
+  'maxlen'   => 12,
+  'sort'     => true
+);
+$opts['fdd']['discount'] = array(
+  'name'     => 'Discount',
+  'select'   => 'T',
+  'maxlen'   => 12,
+  'sort'     => true
+);
+$opts['fdd']['voucher_code'] = array(
+  'name'     => 'Voucher code',
+  'select'   => 'T',
+  'maxlen'   => 20,
+  'sort'     => true
+);
+$opts['fdd']['total_price_tax_incl'] = array(
+  'name'     => 'Total price tax incl',
+  'select'   => 'T',
+  'maxlen'   => 22,
+  'default'  => '0.00',
+  'sort'     => true
+);
+$opts['fdd']['total_price_tax_excl'] = array(
+  'name'     => 'Total price tax excl',
+  'select'   => 'T',
+  'maxlen'   => 22,
+  'default'  => '0.00',
+  'sort'     => true
+);
+$opts['fdd']['supplier_date_delivery'] = array(
+  'name'     => 'Supplier date delivery',
+  'select'   => 'T',
+  'maxlen'   => 10,
+  'sort'     => true
+);
+$opts['fdd']['nb_product_delivered'] = array(
+  'name'     => 'Nb product delivered',
+  'select'   => 'T',
+  'maxlen'   => 11,
+  'sort'     => true
+);
+$opts['fdd']['is_product_custom'] = array(
+  'name'     => 'Is product custom',
+  'select'   => 'T',
+  'maxlen'   => 1,
+  'default'  => '0',
+  'sort'     => true
+);
+$opts['fdd']['product_supplier_comment'] = array(
+  'name'     => 'Product supplier comment',
+  'select'   => 'T',
+  'maxlen'   => 128,
+  'sort'     => true
 );
 
 // Now important call to phpMyEdit
