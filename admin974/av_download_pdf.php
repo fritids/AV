@@ -108,11 +108,11 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
 
     $filename = "tmp/av_orders_" . $_POST["start_date"] . "-" . $_POST["end_date"] . ".xls";
 
-    $stmt = $db2->prepare("SELECT d.invoice_date date_commande, LPAD(reference, 9, '0') reference, lastname nom, firstname prenom, LPAD(d.id_order_invoice, 9, '0') facture, email, address1, city ville,   
+    $stmt = $db2->prepare("SELECT date(d.invoice_date) date_commande, LPAD(reference, 9, '0') ref_commande,LPAD(id_order_invoice, 9, '0') ref_facture, concat(lastname, ' ', firstname) client, 
                         round(25/(1+vat_rate/100),2) frais_de_port_HT,                        
-                        round((total_paid-25)/(1+vat_rate/100), 2) Total_HT,
-                        total_paid Total_TTC,
-                        vat_rate Tva,
+                        round((total_paid)/(1+vat_rate/100), 2) Total_HT,
+                        round(total_paid - (total_paid/(1+vat_rate/100)), 2) montant_tva,                        
+                        total_paid Total_TTC,                        
                         payment,
                         '' compte
                         FROM  mv_orders a, av_customer b, av_address c, av_order_invoice d
@@ -139,7 +139,7 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
         
         if($payment == 'Chèque'){
             $payment_account = "58500000";
-        }elseif ($payment == 'Virement Bancaire'){
+        }elseif ($payment == 'Virement bancaire'){
             $payment_account = "58200000";
         }elseif ($payment == 'Credit card'){
             $payment_account = "58300000";

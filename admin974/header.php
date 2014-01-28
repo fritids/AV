@@ -212,7 +212,8 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                         }
                         ?>  
                         <?
-                        if ($_SESSION['role'] == "ADMIN" || strpos($_SESSION["email"], "comptabilite") > 0) {
+                        
+                        if ($_SESSION['role'] == "ADMIN" || strpos($_SESSION["email"], "mpa") > 0) {
                             ?>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Comptabilité<b class="caret"></b></a>
@@ -273,6 +274,8 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                         <li><a href="logout.php"><span class="glyphicon glyphicon-off"></span></a></li>                        
                     </ul>
 
+                    
                 </div><!--/.nav-collapse -->
             </div>
         </div>
+        

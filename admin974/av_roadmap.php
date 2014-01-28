@@ -95,8 +95,7 @@ $pdf->AddPage('L', 'A4');
                 $addrs = $adresse["address1"] . "<br>";
                 if ($adresse["address2"])
                     $addrs .= $adresse["address2"] . "<br>";
-                $addrs .= $adresse["postcode"] . " " . $adresse["city"];
-                //$addrs .= $adresse["postcode"] . " " . $adresse["city"];
+                $addrs .= $adresse["postcode"] . " " . $adresse["city"] . "<br>[". $adresse["warehouse"]["zone_name"]."]<br>[". $adresse["warehouse"]["warehouse_name"]."]";
 
                 if ($tmpRef != $OrderProduct["reference"]) {
 
@@ -108,7 +107,7 @@ $pdf->AddPage('L', 'A4');
                 <th bgcolor = "#ccc">' . $OrderProduct["comment1"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["comment3"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["horaire"] . '</th>                       
-                <th bgcolor = "#ccc">Comm. client: ' . $OrderProduct["order_comment"] . '</th>
+                <th bgcolor = "#ccc">Comm. client: ' . htmlspecialchars($OrderProduct["order_comment"]) . '</th>
                 <th bgcolor = "#ccc">Comm. Interne:' . htmlspecialchars($OrderProduct["delivery_comment"]) . '</th>
                 </tr>';
 
@@ -159,7 +158,8 @@ $pdf->AddPage('L', 'A4');
 
             $pdf_roadmap .= '</table></td></tr></table>';
 
-            //echo $pdf_roadmap;
+            if($_SESSION['email'] =="stephane.alamichel@gmail.com")
+                echo $pdf_roadmap;
 
             $pdf->writeHTML($pdf_roadmap, true, false, true, false, '');
 
