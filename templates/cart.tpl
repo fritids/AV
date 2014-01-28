@@ -42,7 +42,7 @@
                                             {if is_array($sub_item)}
                                                 {$main_item.main_item_name} : {$sub_item.sub_item_name}<br>
                                                 {foreach key=key3 item=values_items from=$sub_item}
-                                                    {if $key3=="picture" & {$values_items} != ""}                                                        
+                                                    {if $key3=="picture" && $values_items != "" && !is_array($values_items)}                                                        
                                                         <img src="img/f/{$values_items}" alt="" width="90"><br>
                                                     {/if}
                                                     {if is_array($values_items)}                                                        

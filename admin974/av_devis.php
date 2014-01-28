@@ -81,11 +81,12 @@ if (isset($_POST["contact"])) {
             "email" => $_POST["email"],
             "passwd" => md5(_COOKIE_KEY_ . $_POST["firstname"]),
             "active" => 1,
+            "secure_key" => genSecureKey(),
             "date_add" => date("Y-m-d"),
             "date_upd" => date("Y-m-d"));
         $cid = createNewAccount($customer_info);
 
-        if($cid > 0) {
+        if ($cid > 0) {
             $customer_invoice = array(
                 "alias" => 'invoice',
                 "id_customer" => $cid,
@@ -118,7 +119,7 @@ if (isset($_POST["contact"])) {
             $btn_txt = "Modifier";
 
             $isNewCustomer = 1;
-        }else{
+        } else {
             echo '<div class="alert alert-danger text-center">Ce compte existe déjà merci de rechercher le contact</div>';
         }
     }
@@ -191,15 +192,33 @@ if (isset($_POST["devis_save"])) {
                 $p_width = $_POST["product_width"];
                 $p_height = $_POST["product_height"];
                 $p_product_custom_names = $_POST["product_custom_name"];
-
+                $p_product_custom_combination = @$_POST["custom"];
+                $shape_impact_coef = 1;
                 $attributes_amount = 0;
                 $devis_product_attributes = array();
+                $devis_custom_attributes = array();
 
+                if (isset($p_product_custom_combination[$product][$k])) {
+                    $mapCustomAttribute = mapCustomAttribute($p_product_custom_combination[$product][$k]);
+                    foreach ($mapCustomAttribute as $custom_item) {
+                        if (is_array($custom_item)) {
+                            foreach ($custom_item as $o => $sub_items) {
+                                if (is_array($sub_items)) {
+                                    foreach ($sub_items as $l => $sub_item) {
+                                        if ($sub_item["price_impact_percentage"] > 0) {
+                                            $shape_impact_coef = $sub_item["price_impact_percentage"];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 // la quantité de la ligne est présent
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
 
-                    $p_unit_price = $p["price"];
+                    $p_unit_price = $p["price"] * $shape_impact_coef;
                     $p_unit_weight = $p["weight"];
                     $p_area = $p_width[$k] * $p_height[$k] / 1000000;
                     $p_coef = 1;
@@ -211,7 +230,7 @@ if (isset($_POST["devis_save"])) {
                         $p_coef = 1.5;
                     }
 
-                    $product_amount = $p["price"] * $p_coef * $p_qte[$k] * round($p_area, 2);
+                    $product_amount = $p_unit_price * $p_coef * $p_qte[$k] * round($p_area, 2);
 
                     $devis_detail = array(
                         "id_devis" => $did,
@@ -229,6 +248,9 @@ if (isset($_POST["devis_save"])) {
                     foreach ($_POST["product_attribut"][$k] as $attributes) {
                         $arr = explode("|", $attributes);
                         if ($arr[0] == $product) {
+
+                            $arr[2] *= $shape_impact_coef;
+
                             $devis_product_attributes = array(
                                 "id_devis" => $did,
                                 "id_devis_detail" => $ddid,
@@ -240,6 +262,38 @@ if (isset($_POST["devis_save"])) {
                             $attributes_amount += $arr[2] * round($p_area, 2) * $p_coef * $p_qte[$k];
                         }
                     }
+
+                    if (isset($p_product_custom_combination[$product][$k])) {
+                        foreach ($p_product_custom_combination[$product][$k] as $d => $main_attribute) {
+                            if (is_array($main_attribute)) {
+                                $devis_custom_attributes["id_attribute"] = $d;
+                                foreach ($main_attribute as $l => $sub_attribute) {
+                                    if (is_array($sub_attribute)) {
+                                        $devis_custom_attributes["id_attributes_items"] = $l;
+
+                                        foreach ($sub_attribute as $m => $item_values) {
+                                            if (is_array($item_values)) {
+                                                foreach ($item_values as $n => $item_value) {
+                                                    $devis_custom_attributes["id_attributes_items_values"] = $n;
+                                                    $devis_custom_attributes["id_devis"] = $did;
+                                                    $devis_custom_attributes["id_devis_detail"] = $ddid;
+                                                    $devis_custom_attributes["id_product"] = $product;
+                                                    $devis_custom_attributes["custom_value"] = $item_value;
+
+                                                    $db->insert("av_devis_product_custom", $devis_custom_attributes);
+                                                    $is_product_custom = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // post update sur les details
+                        $r = $db->where("id_devis_detail", $ddid)
+                                ->update("av_devis_detail", array("is_product_custom" => $is_product_custom));
+                    }
+
 
                     $total_price_tax_incl = $product_amount + $attributes_amount;
                     $total_paid += $total_price_tax_incl;
@@ -393,7 +447,7 @@ if (isset($_POST["devis_save"])) {
     function addRow() {
         var $row = $table.find('#template2').clone();
         var $input = $row.find('input').val("");
-        $row.attr('id', 'id' + (++c));
+        $row.attr('id', (++c));
 
         $row.find('.unit_price').text("");
         $row.find('.unit_weight').text("");
@@ -506,6 +560,7 @@ if (isset($_POST["devis_save"])) {
         var p_attr5_price = mytr.find(".attr5_price").val();
         var p_attr6_price = mytr.find(".attr6_price").val();
         var p_attr7_price = mytr.find(".attr7_price").val();
+        var p_shape_impact_coef = mytr.find(".shape_impact_coef").val();
 
 
         mytr.find(".unit_price").val(parseFloat(p_prod_price)
@@ -517,6 +572,10 @@ if (isset($_POST["devis_save"])) {
                 + parseFloat(p_attr6_price)
                 + parseFloat(p_attr7_price)
                 );
+
+        if (parseFloat(p_shape_impact_coef) > 1) {
+            mytr.find(".unit_price").val(mytr.find(".unit_price").val() * parseFloat(p_shape_impact_coef));
+        }
 
         updatePrice(mytr);
 
@@ -532,7 +591,6 @@ if (isset($_POST["devis_save"])) {
 
         var p_min_area_invoiced = mytr.find(".min_area_invoiced").val();
         var p_max_area_invoiced = mytr.find(".max_area_invoiced").val();
-
 
         area_calc = (p_width * p_height) / 1000000;
         area_invoiced = area_calc;
@@ -609,6 +667,7 @@ if (isset($_POST["devis_save"])) {
                 },
                 success: function(result) {
                     //console.log(result);
+                    mytr.find(".forme").text("");
                     mytr.find('.min_area_invoiced').val(result.min_area_invoiced);
                     mytr.find(".max_area_invoiced").val(result.max_area_invoiced);
                     mytr.find(".min_width").val(result.min_width);
@@ -621,6 +680,191 @@ if (isset($_POST["devis_save"])) {
                     mytr.find(".max_height").text(result.max_height);
                     mytr.find(".unit_price").val(result.price);
 
+                    if (result.info.specific_combinations) {
+                        combinations = result.info.specific_combinations;
+
+                        $.each(combinations, function(k, data) {
+                            if (data.type == 1) {
+
+                                mytr.find(".forme").append('<b>' + data.name + "</b>:");
+
+                                var s = $("<select id=\"" + k + "\" name=\"main_item\" class=\"main_item\" />");
+                                $("<option />", {value: "", text: "--"}).appendTo(s);
+                                for (var val in data.items) {
+                                    //console.log(val);
+                                    $("<option />", {value: data.items[val].id_attributes_items, text: data.items[val].name}).appendTo(s);
+                                }
+                                mytr.find(".forme").append(s);
+                                mytr.find(".forme").append('<div id="i_' + k + '"><div class="list_' + k + '_i_' + k + '"></div></div>');
+
+                                /*if (data.is_duplicable == 1) {
+                                 mytr.find(".forme").append('test');
+                                 }*/
+                            }
+                        });
+                    }
+
+                    $('.main_item').change(function() {
+                        //console.log($(this).val());  
+                        var mytr = $(this).closest('tr');
+
+                        var min_width = result.min_width;
+                        var max_width = result.max_width;
+                        var min_height = result.min_height;
+                        var max_height = result.max_height;
+
+                        //id_block = $(this).parent().attr("id");
+                        id_block = $(this).attr("id");
+                        id_sub_item = $(this).val();
+                        id_item = $(this).attr("id");
+
+
+                        if ($(this).val() === "") {
+                            mytr.find('.product_height').removeAttr('readonly');
+                            mytr.find('.product_width').removeAttr('readonly');
+                            mytr.find('.list_' + id_item + '_i_' + id_block).text("");
+                            if (id_item == 6) {
+                                mytr.find(".custom_img").attr("src", "");
+                            }
+                        }
+
+
+
+                        // recupe info de la forme
+                        $.ajax({
+                            url: "../functions/ajax_declinaison.php",
+                            type: "POST",
+                            dataType: "json",
+                            async: false,
+                            data: {
+                                //id: id_block,
+                                id_product: pid,
+                                //ids: $('.attribute').serializeArray(),
+                                //subItems: $('.main_item').serializeArray(),
+                                main_item_ids: $('.main_item').serializeArray(),
+                            },
+                            success: function(result2) {
+                                option_price = result2.price_option;
+                                shape_impact_coef = result2.impact_coef;
+                                mytr.find(".shape_impact_coef").val(shape_impact_coef);
+                                //console.log(result2);                                
+                            }
+                        });
+
+                        $.ajax({
+                            url: "../functions/ajax_custom_sub_items.php",
+                            type: "POST",
+                            dataType: "json",
+                            async: false,
+                            data: {
+                                id_item: id_item,
+                                id_sub_item: id_sub_item,
+                                id_product: pid
+                            },
+                            success: function(result) {
+                                //console.log(result);                    
+                                //console.log('#list_' + id_item + '_' + id_block);
+                                mytr.find('.list_' + id_item + '_i_' + id_block).text("");
+                                mytr.find('.product_height').attr('readonly', true);
+                                mytr.find('.product_width').attr('readonly', true);
+
+                                tr_id = mytr.attr("id");
+
+                                if (result.picture !== '') {
+                                    mytr.find(".custom_img").attr("src", "../img/f/" + result.picture);
+                                    console.log(result.picture);
+                                }
+
+                                //calculateprice();
+                                $.each(result.item_values, function(key, value) {
+
+                                    //console.log(value);
+                                    /*$("#list_Formes").append($('<input />').attr({'type':'text', 'id':'url' + key}));*/
+                                    $item_input = $('<input />').attr({
+                                        type: 'text',
+                                        id: 'view_' + key,
+                                        class: 'range_text',
+                                        side: value.name,
+                                        name: 'custom[' + pid + '][' + tr_id + '][' + result.id_attribute + '][' + result.id_attributes_items + '][' + tr_id + '][' + key + ']',
+                                        myid: key,
+                                        value: value.min_width
+                                    });
+                                    if (value.is_width === 1) {
+                                        $item_input.addClass("primary_width");
+                                    }
+                                    if (value.is_height === 1) {
+                                        $item_input.addClass("primary_height");
+                                    }
+
+                                    if (value.is_width === 1 && value.max_width > max_width) {
+                                        item_max_width = max_width;
+                                    } else if (value.is_height === 1 && value.max_width > max_height) {
+                                        item_max_width = max_height;
+                                    } else {
+                                        item_max_width = value.max_width;
+                                    }
+
+                                    mytr.find('.list_' + id_item + '_i_' + id_block).append("<div>");
+                                    mytr.find('.list_' + id_item + '_i_' + id_block).append(value.name + ": ");
+                                    mytr.find('.list_' + id_item + '_i_' + id_block).append($item_input);
+                                    mytr.find('.list_' + id_item + '_i_' + id_block).append("</div>");
+
+                                });
+
+                            }
+                        });
+                        $(".primary_width").change(function() {
+                            var mytr = $(this).closest('tr');
+
+                            A = mytr.find("input[side*='A']").val();
+                            B = mytr.find("input[side*='B']").val();
+                            C = mytr.find("input[side*='C']").val();
+
+                            if (id_sub_item == 5) {
+                                mytr.find('.product_width').val(parseInt(A) * 2);
+                            } else if (id_sub_item == 6) {
+                                mytr.find('.product_width').val(parseInt(A) * 2);
+                            } else if (id_sub_item == 8) {
+                                mytr.find('.product_width').val(mytr.find('product_height').val());
+                            } else {
+                                mytr.find('.product_width').val($(this).val());
+                            }
+
+                            updUnitPrice(mytr);
+                        });
+                        $(".primary_height").change(function() {
+                            var mytr = $(this).closest('tr');
+
+                            A = mytr.find("input[side*='A']").val();
+                            B = mytr.find("input[side*='B']").val();
+                            C = mytr.find("input[side*='C']").val();
+
+                            if (id_sub_item == 2) {
+                                if (parseInt(A) > parseInt(B)) {
+                                    mytr.find('.product_height').val(parseInt(A));
+                                } else {
+                                    mytr.find('.product_height').val(parseInt(B));
+                                }
+                            } else if (id_sub_item == 4) {
+                                mytr.find('.product_height').val(parseInt(A) + parseInt(C));
+                            } else if (id_sub_item == 5) {
+                                mytr.find('.product_height').val(parseInt(A) * 2);
+                            } else if (id_sub_item == 6) {
+                                mytr.find('.product_height').val(parseInt(A) * 2);
+                            } else if (id_sub_item == 8) {
+                                mytr.find('.product_height').val(parseInt(B));
+                                mytr.find('.product_width').val(parseInt(B));
+                            } else {
+                                mytr.find('.product_height').val($(this).val());
+                            }
+
+                            updUnitPrice(mytr);
+                        });
+                        //$('.attribute').change();
+                        mytr.find(".primary_width").change();
+                        mytr.find(".primary_height").change();
+
+                    });
                 }
             });
         })
@@ -976,7 +1220,8 @@ if (isset($_POST["devis_save"])) {
                     <tr id="template2" >
 
                     <input type="hidden" name="" value="0" class="min_area_invoiced" size="2" />
-                    <input type="hidden" name="" value="0" class="max_area_invoiced" size="2" />
+                    <input type="hidden" name="" value="0" class="max_area_invoiced" size="2" />                    
+                    <input type="hidden" name="" value="0" class="shape_impact_coef" value="1" size="2" />                    
                     <input type="hidden" name="" value="0" class="min_width" size="2" />
                     <input type="hidden" name="" value="0" class="max_width" size="2" />
                     <input type="hidden" name="" value="0" class="prod_price" size="2" />
@@ -1000,7 +1245,9 @@ if (isset($_POST["devis_save"])) {
                             }
                             ?>
                         </select><br>
-                        Préfixe : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" >
+                        Préfixe : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" ><br>
+                        <img src="" width="95" class="custom_img" style="float: right;"/>
+                        <span id="forme" class="forme"></span>
                     </td>
 
                     <td>
@@ -1030,7 +1277,7 @@ if (isset($_POST["devis_save"])) {
                             <?
                         }
                         ?>
-                    </td>
+                    </td>                    
                     <td>
                         <input type="text" name="product_width"  class="product_width" size="5" /> <br>
                         [ <span class="min_width"></span> - <span class="max_width"></span> ]

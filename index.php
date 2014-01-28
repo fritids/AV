@@ -113,6 +113,7 @@ if (isset($_GET["cart"])) {
         //$shipping_amount = $shipping_ratio * $pweight;
         //$shipping_amount = $conf_shipping_amount;
         $shipping_amount = 0;
+        $shape_impact_coef = 1;
         $impact_coef = 1;
 
         if (isset($_POST["add"])) {
@@ -136,7 +137,7 @@ if (isset($_GET["cart"])) {
                 if ($surface < $productInfos["min_area_invoiced"])
                     $surface = $productInfos["min_area_invoiced"];
                 if ($surface >= $productInfos["max_area_invoiced"])
-                    $productInfos["price"] = $productInfos["price"] * 1.5;
+                    $impact_coef = 1.5;
 
                 $dimension = array(
                     "width" => $_POST["width"],
@@ -154,7 +155,7 @@ if (isset($_GET["cart"])) {
                                 foreach ($sub_items as $l => $sub_item) {
                                     if ($sub_item["price_impact_percentage"] > 0) {
                                         $productInfos["price"] *= $sub_item["price_impact_percentage"];
-                                        $impact_coef = $sub_item["price_impact_percentage"];
+                                        $shape_impact_coef = $sub_item["price_impact_percentage"];
                                     }
                                 }
                             }
@@ -166,7 +167,7 @@ if (isset($_GET["cart"])) {
             $nbItem = $cart->getNbItems() + 1;
 
             if (empty($ko_msg))
-                $cart->addItem($pid, $pqte, round($productInfos["price"], 2), $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef * $shape_impact_coef, $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
             if (empty($ko_msg) && isset($_POST["options"])) {
@@ -179,7 +180,7 @@ if (isset($_GET["cart"])) {
                         //$shipping_amount = $shipping_ratio * $option_weight;
                         $shipping_amount = 0;
 
-                        $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                        $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef * $shape_impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
                     }
                 }
             }
@@ -829,7 +830,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
         $productInfos = array();
         $shipping_amount = 0;
         $surface = 0;
-
+        $impact_coef = 1;
+        $shape_impact_coef = 1;
+        $pcustom = array();
+        
         $nbItem = $cart->getNbItems() + 1;
         $pqte = $odd["product_quantity"];
 
@@ -843,7 +847,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
             if ($surface < $productInfos["min_area_invoiced"])
                 $surface = $productInfos["min_area_invoiced"];
             if ($surface >= $productInfos["max_area_invoiced"])
-                $odd["product_price"] = $odd["product_price"] * 1.5;
+                $impact_coef = 1.5;
 
             if ($odd["product_width"] > 0 && $odd["product_height"]) {
                 $dimension = array(
@@ -851,8 +855,23 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                     "height" => $odd["product_height"]
                 );
             }
+            
+            if(isset($odd["custom"])) {
+                foreach ($odd["custom"] as $custom) {
+                    foreach ($custom["sub_item"] as $sub_item) {
+                        foreach ($sub_item["item_values"] as $k => $item_value) {
+                            $pcustom[$item_value["id_attribute"]][$item_value["id_attributes_items"]][$k][$item_value["id_attributes_items_values"]] = $item_value["custom_value"];
+                        }
+                    }
+                }
+            }
+            if ($pcustom) {
+                $mapCustomAttribute = mapCustomAttribute($pcustom);
+                $productInfos["custom_label"] = $mapCustomAttribute;
+                $productInfos["custom"] = $pcustom;
+            }
 
-            $cart->addItem($pid, $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+            $cart->addItem($pid, $pqte, $odd["product_price"] * $impact_coef, "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
             foreach ($odd["combinations"] as $i => $attribute) {
                 $option_price = $attribute["prixttc"];
                 $option_name = $attribute["name"];
@@ -860,8 +879,10 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $id_option = $attribute["id_attribute"];
                 //$shipping_amount = $shipping_ratio * $option_weight;
                 $shipping_amount = 0;
-                $cart->addItemOption($pid, $id_option, $pqte, $option_price, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
             }
+            
+            // TOTO
         } else {
             $surface = 0;
             $dimension = array();

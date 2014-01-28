@@ -267,11 +267,28 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                     </tr>
                                     <?
                                     foreach ($devis["details"] as $line) {
-                                        $attribute_price = 0;
+                                        $attribute_price = 0; 
+                                        
                                         ?>
 
                                         <tr id="id0">
-                                            <td><?= $line["product_name"] ?></td>
+                                            <td>
+                                                <?= $line["product_name"] ?>
+                                                <?
+                                                if(isset($line["custom"])) {                                                    
+                                                    echo "<br>";
+                                                    foreach ($line["custom"] as $custom) {
+                                                        echo " - " . $custom["main_item_name"];
+                                                        foreach ($custom["sub_item"] as $sub_item) {
+                                                            echo " - " . $sub_item["sub_item_name"] . "<br>";
+                                                            foreach ($sub_item["item_values"] as $item_value) {
+                                                                echo $item_value["item_value_name"] . ": " . $item_value["custom_value"] . "<br>";
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                ?>
+                                            </td>
                                             <td>
                                                 <?
                                                 foreach ($line["combinations"] as $attribute) {

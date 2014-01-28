@@ -33,7 +33,7 @@ function getUserDevis($cid) {
                                 and id_customer = ?", array($cid));
 
     foreach ($r as $k => $devis) {
-        $r[$k]["details"] = getUserDevisDetail($devis["id_devis"]);
+        $r[$k]["details"] = getUserDevisDetail($devis["id_devis"]);        
     }
     return $r;
 }
@@ -48,8 +48,61 @@ function getUserDevisDetail($oid) {
 
     foreach ($r as $k => $devisdetail) {
         $r[$k]["combinations"] = getUserDevisProductAttributs($devisdetail["id_devis_detail"]);
+        $r[$k]["custom"] = getUserDevisCustomMainItem($devisdetail["id_devis_detail"]);
     }
 
+    return $r;
+}
+
+
+function getUserDevisCustomMainItem($odid) {
+    global $db;
+    $params = array($odid);
+
+    $r = $db->rawQuery("SELECT distinct a.id_devis_detail, a.id_attribute, b.name as main_item_name 
+                        FROM av_devis_product_custom a , av_attributes b
+                        where a.id_attribute = b.id_attribute
+                        and  id_devis_detail = ?  ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["sub_item"] = getDevisCustomSubItem($od["id_devis_detail"], $od["id_attribute"]);
+    }
+
+    return $r;
+}
+
+function getDevisCustomSubItem($odid, $iaid) {
+    global $db;
+    $params = array($odid, $iaid);
+
+    $r = $db->rawQuery("SELECT distinct a.id_devis_detail, a.id_attributes_items, c.name as sub_item_name , c.picture 
+                        FROM av_devis_product_custom a , av_attributes_items c
+                        where a.id_attributes_items = c.id_attributes_items                         
+                        and a.id_devis_detail = ?  
+                        and a.id_attribute = ?", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k]["item_values"] = getDevisCustomItemValues($od["id_devis_detail"], $iaid, $od["id_attributes_items"]);
+    }
+
+    return $r;
+}
+
+function getDevisCustomItemValues($odid, $iaid, $iaiid) {
+    global $db;
+    $params = array($odid, $iaid, $iaiid);
+
+    $r = $db->rawQuery("SELECT a.*, d.name as item_value_name
+                        FROM av_devis_product_custom a , av_attributes_items_values d
+                        where a.id_attributes_items_values = d.id_attributes_items_values 
+                        and a.id_devis_detail = ?  
+                        and a.id_attribute = ?
+                        and a.id_attributes_items = ?
+                        ", $params);
+
+    foreach ($r as $k => $od) {
+        $r[$k] = $od;
+    }
     return $r;
 }
 
@@ -121,6 +174,13 @@ function CreateOrder($did, $payment) {
             foreach ($k as $attribute) {
                 $db->insert("av_order_product_attributes", $attribute);
             }
+            //les formes specifiq
+            $l = $db->rawQuery("SELECT ? as id_order, ? `id_order_detail`, `id_product`, `id_attribute`, `id_attributes_items`, `id_attributes_items_values`, `custom_value` FROM `av_devis_product_custom` WHERE id_devis = ? and id_devis_detail = ?", array($oid, $odid, $did, $ddid));
+            foreach ($l as $item) {
+                $db->insert("av_order_product_custom", $item);
+            }
+            
+            
         }
 
 
