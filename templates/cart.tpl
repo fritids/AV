@@ -96,6 +96,13 @@
         {elseif empty($smarty.session.user.delivery.phone) && empty($smarty.session.user.delivery.phone_mobile)}
             <p><font color="red">Merci de renseigner au moins un numéro de téléphone <b>dans l'adresse de livraison</b>.</font></p>
             <a href="?register">Mon compte</a>
+        {elseif substr($smarty.session.user.delivery.postcode,0,2) eq 20 
+            || substr($smarty.session.user.delivery.postcode,0,3) eq 971
+            || substr($smarty.session.user.delivery.postcode,0,3) eq 972
+            || substr($smarty.session.user.delivery.postcode,0,3) eq 973
+            || substr($smarty.session.user.delivery.postcode,0,3) eq 974}
+            <p><font color="red">livraison disponible uniquement en France métropolitaine.</font></p>
+            <a href="?register">Mon compte</a>
         {else}
             <a href="?delivery"><img src='/img/BTN-livraison.png'></a>
             {/if}

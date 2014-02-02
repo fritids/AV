@@ -9,7 +9,7 @@
             {foreach key=key item=product from=$promoshome name="promo"}
                 <div class="produit {if $smarty.foreach.promo.first}first{/if}">
                     <span class="promo"></span>
-                    <a href="/?p&id={$product.id_product}">
+                    <a href="{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html">
                         <img src="/img/p/{$product.cover.filename}" width="147">
                     </a>
                     <h3 class="titre">{$product.name}</h3>
@@ -21,7 +21,7 @@
 
                     </p>
                     <p class="liens">
-                        <a href="" class="panier indent">Panier</a>
+                        {*<a href="" class="panier indent">Panier</a>*}
                         <a href="{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html"" class="voir indent">Voir</a>
                     </p>
                 </div>                
@@ -36,10 +36,12 @@
                         <img src="/img/zoom.png" alt="">
                         <p class="desc"><span class="blue">DOUBLE VITRAGE</span><br>avec gaz argon</p>
                         <p class="prix">à partir de <span class="blue">67,91 €</span></p>
-                        <img src="/img/thermique.png" alt="" style="text-align: left;float: left;">
+                        
                     </div>
                     <img src="/img/miroir.png" alt="">
-                    <p class="therme clearfix">Avantages thermiques</p>
+					
+                    <p class="therme clearfix"><img src="/img/thermique.png" alt="" style="text-align: right;">Avantages thermiques</p>
+					
                 </div>
             </div>
         </a>

@@ -139,6 +139,10 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                     "oldval" => '',
                     "newval" => $warehouse
                 ));
+
+                //degreve du stock
+                if (updQuantityWarehouse($id))
+                    @$updated["text"] .= "Le stock a été mise à jour<br>";
             }
         } else {
             foreach ($orderinfo["details"] as $od) {
@@ -1023,7 +1027,7 @@ if ($orderinfo) {
 
                                                     <?
                                                 } else {
-                                                    echo getSupplierName($od["id_supplier_warehouse"])."<br>";
+                                                    echo getSupplierName($od["id_supplier_warehouse"]) . "<br>";
                                                     echo getWarehouseName($od["id_supplier_warehouse"]);
                                                 }
                                                 ?>

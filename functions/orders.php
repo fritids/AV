@@ -134,7 +134,7 @@ function getUserOrdersAddress($iaid) {
 
 function getUserOrdersDetail($oid, $id_supplier_warehouse = null) {
     global $db;
-    $params = array($oid,$id_supplier_warehouse, $id_supplier_warehouse);
+    $params = array($oid, $id_supplier_warehouse, $id_supplier_warehouse);
 
     $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name, a.id_supplier_warehouse
                         FROM av_order_detail a                        
@@ -147,7 +147,7 @@ function getUserOrdersDetail($oid, $id_supplier_warehouse = null) {
 
     foreach ($r as $k => $od) {
         $w = getWarehouseInfos($od["id_supplier_warehouse"]);
-        
+
         $r[$k]["attributes"] = getOrdersDetailAttribute($od["id_order_detail"]);
         $r[$k]["custom"] = getOrdersCustomMainItem($od["id_order_detail"]);
         $r[$k]["id_warehouse"] = $w["id_warehouse"];
@@ -445,7 +445,7 @@ function saveOrder() {
 
                             foreach ($sub_attribute as $m => $item_values) {
                                 if (is_array($item_values)) {
-                                    foreach ($item_values as $n => $item_value) {                                       
+                                    foreach ($item_values as $n => $item_value) {
                                         $order_custom_attributes["id_attributes_items_values"] = $n;
                                         $order_custom_attributes["id_order"] = $oid;
                                         $order_custom_attributes["id_order_detail"] = $odid;
@@ -568,6 +568,61 @@ function updQuantity($oid) {
                 ->where("id_product", $pid)
                 ->update("av_product", $params);
     }
+}
+
+function updQuantityWarehouse($odid) {
+    global $db;
+    $stock = false;
+
+    $r = $db->where("id_order_detail", $odid)
+            ->where("is_debit_stock", 0)
+            ->get("av_order_detail");
+
+    foreach ($r as $item) {
+
+        $qte_ordered = $item["product_quantity"];
+        $pid = $item["id_product"];
+        $id_sw = $item["id_supplier_warehouse"];
+
+
+        $s = $db->where("id_supplier_warehouse", $id_sw)
+                ->get("av_supplier_warehouse");
+
+        if ($s) {
+            $id_warehouse = $s[0]["id_warehouse"];
+
+            $p = $db->where("id_product", $pid)
+                    ->where("id_warehouse", $id_warehouse)
+                    ->get("av_product_warehouse");
+
+            if ($p) {
+                $id_product_warehouse = $p[0]["id_product_warehouse"];
+                $new_qte = $p[0]["quantity"] - $qte_ordered;
+                $params = array("quantity" => $new_qte);
+
+                $r = $db->where("id_product_warehouse", $id_product_warehouse)
+                        ->where("id_product", $pid)
+                        ->update("av_product_warehouse", $params);
+
+                if ($r) {
+                    $params = array(
+                        "id_order_detail" => $odid,
+                        "date_add" => date("Y-m-d H:i:s"),
+                        "id_product_warehouse" => $id_product_warehouse,
+                        "old_quantity" => $p[0]["quantity"],
+                        "quantity" => -$qte_ordered
+                    );
+
+                    $db->insert("av_product_warehouse_hist", $params);
+
+                    $db->where("id_order_detail", $odid)
+                            ->update("av_order_detail", array("is_debit_stock" => 1));
+                    $stock = true;
+                }
+            }
+        }
+    }
+    return($stock);
 }
 
 ?>
