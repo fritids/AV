@@ -82,7 +82,7 @@ $orderStates = $db->where("id_level", 0)
                         <td><input type="text" name="reference" value="<?= $reference ?>"></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><input type="submit" name="Filtrer" value="Filtrer" id="filtre" class="btn btn-primary btn-block" data-loading-text="Loading..."></td>
+                        <td colspan="2"><input type="submit" name="Filtrer" value="Filtrer" id="filtre" class="btn btn-primary btn-block" data-loading-text="Chargement de la page..."></td>
                     </tr>
                 </table>
             </form>
@@ -95,7 +95,7 @@ $orderStates = $db->where("id_level", 0)
     <script>
         $('#filtre').click(function() {
             var btn = $(this);
-            btn.button('Chargement de la page...');
+            btn.button('loading');
         });
     </script>    
     <div class="clearfix"></div>
