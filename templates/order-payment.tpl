@@ -3,44 +3,73 @@
     <div class="texte_paiement">
 
     </div>
-    <div class="type_paiement">
-        {$SOCGEN_CHECKOUT_FORM}<br><br>
-        <div class="clear"></div>
-    </div>
+	<table border="0">
+<!-- Paiement CB -->	
+		<tr>
+			<td nowrap valign="middle" align="center"><b>Paiement par CB</b><br/>(cliquez sur le logo de votre CB)</td>
+			<td nowrap valign="middle" align="center">
+				<div class="type_paiement">
+				{$SOCGEN_CHECKOUT_FORM}<br><br>
+				<div class="clear"></div>
+				<br/><br/>
+				</div>
+			</td>
+		</tr>
+<!-- Paiement Paypal -->	
+		<tr>
+			<td nowrap valign="middle" align="center"><b>Paiement par paypal</b></td>
+			<td nowrap valign="middle" align="center">
+				<div class="type_paiement">
+					<div class="logo_pay"><img src="/img/paypal.png" alt="Paiement par Paypal" /></div>
+					<div class="choix_pay">{$PAYPAL_CHECKOUT_FORM}</div>
+					<div class="clear"></div>
+				</div>
+			</td>
+		</tr>
+<!-- Paiement chèque -->	
+		<tr>
+			<td valign="middle" align="center"><b>Paiement par chèque</b></td>
+			<td nowrap valign="middle" align="center">
+				<div class="type_paiement">
+					<div class="logo_pay"><img src="/img/checque.png" alt="Paiement par Ch&egrave;que" /></div>
+					<div class="choix_pay">
+					<p>
+						<label>
+							<form action="/?action=order_validate" method="post">
+								<input type='hidden' name="payment" value='Chèque' />
+								<input type='submit' value='Payer par chèque' class="pay_cheque" />
+							</form>
+						</label>
+					</p>
+				</div>
+				<div class="clear"></div>
+			</td>
+
+		</tr>
+<!-- Paiement virement -->	
+		<tr>
+			<td valign="middle" align="center"><b>Paiement par virement</b></td>
+			<td nowrap valign="middle" align="center">
+					<div class="type_paiement">
+						<div class="logo_pay"><img src="/img/virement-bancaire.gif" alt="Paiement par virement bancaire" /></div>
+						<div class="choix_pay">
+							<p>
+								<label>
+									<form action="/?action=order_validate" method="post">
+										<input type='hidden' name="payment" value='Virement bancaire' />
+										<input type='submit' value='Payer par virement bancaire' class="pay_cheque" />
+									</form>
+								</label>
+							</p>
+						</div>
+						<div class="clear"></div>
+					</div>
+			</td>
+		</tr>		
+	</table>
+
     
-    <div class="type_paiement">
-        <div class="logo_pay"><img src="/img/paypal.png" alt="Paiement par Paypal" /></div>
-        <div class="choix_pay">{$PAYPAL_CHECKOUT_FORM}</div>
-        <div class="clear"></div>
-    </div>
-    <div class="type_paiement">
-        <div class="logo_pay"><img src="/img/checque.png" alt="Paiement par Ch&egrave;que" /></div>
-        <div class="choix_pay">
-            <p>
-                <label>
-                    <form action="/?action=order_validate" method="post">
-                        <input type='hidden' name="payment" value='Chèque' />
-                        <input type='submit' value='Payer par chèque' class="pay_cheque" />
-                    </form>
-                </label>
-            </p>
-        </div>
-        <div class="clear"></div>
-    </div>
-    <div class="type_paiement">
-        <div class="logo_pay"><img src="/img/virement-bancaire.gif" alt="Paiement par virement bancaire" /></div>
-        <div class="choix_pay">
-            <p>
-                <label>
-                    <form action="/?action=order_validate" method="post">
-                        <input type='hidden' name="payment" value='Virement bancaire' />
-                        <input type='submit' value='Payer par virement bancaire' class="pay_cheque" />
-                    </form>
-                </label>
-            </p>
-        </div>
-        <div class="clear"></div>
-    </div>
+
 </form>
 <div class="back_to">
     <a href="/?order-resume" title="Revenir au r&eacute;capitulatif"><img src="/img/btn_retour.png" alt="&lt; Revenir au r&eacute;capitulatif" width="239" height="48" /></a>

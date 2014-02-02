@@ -56,6 +56,9 @@
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}
+                                            {if $detail.is_product_custom == 1}
+                                                <b>forme spécifique voir annexe</b>
+                                            {/if}
                                             {if $detail.combinations}
                                                 <br>
                                                 {foreach key=key item=attribute from=$detail.combinations}

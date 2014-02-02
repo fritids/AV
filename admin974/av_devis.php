@@ -186,6 +186,7 @@ if (isset($_POST["devis_save"])) {
 
     //produit standard
     if (!empty($_POST["product_id"])) {
+        $nb_product_custom = 0;
         foreach ($_POST["product_id"] as $k => $product) {
             if (!empty($product)) {
                 $p_qte = $_POST["product_quantity"];
@@ -194,7 +195,7 @@ if (isset($_POST["devis_save"])) {
                 $p_product_custom_names = $_POST["product_custom_name"];
                 $p_product_custom_combination = @$_POST["custom"];
                 $shape_impact_coef = 1;
-                $attributes_amount = 0;
+                $attributes_amount = 0;                
                 $devis_product_attributes = array();
                 $devis_custom_attributes = array();
 
@@ -264,6 +265,7 @@ if (isset($_POST["devis_save"])) {
                     }
 
                     if (isset($p_product_custom_combination[$product][$k])) {
+                        $nb_product_custom++;
                         foreach ($p_product_custom_combination[$product][$k] as $d => $main_attribute) {
                             if (is_array($main_attribute)) {
                                 $devis_custom_attributes["id_attribute"] = $d;
@@ -370,7 +372,7 @@ if (isset($_POST["devis_save"])) {
             }
         }
     }
-    $devis_summary = array("total_paid" => $total_paid);
+    $devis_summary = array("total_paid" => $total_paid, "nb_product_custom" => $nb_product_custom);
     $r = $db->where("id_devis", $did)
             ->update("av_devis", $devis_summary);
 
@@ -388,6 +390,12 @@ if (isset($_POST["devis_save"])) {
         $pdf->AddPage('P', 'A4');
         $pdf->writeHTML($content_body, true, false, true, false, '');
         $pdf->lastPage();
+
+        if ($devisinfo[0]["nb_product_custom"] > 0) {            
+            $annexe_body = $smarty->fetch('front_devis_annexe.tpl');
+            $pdf->AddPage('P', 'A4');
+            $pdf->writeHTML($annexe_body, true, false, true, false, '');
+        }
 
         $path = "../tmp";
 
@@ -825,7 +833,7 @@ if (isset($_POST["devis_save"])) {
                             } else if (id_sub_item == 6) {
                                 mytr.find('.product_width').val(parseInt(A) * 2);
                             } else if (id_sub_item == 8) {
-                                mytr.find('.product_width').val(mytr.find('product_height').val());
+                                //rien
                             } else {
                                 mytr.find('.product_width').val($(this).val());
                             }
@@ -850,7 +858,7 @@ if (isset($_POST["devis_save"])) {
                             } else if (id_sub_item == 5) {
                                 mytr.find('.product_height').val(parseInt(A) * 2);
                             } else if (id_sub_item == 6) {
-                                mytr.find('.product_height').val(parseInt(A) * 2);
+                                mytr.find('.product_height').val(parseInt(B) * 2);
                             } else if (id_sub_item == 8) {
                                 mytr.find('.product_height').val(parseInt(B));
                                 mytr.find('.product_width').val(parseInt(B));

@@ -96,7 +96,10 @@
         {elseif empty($smarty.session.user.delivery.phone) && empty($smarty.session.user.delivery.phone_mobile)}
             <p><font color="red">Merci de renseigner au moins un numéro de téléphone <b>dans l'adresse de livraison</b>.</font></p>
             <a href="?register">Mon compte</a>
-        {elseif substr($smarty.session.user.delivery.postcode,0,2) eq 20 
+        {elseif !$smarty.session.user.delivery.postcode|is_numeric}
+            <p><font color="red">[Adresse de livraison] Code postal invalide : Chiffre uniquement</font></p>
+            <a href="?register">Mon compte</a>
+            {elseif substr($smarty.session.user.delivery.postcode,0,2) eq 20 
             || substr($smarty.session.user.delivery.postcode,0,3) eq 971
             || substr($smarty.session.user.delivery.postcode,0,3) eq 972
             || substr($smarty.session.user.delivery.postcode,0,3) eq 973

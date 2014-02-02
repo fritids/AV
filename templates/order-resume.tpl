@@ -137,7 +137,7 @@
             <td align="right">
                 <span>
                     <form action="/?order-payment" method="post">
-                        <input type="checkbox" required="true">J’ai lu et j’accepte <a href="/index.php?cms&id=3">les conditions générales de vente</a>.        
+                        <input type="checkbox" required>J’ai lu et j’accepte <a href="/index.php?cms&id=3">les conditions générales de vente</a>.        
                         <input type="submit" class="valider-porsuivre" value="">
                     </form>
                 </span>
