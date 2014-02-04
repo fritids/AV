@@ -63,7 +63,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
 
             });
         </script>
-
+        
         <!-- /tinyMCE -->
 
         <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>        
@@ -212,7 +212,6 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                         }
                         ?>  
                         <?
-                        
                         if ($_SESSION['role'] == "ADMIN" || strpos($_SESSION["email"], "mpa") > 0) {
                             ?>
                             <li class="dropdown">
@@ -274,8 +273,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                         <li><a href="logout.php"><span class="glyphicon glyphicon-off"></span></a></li>                        
                     </ul>
 
-                    
+
                 </div><!--/.nav-collapse -->
             </div>
         </div>
-        

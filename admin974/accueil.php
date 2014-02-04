@@ -141,7 +141,7 @@
         <ul class="list-unstyled">
             <li>04 fév 2014</li>
             <ul>
-                <li>BO - multiples amélioration BO - ticket 55/54/44</li>
+                <li>BO - multiples amélioration BO - ticket 55/54/44/48</li>
             </ul>
             <li>03 fév 2014</li>
             <ul>

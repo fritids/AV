@@ -327,6 +327,40 @@ require_once 'phpMyEdit.class.php';
         })
     });
 
+
+    $('.mceNoEditor').keyup(function() {
+
+        var texte = $(this).val();
+        var nombreCaractere = texte.length;
+        var nombreCaractereMax = $(this).attr("maxlength");
+        var myname = $(this).attr("name");
+
+
+
+        // On soustrait le nombre limite au nombre de caractère existant
+        var nombreCaractere = nombreCaractereMax - nombreCaractere;
+
+        var nombreMots = jQuery.trim($(this).val()).split(' ').length;
+        if ($(this).val() === '') {
+            nombreMots = 0;
+        }
+
+        var msg = ' ' + nombreMots + ' mot(s) | ' + nombreCaractere + ' Caractere(s) restant';
+        
+        $("." + myname).text(msg);
+
+        // On écris le nombre de caractère en rouge si celui si est inférieur à 0 
+        // La limite est donc dépasse
+        if (nombreCaractere < 0) {
+            $(this).val($(this).val().substr(0, nombreCaractereMax));            
+        } 
+
+
+
+    });
+
+
+
 </script>
 
 

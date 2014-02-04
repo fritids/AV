@@ -1045,7 +1045,8 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 							$strip_tags, $escape);
 				}
 			} elseif (isset ($this->fdd[$k]['textarea'])) {
-				echo '<textarea class="',$css_class_name,'" name="',$this->cgi['prefix']['data'].$this->fds[$k],'"';
+                                $maxlen = intval($this->fdd[$k]['maxlen']);                                
+				echo '<textarea id="montextarea" class="',$css_class_name,'" name="',$this->cgi['prefix']['data'].$this->fds[$k],'"';
 				echo ($this->readonly($k) ? ' disabled' : '');
 				if (intval($this->fdd[$k]['textarea']['rows']) > 0) {
 					echo ' rows="',$this->fdd[$k]['textarea']['rows'],'"';
@@ -1053,15 +1054,19 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 				if (intval($this->fdd[$k]['textarea']['cols']) > 0) {
 					echo ' cols="',$this->fdd[$k]['textarea']['cols'],'"';
 				}
+                                if ($maxlen > 0) {
+					echo ' maxlength="'.$maxlen.'"';
+				}
 				if (isset($this->fdd[$k]['textarea']['wrap'])) {
 					echo ' wrap="',$this->fdd[$k]['textarea']['wrap'],'"';
 				} else {
 					echo ' wrap="virtual"';
 				}
-				echo '>';
+				echo '>';                                
 				if($escape) echo htmlspecialchars($this->fdd[$k]['default']);
 				else echo $this->fdd[$k]['default'];
 				echo '</textarea>',"\n";
+                                echo '<span id="desc" class="'.$this->cgi['prefix']['data'].$this->fds[$k].'" >Tapez votre texte</span>';
 			} elseif ($this->col_has_php($k)) {
 				echo include($this->fdd[$k]['php']);
 			} else {
@@ -1200,13 +1205,17 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 						$strip_tags, $escape);
 			}
 		} elseif (isset($this->fdd[$k]['textarea'])) {
-			echo '<textarea class="',$css_class_name,'" name="',$this->cgi['prefix']['data'].$this->fds[$k],'"';
+                        $maxlen = intval($this->fdd[$k]['maxlen']);
+			echo '<textarea id="montextarea" class="',$css_class_name,'" name="',$this->cgi['prefix']['data'].$this->fds[$k],'"';
 			echo ($this->readonly($k) ? ' disabled' : '');
 			if (intval($this->fdd[$k]['textarea']['rows']) > 0) {
 				echo ' rows="',$this->fdd[$k]['textarea']['rows'],'"';
 			}
 			if (intval($this->fdd[$k]['textarea']['cols']) > 0) {
 				echo ' cols="',$this->fdd[$k]['textarea']['cols'],'"';
+			}
+                        if ($maxlen > 0) {
+				echo ' maxlength="'.$maxlen.'"';
 			}
 			if (isset($this->fdd[$k]['textarea']['wrap'])) {
 				echo ' wrap="',$this->fdd[$k]['textarea']['wrap'],'"';
@@ -1217,6 +1226,7 @@ function '.$this->js['prefix'].'filter_handler(theForm, theEvent)
 			if($escape) echo htmlspecialchars($row["qf$k"]);
 			else echo $row["qf$k"];
 			echo '</textarea>',"\n";
+                        echo '<span id="desc" class="'.$this->cgi['prefix']['data'].$this->fds[$k].'">Tapez votre texte</span>';
 		} elseif ($this->col_has_php($k)) {
 			echo include($this->fdd[$k]['php']);
 		} else {
