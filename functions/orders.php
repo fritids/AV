@@ -367,7 +367,6 @@ function saveOrder() {
         "invoice_date" => date("Y-m-d H:i:s"),
         "delivery_date" => date("Y-m-d H:i:s"),
         "date_add" => date("Y-m-d H:i:s"),
-        "date_upd" => date("Y-m-d H:i:s"),
         "order_comment" => $_SESSION["cart_summary"]["order_comment"],
         "vat_rate" => ( $config["vat_rate"] - 1 ) * 100,
         "alert_sms" => $alert_sms,

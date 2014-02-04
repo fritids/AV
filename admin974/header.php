@@ -57,7 +57,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                 external_link_list_url: "js/link_list.js",
                 external_image_list_url: "js/image_list.js",
                 media_external_list_url: "js/media_list.js",
-                relative_urls: true,
+                relative_urls: false,
                 document_base_url: "http://www.allovitres.com/"
 
 

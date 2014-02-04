@@ -83,6 +83,7 @@
     font-size: 12px;
     text-align: center;
     max-width: 147px;
+	min-height:35px;
 }
 
 .complement .produit .prix,
@@ -103,12 +104,13 @@
 .promotions .produit .voir,
 .complement .produit .panier,
 .promotions .produit .panier{
-    display: inline-block;
+    display: inline-block; 
     text-decoration: none;
     color: #fff;
     width: 69px;
     height: 23px;
     text-align: center;
+	margin:0 auto;
 }
 
 .complement .produit .panier,
@@ -151,11 +153,12 @@
 }
 .produit-du-mois .produit .desc{
     text-align: center;
+	padding-left: 4px;
 }
 
 .produit-du-mois .produit .infos{
     float: left;
-    width: 120px;
+    width: 124px;
     text-align: center;
 }
 
@@ -163,6 +166,8 @@
     color: #fff;
     font-size: 12px;
     font-weight: bold;
+	text-align: left;
+	margin:-5px 5px 5px 5px;
 }
 
 .blocks div{
@@ -307,7 +312,7 @@
 /*-----------------Page Produit----------------*/
 
 #produit #features .features{
-    background: url(/img/bg-fetaures.png) no-repeat center top;
+ /*   background: url(/img/bg-fetaures.png) no-repeat center top; */
     width: 350px;
     float: left;
     margin-left: 10px;
@@ -931,11 +936,11 @@
 {
     text-decoration: none;
 }
-
+/*
 #recapitulatif .produits td.designation_prd{
     text-align: left;
 }
-
+*/
 #recapitulatif .produits td.total{
     font-weight: bold;
 }
@@ -1057,7 +1062,19 @@
 {
     font-weight: bold;
 }
+#livraison-pose .trois
+{
+    padding-left: 45px;
+    line-height: 30px;
 
+}
+#livraison-pose .trois{
+    background: url(/img/3.png) no-repeat left center;
+}
+#livraison-pose .trois span.orange
+{
+    font-weight: bold;
+}
 #livraison-pose .un{
     background: url(/img/1.png) no-repeat left center;
 }
@@ -1152,7 +1169,11 @@ body{font-family:Arial;font-size:14px;line-height:normal;}
 .type_paiement{background:url("/images/trait.jpg") repeat-x bottom;}
 .logo_pay{float:left;width:420px;text-align:center;padding:20px 0 0;}
 .logo_pay img{font-size:16px;font-weight:bold;color:#010101;}
-.choix_pay{width:530px;float:left;}
+.choix_pay{
+/*
+width:530px;float:left;
+*/
+}
 .choix_pay p{display:table-cell;height:112px;vertical-align:middle;}
 .choix_pay input.choice{margin-right:7px;}
 .back_to{margin-top:45px;}

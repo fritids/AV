@@ -46,6 +46,9 @@ if (isset($_SESSION["nb_orders"]))
 if (isset($_GET["filter"]) && $_GET["filter"] == "today") {
     $opts['filters'] = "date(PMEtable0.date_add) = date(now())";
 }
+if (isset($_GET["filter"]) && $_GET["filter"] == "processedtoday") {
+    $opts['filters'] = "date(PMEtable0.date_upd) = date(now())";
+}
 
 $opts['fdd']['id_order'] = array(
     'name' => 'ID order',
@@ -77,7 +80,7 @@ $opts['fdd']['id_customer'] = array(
     'select' => 'T',
     'options' => 'VL',
     'maxlen' => 10,
-    'size' => 40,
+    'size' => 35,
     'values' => array(
         'table' => 'av_customer',
         'column' => 'id_customer',
@@ -116,7 +119,7 @@ $opts['fdd']['id_address_delivery'] = array(
     'select' => 'T',
     'maxlen' => 10,
     'options' => 'VL',
-    'size' => 40,
+    'size' => 35,
     'values' => array(
         'table' => 'av_address',
         'column' => 'id_address',
@@ -223,10 +226,13 @@ require_once 'phpMyEdit.class.php';
             </div>
         </form> 
 
-        <a href="?filter=today" class="btn btn-primary">Les commandes du jour</a>
-        <a href="?" class="btn btn-primary">Toutes les commandes</a>
+        <a href="?" class="btn btn-primary">Toutes</a>
+        <a href="?filter=today" class="btn btn-primary">Les ventes du jour</a>
+        <a href="?filter=processedtoday" class="btn btn-primary">Les traitées du jour</a>
+
     </div>
 </div>
+<hr>
 <center>
     <?
     new phpMyEdit($opts);

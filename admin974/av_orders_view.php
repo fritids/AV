@@ -96,6 +96,7 @@ if (isset($_POST) && isset($_POST["add_notes"])) {
     $orderinfo = getOrderInfos($oid);
 }
 
+$orderLocked = false;
 
 /* Update des combobox */
 if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
@@ -199,7 +200,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
 
                     $r = $db->where("id_order", $oid)
-                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
+                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
 
                     addLog(array("tabs" => "mv_orders",
                         "rowkey" => $oid,
@@ -231,7 +232,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
                             ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
 
                     $r = $db->where("id_order", $oid)
-                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS));
+                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
 
                     addLog(array("tabs" => "mv_orders",
                         "rowkey" => $oid,
@@ -277,7 +278,7 @@ if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || i
 
 if ($orderinfo["LIV_GLOBAL_INFO"] == 5) {
     $r = $db->where("id_order", $oid)
-            ->update("av_orders", array("current_state" => LIVREE));
+            ->update("av_orders", array("current_state" => LIVREE, "date_upd" => date("Y-m-d H:i:s")));
     if ($r) {
         @$updated["text"] .= "La commande a été passé en statut LIVREE.<br>";
         $orderinfo = getOrderInfos($oid);
@@ -408,7 +409,7 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
         $new_state = PREPARATION_EN_COURS;
 
     $r = $db->where("id_order", $oid)
-            ->update("av_orders", array("current_state" => $new_state));
+            ->update("av_orders", array("current_state" => $new_state, "date_upd" => date("Y-m-d H:i:s")));
 
     if ($new_state == PAIEMENT_ACCEPTE) {
         createInvoice($oid);
@@ -525,14 +526,20 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
 
 
 <?
+if (
+        $orderinfo["current_state"] != 1 && $orderinfo["current_state"] != 5 && $orderinfo["current_state"] != 6 && $orderinfo["current_state"] != 7 && $orderinfo["current_state"] != 8 && $orderinfo["current_state"] != 10 && $orderinfo["current_state"] != 11
+)
+    $orderLocked = true;
+
+
 if ($orderinfo) {
     ?>
     <div class="container">    
         <div class="row">
             <div class="col-xs-1">
-                <?
-                if ($order_precedent) {
-                    ?>
+    <?
+    if ($order_precedent) {
+        ?>
                     <a href="?id_order=<?= $order_precedent[0]["id_order"] ?>" data-toggle="tooltip" title="Commande précédente"><span class="glyphicon glyphicon-arrow-left"></span></a>
                     <?
                 }
@@ -549,10 +556,10 @@ if ($orderinfo) {
             </div>
             <div class="col-xs-10">
                 <ul class="pagination">
-                    <?
-                    for ($i = 5; $i >= 0; $i--) {
-                        if (isset($order_precedent[$i])) {
-                            ?>
+    <?
+    for ($i = 5; $i >= 0; $i--) {
+        if (isset($order_precedent[$i])) {
+            ?>
                             <li ><a href="?id_order=<?= $order_precedent[$i]["id_order"] ?>" class="alert-<?= @$order_precedent[$i]["current_state"] ?>"><?= @$order_precedent[$i]["id_order"] ?></a></li>
                             <?
                         }
@@ -575,21 +582,21 @@ if ($orderinfo) {
 
 
         </div>
-        <?
-        if (!empty($updated)) {
-            ?>
+    <?
+    if (!empty($updated)) {
+        ?>
             <div class="row">
                 <div class="col-xs-12" >
                     <div class="alert alert-success">
-                        <?= $updated["text"] ?>
+        <?= $updated["text"] ?>
                     </div>                   
 
                 </div>
 
             </div>
-            <?
-        }
-        ?>
+        <?
+    }
+    ?>
         <div class="row">
 
             <div class="col-xs-3">
@@ -616,20 +623,20 @@ if ($orderinfo) {
                     </tr>
                     <tr>
                         <td class="text-center alert-<?= $orderinfo["COMMANDE_INFO"] ?>">
-                            <?
-                            switch ($orderinfo["COMMANDE_INFO"]) {
-                                case 5:
-                                    echo '<span class="glyphicon glyphicon-ok"></span>';
-                                    break;
-                                case 6:
-                                    echo '<span class="glyphicon glyphicon-bullhorn"></span>';
-                                    break;
-                                case 8:
-                                    echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
-                                    break;
-                                default:
-                            }
-                            ?>                        
+    <?
+    switch ($orderinfo["COMMANDE_INFO"]) {
+        case 5:
+            echo '<span class="glyphicon glyphicon-ok"></span>';
+            break;
+        case 6:
+            echo '<span class="glyphicon glyphicon-bullhorn"></span>';
+            break;
+        case 8:
+            echo '<span class="glyphicon glyphicon-exclamation-sign"></span>';
+            break;
+        default:
+    }
+    ?>                        
                         </td>
                         <td class="text-center alert-<?= $orderinfo["ARC_INFO"] ?>">
                             <?
@@ -706,15 +713,15 @@ if ($orderinfo) {
                     <form method="post">
                         <select name="current_state" class="pme-input-0">
                             <option value="">--</option>
-                            <?
-                            foreach ($orderStates as $orderState) {
-                                ?>
+    <?
+    foreach ($orderStates as $orderState) {
+        ?>
                                 <option value="<?= $orderState["id_statut"] ?>"
                                 <?= ($orderinfo["current_state"] == $orderState["id_statut"]) ? "selected" : "" ?>
                                         ><?= $orderState["title"] ?> </option>
-                                        <?
-                                    }
-                                    ?> 
+                                <?
+                            }
+                            ?> 
                         </select>
 
                         <button type="submit" class="btn btn-sm" name="order_state">Ok</button>
@@ -759,8 +766,8 @@ if ($orderinfo) {
                     <div class="panel-body">
                         <span class="glyphicon glyphicon-phone-alt" ></span> <?= $orderinfo["address"]["delivery"]["phone"] ?><br>
                         <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["delivery"]["phone_mobile"] ?> <br>
-                        <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
-                        <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
+    <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
+    <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
                         <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?>
                     </div> 
                     <table class="table table-condensed">
@@ -776,8 +783,8 @@ if ($orderinfo) {
                     <div class="panel-body">
                         <span class="glyphicon glyphicon-phone-alt" ></span> <?= $orderinfo["address"]["invoice"]["phone"] ?> <br>
                         <span class="glyphicon glyphicon-phone" ></span> <?= $orderinfo["address"]["invoice"]["phone_mobile"] ?> <br>
-                        <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
-                        <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
+    <?= $orderinfo["address"]["invoice"]["address1"] ?><br>
+    <?= $orderinfo["address"]["invoice"]["address2"] ?><br>
                         <?= $orderinfo["address"]["invoice"]["postcode"] ?> <?= $orderinfo["address"]["invoice"]["city"] ?><br>
                     </div>
                 </div> 
@@ -786,7 +793,7 @@ if ($orderinfo) {
                 <div class="panel panel-default">
                     <div class="panel-heading">Commentaire client <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                     <div class="panel-body">
-                        <?= $orderinfo["order_comment"] ?>
+    <?= $orderinfo["order_comment"] ?>
                     </div>
                 </div>
             </div>
@@ -845,7 +852,7 @@ if ($orderinfo) {
                 <div class="panel panel-default">
                     <div class="panel-heading">Commentaire interne livraison <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
                     <div class="panel-body">
-                        <?= $orderinfo["delivery_comment"] ?>
+    <?= $orderinfo["delivery_comment"] ?>
                     </div>
                 </div>
             </div>
@@ -857,23 +864,23 @@ if ($orderinfo) {
                             <p>Statuts: 
                                 <select style="width: 150px"  name="product_current_state" class="pme-input-0">
                                     <option value=""></option>
-                                    <?
-                                    foreach ($productStates as $pstate) {
-                                        ?>
+    <?
+    foreach ($productStates as $pstate) {
+        ?>
                                         <option value="<?= $pstate["id_statut"] ?>"                                        
                                                 ><?= $pstate["title"] ?> </option>
-                                                <?
-                                            }
-                                            ?>
+                                        <?
+                                    }
+                                    ?>
                                 </select>
                             </p>                        
                             <p>
                                 Fournisseur:
                                 <select name="id_supplier" class="pme-input-0" disabled="disabled">
                                     <option value=""></option>
-                                    <?
-                                    foreach ($suppliers as $supplier) {
-                                        ?>
+    <?
+    foreach ($suppliers as $supplier) {
+        ?>
                                         <option value="<?= $supplier["id_supplier"] ?>"><?= $supplier["name"] ?> </option>
                                         <?
                                     }
@@ -884,18 +891,24 @@ if ($orderinfo) {
                             <p>Date liv. Fournisseur: 
                                 <input type="text" style="width: 90px" class="datepicker" value="" name="supplier_date_delivery"> 
                             </p>
-                            <p>
-                                <button type="submit" class="btn btn-sm btn-warning btn-block">Ok</button>
-                            </p>
+    <?
+    if ($orderLocked) {
+        ?>
+                                <p>
+                                    <button type="submit" class="btn btn-sm btn-warning btn-block">Ok</button>
+                                </p>
+        <?
+    }
+    ?>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <?
-        if (!empty($orderinfo["details"])) {
-            ?>
+    <?
+    if (!empty($orderinfo["details"])) {
+        ?>
             <div class="row">
                 <div class="col-xs-12">
                     <h2>Produits</h2>
@@ -931,22 +944,22 @@ if ($orderinfo) {
                                         <th>commentaire</th>    
                                         <th></th>    
                                     </tr>
-                                    <?
-                                    foreach ($orderinfo["details"] as $od) {
-                                        $t = getItemTourneeinfo($od["id_order_detail"]);
+        <?
+        foreach ($orderinfo["details"] as $od) {
+            $t = getItemTourneeinfo($od["id_order_detail"]);
 
-                                        $isFournisseurOk = true;
-                                        $isFournisseurOk = ($od["id_supplier_warehouse"] != '' ) ? true : false;
-                                        ?>
+            $isFournisseurOk = true;
+            $isFournisseurOk = ($od["id_supplier_warehouse"] != '' ) ? true : false;
+            ?>
                                         <tr id="id0">
 
                                             <td nowrap> 
-                                                <?= $od["product_name"] ?> <br>
-                                                <?
-                                                foreach ($od["attributes"] as $attribute) {
-                                                    echo " - " . $attribute["attribute_name"] . ": " . $attribute["attribute_value"] . "<br>";
-                                                }
-                                                ?>
+            <?= $od["product_name"] ?> <br>
+            <?
+            foreach ($od["attributes"] as $attribute) {
+                echo " - " . $attribute["attribute_name"] . ": " . $attribute["attribute_value"] . "<br>";
+            }
+            ?>
                                                 <font color="red">
                                                 <?
                                                 foreach ($od["custom"] as $custom) {
@@ -964,11 +977,11 @@ if ($orderinfo) {
                                             </td>
                                             <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
                                             <td>
-                                                <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
+            <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
                                             </td>
                                             <td nowrap>
                                                 <?= $od["total_price_tax_incl"] ?> €
-                                                <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?><br>
+            <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?><br>
                                                 <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
                                             </td>
                                             <td>
@@ -977,24 +990,24 @@ if ($orderinfo) {
                                                     ?>
                                                     <select style="width: 150px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="product_current_state form-control input-sm">
                                                         <option value="">--</option>
-                                                        <?
-                                                        foreach ($productStates as $pState) {
-                                                            ?>
+                                                    <?
+                                                    foreach ($productStates as $pState) {
+                                                        ?>
                                                             <option value="<?= $pState["id_statut"] ?>"
                                                             <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
                                                                     ><?= $pState["title"] ?> </option>
-                                                                    <?
-                                                                }
-                                                                ?>
+                                                            <?
+                                                        }
+                                                        ?>
                                                     </select>
 
                                                     <input type="text" value="<?= $od["product_supplier_comment"] ?>" name="product_supplier_comment[<?= $od["id_order_detail"] ?>]" class="form-control input-sm product_supplier_comment" maxlength="128" placeholder="Comm. SAV/CASSE">
 
-                                                    <?
-                                                } else {
-                                                    echo $od["product_state_label"];
-                                                }
-                                                ?>                                                
+                <?
+            } else {
+                echo $od["product_state_label"];
+            }
+            ?>                                                
                                             </td>
                                             <td>
                                                 <?
@@ -1002,41 +1015,41 @@ if ($orderinfo) {
                                                     ?>
                                                     <select style="width: 120px"  name="id_warehouse[<?= $od["id_order_detail"] ?>]" id="warehouse_<?= $od["id_order_detail"] ?>" class="form-control input-sm warehouse">
                                                         <option value="">--</option>
-                                                        <?
-                                                        foreach ($warehouses as $warehouse) {
-                                                            ?>
+                                                    <?
+                                                    foreach ($warehouses as $warehouse) {
+                                                        ?>
                                                             <option value="<?= $warehouse["id_warehouse"] ?>"
                                                             <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
                                                                     ><?= $warehouse["name"] ?> </option>
-                                                                    <?
-                                                                }
-                                                                ?>
+                                                            <?
+                                                        }
+                                                        ?>
                                                     </select>                                                    
                                                     <select name="id_supplier_warehouse[<?= $od["id_order_detail"] ?>]" id="supplier_<?= $od["id_order_detail"] ?>" class="form-control input-sm supplier">
                                                         <option value="">--</option>
-                                                        <?
-                                                        foreach ($suppliersWarehouse as $supplier) {
-                                                            ?>
+                <?
+                foreach ($suppliersWarehouse as $supplier) {
+                    ?>
                                                             <option class="<?= $supplier["id_warehouse"] ?>" value="<?= $supplier["id_supplier_warehouse"] ?>"
                                                             <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
                                                                     ><?= $supplier["supplier_name"] ?> </option>
-                                                                    <?
-                                                                }
-                                                                ?>
+                                                            <?
+                                                        }
+                                                        ?>
                                                     </select>
 
-                                                    <?
-                                                } else {
-                                                    echo getSupplierName($od["id_supplier_warehouse"]) . "<br>";
-                                                    echo getWarehouseName($od["id_supplier_warehouse"]);
-                                                }
-                                                ?>
+                                                                <?
+                                                            } else {
+                                                                echo getSupplierName($od["id_supplier_warehouse"]) . "<br>";
+                                                                echo getWarehouseName($od["id_supplier_warehouse"]);
+                                                            }
+                                                            ?>
 
                                             </td>
                                             <td>
-                                                <?
-                                                if ($od["product_current_state"] != 20) {
-                                                    ?>
+            <?
+            if ($od["product_current_state"] != 20) {
+                ?>
                                                     <input type="text" style="width: 100px" class="datepicker form-control input-sm " value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]" placeholder="Date ARC"> 
                                                     <?
                                                 } else {
@@ -1044,22 +1057,22 @@ if ($orderinfo) {
                                                 }
                                                 ?>
                                             </td>                                        
-                                            <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b %y", strtotime($t["date_livraison"])) : ""; ?></td>                                
+                                            <td><?= ( $t["date_livraison"]) ? strftime("%a %d %b%y", strtotime($t["date_livraison"])) : ""; ?></td>                                
                                             <td><?= $t["horaire"] ?></td>
                                             <td><?= $t["comment1"] ?></td>
                                             <td><?= $t["comment2"] ?></td>
                                             <td><?= $t["comment3"] ?></td>
                                             <td>
-                                                <?
-                                                if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
-                                                    ?>
+            <?
+            if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
+                ?>
                                                     <div class="input-group">
                                                         <span class="input-group-addon">
                                                             <select name="qte[<?= $od["id_order_detail"] ?>]">
                                                                 <option></option>
-                                                                <?
-                                                                for ($n = 1; $n < $od["product_quantity"]; $n++) {
-                                                                    ?>
+                <?
+                for ($n = 1; $n < $od["product_quantity"]; $n++) {
+                    ?>
                                                                     <option value="<?= $n ?>"><?= $n ?></option>
                                                                     <?
                                                                 }
@@ -1070,48 +1083,62 @@ if ($orderinfo) {
                                                             <button class="btn btn-default" type="submit" name="split_order">Split!</button>
                                                         </span>
                                                     </div><!-- /input-group -->
-                                                    <?
-                                                }
-                                                ?>
+                <?
+            }
+            ?>
                                                 <?
                                                 if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
                                                     ?>
                                                     <button type="button" name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
-                                                        Retirer du camion
+                                                        Retirer du camion<br>
+                                                    <?= $t["truck_name"] ?>
                                                     </button>
-                                                    <?
-                                                }
-                                                ?>
+                                                        <?
+                                                    }
+                                                    ?>
                                             </td>
 
                                         </tr>
                                         <script>
                                             $("#supplier_<?= $od["id_order_detail"] ?>").chainedTo("#warehouse_<?= $od["id_order_detail"] ?>");
                                         </script>
-                                        <?
-                                    }
-                                    ?>
+            <?
+        }
+        ?>
                                 </table>                            
                                 <div class="col-xs-3 pull-right">
                                     <div class="col-xs-12" >
                                         <p id="idmsg"></p>
                                     </div>
                                     <div class="col-xs-12" >
-                                        <p>
-                                            <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
-                                        </p>
+        <?
+        if ($orderLocked) {
+            ?>
+                                            <p>
+                                                <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
+                                            </p>
+            <?
+        }
+        ?>
                                         <?
                                         if ($isFournisseurOk) {
                                             ?>
                                             <p>
-                                                <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"   class="btn-lg btn-block btn-primary" id="btn_send_supplier">
+                                                <input type="submit" name="order_action_send_supplier" value="Envoi fournisseur"  class="btn-lg btn-block btn-primary" id="btn_send_supplier" data-loading-text="Envoi en cours...">
                                             </p>
-                                            <?
-                                        }
-                                        ?>
+            <?
+        }
+        ?>
                                     </div>
                                 </div>
                             </div>
+
+                            <script>
+                                $('#btn_send_supplier').click(function() {
+                                    var btn = $(this);
+                                    btn.button('loading');
+                                });
+                            </script>
 
                             <div class="tab-pane" id="bdc">
                                 <table>
@@ -1122,21 +1149,21 @@ if ($orderinfo) {
                                         <th>Bdc</th>
 
                                     </tr>
-                                    <?
-                                    if ($orderinfo["history"])
-                                        foreach ($orderinfo["history"] as $odh) {
-                                            if ($odh["supplier_name"]) {
-                                                ?>
+        <?
+        if ($orderinfo["history"])
+            foreach ($orderinfo["history"] as $odh) {
+                if ($odh["supplier_name"]) {
+                    ?>
                                                 <tr>
                                                     <td><?= $odh["prenom"] ?></td>
                                                     <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
                                                     <td><?= $odh["supplier_name"] ?></td>
                                                     <td><a href="ressources/bon_de_commandes/<?= $odh["id_order"] ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a></td>
                                                 </tr>
-                                                <?
-                                            }
-                                        }
-                                    ?>
+                    <?
+                }
+            }
+        ?>
 
                                 </table>
 
@@ -1149,40 +1176,40 @@ if ($orderinfo) {
                                         <th>Objet</th>
                                         <th>Fichier</th>
                                     </tr>
-                                    <?
-                                    foreach ($orderinfo["history"] as $odh) {
-                                        if (empty($odh["supplier_name"])) {
-                                            ?>
+        <?
+        foreach ($orderinfo["history"] as $odh) {
+            if (empty($odh["supplier_name"])) {
+                ?>
                                             <tr>
                                                 <td><?= $odh["prenom"] ?></td>
                                                 <td><?= strftime("%a %d %b %y %T", strtotime($odh["date_add"])) ?></td>
                                                 <td><?= $odh["category"] ?></td>  
                                                 <td>
 
-                                                    <?
-                                                    if ($odh["bdc_filename"]) {
-                                                        if ($odh["category"] == "roadmap")
-                                                            $folder = "roadmap";
-                                                        if ($odh["category"] == "bl")
-                                                            $folder = "bon_de_livraison";
-                                                        ?>
+                <?
+                if ($odh["bdc_filename"]) {
+                    if ($odh["category"] == "roadmap")
+                        $folder = "roadmap";
+                    if ($odh["category"] == "bl")
+                        $folder = "bon_de_livraison";
+                    ?>
                                                         <a href="ressources/<?= $folder ?>/<?= $odh["bdc_filename"] ?>.pdf" target="_blank">Download</a>
                                                         <?
                                                     }
                                                     ?>
                                                 </td>
                                             </tr>
-                                            <?
-                                        }
-                                    }
-                                    ?>
+                                                    <?
+                                                }
+                                            }
+                                            ?>
                                 </table>                            
                             </div>
                             <div class="tab-pane" id="history_mod">
-                                <?
-                                getChangeLog('mv_orders', $oid);
-                                //getChangeLog('av_order_detail', $oid);
-                                ?>
+        <?
+        getChangeLog('mv_orders', $oid);
+        //getChangeLog('av_order_detail', $oid);
+        ?>
                             </div>
                         </div>
                     </form>
@@ -1192,10 +1219,10 @@ if ($orderinfo) {
                         <h2>Bloc note</h2>
                         <div class="col-xs-5 ">
                             <table class="well">
-                                <?
-                                if ($orderinfo["notes"])
-                                    foreach ($orderinfo["notes"] as $k => $on) {
-                                        ?>
+        <?
+        if ($orderinfo["notes"])
+            foreach ($orderinfo["notes"] as $k => $on) {
+                ?>
                                         <tr>
                                             <td><?= strftime("%a %d %b %y %T", strtotime($on["date_add"])) ?></td>
                                             <td><?= $on["prenom"] ?></td>
@@ -1204,9 +1231,9 @@ if ($orderinfo) {
                                             <td colspan="2"><?= $on["message"] ?></td>
                                         </tr>
 
-                                        <?
-                                    }
-                                ?>
+                <?
+            }
+        ?>
                             </table>
                             <textarea name="order_note" cols="20" rows="5" ></textarea>
                             <p>
@@ -1216,23 +1243,23 @@ if ($orderinfo) {
                     </form>
                 </div>
             </div>        
-            <?
-        }
-        ?>
+        <?
+    }
+    ?>
 
 
 
         <div class = "row">
             <div class = "col-xs-3">
-                <?
-                foreach ($orderStates as $orderState) {
-                    ?>
+    <?
+    foreach ($orderStates as $orderState) {
+        ?>
                     <div class="alert-<?= $orderState["id_statut"] ?>" >
-                        <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
+                    <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
                     </div>
-                    <?
-                }
-                ?>
+                        <?
+                    }
+                    ?>
             </div>
         </div>
 
@@ -1284,6 +1311,30 @@ if ($orderinfo) {
             location.reload();
         });
 
+
+
+        $(function($) {
+            $.fn.clearTextLimit = function() {
+                return this.each(function() {
+                    this.onkeydown = this.onkeyup = null;
+                });
+            };
+            $.fn.textLimit = function(limit, callback) {
+                if (typeof callback !== 'function')
+                    var callback = function() {
+                    };
+                return this.each(function() {
+                    this.limit = limit;
+                    this.callback = callback;
+                    this.onkeydown = this.onkeyup = function() {
+                        this.value = this.value.substr(0, this.limit);
+                        this.reached = this.limit - this.value.length;
+                        this.reached = (this.reached == 0) ? true : false;
+                        return this.callback(this.value.length, this.limit, this.reached);
+                    }
+                });
+            };
+        })
 
     </script>
     <?

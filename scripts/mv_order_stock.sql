@@ -1,3 +1,14 @@
+drop table mv_orders;
+drop table mv_orders_nb_arc_recu;
+drop table mv_orders_pivot_arc_recu;
+drop table mv_orders_pivot_stock;
+drop table mv_orders_stock;
+drop table mv_order_detail_stock;
+
+drop view mv_orders_pivot_stock;
+drop view mv_orders_stock;
+drop view mv_order_detail_stock;
+
 CREATE OR REPLACE ALGORITHM = UNDEFINED
 VIEW  `mv_order_detail_stock` AS 
 SELECT d.`id_order`, id_order_detail, id_supplier_warehouse, id_product,

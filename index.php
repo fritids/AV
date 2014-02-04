@@ -52,7 +52,7 @@ $mail->CharSet = 'UTF-8';
 
 // récupère les produits en promo
 
-$r = $db->rawQuery("select * from av_product where is_promo = 1 and id_product in (79, 65, 49, 124)");
+$r = $db->rawQuery("select * from av_product where is_promo = 1 and id_product in (56, 65, 49, 124)");
 foreach ($r as $p) {
     $promoshome[] = getProductInfos($p["id_product"]);
 }
@@ -408,131 +408,72 @@ if (isset($_GET["order-payment"])) {
 
     saveorder();
 
-    // PAYPAL
-    $settings = array(
-        'business' => $paypal["email_account"], //paypal email address
-        'currency' => 'EUR', //paypal currency
-        'cursymbol' => '&euro;', //currency symbol
-        'location' => 'FR', //location code  (ex GB)
-        'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
-        'returntxt' => 'Retour au site', //What is written on the return button in paypal
-        'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
-        'returnipn' => $paypal["returnipn"], //Where to go if the user cancels.
-        'shipping' => 0, //Shipping Cost        
-        'invoice' => $_SESSION["id_order"], // order ref
-        'custom' => ''                           //Custom attribute
-    );
+    if (empty($_SESSION["id_order"])) {
+        $ko_msg = array("txt" => "Une erreur est survenue lors de la finalisation de votre commande, veuillez retourner dans votre caddie et recommencer la procédure");
+        $page = "generic_page";
+    } else {
+        // PAYPAL
+        $settings = array(
+            'business' => $paypal["email_account"], //paypal email address
+            'currency' => 'EUR', //paypal currency
+            'cursymbol' => '&euro;', //currency symbol
+            'location' => 'FR', //location code  (ex GB)
+            'returnurl' => $paypal["returnurl"], //where to go back when the transaction is done.
+            'returntxt' => 'Retour au site', //What is written on the return button in paypal
+            'cancelurl' => $paypal["cancelurl"], //Where to go if the user cancels.
+            'returnipn' => $paypal["returnipn"], //Where to go if the user cancels.
+            'shipping' => 0, //Shipping Cost        
+            'invoice' => $_SESSION["id_order"], // order ref
+            'custom' => ''                           //Custom attribute
+        );
 
 
-    $pp = new paypalcheckout($settings); //Create an instance of the class
-    //$pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
-    $pp->addSimpleItem(array(
-        "name" => "Commande Allovitres#" . $_SESSION["reference"],
-        "quantity" => 1,
-        "prixttc" => $total_paid,
-        "discount" => 0
-    )); //Add all the items to the cart in one go
-    //$cartHTML = $pp->getCartContentAsHtml();
-    $PaypalCheckoutForm = $pp->getCheckoutForm();
+        $pp = new paypalcheckout($settings); //Create an instance of the class
+        //$pp->addMultipleItems($cartItems); //Add all the items to the cart in one go
+        $pp->addSimpleItem(array(
+            "name" => "Commande Allovitres#" . $_SESSION["reference"],
+            "quantity" => 1,
+            "prixttc" => $total_paid,
+            "discount" => 0
+        )); //Add all the items to the cart in one go
+        //$cartHTML = $pp->getCartContentAsHtml();
+        $PaypalCheckoutForm = $pp->getCheckoutForm();
 
-    $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
-    // fin paypal
-    // CMCIC
-    /* $sOptions = "";
-      $sReference = $_SESSION["id_order"];
-      $sMontant = $_SESSION["cart_summary"]["total_amount"] + $_SESSION["cart_summary"]["total_shipping"] - $_SESSION["cart_summary"]["total_discount"];
-      $sDevise = "EUR";
-      $sDate = date("d/m/Y:H:i:s");
-      $sLangue = "FR";
-      $sTexteLibre = "Texte";
-      $sEmail = $_SESSION["user"]["email"];
+        $smarty->assign('PAYPAL_CHECKOUT_FORM', $PaypalCheckoutForm);
 
-      $sNbrEch = "";
-      $sDateEcheance1 = "";
-      $sMontantEcheance1 = "";
-      $sDateEcheance2 = "";
-      $sMontantEcheance2 = "";
-      $sDateEcheance3 = "";
-      $sMontantEcheance3 = "";
-      $sDateEcheance4 = "";
-      $sMontantEcheance4 = "";
-
-      $oTpe = new CMCIC_Tpe($sLangue);
-      $oHmac = new CMCIC_Hmac($oTpe);
-
-      // Data to certify
-      $PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS, $oTpe->sNumero, $sDate, $sMontant, $sDevise, $sReference, $sTexteLibre, $oTpe->sVersion, $oTpe->sLangue, $oTpe->sCodeSociete, $sEmail, $sNbrEch, $sDateEcheance1, $sMontantEcheance1, $sDateEcheance2, $sMontantEcheance2, $sDateEcheance3, $sMontantEcheance3, $sDateEcheance4, $sMontantEcheance4, $sOptions);
-
-      // MAC computation
-      $sMAC = $oHmac->computeHmac($PHP1_FIELDS);
-
-      $CMCICCheckoutForm = '
-      <form action="' . $oTpe->sUrlPaiement . '" method="post" id="PaymentRequest">
-      <p>
-      <input type="hidden" name="version"             id="version"        value="' . $oTpe->sVersion . '" />
-      <input type="hidden" name="TPE"                 id="TPE"            value="' . $oTpe->sNumero . '" />
-      <input type="hidden" name="date"                id="date"           value="' . $sDate . '" />
-      <input type="hidden" name="montant"             id="montant"        value="' . $sMontant . $sDevise . '" />
-      <input type="hidden" name="reference"           id="reference"      value="' . $sReference . '" />
-      <input type="hidden" name="MAC"                 id="MAC"            value="' . $sMAC . '" />
-      <input type="hidden" name="url_retour"          id="url_retour"     value="' . $oTpe->sUrlKO . '" />
-      <input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="' . $oTpe->sUrlOK . '" />
-      <input type="hidden" name="url_retour_err"      id="url_retour_err" value="' . $oTpe->sUrlKO . '" />
-      <input type="hidden" name="lgue"                id="lgue"           value="' . $oTpe->sLangue . '" />
-      <input type="hidden" name="societe"             id="societe"        value="' . $oTpe->sCodeSociete . '" />
-      <input type="hidden" name="texte-libre"         id="texte-libre"    value="' . HtmlEncode($sTexteLibre) . '" />
-      <input type="hidden" name="mail"                id="mail"           value="' . $sEmail . '" />
-      <!-- -->
-      <input type="hidden" name="nbrech"              id="nbrech"         value="" />
-      <input type="hidden" name="dateech1"            id="dateech1"       value="" />
-      <input type="hidden" name="montantech1"         id="montantech1"    value="" />
-      <input type="hidden" name="dateech2"            id="dateech2"       value="" />
-      <input type="hidden" name="montantech2"         id="montantech2"    value="" />
-      <input type="hidden" name="dateech3"            id="dateech3"       value="" />
-      <input type="hidden" name="montantech3"         id="montantech3"    value="" />
-      <input type="hidden" name="dateech4"            id="dateech4"       value="" />
-      <input type="hidden" name="montantech4"         id="montantech4"    value="" />
-
-      <input type="submit" name="bouton"              id="bouton"         class ="pay_cb" value="Payer par carte bancaire" />
-      </p>
-      </form>';
-
-      $smarty->assign('CMCIC_CHECKOUT_FORM', $CMCICCheckoutForm);
-     */
+        //Socgen
+        $parm = "merchant_id=075218256800011";
+        $parm = "$parm merchant_country=fr";
+        $parm = "$parm amount=" . $total_paid * 100;
+        $parm = "$parm transaction_id=" . $_SESSION["id_order"];
+        $parm = "$parm order_id=" . $_SESSION["id_order"];
+        $parm = "$parm currency_code=978";
+        $parm = "$parm pathfile=/trusttelecom.fr/paiement/param/pathfile";
+        $path_bin = "/trusttelecom.fr/paiement/bin/request";
+        $parm = escapeshellcmd($parm);
+        $result = exec("$path_bin $parm");
+        $tableau = explode("!", "$result");
+        $code = $tableau[1];
+        $error = $tableau[2];
+        $message = $tableau[3];
 
 
-    //Socgen
-    $parm = "merchant_id=075218256800011";
-    $parm = "$parm merchant_country=fr";
-    $parm = "$parm amount=" . $total_paid * 100;
-    $parm = "$parm transaction_id=" . $_SESSION["id_order"];
-    $parm = "$parm order_id=" . $_SESSION["id_order"];
-    $parm = "$parm currency_code=978";
-    $parm = "$parm pathfile=/trusttelecom.fr/paiement/param/pathfile";
-    $path_bin = "/trusttelecom.fr/paiement/bin/request";
-    $parm = escapeshellcmd($parm);
-    $result = exec("$path_bin $parm");
-    $tableau = explode("!", "$result");
-    $code = $tableau[1];
-    $error = $tableau[2];
-    $message = $tableau[3];
-
-
-    if (( $code == "" ) && ( $error == "" )) {
-        $ko_msg = array("txt" => "erreur appel request<BR> executable request non trouve $path_bin");
-    }
-    //	Erreur, affiche le message d'erreur
-    else if ($code != 0) {
-        //$ko_msg = array("txt" => "<h2>Erreur appel API de paiement.</h2><br><br><br> message erreur : $error <br>");
-        if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com") {
-            echo $error . "<br>" . $parm;
+        if (( $code == "" ) && ( $error == "" )) {
+            $ko_msg = array("txt" => "erreur appel request<BR> executable request non trouve $path_bin");
         }
-    }
-    //	OK, affiche le formulaire HTML
-    else {
-        # OK, affichage du mode DEBUG si activé
-        //print (" $error <br>");
-        $smarty->assign('SOCGEN_CHECKOUT_FORM', $message);
+        //	Erreur, affiche le message d'erreur
+        else if ($code != 0) {
+            //$ko_msg = array("txt" => "<h2>Erreur appel API de paiement.</h2><br><br><br> message erreur : $error <br>");
+            if ($_SESSION["user"]["email"] == "stephane.alamichel@gmail.com") {
+                echo $error . "<br>" . $parm;
+            }
+        }
+        //	OK, affiche le formulaire HTML
+        else {
+            # OK, affichage du mode DEBUG si activé
+            //print (" $error <br>");
+            $smarty->assign('SOCGEN_CHECKOUT_FORM', $message);
+        }
     }
 }
 
@@ -833,7 +774,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
         $impact_coef = 1;
         $shape_impact_coef = 1;
         $pcustom = array();
-        
+
         $nbItem = $cart->getNbItems() + 1;
         $pqte = $odd["product_quantity"];
 
@@ -855,8 +796,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                     "height" => $odd["product_height"]
                 );
             }
-            
-            if(isset($odd["custom"])) {
+
+            if (isset($odd["custom"])) {
                 foreach ($odd["custom"] as $custom) {
                     foreach ($custom["sub_item"] as $sub_item) {
                         foreach ($sub_item["item_values"] as $k => $item_value) {
@@ -881,7 +822,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $shipping_amount = 0;
                 $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
             }
-            
+
             // TOTO
         } else {
             $surface = 0;
@@ -910,7 +851,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ko_msg = array();
     }
 
-    if ($code == "VICTOIREPAUC") {
+    /*if ($code == "VICTOIREPAUC") {
         $cart->addVoucher(array(
             "code" => "VICTOIREPAUC",
             "title" => "VICTOIREPAUC",

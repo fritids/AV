@@ -139,6 +139,14 @@
     <div class="col-xs-5" style="overflow:scroll; height: 400px">
         <h3>Les nouveautés</h3>
         <ul class="list-unstyled">
+            <li>04 fév 2014</li>
+            <ul>
+                <li>BO - multiples amélioration BO - ticket 55/54/44</li>
+            </ul>
+            <li>03 fév 2014</li>
+            <ul>
+                <li>BO - Devis - ajout des formes</li>
+            </ul>
             <li>20 jan 2014</li>
             <ul>
                 <li>FO - Forme spécifique - Ajout forme rond v2</li>

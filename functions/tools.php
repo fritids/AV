@@ -66,8 +66,11 @@ function getDeliveryZone($postcode) {
 
 function getItemTourneeinfo($odetail) {
     global $db;
-    $r = $db->where("id_order_detail", $odetail)
-            ->get("av_tournee");
+    $r = $db->rawQuery("select a.*, b.name truck_name
+        from av_tournee a , av_truck b
+        where a.id_truck= b.id_truck
+        and a.id_order_detail = ?", array($odetail));
+
     if ($r)
         return($r[0]);
 }
