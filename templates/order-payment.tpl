@@ -76,5 +76,22 @@
 </div>
 
 </div>
+							<!-- Code de tracking RetailMeNot Partenaires -->
+							<script type="text/javascript">
+								var id_m = "ZWdlmmtt"; /* Identifiant de votre boutique sur votre Espace RetailMeNot Partenaires */
+								var mc_ht = "{(($smarty.session.cart_summary.total_amount + $smarty.session.cart_summary.total_shipping - $smarty.session.cart_summary.total_discount)/$config.vat_rate)|round:"2"}"; /* Montant HT de la commande */
+								var no_com = "{$smarty.session.id_order}"; /* Numéro de la commande */
+								var no_cl = ""; /* Numéro du client */
+								var com = ""; /* Commentaire */
+							</script>
 
+							<!-- Tracker RetailMeNot Partenaires -->
+							<div id="innerScript"></div>
+							<script type="text/javascript">
+							(function() {
+								var tc = document.createElement('script'); tc.type = 'text/javascript'; tc.async = true;
+								tc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'partenaires.retailmenot.fr/account/tracker.js';
+								var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(tc, s);
+							})();
+							</script>
 

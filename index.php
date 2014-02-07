@@ -167,7 +167,7 @@ if (isset($_GET["cart"])) {
             $nbItem = $cart->getNbItems() + 1;
 
             if (empty($ko_msg))
-                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef * $shape_impact_coef, $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef , $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
             if (empty($ko_msg) && isset($_POST["options"])) {
@@ -449,6 +449,8 @@ if (isset($_GET["order-payment"])) {
         $parm = "$parm order_id=" . $_SESSION["id_order"];
         $parm = "$parm currency_code=978";
         $parm = "$parm pathfile=/trusttelecom.fr/paiement/param/pathfile";
+		$parm = "$parm data=NO_RESPONSE_PAGE";
+		
         $path_bin = "/trusttelecom.fr/paiement/bin/request";
         $parm = escapeshellcmd($parm);
         $result = exec("$path_bin $parm");

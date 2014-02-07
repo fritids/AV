@@ -59,7 +59,45 @@
         <div class="blocks">
 
             <div class="partenaires">
-                <img src="/img/bohle.png" alt="" style="margin: 0px auto; display: block;">
+                <!--<img src="/img/bohle.png" alt="" style="margin: 0px auto; display: block;">-->
+				<table >
+					<tr>
+						<td style="padding:10px;font-weight:200;">
+						<a href="http://www.allovitres.com/content/16-prise-de-mesure-et-pose-d-un-vitrage-sur-fenetre-pvc">
+							<span style="font-weight:normal;">
+							- PRISE DE MESURES ET POSE D'UNE VITRE SUR UNE FENÊTRE PVC
+							</span>
+						</a>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:10px;">
+							<a href="http://www.allovitres.com/content/19-comment-mesurer-une-vitre">
+								<span style="font-weight:normal;">
+								- PRISE DE MESURE DE VOTRE VITRE
+								</span>
+								</a>
+						</td>			
+					</tr>
+					<tr>
+						<td style="padding:10px;">
+							<a href="http://www.allovitres.com/content/18-comment-poser-une-vitre-simple-vitrage-ou-double-vitrage-sur-fenetre-bois">
+								<span style="font-weight:normal;">
+								- POSE DE VOTRE SIMPLE OU DOUBLE VITRAGE SUR UNE FENÊTRE BOIS
+								</span>
+							</a>
+						</td>			
+					</tr>
+					<tr>
+						<td style="padding:10px;">
+							<a href="http://www.allovitres.com/content/20-foire-aux-questions">
+								<span style="font-weight:normal;">
+								- FOIRE AUX QUESTIONS
+								</span>
+							</a>
+						</td>			
+					</tr>
+				</table>
             </div>
             <div class="videos">
                 <p class="center">Suivez étapes par étapes le montage de vos vitres et miroirs grâce à de <span class="blue">vrais conseils de pros !</span></p>

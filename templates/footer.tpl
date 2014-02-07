@@ -48,7 +48,7 @@
                 <li><a href="/?cms&id=3" class="lien-footer">CGU</a></li>
                 <li><a href="/?cms&id=20" class="lien-footer">FAQ</a></li>
                 <li><a href="/?sitemap" class="lien-footer">Plan du site</a></li>
-				<li><a title="Code promo" href="http://www.1001codepromo.fr" class="lien-footer">Code promo</a></li>
+				<li><a target="_blank" title="Code promo" href="http://www.1001codepromo.fr" class="lien-footer">Code promo</a></li>
             </ul>
             <ul>
                 <li><span class="caret"></span></li>
@@ -99,7 +99,9 @@
                                     s.parentNode.insertBefore(ga, s);
                                 })();
                             </script>
+							
 
+							
                             <!-- Google Tag Manager -->
                             <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-595CL7"
                                               height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
