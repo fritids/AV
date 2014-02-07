@@ -4,8 +4,6 @@ include ("header.php");
 include ("../functions/users.php");
 include ("../functions/tools.php");
 
-
-
 $db = new Mysqlidb($bdd_host, $bdd_user, $bdd_pwd, $bdd_name);
 $stda = '';
 $enda = '';
@@ -17,18 +15,20 @@ if (isset($_POST["enda"]))
 
 
 if ($stda != "" && $enda != '') {
-    $r1 = $db->rawQuery("SELECT date(invoice_date) invoice_date, payment, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
-    FROM `av_orders` 
-    where ifnull(current_state,0) > 0 
-    and date(invoice_date) between ? and ?
-    and current_state not in (1,6,7,8)
+    $r1 = $db->rawQuery("SELECT date(b.invoice_date) invoice_date, payment, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
+    FROM `av_orders` a, av_order_invoice b
+    where a.id_order = b.id_order 
+    and ifnull(current_state,0) > 0 
+    and date(b.invoice_date) between ? and ?
+    and current_state in (2,3,4,5)
     group by date(invoice_date), payment  ", array($stda, $enda));
 
-    $r2 = $db->rawQuery("SELECT date(invoice_date) invoice_date, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
-    FROM `av_orders` 
-    where ifnull(current_state,0) > 0 
-    and date(invoice_date) between ? and ?
-    and current_state not in (1,6,7,8)
+    $r2 = $db->rawQuery("SELECT date(b.invoice_date) invoice_date, count(1) nb_orders, sum((total_paid-25)/(1+vat_rate/100)) total_produit_ht, sum(total_paid)  total_paid
+    FROM `av_orders` a, av_order_invoice b
+    where a.id_order = b.id_order 
+    and ifnull(current_state,0) > 0 
+    and date(b.invoice_date) between ? and ?
+    and current_state in (2,3,4,5)
     group by date(invoice_date) ", array($stda, $enda));
 }
 ?>
@@ -40,28 +40,47 @@ if ($stda != "" && $enda != '') {
     <div class="row">
         <div class="col-xs-6">
             <div class="panel panel-default">
-                <div class="panel-heading">Statistiques</div>
+                <div class="panel-heading">Statistiques des ventes </div>
                 <div class="panel-body">
-                    <form action="?stats" method="post">
-                        Début : <input type="text" class="datepicker" value="<?= $stda ?>" name="stda"> 
-                        Fin : <input type="text" class="datepicker" value="<?= $enda ?>" name="enda"> 
-                        <input type="submit">
+                    <form action="?stats" method="post" class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                Début : <input type="text" class="datepicker" value="<?= $stda ?>" name="stda"> 
+                            </div>                       
+                            <div class="col-xs-6">
+                                Fin : <input type="text" class="datepicker" value="<?= $enda ?>" name="enda"> 
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <input type="submit" class="btn btn-block btn-primary">
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-xs-6">
             <div class="panel panel-default">
-                <div class="panel-heading">Reporting</div>
+                <div class="panel-heading">Reporting comptable</div>
                 <div class="panel-body">                
-                    <form action="av_download_pdf.php" method="post"  target="blank">
-                        <div>
-                            <input type="radio"  name="extract" value="1"> Excel
-                            <input type="radio"  name="extract" value="2"> PDF
+                    <form action="av_download_pdf.php" method="post"  target="blank" class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                Début : <input type="text" class="datepicker" value="" name="start_date"> 
+                            </div> 
+                            <div class="col-xs-6">
+                                Fin : <input type="text" class="datepicker" value="" name="end_date"> 
+                            </div>
                         </div>
-                        Début : <input type="text" class="datepicker" value="" name="start_date"> 
-                        Fin : <input type="text" class="datepicker" value="" name="end_date"> 
-                        <input type="submit">
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <input type="submit" name="reporting" value="Ventes" class="btn btn-block btn-primary">                                
+                            </div>
+                            <div  class="col-xs-6">
+                                <input type="submit" name="reporting" value="Remboursement" disabled="disabled" class="btn btn-block btn-primary">                                
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -80,10 +99,10 @@ if ($stda != "" && $enda != '') {
             <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th>Date</th>
-                    <th>Mode de paiement</th>
-                    <th>Nb commandes</th>
-                    <th>Montant produit HT (hors fdp)</th>
-                    <th>Montant TTC</th>
+                    <th>Paiement</th>
+                    <th>Nb comm.</th>
+                    <th>Mnt produit HT (hors fdp)</th>
+                    <th>Mnt TTC</th>
                 </tr>
                 <?
                 foreach ($r1 as $row) {
@@ -126,7 +145,7 @@ if ($stda != "" && $enda != '') {
             <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th>Date</th>
-                    <th>Nb commandes</th>
+                    <th>Nb comm.</th>
                     <th>Montant produit HT (hors fdp)</th>
                     <th>Montant TTC</th>
                 </tr>

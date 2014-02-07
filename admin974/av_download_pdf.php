@@ -80,47 +80,51 @@ if (isset($_GET["order"]) && isset($_POST["id_order"])) {
     $pdf->Output($filename, 'D');
     //echo $annexe_body;
 }
-if ($_POST["extract"] == 2 && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
-    $start_date = $_POST["start_date"];
-    $end_date = $_POST["end_date"];
 
-    $r = $db->rawQuery("select id_order from av_orders where ifnull(current_state,0) != 0 and date(invoice_date) between ? and ?", array($start_date, $end_date));
+/* if ($_POST["extract"] == 2 && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+  $start_date = $_POST["start_date"];
+  $end_date = $_POST["end_date"];
 
-    if ($r) {
-        foreach ($r as $order) {
-            $orderinfo = getOrderInfos($order["id_order"]);
+  $r = $db->rawQuery("select id_order from av_orders where ifnull(current_state,0) != 0 and date(invoice_date) between ? and ?", array($start_date, $end_date));
 
-            $smarty->assign("orderinfo", $orderinfo);
-            $content_body = $smarty->fetch('front_order.tpl');
+  if ($r) {
+  foreach ($r as $order) {
+  $orderinfo = getOrderInfos($order["id_order"]);
 
-            $pdf->AddPage('P', 'A4');
-            $pdf->writeHTML($content_body, true, false, true, false, '');
-        }
-        $pdf->lastPage();
-        $filename = "AV_FA_" . $start_date . "_" . $end_date . "_" . $now . ".pdf";
-        $pdf->Output($filename, 'D');
-    } else {
-        echo "pas de résultat.";
-    }
-}
+  $smarty->assign("orderinfo", $orderinfo);
+  $content_body = $smarty->fetch('front_order.tpl');
 
-if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
+  $pdf->AddPage('P', 'A4');
+  $pdf->writeHTML($content_body, true, false, true, false, '');
+  }
+  $pdf->lastPage();
+  $filename = "AV_FA_" . $start_date . "_" . $end_date . "_" . $now . ".pdf";
+  $pdf->Output($filename, 'D');
+  } else {
+  echo "pas de résultat.";
+  }
+  } */
+
+if ($_POST["reporting"] == "Ventes" && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
 
     $filename = "tmp/av_orders_" . $_POST["start_date"] . "-" . $_POST["end_date"] . ".xls";
 
-    $stmt = $db2->prepare("SELECT date(d.invoice_date) date_commande, LPAD(reference, 9, '0') ref_commande,LPAD(id_order_invoice, 9, '0') ref_facture, concat(lastname, ' ', firstname) client, 
-                        round(25/(1+vat_rate/100),2) frais_de_port_HT,                        
-                        round((total_paid)/(1+vat_rate/100), 2) Total_HT,
-                        round(total_paid - (total_paid/(1+vat_rate/100)), 2) montant_tva,                        
-                        total_paid Total_TTC,                        
+    $stmt = $db2->prepare("SELECT date(d.invoice_date) date_commande, 
+                        LPAD(reference, 9, '0') ref_commande,
+                        LPAD(id_order_invoice, 9, '0') ref_facture, 
+                        concat(a.id_order, '-', lastname, ' ', firstname) client, 
+                        frais_de_port_ht,                        
+                        total_ht,
+                        montant_tva_196,                        
+                        montant_tva_20,                        
+                        total_paid,                        
                         payment,
                         '' compte
-                        FROM  mv_orders a, av_customer b, av_address c, av_order_invoice d
+                        FROM  mv_orders a, av_customer b, av_order_invoice d
                         WHERE a.id_customer = b.id_customer
-                        and a.id_address_invoice = c.id_address
                         and a.id_order = d.id_order
                         and date(d.invoice_date) between ? and ?
-                        and current_state not in (1,6,7,8)
+                        and current_state in (2,3,4,5,7)
                         ");
 
     $stmt->execute(array($_POST["start_date"], $_POST["end_date"]));
@@ -134,31 +138,214 @@ if ($_POST["extract"] == 1 && isset($_POST["start_date"]) && isset($_POST["end_d
 
     $excel->addRow($header);
 
+    $now = date("Y-m-d H:i:s");
+    $batch = "VENTES";
+    $sth = $db->rawQuery("select max(batch_no)+1 batch_no from av_accounting_summary where batch_name = ?", array($batch));
+
+    if (empty($sth[0]["batch_no"]))
+        $sth[0]["batch_no"] = 100;
+
+    $batch_no = $sth[0]["batch_no"];
+
     foreach ($r as $record) {
         $payment = $record["payment"];
-        
-        if($payment == 'Chèque'){
-            $payment_account = "58500000";
-        }elseif ($payment == 'Virement bancaire'){
-            $payment_account = "58200000";
-        }elseif ($payment == 'Credit card'){
-            $payment_account = "58300000";
-        }elseif ($payment == 'Carte credit'){
-            $payment_account = "58300000";
-        }elseif (strtolower ($payment) == 'paypal'){
-            $payment_account = "58400000";
-        }elseif ($payment == 'Manuel'){
-            $payment_account = "58300000";
-        }else{
-            $payment_account = "585000xx";
-        }  
-        
-        $record["compte"] = $payment_account;
-        $excel->addRow($record);
+
+        $entries = $db2->query("select * from av_accounting_entries where batch_name = '" . $batch . "' order by 1");
+
+        foreach ($entries as $entry) {
+            $debit_amount = 0;
+            $credit_amount = 0;
+
+            if (empty($entry["account"])) {
+                if ($payment == 'Chèque') {
+                    $payment_account = "58500000";
+                } elseif ($payment == 'Virement bancaire') {
+                    $payment_account = "58200000";
+                } elseif ($payment == 'Credit card') {
+                    $payment_account = "58300000";
+                } elseif ($payment == 'Carte credit') {
+                    $payment_account = "58300000";
+                } elseif (strtolower($payment) == 'paypal') {
+                    $payment_account = "58400000";
+                } elseif ($payment == 'Manuel') {
+                    $payment_account = "58300000";
+                } else {
+                    $payment_account = "585000xx";
+                }
+            } else {
+                $payment_account = $entry["account"];
+            }
+
+            $amount = $record[$entry["calculation"]];
+
+            if ($amount > 0) {
+                if ($entry["sens"] == 'C')
+                    $credit_amount = $amount;
+
+                if ($entry["sens"] == 'D')
+                    $debit_amount = $amount;
+
+                $date_invoice = strftime("%Y/%m/%d", strtotime($record["date_commande"]));
+                $ref_facture = $record["ref_facture"];
+                $client = $record["client"];
+                $compte = $payment_account;
+                $debit = $debit_amount;
+                $credit = $credit_amount;
+
+                $output = array($date_invoice, $ref_facture, $client, $compte, $debit, $credit);
+
+                $ouputParams = array(
+                    "entry_name" => $entry["name"],
+                    "entry_calculation" => $entry["calculation"],
+                    "date_add" => $now,
+                    "batch_name" => $batch,
+                    "batch_no" => $batch_no,
+                    "output" => implode(",", $output),
+                );
+
+                $db->insert("av_accounting_output", $ouputParams);
+            }
+        }
+        //$excel->addRow($record);
+        $summaryParams = array(
+            "batch_name" => $batch,
+            "batch_no" => $batch_no,
+            "id_user" => $_SESSION["user_id"],
+            "date_add" => $now,
+        );
+        $db->insert("av_accounting_summary", $summaryParams);
     }
+    $data = "";
+    $output = $db2->query("select * from av_accounting_output where batch_name = '" . $batch . "' and  batch_no = " . $batch_no);
+    foreach ($output as $o) {
+        $data .= $o["output"] . "\n";
+    }
+    header("Content-type: application/octet-stream");
+    header("Content-Disposition: attachment; filename=AV_" . $batch . "_" . $batch_no . ".csv");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    print $data;
+}
 
-    $excel->finalize();
+if ($_POST["reporting"] == "Remboursement" && isset($_POST["start_date"]) && isset($_POST["end_date"])) {
 
-    header("Location: " . $filename);
+    $filename = "tmp/av_orders_" . $_POST["start_date"] . "-" . $_POST["end_date"] . ".xls";
+
+    $stmt = $db2->prepare("SELECT date(date_refund) date_commande, 
+                        LPAD(id_order, 9, '0') ref_commande,
+                        LPAD(id_order_refund, 9, '0') ref_facture, 
+                        concat(id_order, '-', lastname, ' ', firstname) client, 
+                        frais_de_port_ht,                        
+                        total_ht,
+                        montant_tva_196,                        
+                        montant_tva_20,                        
+                        total_refund,                        
+                        payment,
+                        '' compte
+                        FROM  mv_order_refund
+                        WHERE date(date_refund) between ? and ?
+                        ");
+
+    $stmt->execute(array($_POST["start_date"], $_POST["end_date"]));
+
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $excel = new ExportDataExcel('file');
+    $excel->filename = $filename;
+    $excel->initialize();
+    $header = array_keys($r[0]);
+
+    $excel->addRow($header);
+
+    $now = date("Y-m-d H:i:s");
+    $batch = "REMBOURSEMENTS";
+    $sth = $db->rawQuery("select max(batch_no)+1 batch_no from av_accounting_summary where batch_name = ?", array($batch));
+
+    if (empty($sth[0]["batch_no"]))
+        $sth[0]["batch_no"] = 100;
+
+    $batch_no = $sth[0]["batch_no"];
+
+    foreach ($r as $record) {
+        $payment = $record["payment"];
+
+        $entries = $db2->query("select * from av_accounting_entries where batch_name = '" . $batch . "' order by 1");
+
+
+        
+        foreach ($entries as $entry) {
+            $debit_amount = 0;
+            $credit_amount = 0;                   
+                    
+            if (empty($entry["account"])) {
+                if ($payment == 'Chèque') {
+                    $payment_account = "58500000";
+                } elseif ($payment == 'Virement bancaire') {
+                    $payment_account = "58200000";
+                } elseif ($payment == 'Credit card') {
+                    $payment_account = "58300000";
+                } elseif ($payment == 'Carte credit') {
+                    $payment_account = "58300000";
+                } elseif (strtolower($payment) == 'paypal') {
+                    $payment_account = "58400000";
+                } elseif ($payment == 'Manuel') {
+                    $payment_account = "58300000";
+                } else {
+                    $payment_account = "585000xx";
+                }
+            } else {
+                $payment_account = $entry["account"];
+            }
+
+            $amount = $record[$entry["calculation"]];
+
+            if ($amount > 0) {
+                if ($entry["sens"] == 'C')
+                    $credit_amount = $amount;
+
+                if ($entry["sens"] == 'D')
+                    $debit_amount = $amount;
+
+                $date_invoice = strftime("%Y/%m/%d", strtotime($record["date_commande"]));
+                $ref_facture = $record["ref_facture"];
+                $client = $record["client"];
+                $compte = $payment_account;
+                $debit = $debit_amount;
+                $credit = $credit_amount;
+
+                $output = array($date_invoice, $ref_facture, $client, $compte, $debit, $credit);
+
+                $ouputParams = array(
+                    "entry_name" => $entry["name"],
+                    "entry_calculation" => $entry["calculation"],
+                    "date_add" => $now,
+                    "batch_name" => $batch,
+                    "batch_no" => $batch_no,
+                    "output" => implode(",", $output),
+                );
+
+                
+                $db->insert("av_accounting_output", $ouputParams);
+            }
+        }
+        //$excel->addRow($record);
+        $summaryParams = array(
+            "batch_name" => $batch,
+            "batch_no" => $batch_no,
+            "id_user" => $_SESSION["user_id"],
+            "date_add" => $now,
+        );
+        $db->insert("av_accounting_summary", $summaryParams);
+    }
+    $data = "";
+    $output = $db2->query("select * from av_accounting_output where batch_name = '" . $batch . "' and  batch_no = " . $batch_no);
+    foreach ($output as $o) {
+        $data .= $o["output"] . "\n";
+    }
+    header("Content-type: application/octet-stream");
+    header("Content-Disposition: attachment; filename=AV_" . $batch . "_" . $batch_no . ".csv");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    print $data;
 }
 ?>

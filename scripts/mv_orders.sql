@@ -64,7 +64,13 @@ from mv_orders_nb_arc_recu c;
 
 CREATE OR REPLACE ALGORITHM = UNDEFINED
 VIEW  `mv_orders` AS 
-SELECT a.* , c.title state_label, b.ARC_INFO, b.RECU_INFO, b.COMMANDE_INFO, b.LIV_INFO, b.LIV_GLOBAL_INFO
+SELECT a.*, 
+	round((25+alert_sms)/(1+vat_rate/100),2) frais_de_port_ht,  
+	total_paid - (round((25+alert_sms)/(1+vat_rate/100),2)) - (total_paid - round((total_paid/(1+vat_rate/100)),2)) total_ht, 
+	total_paid - round((total_paid/(1+vat_rate/100)),2) montant_tva , 
+	if(vat_rate = 19.6 ,total_paid - round((total_paid/(1+vat_rate/100)),2),0) montant_tva_196 , 
+	if(vat_rate = 20 ,total_paid - round((total_paid/(1+vat_rate/100)),2),0) montant_tva_20 , 
+	c.title state_label, b.ARC_INFO, b.RECU_INFO, b.COMMANDE_INFO, b.LIV_INFO, b.LIV_GLOBAL_INFO
 FROM  `av_orders` a, mv_orders_pivot_arc_recu b, av_order_status c 
 WHERE   a.id_order = b.id_order
 and a.current_state = c.id_statut
