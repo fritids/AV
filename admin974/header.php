@@ -169,7 +169,7 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Les ventes <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="av_orders.php?filter=today">Commandes <span class="badge"><?= $nb[0]["nb_orders"] ?></span></a> </li>
+                                    <li><a href="av_orders.php?filter=all">Commandes <span class="badge"><?= $nb[0]["nb_orders"] ?></span></a> </li>
                                     <li><a href="av_orders_dashboard.php">Tableau de bord</a></li>
                                     <li class="divider"></li>                                    
                                     <li><a href="av_order_stock.php">Commande avec stock</a></li>

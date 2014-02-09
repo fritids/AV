@@ -95,7 +95,7 @@ if ($stda != "" && $enda != '') {
         $total_nb_order = 0;
         ?>
         <div class="col-xs-6">
-            <h2>Aggrégé par date et mode de paiement</h2>
+            <h2>Agrégé par date et mode de paiement</h2>
             <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th>Date</th>
@@ -141,7 +141,7 @@ if ($stda != "" && $enda != '') {
         ?>  
 
         <div class="col-xs-6">
-            <h2>Aggrégé par date</h2>
+            <h2>Agrégé par date</h2>
             <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th>Date</th>

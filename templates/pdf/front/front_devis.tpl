@@ -49,10 +49,11 @@
                                     <td width="14%" bgcolor="#f5f5f5">Dimension</td>
                                     {*<td width="14%" bgcolor="#f5f5f5">Référence</td>*}
                                     <td width="10%" bgcolor="#f5f5f5">Qté</td>
-                                    <td width="10%" bgcolor="#f5f5f5">Prix TTc</td>
+                                    <td width="10%" bgcolor="#f5f5f5">Prix TTC</td>
                                 </tr>
-
+                                {$tot_produit_ttc = 0}
                                 {foreach key=key item=detail from=$devisinfo.details}
+                                    {$tot_produit_ttc = $tot_produit_ttc + $detail.total_price_tax_incl}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}
@@ -99,9 +100,11 @@
                     </tr>
                     <tr>
                         <td>
-                            Total produits TTC: {($devisinfo.total_paid*1.20)|round:"2"} €<br>
+                            Total produits HT: {($tot_produit_ttc/1.2)|number_format:2} €<br>                            
                             Frais de transport: 25€ <br>
-                            Total TTC: {($devisinfo.total_paid*1.20+25)|round:"2"} €<br>
+                            Total TTC: {($devisinfo.total_paid*1.20+25)|round:"2"} € <br>
+                            dont TVA (20.0%) {($devisinfo.total_paid - ($devisinfo.total_paid/1.2))|number_format:2} €
+                            <br>
                         </td>
                     </tr>
                 </table>

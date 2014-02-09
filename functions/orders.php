@@ -179,8 +179,10 @@ function getUserOrdersInvoice($oid) {
     $r = $db->where("id_order", $oid)
             ->get("av_order_invoice");
 
+    $r[0]["ref_invoice"] = str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
+        
     if ($r)
-        return str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
+        return $r[0];
     return null;
 }
 
@@ -292,7 +294,7 @@ function getOrdersCustomItemValues($odid, $iaid, $iaiid) {
 
 function saveOrderPayment($oid, $payment) {
     global $db;
-    //paiement
+//paiement
     $order_payment = array(
         "id_order" => $oid,
         "id_currency" => 1,
@@ -318,7 +320,7 @@ function validateOrder($oid, $orderValidateInfo) {
 
     updQuantity($oid);
 
-    // on retire 1 à nombre coupon utilisable
+// on retire 1 à nombre coupon utilisable
     if (isset($_SESSION["cart_summary"]["discount_code"]) != "") {
         $code = $_SESSION["cart_summary"]["discount_code"];
         $cid = $_SESSION["user"]["id_customer"];
@@ -347,7 +349,7 @@ function getOptionWeight($ipaid) {
 function saveOrder() {
 
     global $db, $cartItems, $config;
-    //$ref = getLastOrderId();
+//$ref = getLastOrderId();
     $alert_sms = 0;
     $is_product_custom = 0;
     $nb_product = 0;
@@ -358,7 +360,7 @@ function saveOrder() {
         $alert_sms = 1;
         $alert_sms_phone = $_SESSION["cart_summary"]["alert_sms_phone"];
     }
-    //global de la commande
+//global de la commande
     $order_summary = array(
         "id_customer" => $_SESSION["user"]["id_customer"],
         "id_address_delivery" => $_SESSION["user"]["delivery"]["id_address"],
@@ -408,7 +410,7 @@ function saveOrder() {
 
         $odid = $db->insert("av_order_detail", $order_detail);
 
-        // on rajoute les options
+// on rajoute les options
         if (isset($item["options"])) {
             $option_unit_weight = 0;
             $option_weight = 0;
@@ -432,7 +434,7 @@ function saveOrder() {
                 $db->insert("av_order_product_attributes", $order_product_attributes);
             }
         }
-        // on rajoute les options personalisé
+// on rajoute les options personalisé
         if (isset($item["custom"])) {
             foreach ($item["custom"] as $k => $main_attribute) {
                 $nb_custom_product += 1;
@@ -460,19 +462,19 @@ function saveOrder() {
                     }
                 }
             }
-            // post update sur les details
+// post update sur les details
             $r = $db->where("id_order_detail", $odid)
                     ->update("av_order_detail", array("is_product_custom" => $is_product_custom));
         }
 
-        // post update sur les details
+// post update sur les details
         $param = array(
             "product_weight" => ($p["weight"] * $item["surface"] + $option_weight)
         );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);
 
-        // post update global
+// post update global
         $param = array(
             "nb_product" => $nb_product - $nb_custom_product,
             "nb_custom_product" => $nb_custom_product
@@ -536,7 +538,7 @@ function splitOrderDetail($odid, $qty_request) {
                 ->update("av_order_detail", $params);
     }
 
-    //les attributs
+//les attributs
     $r = $db->where("id_order_detail", $odid)
             ->get("av_order_product_attributes");
     foreach ($r as $attribut) {
@@ -569,15 +571,18 @@ function updQuantity($oid) {
     }
 }
 
-function updQuantityWarehouse($odid) {
+function updQuantityWarehouse($odid, $sns = 0) {
     global $db;
     $stock = false;
 
     $r = $db->where("id_order_detail", $odid)
-            ->where("is_debit_stock", 0)
+            ->where("is_debit_stock", $sns)
             ->get("av_order_detail");
 
     foreach ($r as $item) {
+
+        if ($sns == 1)
+            $item["product_quantity"] *=-1; // on remet en stock; 
 
         $qte_ordered = $item["product_quantity"];
         $pid = $item["id_product"];
@@ -624,4 +629,59 @@ function updQuantityWarehouse($odid) {
     return($stock);
 }
 
+function refundOrder($oid, $refund_comment = "", $payment = "Carte credit") {
+    global $db;
+
+    $o = $db->where("id_order", $oid)
+            ->get("av_orders");
+
+    $now = date("Y-m-d H:i:s");
+
+    $refundParam = array(
+        "id_order" => $o[0]["id_order"],
+        "date_add" => $now,
+        "date_order" =>  $o[0]["date_add"],
+        "date_refund" =>  $now,
+        "payment" => $payment,
+        "id_customer" => $o[0]["id_customer"],
+        "total_shipping" => 25,
+        "total_refund" => $o[0]["total_paid"],
+        "vat_rate" => $o[0]["vat_rate"],
+        "refund_comment" => $refund_comment
+    );
+
+    $ior = $db->insert("av_order_refund", $refundParam);
+
+    if ($ior) {
+        $od = $db->where("id_order", $oid)
+                ->get("av_order_detail");
+
+        foreach ($od as $detail) {
+            $refundDetail = array(
+                "id_order_refund" => $ior,
+                "id_order_detail" => $detail["id_order_detail"],
+                "id_product" => $detail["id_product"],
+                "id_supplier_warehouse" => $detail["id_supplier_warehouse"],
+                "date_add" => $now,
+                "product_name" => $detail["product_name"],
+                "product_quantity" => $detail["product_quantity"],
+                "product_price" => $detail["product_price"],
+                "product_width" => $detail["product_width"],
+                "product_height" => $detail["product_height"],
+                "product_weight" => $detail["product_weight"],
+                "total_price_tax_incl" => $detail["total_price_tax_incl"],
+                "total_price_tax_excl" => $detail["total_price_tax_excl"],
+                "is_product_custom" => $detail["is_product_custom"],
+                "is_debit_stock" => $detail["is_debit_stock"],
+            );
+
+            updQuantityWarehouse($detail["id_order_detail"], $detail["is_debit_stock"]);
+
+            $db->insert("av_order_refund_detail", $refundDetail);
+        }
+        return $ior;
+    }
+
+    return false;
+}
 ?>

@@ -32,21 +32,23 @@ if (isset($_GET["nb_orders"]) && $_GET["nb_orders"] > 0) {
 }
 if (isset($_SESSION["nb_orders"]))
     $opts['inc'] = $_SESSION["nb_orders"];
+if (isset($_SESSION["nb_orders"]))
+    $opts['inc'] = $_SESSION["nb_orders"];
 
 
-/* Table-level filter capability. If set, it is included in the WHERE clause
-  of any generated SELECT statement in SQL query. This gives you ability to
-  work only with subset of data from table.
+if (isset($_GET["filter"]) && $_GET["filter"] == "all")
+        $_SESSION["filter"] = "";
 
-  $opts['filters'] = "column1 like '%11%' AND column2<17";
-  $opts['filters'] = "section_id = 9";
-  $opts['filters'] = "PMEtable0.sessions_count > 200";
- */
+if (isset($_GET["filter"]) && $_GET["filter"] == "today")
+    $_SESSION["filter"] = "today";
+        
+if (isset($_GET["filter"]) && $_GET["filter"] == "processedtoday")
+    $_SESSION["filter"] = "processedtoday";
 
-if (isset($_GET["filter"]) && $_GET["filter"] == "today") {
+if ($_SESSION["filter"] == "today") {
     $opts['filters'] = "date(PMEtable0.date_add) = date(now())";
 }
-if (isset($_GET["filter"]) && $_GET["filter"] == "processedtoday") {
+if ($_SESSION["filter"] == "processedtoday") {
     $opts['filters'] = "date(PMEtable0.date_upd) = date(now())";
 }
 
@@ -226,9 +228,9 @@ require_once 'phpMyEdit.class.php';
             </div>
         </form> 
 
-        <a href="?" class="btn btn-primary">Toutes</a>
-        <a href="?filter=today" class="btn btn-primary">Les ventes du jour</a>
-        <a href="?filter=processedtoday" class="btn btn-primary">Les traitées du jour</a>
+        <a href="?filter=all" class="btn btn-primary">Toutes</a>
+        <a href="?filter=today&nb_orders=<?= $_SESSION["nb_orders"] ?>" class="btn btn-primary">Les ventes du jour</a>
+        <a href="?filter=processedtoday&nb_orders=<?= $_SESSION["nb_orders"] ?>" class="btn btn-primary">Les traitées du jour</a>
 
     </div>
 </div>
@@ -346,14 +348,14 @@ require_once 'phpMyEdit.class.php';
         }
 
         var msg = ' ' + nombreMots + ' mot(s) | ' + nombreCaractere + ' Caractere(s) restant';
-        
+
         $("." + myname).text(msg);
 
         // On écris le nombre de caractère en rouge si celui si est inférieur à 0 
         // La limite est donc dépasse
         if (nombreCaractere < 0) {
-            $(this).val($(this).val().substr(0, nombreCaractereMax));            
-        } 
+            $(this).val($(this).val().substr(0, nombreCaractereMax));
+        }
 
 
 

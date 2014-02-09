@@ -51,9 +51,13 @@ if (isset($_GET["devis"]) && isset($_POST["id_devis"])) {
     $devisinfo = getDevis($did);
     $smarty->assign("devisinfo", $devisinfo[0]);
     $content_body = $smarty->fetch('front_devis.tpl');
-
     $pdf->AddPage('P', 'A4');
     $pdf->writeHTML($content_body, true, false, true, false, '');
+    if ($devisinfo[0]["nb_product_custom"] > 0) {
+        $annexe_body = $smarty->fetch('front_devis_annexe.tpl');
+        $pdf->AddPage('P', 'A4');
+        $pdf->writeHTML($annexe_body, true, false, true, false, '');
+    }
     $pdf->lastPage();
     $filename = "AV_DE_" . $did . "_" . $now . ".pdf";
     $pdf->Output($filename, 'D');
@@ -272,11 +276,11 @@ if ($_POST["reporting"] == "Remboursement" && isset($_POST["start_date"]) && iss
         $entries = $db2->query("select * from av_accounting_entries where batch_name = '" . $batch . "' order by 1");
 
 
-        
+
         foreach ($entries as $entry) {
             $debit_amount = 0;
-            $credit_amount = 0;                   
-                    
+            $credit_amount = 0;
+
             if (empty($entry["account"])) {
                 if ($payment == 'Chèque') {
                     $payment_account = "58500000";
@@ -324,7 +328,7 @@ if ($_POST["reporting"] == "Remboursement" && isset($_POST["start_date"]) && iss
                     "output" => implode(",", $output),
                 );
 
-                
+
                 $db->insert("av_accounting_output", $ouputParams);
             }
         }

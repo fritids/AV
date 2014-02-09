@@ -167,7 +167,7 @@ if (isset($_GET["cart"])) {
             $nbItem = $cart->getNbItems() + 1;
 
             if (empty($ko_msg))
-                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef , $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef, $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
             if (empty($ko_msg) && isset($_POST["options"])) {
@@ -449,8 +449,8 @@ if (isset($_GET["order-payment"])) {
         $parm = "$parm order_id=" . $_SESSION["id_order"];
         $parm = "$parm currency_code=978";
         $parm = "$parm pathfile=/trusttelecom.fr/paiement/param/pathfile";
-		$parm = "$parm data=NO_RESPONSE_PAGE";
-		
+        $parm = "$parm data=NO_RESPONSE_PAGE";
+
         $path_bin = "/trusttelecom.fr/paiement/bin/request";
         $parm = escapeshellcmd($parm);
         $result = exec("$path_bin $parm");
@@ -853,19 +853,19 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $ko_msg = array();
     }
 
-    /*if ($code == "VICTOIREPAUC") {
-        $cart->addVoucher(array(
-            "code" => "VICTOIREPAUC",
-            "title" => "VICTOIREPAUC",
-            "group" => "category",
-            "value" => 12,
-            "reduction" => 10)
-        );
-        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-        $ko_msg = array();
-    }
+    /* if ($code == "VICTOIREPAUC") {
+      $cart->addVoucher(array(
+      "code" => "VICTOIREPAUC",
+      "title" => "VICTOIREPAUC",
+      "group" => "category",
+      "value" => 12,
+      "reduction" => 10)
+      );
+      $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+      $ko_msg = array();
+      }
 
-    /* if ($code == "NOEL2013DV") {
+      /* if ($code == "NOEL2013DV") {
       $cart->addVoucher(array(
       "code" => "NOEL2013DV",
       "title" => "NOEL2013DV",
@@ -958,6 +958,11 @@ if (isset($_GET["action"]) && $_GET["action"] == "dl_devis") {
 
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($content_body, true, false, true, false, '');
+            if ($devisinfo[0]["nb_product_custom"] > 0) {
+                $annexe_body = $smarty->fetch('front_devis_annexe.tpl');
+                $pdf->AddPage('P', 'A4');
+                $pdf->writeHTML($annexe_body, true, false, true, false, '');
+            }
             $pdf->lastPage();
             $pdf->Output("AV_DE_" . $did . "_" . $now . ".pdf", 'D');
             foreach ($monitoringEmails as $bccer) {

@@ -15,7 +15,8 @@ $did = "";
 if (isset($_GET["create_order"]) && isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
     $payment = $_POST["payment"];
-    $cid = CreateOrder($did, $payment);
+    $discount = $_POST["discount"];
+    $cid = CreateOrder($did, $payment, $discount);
 }
 if (isset($_GET["remove"]) && isset($_POST["id_devis"])) {
     $did = $_POST["id_devis"];
@@ -60,18 +61,18 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
     $(function() {
         $("#accordion")
                 .accordion({
-            header: "> ul > li",
-            heightStyle: "content"
-        })
+                    header: "> ul > li",
+                    heightStyle: "content"
+                })
                 .sortable({
-            axis: "y",
-            handle: "li",
-            stop: function(event, ui) {
-                // IE doesn't register the blur when sorting
-                // so trigger focusout handlers to remove .ui-state-focus
-                ui.item.children("li").triggerHandler("focusout");
-            }
-        });
+                    axis: "y",
+                    handle: "li",
+                    stop: function(event, ui) {
+                        // IE doesn't register the blur when sorting
+                        // so trigger focusout handlers to remove .ui-state-focus
+                        ui.item.children("li").triggerHandler("focusout");
+                    }
+                });
     });
 
 </script>
@@ -218,37 +219,48 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                             </a>
                                         </th>
                                         <td nowrap>
-                                            <div>
-                                                <?
-                                                if ($devis["current_state"] == 1) {
-                                                    ?>
-                                                    <form action="?create_order" method="post">
-                                                        <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
-                                                        <select name="payment" required="required">
+                                            <?
+                                            if ($devis["current_state"] == 1) {
+                                                ?>
+
+                                                <form action="?create_order" method="post" class="form-horizontal">
+                                                    <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                    <div class="col-xs-6">
+                                                        <select name="payment" required="required" class="form-control">
                                                             <option value="Carte credit">Carte crédit</option>
                                                             <option value="chèque">Chèque</option>
                                                             <option value="Virement bancaire">Virement bancaire</option>                                                            
                                                         </select>
-                                                        <button class="btn btn-default" data-toggle="tooltip" title="Créer une commande à partir de ce devis"><span class="glyphicon glyphicon-shopping-cart"></span></button>
-                                                    </form> 
-                                                    <form action="?remove" method="post">
-                                                        <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
-                                                        <button class="btn btn-default" data-toggle="tooltip" title="Annuler le devis"><span class="glyphicon glyphicon-remove"></span></button>
-                                                    </form> 
-                                                    <?
-                                                } else if ($devis["current_state"] == 4) {
-                                                    ?>
-                                                    <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-default" data-toggle="tooltip" title="Aller à la facture"><span class="glyphicon glyphicon-zoom-in"></span></a>
-                                                    <?
-                                                }
-                                                ?>
+                                                    </div>
+                                                    <div class="col-xs-6">
+                                                        <input type="text" name="discount" placeholder="Remise en €" size="5" class="form-control"><br>
+                                                    </div>
+                                                    <br class="clearfix">
+                                                    <input type="submit" value="Valider le devis" class="btn btn-block btn-success">
 
-                                                <form action="av_download_pdf.php?devis" method="post" target="blank">
+                                                </form>
+
+                                                <div class="clearfix"></div>
+                                                <p>
+                                                <form action="?remove" method="post">
                                                     <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
-
-                                                    <button class="btn btn-default" data-toggle="tooltip" title="Télécharger le devis au format PDF"><span class="glyphicon glyphicon-floppy-save"></span></button>
+                                                    <button class="btn btn-warning btn-block" data-toggle="tooltip" title="Annuler le devis"><span class="glyphicon glyphicon-remove"></span> Annuler le devis</button>
                                                 </form> 
-                                            </div>
+                                                </p>
+                                                <?
+                                            } else if ($devis["current_state"] == 4) {
+                                                ?>
+                                                <p>
+                                                    <a href="av_orders_view.php?id_order=<?= $devis["id_order"] ?>" class="btn btn-primary btn-block" data-toggle="tooltip" title="Aller à la facture"><span class="glyphicon glyphicon-zoom-in"></span> Aller à la commande</a>
+                                                </p>
+                                                <?
+                                            }
+                                            ?>
+
+                                            <form action="av_download_pdf.php?devis" method="post" target="blank">
+                                                <input type="hidden" value="<?= $devis["id_devis"] ?>" name="id_devis">
+                                                <button class="btn btn-primary btn-block" data-toggle="tooltip" title="Télécharger le devis au format PDF"><span class="glyphicon glyphicon-floppy-save"></span> Télécharger</button>
+                                            </form> 
                                         </td>
                                     </tr>
                                 </table>
@@ -267,15 +279,14 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                     </tr>
                                     <?
                                     foreach ($devis["details"] as $line) {
-                                        $attribute_price = 0; 
-                                        
+                                        $attribute_price = 0;
                                         ?>
 
                                         <tr id="id0">
                                             <td>
                                                 <?= $line["product_name"] ?>
                                                 <?
-                                                if(isset($line["custom"])) {                                                    
+                                                if (isset($line["custom"])) {
                                                     echo "<br>";
                                                     foreach ($line["custom"] as $custom) {
                                                         echo " - " . $custom["main_item_name"];

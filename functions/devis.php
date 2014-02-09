@@ -33,7 +33,7 @@ function getUserDevis($cid) {
                                 and id_customer = ?", array($cid));
 
     foreach ($r as $k => $devis) {
-        $r[$k]["details"] = getUserDevisDetail($devis["id_devis"]);        
+        $r[$k]["details"] = getUserDevisDetail($devis["id_devis"]);
     }
     return $r;
 }
@@ -53,7 +53,6 @@ function getUserDevisDetail($oid) {
 
     return $r;
 }
-
 
 function getUserDevisCustomMainItem($odid) {
     global $db;
@@ -117,7 +116,7 @@ function getUserDevisProductAttributs($ddid) {
     return $r;
 }
 
-function CreateOrder($did, $payment) {
+function CreateOrder($did, $payment, $discount = 0) {
     global $db, $config;
 
     //Order 
@@ -126,11 +125,14 @@ function CreateOrder($did, $payment) {
         $cid = $r[0]["id_customer"];
         //shipping
         $r[0]["total_paid"] = $r[0]["total_paid"] * $config["vat_rate"] + 25;
+        $r[0]["total_paid"] -= $discount;
+        
         $total_paid = $r[0]["total_paid"];
+
         $nb_product = 0;
 
         $oid = $db->insert("av_orders", $r[0]);
-        
+
         $params = array("invoice_date" => date("Y-m-d H:i:s"),
             "delivery_date" => date("Y-m-d H:i:s"),
             "date_add" => date("Y-m-d H:i:s"),
@@ -139,7 +141,9 @@ function CreateOrder($did, $payment) {
             "order_comment" => @$r[0]["devis_comment"],
             "current_state" => 2,
             "vat_rate" => ($config["vat_rate"] - 1) * 100,
-            "payment" => $payment
+            "payment" => $payment,
+            "total_discount" => $discount,
+            "order_voucher" => "REMISE DEVIS"
         );
         $r = $db->where("id_order", $oid)
                 ->update("av_orders", $params);
@@ -156,7 +160,7 @@ function CreateOrder($did, $payment) {
         );
 
         $db->insert("av_order_payment", $order_payment);
-        
+
         // order detail
         $r = $db->rawQuery("SELECT `id_devis_detail`, `id_product`, ? as id_order, `product_name`, `product_quantity`, `product_price`, `product_width`, `product_height`, `product_weight`, `total_price_tax_incl`, `total_price_tax_excl`  FROM `av_devis_detail` WHERE id_devis = ?", array($oid, $did));
 
@@ -179,8 +183,6 @@ function CreateOrder($did, $payment) {
             foreach ($l as $item) {
                 $db->insert("av_order_product_custom", $item);
             }
-            
-            
         }
 
 
