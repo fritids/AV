@@ -1,3 +1,7 @@
+delete from av_order_refund;
+delete from av_order_refund_detail;
+
+ALTER TABLE  `av_order_refund_detail` AUTO_INCREMENT =1;
 
 CREATE TABLE IF NOT EXISTS `av_order_refund` (
   `id_order_refund` int(10) unsigned NOT NULL AUTO_INCREMENT,

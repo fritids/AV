@@ -629,7 +629,7 @@ function updQuantityWarehouse($odid, $sns = 0) {
     return($stock);
 }
 
-function refundOrder($oid, $refund_comment = "", $payment = "Carte credit") {
+function refundOrder($oid, $payment = "Carte credit", $refund_comment = "") {
     global $db;
 
     $o = $db->where("id_order", $oid)

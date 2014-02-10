@@ -78,7 +78,7 @@ if ($stda != "" && $enda != '') {
                                 <input type="submit" name="reporting" value="Ventes" class="btn btn-block btn-primary">                                
                             </div>
                             <div  class="col-xs-6">
-                                <input type="submit" name="reporting" value="Remboursement" disabled="disabled" class="btn btn-block btn-primary">                                
+                                <input type="submit" name="reporting" value="Remboursement" class="btn btn-block btn-primary">                                
                             </div>
                         </div>
                     </form>

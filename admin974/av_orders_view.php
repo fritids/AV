@@ -12,8 +12,6 @@ require('../classes/tcpdf.php');
 require "../classes/php-export-data.class.php";
 require('../classes/sms.inc.php');
 
-
-
 define("PREPARATION_EN_COURS", 3);
 define("PAIEMENT_ACCEPTE", 2);
 define("REMBOURSE", 7);
@@ -423,7 +421,7 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
         createInvoice($oid);
     }
     if ($new_state == REMBOURSE) {
-        refundOrder($oid);
+        refundOrder($oid, $orderinfo["payment"]);
     }
 
     addLog(array("tabs" => "mv_orders",
@@ -821,6 +819,10 @@ if ($orderinfo) {
                             <td><?= $orderinfo["reference"] ?></td>
                         </tr>                        
                         <tr>
+                            <td>Facture</td>
+                            <td><?= $orderinfo["invoice"]["ref_invoice"] ?></td>
+                        </tr>
+                        <tr>
                             <td>Création</td>
                             <td><?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?></td>
                         </tr>
@@ -908,16 +910,6 @@ if ($orderinfo) {
                             }
                             ?>
                         </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-3">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Commentaire interne livraison <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                    <div class="panel-body">
-                        <?= $orderinfo["delivery_comment"] ?>
                     </div>
                 </div>
             </div>
@@ -1117,7 +1109,8 @@ if ($orderinfo) {
 
                                         </tr>
                                         <script>
-                                                        $("#supplier_<?= $od["id_order_detail"] ?>").chainedTo("#warehouse_<?= $od["id_order_detail"] ?>");</script>
+                                            $("#supplier_<?= $od["id_order_detail"] ?>").chainedTo("#warehouse_<?= $od["id_order_detail"] ?>");
+                                        </script>
                                         <?
                                     }
                                     ?>
@@ -1153,7 +1146,8 @@ if ($orderinfo) {
                                         $('#btn_send_supplier').click(function() {
                                 var btn = $(this);
                                         btn.button('loading');
-                                });</script>
+                                });
+                            </script>
 
                             <div class="tab-pane" id="bdc">
                                 <table>
@@ -1293,11 +1287,6 @@ if ($orderinfo) {
         $(".product_supplier_comment").show("slow");
         }
         })
-                $(".current_state").change(function() {
-        if ($(this).val() === 7) {
-        alert("te");
-        }
-        }
 
         $(".supplier").change(function() {
         $("#btn_send_supplier").attr("disabled", "disabled");

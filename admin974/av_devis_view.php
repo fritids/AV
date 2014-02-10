@@ -228,7 +228,7 @@ if ((isset($_POST["id_customer"]) && $_POST["id_customer"] != "") || !empty($cid
                                                     <div class="col-xs-6">
                                                         <select name="payment" required="required" class="form-control">
                                                             <option value="Carte credit">Carte crédit</option>
-                                                            <option value="chèque">Chèque</option>
+                                                            <option value="Chèque">Chèque</option>
                                                             <option value="Virement bancaire">Virement bancaire</option>                                                            
                                                         </select>
                                                     </div>
