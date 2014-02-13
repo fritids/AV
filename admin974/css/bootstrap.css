@@ -5519,7 +5519,9 @@ a.list-group-item:focus {
 }
 
 .panel-body {
-  padding: 15px;
+  padding: 5px;
+  height: 130px;
+  overflow-y: auto;
 }
 
 .panel-body:before,

@@ -1,6 +1,8 @@
 delete from av_order_refund;
 delete from av_order_refund_detail;
 
+INSERT INTO  `av_order_status` (`id_statut` ,`id_level` ,`title`) VALUES (NULL ,  '1',  'Remboursé');
+
 ALTER TABLE  `av_order_refund_detail` AUTO_INCREMENT =1;
 
 CREATE TABLE IF NOT EXISTS `av_order_refund` (

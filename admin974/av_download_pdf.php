@@ -60,6 +60,11 @@ if (isset($_GET["devis"]) && isset($_POST["id_devis"])) {
     }
     $pdf->lastPage();
     $filename = "AV_DE_" . $did . "_" . $now . ".pdf";
+
+    /*
+      if ($_SESSION["email"] == "stephane.alamichel@gmail.com")
+      echo $content_body;
+     */
     $pdf->Output($filename, 'D');
 }
 if (isset($_GET["order"]) && isset($_POST["id_order"])) {
@@ -196,7 +201,7 @@ if ($_POST["reporting"] == "Ventes" && isset($_POST["start_date"]) && isset($_PO
                 $debit = $debit_amount;
                 $credit = $credit_amount;
 
-                $output = array($date_invoice, $ref_facture, $client, $compte, $debit, $credit);
+                $output = array('VT', substr($date_invoice, 0, 4), substr($date_invoice, 5, 2), substr($date_invoice, -2), $ref_facture, $client, $compte, $debit, $credit);
 
                 $ouputParams = array(
                     "entry_name" => $entry["name"],
@@ -310,14 +315,14 @@ if ($_POST["reporting"] == "Remboursement" && isset($_POST["start_date"]) && iss
                 if ($entry["sens"] == 'D')
                     $debit_amount = $amount;
 
-                $date_invoice = strftime("%Y/%m/%d", strtotime($record["date_commande"]));
+                $date_commande = strftime("%Y/%m/%d", strtotime($record["date_commande"]));
                 $ref_facture = $record["ref_facture"];
                 $client = $record["client"];
                 $compte = $payment_account;
                 $debit = $debit_amount;
                 $credit = $credit_amount;
 
-                $output = array($date_invoice, $ref_facture, $client, $compte, $debit, $credit);
+                $output = array('VR', substr($date_commande, 0, 4), substr($date_commande, 5, 2), substr($date_commande, -2), $ref_facture, $client, $compte, $debit, $credit);
 
                 $ouputParams = array(
                     "entry_name" => $entry["name"],

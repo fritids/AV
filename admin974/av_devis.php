@@ -1253,7 +1253,7 @@ if (isset($_POST["devis_save"])) {
                             }
                             ?>
                         </select><br>
-                        Préfixe : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" ><br>
+                        Préfixe : <input type="text" name="product_custom_name" class="product_custom_name" maxlength="10" ><br>                        
                         <img src="" width="95" class="custom_img" style="float: right;"/>
                         <span id="forme" class="forme"></span>
                     </td>
@@ -1313,7 +1313,7 @@ if (isset($_POST["devis_save"])) {
                     <tr id="template_exo">
                         <td><input type="text" name="exo_product_name[]" class="product_name col-xs-12"></td>
                         <td><input type="text" name="exo_product_unit_price[]" class="unit_price" size="5" /> €</td>
-                        <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" required=""/> Kg</td>
+                        <td><input type="text" name="exo_product_unit_weight[]" class="unit_weight" size="5" required="required"/> Kg</td>
                         <td><input type="text" name="exo_product_quantity[]" class="product_quantity" size="2" /></td>                    
                         <td><span class="poids"></span> Kg</td>  
                         <td>
@@ -1415,7 +1415,8 @@ if (isset($_POST["devis_save"])) {
                         </div>                       
                     </div>
                     <div class="col-xs-7 pull-left">
-                        <textarea name="devis_comment" cols="40"></textarea>
+                        <textarea name="devis_comment" maxlength="255" class="mceNoEditor" rows="8" cols="40"></textarea>
+                        <span id="desc" class="PME_data_order_comment devis_comment">Tapez votre texte</span>
                     </div>
                     <div class=" col-xs-5 pull-right">    
                         <button type="button" id='calculate_total'>Calculer : prix total</button>
@@ -1443,5 +1444,29 @@ if (isset($_POST["devis_save"])) {
             }
         });
         $(".totaldevis").text(totaldevis.toFixed(2));
+    });
+    $('.mceNoEditor').keyup(function() {
+        var texte = $(this).val();
+        var nombreCaractere = texte.length;
+        var nombreCaractereMax = $(this).attr("maxlength");
+        var myname = $(this).attr("name");
+        
+        // On soustrait le nombre limite au nombre de caractère existant
+        var nombreCaractere = nombreCaractereMax - nombreCaractere;
+
+        var nombreMots = jQuery.trim($(this).val()).split(' ').length;
+        if ($(this).val() === '') {
+            nombreMots = 0;
+        }
+
+        var msg = ' ' + nombreMots + ' mot(s) | ' + nombreCaractere + ' Caractere(s) restant';
+
+        $("." + myname).text(msg);
+
+        // On écris le nombre de caractère en rouge si celui si est inférieur à 0 
+        // La limite est donc dépasse
+        if (nombreCaractere < 0) {
+            $(this).val($(this).val().substr(0, nombreCaractereMax));
+        }
     });
 </script>

@@ -12,16 +12,22 @@ require('../classes/tcpdf.php');
 require "../classes/php-export-data.class.php";
 require('../classes/sms.inc.php');
 
-define("PREPARATION_EN_COURS", 3);
+define("ATTENTE_CHEQUE", 1);
 define("PAIEMENT_ACCEPTE", 2);
-define("REMBOURSE", 7);
+define("PREPARATION_EN_COURS", 3);
+define("EN_COURS_LIVRAISON", 4);
 define("LIVREE", 5);
+define("ANNULE", 6);
+define("REMBOURSE", 7);
+define("ERREUR_PAIEMENT", 8);
+define("ATTENTE_VIREMENT", 10);
 
+define("PRODUIT_COMMANDE_FOURNISSEUR", 16);
 define("PRODUIT_CASSE", 21);
 define("PRODUIT_SAV", 22);
-define("PRODUIT_ANNULE_CLIENT", 23);
-define("PRODUIT_REMBOURSE", 7);
-define("PRODUIT_COMMANDE_FOURNISSEUR", 16);
+define("PRODUIT_REMBOURSE", 23);
+define("PRODUIT_ANNULE_CLIENT", 24);
+
 
 //SMS
 
@@ -56,8 +62,8 @@ $updated = array();
 $r = $db->rawQuery("select id_customer from av_orders where id_order = ?", array($oid));
 $orderStates = $db->where("id_level", 0)
         ->get("av_order_status");
-$productStates = $db->where("id_level", 1)
-        ->get("av_order_status");
+$productStates = $db->rawQuery("select * from av_order_status where id_level=1 and id_statut not in (23)");
+
 $cid = $r[0]["id_customer"];
 
 //contact
@@ -103,184 +109,186 @@ if (isset($_POST) && isset($_POST["add_notes"])) {
 }
 
 $orderLocked = false;
+$orderRefund = false;
 
 /* Update des combobox */
-if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
+if (!isset($_POST["order_action_refund"]))
+    if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
 
-    if (isset($_POST["id_supplier"]) && !empty($_POST["id_supplier"]))
-        if (is_array($_POST["id_supplier"])) {
-            foreach ($_POST["id_supplier"] as $id => $supplier) {
-                $r = $db->where("id_order_detail", $id)
-                        ->update("av_order_detail", array("id_supplier" => $supplier));
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $id,
-                    "col" => "id_supplier",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $supplier
-                ));
-            }
-        } else {
-            foreach ($orderinfo["details"] as $od) {
-                $r = $db->where("id_order_detail", $od["id_order_detail"])
-                        ->update("av_order_detail", array("id_supplier" => $_POST["id_supplier"]));
-
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $od["id_order_detail"],
-                    "col" => "id_supplier",
-                    "operation" => "update",
-                    "oldval" => $od["id_supplier"],
-                    "newval" => $_POST["id_supplier"]
-                ));
-            }
-        }
-    if (isset($_POST["id_supplier_warehouse"]) && !empty($_POST["id_supplier_warehouse"]))
-        if (is_array($_POST["id_supplier_warehouse"])) {
-            foreach ($_POST["id_supplier_warehouse"] as $id => $warehouse) {
-                $r = $db->where("id_order_detail", $id)
-                        ->update("av_order_detail", array("id_supplier_warehouse" => $warehouse));
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $id,
-                    "col" => "id_supplier_warehouse",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $warehouse
-                ));
-
-                //degreve du stock
-                if (updQuantityWarehouse($id))
-                    @$updated["text"] .= "Le stock a été mise à jour<br>";
-            }
-        } else {
-            foreach ($orderinfo["details"] as $od) {
-                $r = $db->where("id_order_detail", $od["id_order_detail"])
-                        ->update("av_order_detail", array("id_supplier_warehouse" => $_POST["id_supplier_warehouse"]));
-
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $od["id_order_detail"],
-                    "col" => "id_supplier_warehouse",
-                    "operation" => "update",
-                    "oldval" => $od["id_supplier_warehouse"],
-                    "newval" => $_POST["id_supplier_warehouse"]
-                ));
-            }
-        }
-    if (isset($_POST["supplier_date_delivery"]) && !empty($_POST["supplier_date_delivery"]))
-        if (is_array($_POST["supplier_date_delivery"])) {
-            foreach ($_POST["supplier_date_delivery"] as $id => $date_delivery) {
-                if (!empty($date_delivery))
+        if (isset($_POST["id_supplier"]) && !empty($_POST["id_supplier"]))
+            if (is_array($_POST["id_supplier"])) {
+                foreach ($_POST["id_supplier"] as $id => $supplier) {
                     $r = $db->where("id_order_detail", $id)
-                            ->update("av_order_detail", array("supplier_date_delivery" => $date_delivery));
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $id,
-                    "col" => "supplier_date_delivery",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $date_delivery
-                ));
-            }
-        }else {
-            foreach ($orderinfo["details"] as $od) {
-                $r = $db->where("id_order_detail", $od["id_order_detail"])
-                        ->update("av_order_detail", array("supplier_date_delivery" => $_POST["supplier_date_delivery"]));
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $od["id_order_detail"],
-                    "col" => "supplier_date_delivery",
-                    "operation" => "update",
-                    "oldval" => $od["supplier_date_delivery"],
-                    "newval" => $_POST["supplier_date_delivery"]
-                ));
-            }
-        }
-    if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
-        if (is_array($_POST["product_current_state"])) {
-            foreach ($_POST["product_current_state"] as $id => $state) {
-                $r = $db->where("id_order_detail", $id)
-                        ->update("av_order_detail", array("product_current_state" => $state));
-                //casse ou SAV
-                if ($state == PRODUIT_CASSE || $state == PRODUIT_SAV || $state == PRODUIT_ANNULE_CLIENT) {
-                    $r = $db->where("id_order_detail", $id)
-                            ->delete("av_tournee");
-
-                    $r = $db->where("id_order_detail", $id)
-                            ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
-
-                    $r = $db->where("id_order", $oid)
-                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
-
-                    addLog(array("tabs" => "mv_orders",
-                        "rowkey" => $oid,
-                        "col" => "current_state",
+                            ->update("av_order_detail", array("id_supplier" => $supplier));
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $id,
+                        "col" => "id_supplier",
                         "operation" => "update",
                         "oldval" => '',
-                        "newval" => PREPARATION_EN_COURS
+                        "newval" => $supplier
                     ));
                 }
+            } else {
+                foreach ($orderinfo["details"] as $od) {
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->update("av_order_detail", array("id_supplier" => $_POST["id_supplier"]));
 
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $id,
-                    "col" => "product_current_state",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $state
-                ));
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $od["id_order_detail"],
+                        "col" => "id_supplier",
+                        "operation" => "update",
+                        "oldval" => $od["id_supplier"],
+                        "newval" => $_POST["id_supplier"]
+                    ));
+                }
             }
-        } else {
-            foreach ($orderinfo["details"] as $od) {
-                $r = $db->where("id_order_detail", $od["id_order_detail"])
-                        ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
-                //casse ou SAV
-                if ($_POST["product_current_state"] == PRODUIT_CASSE || $_POST["product_current_state"] == PRODUIT_SAV || $_POST["product_current_state"] == PRODUIT_ANNULE_CLIENT) {
-                    $r = $db->where("id_order_detail", $od["id_order_detail"])
-                            ->delete(("av_tournee"));
-
-                    $r = $db->where("id_order_detail", $od["id_order_detail"])
-                            ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
-
-                    $r = $db->where("id_order", $oid)
-                            ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
-
-                    addLog(array("tabs" => "mv_orders",
-                        "rowkey" => $oid,
-                        "col" => "current_state",
+        if (isset($_POST["id_supplier_warehouse"]) && !empty($_POST["id_supplier_warehouse"]))
+            if (is_array($_POST["id_supplier_warehouse"])) {
+                foreach ($_POST["id_supplier_warehouse"] as $id => $warehouse) {
+                    $r = $db->where("id_order_detail", $id)
+                            ->update("av_order_detail", array("id_supplier_warehouse" => $warehouse));
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $id,
+                        "col" => "id_supplier_warehouse",
                         "operation" => "update",
                         "oldval" => '',
-                        "newval" => PREPARATION_EN_COURS
+                        "newval" => $warehouse
+                    ));
+
+//degreve du stock
+                    if (updQuantityWarehouse($id))
+                        @$updated["text"] .= "Le stock a été mise à jour<br>";
+                }
+            } else {
+                foreach ($orderinfo["details"] as $od) {
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->update("av_order_detail", array("id_supplier_warehouse" => $_POST["id_supplier_warehouse"]));
+
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $od["id_order_detail"],
+                        "col" => "id_supplier_warehouse",
+                        "operation" => "update",
+                        "oldval" => $od["id_supplier_warehouse"],
+                        "newval" => $_POST["id_supplier_warehouse"]
                     ));
                 }
-
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $od["id_order_detail"],
-                    "col" => "supplier_date_delivery",
-                    "operation" => "update",
-                    "oldval" => $od["product_current_state"],
-                    "newval" => $_POST["product_current_state"]
-                ));
             }
-        }
-    if (isset($_POST["product_supplier_comment"]) && !empty($_POST["product_supplier_comment"]))
-        if (is_array($_POST["product_supplier_comment"])) {
-            foreach ($_POST["product_supplier_comment"] as $id => $product_supplier_comment) {
-
-                $r = $db->where("id_order_detail", $id)
-                        ->update("av_order_detail", array("product_supplier_comment" => $product_supplier_comment));
-
-
-                addLog(array("tabs" => "av_order_detail",
-                    "rowkey" => $id,
-                    "col" => "product_supplier_comment",
-                    "operation" => "update",
-                    "oldval" => '',
-                    "newval" => $product_supplier_comment
-                ));
+        if (isset($_POST["supplier_date_delivery"]) && !empty($_POST["supplier_date_delivery"]))
+            if (is_array($_POST["supplier_date_delivery"])) {
+                foreach ($_POST["supplier_date_delivery"] as $id => $date_delivery) {
+                    if (!empty($date_delivery))
+                        $r = $db->where("id_order_detail", $id)
+                                ->update("av_order_detail", array("supplier_date_delivery" => $date_delivery));
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $id,
+                        "col" => "supplier_date_delivery",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => $date_delivery
+                    ));
+                }
+            }else {
+                foreach ($orderinfo["details"] as $od) {
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->update("av_order_detail", array("supplier_date_delivery" => $_POST["supplier_date_delivery"]));
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $od["id_order_detail"],
+                        "col" => "supplier_date_delivery",
+                        "operation" => "update",
+                        "oldval" => $od["supplier_date_delivery"],
+                        "newval" => $_POST["supplier_date_delivery"]
+                    ));
+                }
             }
-        }
+        if (isset($_POST["product_current_state"]) && !empty($_POST["product_current_state"]))
+            if (is_array($_POST["product_current_state"])) {
+                foreach ($_POST["product_current_state"] as $id => $state) {
+                    $r = $db->where("id_order_detail", $id)
+                            ->update("av_order_detail", array("product_current_state" => $state));
+//casse ou SAV
+                    if ($state == PRODUIT_CASSE || $state == PRODUIT_SAV || $state == PRODUIT_ANNULE_CLIENT) {
+                        $r = $db->where("id_order_detail", $id)
+                                ->delete("av_tournee");
 
-    @$updated["text"] .= "Modification a été effectuée.<br>";
+                        $r = $db->where("id_order_detail", $id)
+                                ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
+
+                        $r = $db->where("id_order", $oid)
+                                ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
+
+                        addLog(array("tabs" => "mv_orders",
+                            "rowkey" => $oid,
+                            "col" => "current_state",
+                            "operation" => "update",
+                            "oldval" => '',
+                            "newval" => PREPARATION_EN_COURS
+                        ));
+                    }
+
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $id,
+                        "col" => "product_current_state",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => $state
+                    ));
+                }
+            } else {
+                foreach ($orderinfo["details"] as $od) {
+                    $r = $db->where("id_order_detail", $od["id_order_detail"])
+                            ->update("av_order_detail", array("product_current_state" => $_POST["product_current_state"]));
+//casse ou SAV
+                    if ($_POST["product_current_state"] == PRODUIT_CASSE || $_POST["product_current_state"] == PRODUIT_SAV || $_POST["product_current_state"] == PRODUIT_ANNULE_CLIENT) {
+                        $r = $db->where("id_order_detail", $od["id_order_detail"])
+                                ->delete(("av_tournee"));
+
+                        $r = $db->where("id_order_detail", $od["id_order_detail"])
+                                ->update("av_order_detail", array("supplier_date_delivery" => null/* , "id_warehouse" => null */));
+
+                        $r = $db->where("id_order", $oid)
+                                ->update("av_orders", array("current_state" => PREPARATION_EN_COURS, "date_upd" => date("Y-m-d H:i:s")));
+
+                        addLog(array("tabs" => "mv_orders",
+                            "rowkey" => $oid,
+                            "col" => "current_state",
+                            "operation" => "update",
+                            "oldval" => '',
+                            "newval" => PREPARATION_EN_COURS
+                        ));
+                    }
+
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $od["id_order_detail"],
+                        "col" => "supplier_date_delivery",
+                        "operation" => "update",
+                        "oldval" => $od["product_current_state"],
+                        "newval" => $_POST["product_current_state"]
+                    ));
+                }
+            }
+        if (isset($_POST["product_supplier_comment"]) && !empty($_POST["product_supplier_comment"]))
+            if (is_array($_POST["product_supplier_comment"])) {
+                foreach ($_POST["product_supplier_comment"] as $id => $product_supplier_comment) {
+
+                    $r = $db->where("id_order_detail", $id)
+                            ->update("av_order_detail", array("product_supplier_comment" => $product_supplier_comment));
+
+
+                    addLog(array("tabs" => "av_order_detail",
+                        "rowkey" => $id,
+                        "col" => "product_supplier_comment",
+                        "operation" => "update",
+                        "oldval" => '',
+                        "newval" => $product_supplier_comment
+                    ));
+                }
+            }
+
+        @$updated["text"] .= "Modification a été effectuée.<br>";
 
 //suite aux update on recharge les infos    
-    $orderinfo = getOrderInfos($oid);
-}
+        $orderinfo = getOrderInfos($oid);
+    }
 
 if ($orderinfo["LIV_GLOBAL_INFO"] == 5) {
     $r = $db->where("id_order", $oid)
@@ -326,7 +334,7 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
             $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, '', PDF_HEADER_STRING);
 
-            //print_r($orderinfo);
+//print_r($orderinfo);
 
             $smarty->assign("supplier", $orderSupplier);
             $smarty->assign("warehouse", getWarehouseInfos($id_supplier_warehouse));
@@ -347,22 +355,22 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
             $path = "./ressources/bon_de_commandes";
             $order_path = $path . "/" . $orderinfo["id_order"];
 
-            //$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
+//$bdc_commande_filename = "BDC_" . $orderSupplier["id_supplier"] . "_" . $orderinfo["id_order"] . "_" . date("dMy") ;
             $bdc_commande_filename = md5(rand());
             @mkdir($order_path);
             $pdf->Output($order_path . "/" . $bdc_commande_filename . ".pdf", 'F');
 
-            //Excel
+//Excel
 
             $fp = fopen($order_path . "/" . $bdc_commande_filename . ".xls", 'w');
             fwrite($fp, iconv("utf-8", "ISO-8859-1", $bdc_pdf_body));
             fclose($fp);
 
-            // fin excel
+// fin excel
 
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".pdf");
             $mail->addAttachment($order_path . "/" . $bdc_commande_filename . ".xls");
-            //$mail->AddStringAttachment(utf8_encode($mail_body), $bdc_commande_filename . ".html");
+//$mail->AddStringAttachment(utf8_encode($mail_body), $bdc_commande_filename . ".html");
             $mail->MsgHTML($mail_body);
 
             if ($mail->Send()) {
@@ -404,9 +412,9 @@ if (isset($_POST) && !empty($_POST["order_action_send_supplier"])) {
         $updated["text"] = "Bon de commande envoyé au(x) founisseur(s) suivant(s): <ul>" . $tmp . "</ul>";
 }
 
+
 //maj status order  
-if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] == PAIEMENT_ACCEPTE)
-) {
+if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($orderinfo["COMMANDE_INFO"] == 5 && $orderinfo["current_state"] == PAIEMENT_ACCEPTE)) {
 
     if (isset($_POST["current_state"]) && !empty($_POST["current_state"]))
         $new_state = $_POST["current_state"];
@@ -419,9 +427,6 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
 
     if ($new_state == PAIEMENT_ACCEPTE) {
         createInvoice($oid);
-    }
-    if ($new_state == REMBOURSE) {
-        refundOrder($oid, $orderinfo["payment"]);
     }
 
     addLog(array("tabs" => "mv_orders",
@@ -482,7 +487,7 @@ if ((isset($_POST["current_state"]) && !empty($_POST["current_state"])) || ($ord
 
                 @$updated["text"] .= "un SMS de notification a été envoyé au " . $orderinfo["alert_sms_phone"] . "<br>";
 
-                //log
+//log
                 $param = array(
                     "id_order" => $orderinfo["id_order"],
                     "id_user" => $_SESSION["user_id"],
@@ -531,14 +536,40 @@ if (isset($_POST["split_order"]) && isset($_POST["qte"])) {
     $orderinfo = getOrderInfos($oid);
     $updated["text"] = "La ligne a été 'splitté'";
 }
+
+if ((isset($new_state) && $new_state == REMBOURSE) || isset($_POST["order_action_refund"])) {
+    $RefundPayment = $orderinfo["payment"];
+    $RefundComment = "";
+    $refundDetails = array();
+    $RefundShipping = 0;
+    $RefundSuppl = 0;
+    if (isset($_POST["RefundPayment"]) && $_POST["RefundPayment"] != "") {
+        $RefundPayment = $_POST["RefundPayment"];
+    }
+    if (isset($_POST["RefundComment"]) && $_POST["RefundComment"] != "") {
+        $RefundComment = $_POST["RefundComment"];
+    }
+    if (isset($_POST["RefundDetails"]) && $_POST["RefundDetails"] != "") {
+        $refundDetails = $_POST["RefundDetails"];
+    }
+    if (isset($_POST["RefundShipping"]) && $_POST["RefundShipping"] != "") {
+        $RefundShipping = $_POST["RefundShipping"];
+    }
+    if (isset($_POST["RefundSuppl"]) && $_POST["RefundSuppl"] != "") {
+        $RefundSuppl = $_POST["RefundSuppl"];
+    }
+
+    refundOrder($oid, $RefundPayment, $RefundComment, $RefundShipping, $RefundSuppl, $refundDetails);
+    $orderinfo = getOrderInfos($oid);
+}
 ?>
 
 
 <?
-if (
-        $orderinfo["current_state"] != 1 && $orderinfo["current_state"] != 5 && $orderinfo["current_state"] != 6 && $orderinfo["current_state"] != 7 && $orderinfo["current_state"] != 8 && $orderinfo["current_state"] != 10 && $orderinfo["current_state"] != 11
-)
+if ($orderinfo["current_state"] != ATTENTE_CHEQUE && $orderinfo["current_state"] != LIVREE && $orderinfo["current_state"] != ANNULE && $orderinfo["current_state"] != REMBOURSE && $orderinfo["current_state"] != ERREUR_PAIEMENT && $orderinfo["current_state"] != ATTENTE_VIREMENT && $orderinfo["current_state"] != 11)
     $orderLocked = true;
+if ($orderinfo["current_state"] != REMBOURSE && $orderinfo["current_state"] != ANNULE )
+    $orderRefund = true;
 
 
 if ($orderinfo) {
@@ -737,35 +768,37 @@ if ($orderinfo) {
                     </form>
                 </div>
             </div>
-
         </div>
 
-        <div class="row">
+        <div class="row infoGeneral">
+
             <div class="col-xs-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">Contact <div class="pull-right">
                             <a href="av_customer_view.php?id_customer=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Consulter la fiche client"><span class="glyphicon glyphicon-user"></span></a>
                             <a href="av_customer.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $customer_info["id_customer"] ?>" data-toggle="tooltip" title="Modifier les infos personnelles"><span class="glyphicon glyphicon-edit"></span></a>
                         </div>
-                    </div>                    
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Nom</td>
-                            <td><?= @$customer_info["firstname"] ?></td>
-                        </tr>
-                        <tr>
-                            <td>Prénom</td>
-                            <td><?= @$customer_info["lastname"] ?></td>
-                        </tr>
-                        <tr>
-                            <td>Email</td>
-                            <td><?= @$customer_info["email"] ?></td>
-                        </tr>
-                        <tr>
-                            <td>Type</td>
-                            <td><?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?></td>
-                        </tr>
-                    </table>
+                    </div>     
+                    <div class="panel-body">
+                        <table class="table table-condensed">
+                            <tr>
+                                <td>Nom</td>
+                                <td><?= @$customer_info["firstname"] ?></td>
+                            </tr>
+                            <tr>
+                                <td>Prénom</td>
+                                <td><?= @$customer_info["lastname"] ?></td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td><?= @$customer_info["email"] ?></td>
+                            </tr>
+                            <tr>
+                                <td>Type</td>
+                                <td><?= (@$customer_info["customer_group"] == 1) ? "PRO" : "Normal"; ?></td>
+                            </tr>
+                        </table>
+                    </div>            
                 </div>            
             </div>
 
@@ -778,12 +811,13 @@ if ($orderinfo) {
                         <?= $orderinfo["address"]["delivery"]["address1"] ?><br>
                         <?= $orderinfo["address"]["delivery"]["address2"] ?><br>
                         <?= $orderinfo["address"]["delivery"]["postcode"] ?> <?= $orderinfo["address"]["delivery"]["city"] ?>
+                        <table class="table table-condensed" style="margin-bottom: 0px">
+                            <tr>
+                                <td class="text-center"><?= $orderinfo["address"]["delivery"]["zone"] ?></td>                            
+                            </tr>
+                        </table>
                     </div> 
-                    <table class="table table-condensed">
-                        <tr>
-                            <td class="text-center"><?= $orderinfo["address"]["delivery"]["zone"] ?></td>                            
-                        </tr>
-                    </table>
+
                 </div>
             </div>
             <div class="col-xs-3">
@@ -809,51 +843,61 @@ if ($orderinfo) {
 
         </div>
 
-        <div class="row">
+        <div class="row infoGeneral">
             <div class="col-xs-3">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Commande <div class="pull-right"><a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Référence</td>
-                            <td><?= $orderinfo["reference"] ?></td>
-                        </tr>                        
-                        <tr>
-                            <td>Facture</td>
-                            <td><?= $orderinfo["invoice"]["ref_invoice"] ?></td>
-                        </tr>
-                        <tr>
-                            <td>Création</td>
-                            <td><?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?></td>
-                        </tr>
-                        <tr>
-                            <td>Suivi SMS</td>
-                            <td><?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?></td>
-                        </tr>
-                        <tr>
-                            <td>Total</td>
-                            <td><?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?></td>
-                        </tr>
-                    </table>
+                    <div class="panel-heading">CO#<?= $orderinfo["id_order"] ?> <div class="pull-right">FA#<?= $orderinfo["invoice"]["ref_invoice"] ?> <a href="av_orders.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $orderinfo["id_order"] ?>"><span class="glyphicon glyphicon-edit"></span></a></div></div>
+                    <div class="panel-body">
+
+                        <table class="table table-condensed">                           
+                            <tr>
+                                <td>Création</td>
+                                <td><?= strftime("%a %d %b %y %T", strtotime($orderinfo["date_add"])) ?></td>
+                            </tr>
+                            <tr>
+                                <td>Suivi SMS</td>
+                                <td><?= ($orderinfo["alert_sms"] == 1) ? "<b>Oui ( " . $orderinfo["alert_sms_phone"] . " )</b>" : "Non" ?></td>
+                            </tr>
+                            <tr>
+                                <td>Total</td>
+                                <td><?= $orderinfo["total_paid"] ?>€ <?= ($orderinfo["total_discount"] > 0) ? "<font color='red'>dont réduction: " . $orderinfo["total_discount"] . "€ " . $orderinfo["order_voucher"] . "</font>" : "" ?></td>
+                            </tr>
+                            <?
+                            if (isset($orderinfo["refund"])) {
+                                foreach ($orderinfo["refund"] as $k => $refund) {
+                                    ?>
+                                    <tr>
+                                        <? /* <td><a href="av_order_refund.php?PME_sys_fl=0&PME_sys_fm=0&PME_sys_sfn[0]=0&PME_sys_operation=PME_op_Change&PME_sys_rec=<?= $refund["id_order_refund"] ?>" target="_blank" data-toggle="tooltip" title="<?= $refund["refund_comment"] ?>">Rmbt#<?= $k + 1 ?></a></td> */ ?>
+                                        <td>Rmbt#<?= $k + 1 ?></td>
+                                        <td><?= $refund["total_refund"] ?>€ dont fdp <?= $refund["total_shipping"] ?><br><?= $refund["payment"] ?> <?= strftime("%a %d %b %y %T", strtotime($refund["date_refund"])) ?></td>
+                                    </tr>
+                                    <?
+                                }
+                            }
+                            ?>
+                        </table>
+                    </div> 
                 </div> 
             </div>
             <div class="col-xs-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">Paiement </div>
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Mode</td>
-                            <td><?= $orderinfo["payment"] ?></td>
-                        </tr>
-                        <tr>
-                            <td>Date paiement:</td>
-                            <td><?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?></td>
-                        </tr>
-                        <tr>
-                            <td>Montant</td>
-                            <td><?= $orderPayment["amount"] ?> €</td>
-                        </tr>
-                    </table>
+                    <div class="panel-body">
+                        <table class="table table-condensed">
+                            <tr>
+                                <td>Mode</td>
+                                <td><?= $orderinfo["payment"] ?></td>
+                            </tr>
+                            <tr>
+                                <td>Date paiement:</td>
+                                <td><?= (!empty($orderPayment["date_add"])) ? strftime("%a %d %b %y %T", strtotime($orderPayment["date_add"])) : "" ?></td>
+                            </tr>
+                            <tr>
+                                <td>Montant</td>
+                                <td><?= $orderPayment["amount"] ?> €</td>
+                            </tr>
+                        </table>
+                    </div> 
                 </div> 
             </div>       
 
@@ -883,7 +927,7 @@ if ($orderinfo) {
                                             ?>
                                 </select>
                             </p>                        
-                            <p>
+                            <p style="display: none">
                                 Fournisseur:
                                 <select name="id_supplier" class="pme-input-0" disabled="disabled">
                                     <option value=""></option>
@@ -914,7 +958,35 @@ if ($orderinfo) {
                 </div>
             </div>
         </div>
+        <?
+        if ($orderRefund) {
+            ?>
+            <div class="row">
+                <div class="col-xs-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Remboursement Spécifique</div>
+                        <div class="panel-body">
+                            <form action="av_orders_view.php" method="post" class="form-horizontal">
+                                <input type="hidden" name="current_state" value="7">
+                                <input type="hidden" name="id_order" value="<?= $oid ?>">
+                                <select name="RefundPayment" class="form-control" required="required" >
+                                    <option value="">Mode de paiement</option>
+                                    <option value="Chèque">Chèque</option>
+                                    <option value="Virement bancaire">Virement bancaire</option>
+                                    <option value="Paypal">Paypal</option>
+                                </select>
+                                <textarea name="RefundComment" class="form-control mceNoEditor" placeholder="Commentaire interne"></textarea>
 
+                                <input type="submit" name="refundTotal" value="Remboursement total" class="btn btn-block btn-danger">
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?
+        }
+        ?>
         <?
         if (!empty($orderinfo["details"])) {
             ?>
@@ -936,9 +1008,10 @@ if ($orderinfo) {
                                     <tr>
                                         <th colspan="5" class="text-center">PRODUIT</th>
                                         <th colspan="2" class="text-center">FOURNISSEUR</th>
-                                        <th colspan="6" class="text-center">LIVRAISON</th>                          
+                                        <th colspan="7" class="text-center">LIVRAISON</th>                          
                                     </tr>
                                     <tr>
+                                        <?/*<th>Rmbt</th>*/?>
                                         <th>Produit</th>
                                         <th>Long x Larg</th>
                                         <th>Qte</th>
@@ -961,6 +1034,18 @@ if ($orderinfo) {
                                         $isFournisseurOk = ($od["id_supplier_warehouse"] != '' ) ? true : false;
                                         ?>
                                         <tr id="id0">
+                                            <?/*<td>
+                                                <?
+                                                if ($od["product_current_state"] != 23) {
+                                                  ?>
+                                                  <input type="checkbox" name="RefundDetails[]" value="<?= $od["id_order_detail"] ?>" class="RefundDetails">
+                                                  <?
+                                                 
+                                                }
+                                                ?>
+                                            </td>
+                                             * 
+                                             */?>
 
                                             <td nowrap> 
                                                 <?= $od["product_name"] ?> <br>
@@ -986,16 +1071,16 @@ if ($orderinfo) {
                                             </td>
                                             <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
                                             <td>
-                                                <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
+            <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
                                             </td>
                                             <td nowrap>
                                                 <?= $od["total_price_tax_incl"] ?> €
                                                 <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?><br>
-                                                <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
+            <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
                                             </td>
                                             <td>
                                                 <?
-                                                if ($od["product_current_state"] != 20) {
+                                                if ($od["product_current_state"] != 20 && ($od["product_current_state"] != 23)) {
                                                     ?>
                                                     <select style="width: 150px"  name="product_current_state[<?= $od["id_order_detail"] ?>]" class="product_current_state form-control input-sm">
                                                         <option value="">--</option>
@@ -1003,7 +1088,7 @@ if ($orderinfo) {
                                                         foreach ($productStates as $pState) {
                                                             ?>
                                                             <option value="<?= $pState["id_statut"] ?>"
-                                                            <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
+                                                                    <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
                                                                     ><?= $pState["title"] ?> </option>
                                                                     <?
                                                                 }
@@ -1020,7 +1105,7 @@ if ($orderinfo) {
                                             </td>
                                             <td>
                                                 <?
-                                                if ($od["product_current_state"] != 20) {
+                                                if ($od["product_current_state"] != 20 && ($od["product_current_state"] != 23)) {
                                                     ?>
                                                     <select style="width: 120px"  name="id_warehouse[<?= $od["id_order_detail"] ?>]" id="warehouse_<?= $od["id_order_detail"] ?>" class="form-control input-sm warehouse">
                                                         <option value="">--</option>
@@ -1028,7 +1113,7 @@ if ($orderinfo) {
                                                         foreach ($warehouses as $warehouse) {
                                                             ?>
                                                             <option value="<?= $warehouse["id_warehouse"] ?>"
-                                                            <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
+                                                                    <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
                                                                     ><?= $warehouse["name"] ?> </option>
                                                                     <?
                                                                 }
@@ -1040,7 +1125,7 @@ if ($orderinfo) {
                                                         foreach ($suppliersWarehouse as $supplier) {
                                                             ?>
                                                             <option class="<?= $supplier["id_warehouse"] ?>" value="<?= $supplier["id_supplier_warehouse"] ?>"
-                                                            <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
+                                                                    <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
                                                                     ><?= $supplier["supplier_name"] ?> </option>
                                                                     <?
                                                                 }
@@ -1057,7 +1142,7 @@ if ($orderinfo) {
                                             </td>
                                             <td>
                                                 <?
-                                                if ($od["product_current_state"] != 20) {
+                                                if ($od["product_current_state"] != 20 && ($od["product_current_state"] != 23)) {
                                                     ?>
                                                     <input type="text" style="width: 100px" class="datepicker form-control input-sm " value="<?= @$od["supplier_date_delivery"] ?>" name="supplier_date_delivery[<?= $od["id_order_detail"] ?>]" placeholder="Date ARC"> 
                                                     <?
@@ -1073,7 +1158,7 @@ if ($orderinfo) {
                                             <td><?= $t["comment3"] ?></td>
                                             <td>
                                                 <?
-                                                if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20)) {
+                                                if ($od["product_quantity"] > 1 && !($od["product_current_state"] == 20 || $od["product_current_state"] == 23)) {
                                                     ?>
                                                     <div class="input-group">
                                                         <span class="input-group-addon">
@@ -1096,11 +1181,11 @@ if ($orderinfo) {
                                                 }
                                                 ?>
                                                 <?
-                                                if ($t["date_livraison"] && !($od["product_current_state"] == 20)) {
+                                                if ($t["date_livraison"] && !($od["product_current_state"] == 20 || $od["product_current_state"] == 23)) {
                                                     ?>
                                                     <button type="button" name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
                                                         Retirer du camion<br>
-                                                        <?= $t["truck_name"] ?>
+                                                    <?= $t["truck_name"] ?>
                                                     </button>
                                                     <?
                                                 }
@@ -1114,7 +1199,27 @@ if ($orderinfo) {
                                         <?
                                     }
                                     ?>
-                                </table>                            
+                                </table>   
+                                <div class="col-xs-3" id="refundPartial" style="display: none">
+                                    <select name="RefundPayment" class="form-control input" >
+                                        <option value="">Mode de paiement</option>
+                                        <option value="Chèque">Chèque</option>
+                                        <option value="Virement bancaire">Virement bancaire</option>
+                                        <option value="Paypal">Paypal</option>
+                                    </select>
+
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" name="RefundShipping" data-toggle="tooltip" title="Imputer les frais suppl. en tant que frais de port?" value="1">   
+                                        </span>    
+                                        <input type="text" name="RefundSuppl" class="form-control" placeholder="Montant supplémentaire" > 
+                                    </div>
+
+                                    <textarea name="RefundComment" class="form-control mceNoEditor input" placeholder="Commentaire interne"></textarea>
+
+                                    <input type="submit" name="order_action_refund" value="Remboursement partiel" class="btn btn-danger btn-block ">
+
+                                </div>
                                 <div class="col-xs-3 pull-right">
                                     <div class="col-xs-12" >
                                         <p id="idmsg"></p>
@@ -1126,6 +1231,7 @@ if ($orderinfo) {
                                             <p>
                                                 <input type="submit" name="order_action_modify" value="Modifier" class="btn-lg btn-warning btn-block">
                                             </p>
+
                                             <?
                                         }
                                         ?>
@@ -1140,15 +1246,8 @@ if ($orderinfo) {
                                         ?>
                                     </div>
                                 </div>
-                            </div>
-
-                            <script>
-                                        $('#btn_send_supplier').click(function() {
-                                var btn = $(this);
-                                        btn.button('loading');
-                                });
-                            </script>
-
+                            </div>                           
+                            <div class="clearfix"></div>
                             <div class="tab-pane" id="bdc">
                                 <table>
                                     <tr>
@@ -1217,7 +1316,7 @@ if ($orderinfo) {
                             <div class="tab-pane" id="history_mod">
                                 <?
                                 getChangeLog('mv_orders', $oid);
-                                //getChangeLog('av_order_detail', $oid);
+//getChangeLog('av_order_detail', $oid);
                                 ?>
                             </div>
                         </div>
@@ -1264,7 +1363,7 @@ if ($orderinfo) {
                 foreach ($orderStates as $orderState) {
                     ?>
                     <div class="alert-<?= $orderState["id_statut"] ?>" >
-                        <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
+                    <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
                     </div>
                     <?
                 }
@@ -1275,47 +1374,66 @@ if ($orderinfo) {
     </div>
 
     <script>
-                $(function() {
-                $(".datepicker").datepicker({
+        $(function() {
+            $(".datepicker").datepicker({
                 changeMonth: true,
-                        changeYear: true,
-                        dateFormat: "yy-mm-dd"
-                });
-                });
-                $(".product_current_state").change(function() {
-        if ($(this).val() === 21 || $(this).val() === 22) {
-        $(".product_supplier_comment").show("slow");
-        }
+                changeYear: true,
+                dateFormat: "yy-mm-dd"
+            });
+        });
+        $(".product_current_state").change(function() {
+            if ($(this).val() === 21 || $(this).val() === 22) {
+                $(".product_supplier_comment").show("slow");
+            }
         })
 
         $(".supplier").change(function() {
-        $("#btn_send_supplier").attr("disabled", "disabled");
-                $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
-                $("#idmsg").addClass("alert alert-info");
+            $("#btn_send_supplier").attr("disabled", "disabled");
+            $("#idmsg").text("Un fournisseur a été modifié,vous devez cliquer sur 'Modifier' pour valider les changements.")
+            $("#idmsg").addClass("alert alert-info");
         })
-                $("button[name='delProduitTruck']").click(function() {
-        var btn = $(this);
-                var p = $(this).val();
-                var action = "del";
-                var module = "ProduitTournee";
-                var func = action + module;
-                $.ajax({
+        $("button[name='delProduitTruck']").click(function() {
+            var btn = $(this);
+            var p = $(this).val();
+            var action = "del";
+            var module = "ProduitTournee";
+            var func = action + module;
+            $.ajax({
                 url: "functions/ajax_trucks.php",
-                        type: "POST",
-                        dataType: "json",
-                        async: false,
-                        data: {
-                        func: func,
-                                id: p,
-                        },
-                        success: function(data) {
-                        console.log(data);
-                                btn.attr("disabled", "disabled");
-                        },
-                });
-                location.reload();
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    func: func,
+                    id: p,
+                },
+                success: function(data) {
+                    console.log(data);
+                    btn.attr("disabled", "disabled");
+                },
+            });
+            location.reload();
         });
 
+        $('#btn_send_supplier').click(function() {
+            var btn = $(this);
+            btn.button('loading');
+        });
+
+        $('.RefundDetails').click(function() {
+            var sThisVal = 0;
+            $('.RefundDetails').each(function() {
+                sThisVal += parseInt((this.checked ? "1" : "0"));
+                if (sThisVal) {
+                    $("#refundPartial").show("slow");
+                } else {
+                    $("#refundPartial").hide("slow");
+                }
+            });
+        });
+        $('#hideinfoGeneral').click(function() {
+            $(".infoGeneral").hide("slow");
+        });
     </script>
     <?
 } else {

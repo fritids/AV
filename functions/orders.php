@@ -72,6 +72,7 @@ function getOrderInfos($oid) {
         $r[$k]["notes"] = getUserOrdersDetailNotes($order["id_order"]);
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
         $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);
+        $r[$k]["refund"] = getUserOrdersRefund($order["id_order"]);
         if ($order["id_address_invoice"])
             $r[$k]["address"]["invoice"] = getUserOrdersAddress($order["id_address_invoice"]);
         if ($order["id_address_delivery"])
@@ -116,6 +117,29 @@ function getUserOrdersCustomer($cid) {
     global $db;
     $r = $db->where("id_customer", $cid)
             ->get("av_customer");
+    return $r[0];
+}
+
+function getUserOrdersRefund($oid) {
+    global $db;
+    $r = $db->where("id_order", $oid)
+            ->get("av_order_refund");
+
+    if ($r) {
+        foreach ($r as $k => $rf) {
+            $r[$k]["refund_detail"] = getUserOrdersRefundDetail($rf["id_order_refund"]);
+        }
+        return $r;
+    } else {
+        return null;
+    }
+}
+
+function getUserOrdersRefundDetail($rid) {
+    global $db;
+    $r = $db->where("id_order_refund", $rid)
+            ->get("av_order_refund_detail");
+
     return $r[0];
 }
 
@@ -180,7 +204,7 @@ function getUserOrdersInvoice($oid) {
             ->get("av_order_invoice");
 
     $r[0]["ref_invoice"] = str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
-        
+
     if ($r)
         return $r[0];
     return null;
@@ -629,23 +653,36 @@ function updQuantityWarehouse($odid, $sns = 0) {
     return($stock);
 }
 
-function refundOrder($oid, $payment = "Carte credit", $refund_comment = "") {
+function refundOrder($oid, $payment = "Carte credit", $refund_comment = "", $is_suppl_shipping = 0, $refund_suppl = 0, $refundDetailList = array()) {
     global $db;
 
     $o = $db->where("id_order", $oid)
             ->get("av_orders");
 
     $now = date("Y-m-d H:i:s");
+    $orig_total_refund = $o[0]["total_paid"];
+    $total_refund = 0;
+    $shipping = 25;
+
+    if (count($refundDetailList) > 0)
+        $shipping = 0;
+
+    if ($is_suppl_shipping) {
+        $shipping = $refund_suppl;
+        $refund_suppl = 0;
+    } else {
+        $orig_total_refund += $refund_suppl;
+    }
 
     $refundParam = array(
         "id_order" => $o[0]["id_order"],
         "date_add" => $now,
-        "date_order" =>  $o[0]["date_add"],
-        "date_refund" =>  $now,
+        "date_order" => $o[0]["date_add"],
+        "date_refund" => $now,
         "payment" => $payment,
         "id_customer" => $o[0]["id_customer"],
-        "total_shipping" => 25,
-        "total_refund" => $o[0]["total_paid"],
+        "total_shipping" => $shipping,
+        "total_refund" => $orig_total_refund,
         "vat_rate" => $o[0]["vat_rate"],
         "refund_comment" => $refund_comment
     );
@@ -653,10 +690,19 @@ function refundOrder($oid, $payment = "Carte credit", $refund_comment = "") {
     $ior = $db->insert("av_order_refund", $refundParam);
 
     if ($ior) {
-        $od = $db->where("id_order", $oid)
-                ->get("av_order_detail");
+        $did_query = "";
+
+        $db->where("id_order", $oid);
+        if (count($refundDetailList) > 0) {
+            $oid_list = implode(",", $refundDetailList);
+            $did_query = " AND id_order_detail in (" . $oid_list . ")";
+        }
+        $query = "select * from av_order_detail where id_order = ? " . $did_query;
+
+        $od = $db->rawQuery($query, array($oid));
 
         foreach ($od as $detail) {
+            $total_refund+= $detail["total_price_tax_incl"];
             $refundDetail = array(
                 "id_order_refund" => $ior,
                 "id_order_detail" => $detail["id_order_detail"],
@@ -677,11 +723,25 @@ function refundOrder($oid, $payment = "Carte credit", $refund_comment = "") {
 
             updQuantityWarehouse($detail["id_order_detail"], $detail["is_debit_stock"]);
 
+            //on retire de la tournee
+            $db->where("id_order_detail", $detail["id_order_detail"])
+                    ->delete("av_tournee");
+
+            $db->where("id_order_detail", $detail["id_order_detail"])
+                    ->update("av_order_detail", array("product_current_state" => 23));
+
             $db->insert("av_order_refund_detail", $refundDetail);
         }
+
+        $total_refund += $shipping + $refund_suppl;
+        if ($total_refund != $orig_total_refund) {
+            $db->where("id_order_refund", $ior)
+                    ->update("av_order_refund", array("total_refund" => $total_refund));
+        }
+
         return $ior;
     }
-
     return false;
 }
+
 ?>

@@ -331,14 +331,11 @@ require_once 'phpMyEdit.class.php';
 
 
     $('.mceNoEditor').keyup(function() {
-
         var texte = $(this).val();
         var nombreCaractere = texte.length;
         var nombreCaractereMax = $(this).attr("maxlength");
         var myname = $(this).attr("name");
-
-
-
+        
         // On soustrait le nombre limite au nombre de caractère existant
         var nombreCaractere = nombreCaractereMax - nombreCaractere;
 
@@ -356,13 +353,7 @@ require_once 'phpMyEdit.class.php';
         if (nombreCaractere < 0) {
             $(this).val($(this).val().substr(0, nombreCaractereMax));
         }
-
-
-
     });
-
-
-
 </script>
 
 
