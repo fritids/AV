@@ -1,0 +1,14 @@
+//Module Prestation
+
+1. Un partenaire peut avoir plusieurs adresses ou zone d'intervention ? les zones sont elles les mêmes que les livraison d'AV
+2. Un contrat de prestation de service peut etre fais avec un ou plusieurs partenaires ? 
+    2.1. une prestation est obligatoirement lié à un produit? j'achete des clous, le site ne proposera pas de pose de vitrage.
+        2.1.1 lister les prestations possibles par produits
+    2.2. Les prix peuvent être différents par couple partenaire/zone
+    2.3. Les contrats de prestation ont une date début et fin
+    2.4. Les prix sont soumis a TVA, la tva est elle différentes par type de prestation ? 
+3. Exemple, lors d'une commande de pose de vitrage, 
+    3.1. comment se passe la prise de contact avec le partenaire de la région(zone) ? décrire le workflow coté BO
+    3.2. une note/evalution/commentaire du partenaire est possible ?
+    3.3. la pose et la livraison des produits est obligatoirement le même jour ? non, pourquoi ?
+2. Proposer les prestations dans le devis ?
