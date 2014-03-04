@@ -132,6 +132,12 @@
                             </script>
                             <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
                             </script>
+							<div id="widget_ozavis" style="position:fixed;bottom:20px; right:20px;z-index:9999;">
+							<script type="text/javascript">
+							var acWGProt = (("https:" == document.location.protocol) ? "https://" : "http://");
+							document.write(unescape("%3Cscript src='" + acWGProt + "www.ozavis.com/avis-clients/widget/jswidget.php?key=3d8ffb0ba426eed3f8e0b98adc43c7cb1366d16f' type='text/javascript'%3E%3C/script%3E"));
+							</script>
+							</div>
                             <noscript>
                             <div style="display:inline;">
                                 <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/964704059/?value=0&amp;guid=ON&amp;script=0"/>

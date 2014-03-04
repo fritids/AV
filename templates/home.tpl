@@ -1,4 +1,12 @@
 <div id="slider">
+<div
+style="width:1000px;margin:auto;"
+>
+
+<div id="countdown-blog"></div>
+<script type="text/javascript" src="/compteur/countdown.js"></script> 
+
+</div>
 </div>
 <div class="largeur">
     <div class="bloc-titre"><h1 style="font-family: Arial;font-size: 14px;display:inline;">ALLOVITRES : Spécialiste de la miroiterie</h1></div>
@@ -20,9 +28,9 @@
                         {($product.price*$config.vat_rate)|round:2} €
 
                     </p>
-                    <p class="liens">
+                    <p class="center">
                         {*<a href="" class="panier indent">Panier</a>*}
-                        <a href="{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html"" class="voir indent">Voir</a>
+                        <a href="{$categorie.link_rewrite}/{$product.id_product}-{$product.link_rewrite}.html" class="voir indent">Voir</a>
                     </p>
                 </div>                
             {/foreach}
@@ -129,11 +137,11 @@
                 <p style="text-align: justify;"><span style="color: #000000;">Vous êtes rétissant à acheter vos<strong> vitres en ligne</strong> ? Nos conseillers miroitiers<strong> Allovitres</strong> sont des profesionnels du verre et de la <strong>vitrerie</strong> et sont disponibles par téléphone ou email pour répondre à toutes vos questions du lundi au vendredi de 9h à 12h et de 14h à 18h. Ils sauront vous aiguiller dans le choix du verre le mieux adapté à vos besoins.</span></p>
                 <p style="text-align: justify;"><span style="color: #000000;">Le verre présente de très nombreuses spécificités comme les traitements <strong>trempé sécurit</strong>, le <strong>feuilleté</strong>, le <strong>laqué</strong>, le <strong>sablé</strong>, le <strong>dépoli à l'acide</strong>, le <strong>décoré</strong>, <strong>l'imprimé</strong>, le teinté, le sans tain, et bien d'autres encore en fonction de vos besoins techniques ou décoratifs. </span></p>
                 <p style="text-align: justify;"><span style="color: #000000;">Les agents techniques de la miroiterie Allovitres vous aident à choisir les spécificités dont vous avez besoin et peuvent vous accompagner dans la prise de dimension ou la pose. Le miroitier <strong>Allovitres peut aussi </strong>vous proposer de mettre en sécurité une vitre cassée, ou de remplacer votre vitre dans les plus brefs délais et ce, dans le cadre de la prise en charge de votre<strong> assurance habitation "bris de verre"</strong>.</span></p>
-                <p style="text-align: justify;"><span style="color: #000000;"><strong>La miroiterie Allovitres.com </strong>est aussi la<strong> </strong>garantie d'un verre de qualité, d'une livraison rapide et pas cher (à partir de 25 € pour une livraison dans toute la France) et la facilité de la<strong> vente en ligne</strong>.</span></p>
-                <p><span style="color: #000000;"><strong>Le miroitier Allovitres</strong> s'engage également à vous livrer votre commande de <strong>vitre, verre ou miroir</strong><span style="font-family: Arial; font-size: 12px; font-style: normal; line-height: normal;"><strong> </strong>dans tous les départements de France <strong>à partir de</strong></span><strong style="font-family: Arial; font-size: 12px; font-style: normal;"> 25€</strong><span style="font-family: Arial; font-size: 12px; font-style: normal; line-height: normal;">.</span></span></p>
-                <p><span style="color: #000000;">En effet, la<strong> miroiterie Allovitres</strong> vous livre votre commande de <strong>verre, miroir, vitrage ou vitre</strong> dans toutes les régions et départements de France <strong>à partir de 25 euros TTC</strong>. Toutes les livraisons de verre s’effectuent en pied d’immeuble.</span></p>
+                <p style="text-align: justify;"><span style="color: #000000;"><strong>La miroiterie Allovitres.com </strong>est aussi la<strong> </strong>garantie d'un verre de qualité, d'une livraison rapide et pas cher (Au tarif unique de 25 € pour une livraison dans toute la France) et la facilité de la<strong> vente en ligne</strong>.</span></p>
+                <p><span style="color: #000000;"><strong>Le miroitier Allovitres</strong> s'engage également à vous livrer votre commande de <strong>vitre, verre ou miroir</strong><strong> </strong>dans tous les départements de France <strong>au tarif unique de 25€</strong>.</span></p>
+                <p><span style="color: #000000;">En effet, la<strong> miroiterie Allovitres</strong> vous livre votre commande de <strong>verre, miroir, vitrage ou vitre</strong> dans toutes les régions et départements de France <strong>au tarif unique de 25 euros TTC</strong>. Toutes les livraisons de verre s’effectuent en pied d’immeuble.</span></p>
                 <p><span style="color: #000000;"><strong>Allovitres </strong>assure<strong> </strong>les<strong> livraisons de verre </strong>aussi bien dans les départements de la région de <strong>Marseille dans les </strong><strong>Bouches du Rhône</strong>, le <strong>Vaucluse</strong> et sur la zone de <strong>Paris</strong> et <strong>région parisienne</strong>, la région <strong>Rhône Alpes</strong> de<strong>Lyon</strong> et ses alentours, mais aussi dans les régions du <strong>Nord</strong>, de la <strong>Normandie</strong>, de la <strong>Bretagne </strong>et de la<strong> Loire Atlantique</strong>.</span></p>
-                <p><span style="color: #000000;"><strong>Allovitres</strong> met tout en œuvre pour vous garantir une livraison de votre <strong>verre</strong> et de vos <strong>vitres</strong> <strong>dans toute la France sous 7 à 15 jours ouvrés</strong> (Délais moyens hors samedi, dimanche et jours fériés en fonction des zones géographiques de livraison).</span></p>
+                <p><span style="color: #000000;"><strong>Allovitres</strong> met tout en œuvre pour vous garantir une livraison de votre <strong>verre</strong> et de vos <strong>vitres</strong> <strong>dans toute la France à partir de 15 jours ouvrés</strong> (Délais moyens hors samedi, dimanche et jours fériés en fonction des zones géographiques de livraison).</span></p>
                 <p style="text-align: justify;"><span style="color: #000000;">La recherche du <strong>verre sur mesur</strong>e dont vous avez besoin est simplifiée. Vous sélectionnez directement le produit que vous voulez acheter, vous y indiquez les dimensions précises qu'il vous faut, les spécificités à appliquer et le façonnage souhaité comme des <strong>bords polis non coupants</strong>, les traitements sécurit pour la solidité et la sécurité en cas de <strong>bris de verre,</strong> et vous obtenez votre<strong> meilleur prix </strong>grâce à notre calculateur en ligne.</span></p>
                 <p style="text-align: justify;"><span style="color: #000000;">Acheter des<strong> vitres double vitrage ou simple vitrage en lign</strong>e chez le vitrier<strong> Allovitres</strong> devient la solution économique pas cher, pratique et confortable pour commander vos vitres et baies vitrées beaucoup <strong>moins cher</strong> qu'ailleurs et en toute sérénité.</span></p></div></div>
 

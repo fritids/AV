@@ -26,6 +26,7 @@
 	<tr>
 		<td align="center" colspan="2">&nbsp;</td>
 	</tr>
+<!--
 	<tr>
 		<td align="center" colspan="2">
 		<p align="left"><font face="Muli">Pour être mis en relation avec le service 
@@ -35,14 +36,14 @@
 	<tr>
 		<td align="center" colspan="2">	&nbsp;</td>
 	</tr>
+-->
 	<tr>
 		<td align="center" colspan="2">	
-		<p align="left"><font face="Muli"><img src="/img/puce_contact_bleu.png">Service commercial : poste 
-		<font color="#539CF1">1</font><br>
+		<p align="left"><font face="Muli"><img src="/img/puce_contact_bleu.png">Service commercial : 0 892 70 11 13<!--	<font color="#539CF1">1</font>--><br>
 		<img src="/img/puce_contact_bleu.png">Service 
-		livraisons : poste <font color="#539CF1">2</font><br>
-		<img src="/img/puce_contact_bleu.png">Service après vente : poste 
-		<font color="#539CF1">3</font></font></td>
+		livraisons : 04 42 91 13 13 <!-- <font color="#539CF1">2</font> --><br>
+		<img src="/img/puce_contact_bleu.png">Service après vente : 04 42 91 13 13 <!-- poste 
+		<font color="#539CF1">3</font>--></font></td>
 	</tr>
 	<tr>
 		<td align="center">&nbsp;</td>

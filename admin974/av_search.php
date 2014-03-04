@@ -16,7 +16,7 @@ $opts['sort_field'] = array('id_search_result');
 
 // Number of records to display on the screen
 // Value of -1 lists all records in a table
-$opts['inc'] = 15;
+$opts['inc'] = 50;
 
 /* Table-level filter capability. If set, it is included in the WHERE clause
   of any generated SELECT statement in SQL query. This gives you ability to

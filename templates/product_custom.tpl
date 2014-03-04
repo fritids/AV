@@ -125,7 +125,8 @@
                     <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
                 </div>   
                 <div class="row clearfix">
-                    <input type="button" value="Calculer" id="calculer" class="submit">						
+				<img src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;cursor : pointer;" />
+                <!-- <input type="button" value="Calculer" id="calculer" class="submit"> -->		
                 </div>	
 
             </div>   	
@@ -335,7 +336,7 @@
                 } else if ($id_sub_item == 5) {
                     $('#height').val(parseInt(A) * 2);
                 } else if ($id_sub_item == 6) {
-                    $('#height').val(parseInt(A) * 2);
+                    $('#height').val(parseInt(B) * 2);
                 } else if ($id_sub_item == 8) {
                     $('#height').val(parseInt(B));
                     $('#width').val(parseInt(B));

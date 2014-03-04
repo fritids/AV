@@ -161,7 +161,7 @@
 												<input name="passwd" id="login_pass" type="password" placeholder="Mon mot de passe" />
                                                 <input type="hidden" name="referer" value="/?my-account" />
 												<a class="oubli" href="" data-target="#LostPwd" data-toggle="modal">Mot de passe oublié ?</a>
-												<button id="login_submit" class="bouton_generique" type="submit" title="Se connecter" style="background-image:url('img/btn_compteclient.png');width:180px;height:20px;border:0;">Se connecter</button>
+												<button id="login_submit" class="bouton_generique" type="submit" title="Se connecter" style="background-image:url('/img/btn_compteclient.png');width:180px;height:20px;border:0;">Se connecter</button>
 												
 											</form>
 										</li>
@@ -189,10 +189,11 @@
                     <div id="header-droit">
                         <div><a href="/index.php?contactez-nous"><img id="img-contactez-nous" src="/img/contactez-nous.png" /><span id="nous-contacter">Nous contacter</span></a></div>
                         <span id="telephone" title="du lundi au vendredi de 9h à 12h et de 14h à 18h.">0 892 70 11 13</span>
-                        <span id="telephone2">(0,34€TT/min)</span>                        
+                        <span id="telephone2">(0,34€TT/min)</span>
+						<span id="telephone3">Du lundi au vendredi<br/>de 9h à 12H et de 14h à 18h</span>						
                     </div>
                     <div id="reseau-sociaux">
-                        <img class="rs-icon" src="/img/RS-twitter.png" />
+                        <a target="_blank" href="https://plus.google.com/b/117282875950258035705/+Allovitres/posts"><img class="rs-icon" src="/img/RS-gplus.png" /></a>
                         <a target="_blank" href="https://www.facebook.com/Allovitres"><img class="rs-icon" src="/img/RS-facebook.png" /></a>
                         <div>
                         </div>
@@ -233,7 +234,7 @@
                             <input type="hidden" name="p" value="">
                             <input type="hidden" name="id" value="" id="search_product">
                             <input type="text" name="search_query" id="recherche_classique" class="recherche_classique" placeholder="Rechercher produits..."/>
-                             <input type="submit" style="background-image:url(img/btn_searchmod.png);width:204px;height:34px;margin:25px 0 0 25px;border:0;" value=""/>
+                             <input type="submit" style="background-image:url(/img/btn_searchmod.png);width:204px;height:34px;margin:25px 0 0 25px;border:0;" value=""/>
                         </form>
                     </span>
                 </div>
@@ -261,7 +262,7 @@
                             </li>
 
                         </ul>
-                        <input type="submit" style="background-image:url(img/btn_searchmod.png);width:204px;height:34px;margin-top:25px;border:0;" value=""/>
+                        <input type="submit" style="background-image:url(/img/btn_searchmod.png);width:204px;height:34px;margin-top:25px;border:0;" value=""/>
                     </form>
                 </div>
 

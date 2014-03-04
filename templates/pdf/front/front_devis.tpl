@@ -100,10 +100,10 @@
                     </tr>
                     <tr>
                         <td>
-                            Total produits HT: {($tot_produit_ttc/1.2)|number_format:2} €<br>                            
+                            Total produits HT: {($tot_produit_ttc)|number_format:2} €<br>                            
                             Frais de transport: 25€ <br>
                             Total TTC: {($devisinfo.total_paid*1.20+25)|round:"2"} € <br>
-                            dont TVA (20.0%) {($devisinfo.total_paid - ($devisinfo.total_paid/1.2))|number_format:2} €
+                            dont TVA (20.0%) {(($devisinfo.total_paid*1.20+25) - ($devisinfo.total_paid+(25/1.2)))|number_format:2} €
                             <br>
                         </td>
                     </tr>

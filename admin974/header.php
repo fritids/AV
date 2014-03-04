@@ -244,6 +244,8 @@ $nb = $db->query("select count(1) nb_orders from av_orders where date(date_add)=
                                     <li class="divider"></li>
                                     <li><a href="av_warehouse.php">Entrepôts</a></li>    
                                     <li><a href="av_zone.php">Entrepôts par zone</a></li>    
+									<li class="divider"></li>
+                                    <li><a href="av_stats2.php">Stats devis</a></li>
                                 </ul>
                             </li>  
                             <?

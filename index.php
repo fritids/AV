@@ -242,14 +242,24 @@ if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
 
-    if (isset($product["name"])) {
+    if (isset($product["name"]) && $product["active"]==1 ) {
         if (empty($product["meta_title"])) {
             $meta["title"] = $product["name"];
         } else {
             $meta["title"] = $product["meta_title"];
         }
-        $meta["description"] = $product["meta_description"];
-        $meta["keywords"] = $product["meta_keywords"];
+		
+		if (empty($product["meta_description"])) {
+            $meta["description"] = 'Spécialiste de la vente de vitre pas chers, Allovitres vous invite à acheter des '.$product["name"].'. Découvrez toute la gamme de vitrage sur mesure, livraison partout en France!';
+        } else {
+            $meta["description"] = $product["meta_description"];
+        }
+        
+		if (empty($product["meta_keywords"])) {
+            $meta["keywords"] = $product["name"];
+        } else {
+            $meta["keywords"] = $product["meta_keywords"];
+        }
 
         $smarty->assign('product', $product);
         $breadcrumb = array("parent" => "Accueil", "fils" => $product["category"]["name"]);
@@ -848,10 +858,20 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $voucherInfo = getVoucherCode($code, $_SESSION["user"]["id_customer"]);
 
     if (!empty($voucherInfo) && $voucherInfo["code"] == $code) {
-        $cart->addOrderVoucher($voucherInfo);
-        $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-        $ko_msg = array();
+
+// Controle du minimum achat	
+		if($_SESSION["cart_summary"]["total_amount"] >= $voucherInfo["min_amount"]) {
+			$cart->addOrderVoucher($voucherInfo);
+			$ok_msg = array("txt" => "Bon de réduction a été ajouté");
+			$ko_msg = array();		
+		}
+		else {
+			$ko_msg = array("txt" => "Ce bon de réduction n'est utilisable que pour un panier d'au moins 150 euros.");
+		}
+
     }
+	
+	
 
     /* if ($code == "VICTOIREPAUC") {
       $cart->addVoucher(array(
@@ -876,7 +896,8 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
       $ok_msg = array("txt" => "Bon de réduction a été ajouté");
       $ko_msg = array();
       } */
-}
+
+	  }
 
 // mot de passe oublié
 if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {

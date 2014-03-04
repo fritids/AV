@@ -1,7 +1,14 @@
 {include file='../pdf_header.tpl'}
 
 <table>
-    <tr height="100">
+    <tr height="100"
+	{if $warehouse.id_warehouse == 1}
+	bgcolor="#CCFFCC"
+	{elseif $warehouse.id_warehouse == 2}
+	bgcolor="#99CCFF"
+	{else}
+	{/if}
+	>
         <td>MERCI DE REGROUPER <br>LES VERRES PAR ZONES<br>SUR LES CHARIOTS</td>
         <td>{$warehouse.address}</td>
     </tr>

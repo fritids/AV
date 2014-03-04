@@ -15,14 +15,14 @@
                 <div class="cycle-slideshow"
                      data-cycle-timeout=0
                      data-cycle-pager="#custom-pager"
-                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" height=95></a>'
+                     data-cycle-pager-template='<a href="#" ><img src="{{src}}" height="95" ></a>'
                      >
                 {/literal}
-                <img src="/img/p/{$product.cover.filename}" width="325" />  
+                <img src="/img/p/{$product.cover.filename}" width="325" alt="{$product.name}" />  
 
                 {if isset($product.images)}
                     {foreach key=key item=image from=$product.images}
-                        <img src="/img/p/{$image.filename}" width="325" />                    
+                        <img src="/img/p/{$image.filename}" alt="{$product.name}" width="325" />                    
                     {/foreach}
                 {/if}
             </div>
@@ -81,14 +81,15 @@
                         <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
                     </div>   
                     <div class="row clearfix">
-                        <input type="button" value="Calculer" id="calculer" class="submit">	
-
+						<img src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;cursor : pointer;" />
+                       <!-- <input type="image" value="Calculer" id="calculer" src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;" disabled>-->
+						<!--<input type="button" value="Calculer" id="calculer" class="submit">	-->
                     </div>
                     <div class="row clearfix">
                     </div>
                     <div class="row clearfix">
                         {if isset($product.specific_combinations) && count($product.specific_combinations) > 0}
-                            <a href="/?product_custom&id={$product.id_product}" class="submit">Formes spécifiques</a>
+                            <a title="Formes spécifiques" href="/?product_custom&id={$product.id_product}"><img style="margin-left: 100px;" src="/img/btn_forme-specifique.png" alt="Formes spécifiques"/></a>
                         {/if}
                     </div>
                 {/if}
