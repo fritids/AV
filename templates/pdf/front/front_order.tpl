@@ -46,16 +46,19 @@
                         <td colspan="2" width="640">
                             <table width="620" border="0" align="center" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td width="66%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>
-                                    <td width="14%" bgcolor="#f5f5f5">Dimension</td>
+                                    <td width="60%" style="padding:3px;" bgcolor="#f5f5f5">Description</td>
+                                    <td width="12%" bgcolor="#f5f5f5">Dimension</td>
                                     {*<td width="14%" bgcolor="#f5f5f5">Référence</td>*}
-                                    <td width="10%" bgcolor="#f5f5f5">Qté</td>
+                                    <td width="8%" bgcolor="#f5f5f5">Qté</td>
+                                    <td width="10%" bgcolor="#f5f5f5">Prix HT</td>
                                     <td width="10%" bgcolor="#f5f5f5">Prix TTC</td>
                                 </tr>
 
                                 {$tot_produit_ttc = 0}
+                                {$tot_produit_ht = 0}
                                 {foreach key=key item=detail from=$orderinfo.details}
                                     {$tot_produit_ttc = $tot_produit_ttc + $detail.total_price_tax_incl}
+                                    {$tot_produit_ht = $tot_produit_ht + $detail.total_price_tax_excl}
                                     <tr>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">
                                             {$detail.product_name}<br>                                            
@@ -74,6 +77,7 @@
                                             {/if}
                                         </td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.product_quantity}</td>
+                                        <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_excl}</td>
                                         <td style=" border-bottom:1px #000000 solid; padding:3px;">{$detail.total_price_tax_incl}</td>
                                     </tr>
                                 {/foreach}
@@ -81,25 +85,19 @@
                             <br>
                             <br>
                             <br>
-
-
                             <table>
                                 <tr>
                                     <td>Total produits HT</td>
-                                    <td>{($tot_produit_ttc/(1+$orderinfo.vat_rate/100))|number_format:2} €</td>
+                                    <td>{$tot_produit_ht} €</td>
                                 </tr>
-                                <tr>
-                                    <td>Frais de transport</td>
-                                    <td>25 €</td>
-                                </tr>
-                                {$sms=0}
-                                {if $orderinfo.alert_sms}
+                                
+                                {foreach key=key item=extra from=$orderinfo.extra_cost}
                                     <tr>
-                                        <td>Option Alerte SMS</td>
-                                        <td>1 €</td>
+                                        <td>{$extra.name}</td>
+                                        <td>{$extra.amount} €</td>
                                     </tr>
-                                    {$sms=1}
-                                {/if}
+                                {/foreach}                               
+                                
                                 {if $orderinfo.total_discount > 0}
                                     <tr>
                                         <td>Réduction</td>
@@ -111,8 +109,12 @@
                                     <td>{$orderinfo.total_paid} €</td>
                                 </tr>   
                                 <tr>
-                                    <td>dont TVA ({$orderinfo.vat_rate|number_format:2} %)</td>
-                                    <td>{($orderinfo.total_paid - ($orderinfo.total_paid/(1+$orderinfo.vat_rate/100)))|number_format:2} €</td>
+                                    <td>dont TVA</td>
+                                    <td>
+                                        {foreach key=key item=taxe from=$orderinfo.taxes}
+                                            {$taxe.name} = {$taxe.amount} €<br>
+                                        {/foreach}                                    
+                                    </td>
                                 </tr>
                             </table>     
 

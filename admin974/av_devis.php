@@ -195,7 +195,7 @@ if (isset($_POST["devis_save"])) {
                 $p_product_custom_names = $_POST["product_custom_name"];
                 $p_product_custom_combination = @$_POST["custom"];
                 $shape_impact_coef = 1;
-                $attributes_amount = 0;                
+                $attributes_amount = 0;
                 $devis_product_attributes = array();
                 $devis_custom_attributes = array();
 
@@ -218,20 +218,23 @@ if (isset($_POST["devis_save"])) {
                 // la quantité de la ligne est présent
                 if (!empty($p_qte[$k])) {
                     $p = getProductInfos($product);
+                    $option_weight = 0;
+                    $option_weight_tot = 0;
 
                     $p_unit_price = $p["price"] * $shape_impact_coef;
                     $p_unit_weight = $p["weight"];
                     $p_area = $p_width[$k] * $p_height[$k] / 1000000;
+                    $p_area_invoice = $p_area;
                     $p_coef = 1;
 
                     if ($p_area < $p["min_area_invoiced"]) {
-                        $p_area = $p["min_area_invoiced"];
+                        $p_area_invoice = $p["min_area_invoiced"];
                     }
                     if ($p_area > $p["max_area_invoiced"]) {
                         $p_coef = 1.5;
                     }
 
-                    $product_amount = $p_unit_price * $p_coef * $p_qte[$k] * round($p_area, 2);
+                    $product_amount = $p_unit_price * $p_coef * $p_qte[$k] * round($p_area_invoice, 2);
 
                     $devis_detail = array(
                         "id_devis" => $did,
@@ -241,7 +244,6 @@ if (isset($_POST["devis_save"])) {
                         "product_price" => $p_unit_price,
                         "product_width" => $p_width[$k],
                         "product_height" => $p_height[$k],
-                        "product_weight" => $p_area * $p_unit_weight,
                     );
 
                     $ddid = $db->insert("av_devis_detail", $devis_detail);
@@ -252,17 +254,26 @@ if (isset($_POST["devis_save"])) {
 
                             $arr[2] *= $shape_impact_coef;
 
+                            $option_unit_weight = getOptionWeight($arr[1]);
+                            $option_weight = $p_area * $option_unit_weight["weight"];
+                            $option_weight_tot += $option_weight;
+
                             $devis_product_attributes = array(
                                 "id_devis" => $did,
                                 "id_devis_detail" => $ddid,
                                 "id_product" => $arr[0],
                                 "id_attribute" => $arr[1],
                                 "prixttc" => $arr[2],
-                                "name" => $arr[3]);
+                                "name" => $arr[3],
+                                "weight" => $option_weight);
                             $db->insert("av_devis_product_attributes", $devis_product_attributes);
-                            $attributes_amount += $arr[2] * round($p_area, 2) * $p_coef * $p_qte[$k];
+                            $attributes_amount += $arr[2] * round($p_area_invoice, 2) * $p_coef * $p_qte[$k];
                         }
                     }
+                    //update poids total
+                    $param = array("product_weight" => ($p_unit_weight * $p_area + $option_weight_tot));
+                    $r = $db->where("id_devis_detail", $ddid)
+                            ->update("av_devis_detail", $param);
 
                     if (isset($p_product_custom_combination[$product][$k])) {
                         $nb_product_custom++;
@@ -391,7 +402,7 @@ if (isset($_POST["devis_save"])) {
         $pdf->writeHTML($content_body, true, false, true, false, '');
         $pdf->lastPage();
 
-        if ($devisinfo[0]["nb_product_custom"] > 0) {            
+        if ($devisinfo[0]["nb_product_custom"] > 0) {
             $annexe_body = $smarty->fetch('front_devis_annexe.tpl');
             $pdf->AddPage('P', 'A4');
             $pdf->writeHTML($annexe_body, true, false, true, false, '');
@@ -433,6 +444,8 @@ if (isset($_POST["devis_save"])) {
         if ($mail->Send()) {
             unlink($path . "/" . $filename);
             echo '<div class="alert alert-success text-center">Email envoyé et devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
+        } else {
+            echo '<div class="alert alert-danger text-center">Email non envoyé et devis ajouté n° : <b>' . $did . '</b> <a href="av_devis_view.php?id_devis=' . $did . '">Consulter</a></div>';
         }
     }
 }
@@ -1450,7 +1463,7 @@ if (isset($_POST["devis_save"])) {
         var nombreCaractere = texte.length;
         var nombreCaractereMax = $(this).attr("maxlength");
         var myname = $(this).attr("name");
-        
+
         // On soustrait le nombre limite au nombre de caractère existant
         var nombreCaractere = nombreCaractereMax - nombreCaractere;
 

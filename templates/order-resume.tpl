@@ -27,7 +27,11 @@
                 <h3>mode de transport</h3>
                 <div class="content">
                     <br/><br/>
-                    <img src="/img/transporteur-allovitres.png" alt="">
+                    {if $pose_enable}
+                        <img src="/img/service-indispo.png" alt="">
+                    {else}
+                        <img src="/img/transporteur-allovitres.png" alt="">
+                    {/if}
                 </div>            
             </div>
         </div>
@@ -58,6 +62,7 @@
                                     {$option_price =  $option_price+$option.o_price}
                                     {$option.o_name} 
                                 {/foreach}   
+                                <br>
                             {/if} 
                             {if isset($product.productinfos.custom_label)}  
                                 {foreach key=key item=main_item from=$product.productinfos.custom_label}
@@ -84,6 +89,12 @@
                                 {/foreach}   
                                 <br>
                             {/if} 
+                            
+                            {if isset($product.pose_details)}                                
+                                {foreach key=key item=pose from=$product.pose_details}
+                                    {$pose.question} {$pose.answer}<br>
+                                {/foreach}
+                            {/if}
                         </a>
                     </td>                    
                     {if $product.dimension}
@@ -94,6 +105,16 @@
                     <td class="quantite">{$product.quantity}</td>
                     <td class="total">{$product.prixttc} €</td>
                 </tr>
+                {if isset($product.pose_detail)}
+                    <tr>
+                        <td colspan="5">
+                            id_etage {$product.pose_detail.pose_etage}<br>
+                            id_hauteur {$product.pose_detail.pose_hauteur}<br>
+                            id_chassis {$product.pose_detail.pose_chassis}<br>
+                            comment {$product.pose_detail.pose_comment}<br>
+                        </td>
+                    </tr>
+                {/if}
             {/foreach}               
         </tbody>
     </table>

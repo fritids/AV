@@ -9,6 +9,7 @@ mysql_select_db($bdd_name);
 
 $priceAttribut = 0;
 $priceOption = 0;
+$priceAnswer = 0;
 $weightAttribut = 0;
 $impact_coef = 1;
 
@@ -21,6 +22,10 @@ if (isset($_POST["ids"])) {
 
             $query = mysql_query($req);
             $rows = mysql_fetch_array($query);
+
+            if ($_POST["posable"])
+                $rows["price"] = $rows["price_pose"];
+
             $priceAttribut += $rows["price"] * $config["vat_rate"];
             $weightAttribut += $rows["weight"];
         }
@@ -46,6 +51,22 @@ if (isset($_POST["main_item_ids"])) {
         }
     }
 }
+if (isset($_POST["questions"]) && $_POST["posable"] == 1) {
+    foreach ($_POST["questions"] as $question) {
+        if ($question["value"] > 0) {
+            $req = "SELECT * "
+                    . " FROM av_pose_form "
+                    . " WHERE id_pose_form = " . $question["value"];
+
+            $query = mysql_query($req);
+            $rows = mysql_fetch_array($query);
+
+            if ($rows["price"] > 0) {
+                $priceAnswer += $rows["price"] * $config["vat_rate"];
+            }
+        }
+    }
+}
 
 $req = "SELECT * "
         . " FROM av_product"
@@ -54,6 +75,11 @@ $req = "SELECT * "
 
 $query = mysql_query($req);
 $rows = mysql_fetch_array($query);
+
+if ($_POST["posable"])
+    $rows["price"] = $rows["price_pose"];
+
+
 $productPrice = $rows["price"] * $impact_coef * $config["vat_rate"];
 $productweight = $rows["weight"];
 
@@ -61,6 +87,7 @@ echo json_encode(
         array(
             "price" => $priceAttribut * $impact_coef + $productPrice,
             "price_option" => $priceOption,
+            "price_answer" => $priceAnswer,
             "weight" => $weightAttribut + $productweight,
             "post" => $_POST,
             "impact_coef" => $impact_coef,

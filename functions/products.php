@@ -23,6 +23,7 @@ function getProductInfos($pid) {
     $images = getImages($pid);
     $cover = getImageCover($pid);
     $category = getProductCategory($r[0]["id_category"]);
+    $pose_details = getProductPoseDetail($pid);
 
     $r[0]["caracteristiques"] = $carac;
     //$r[0]["attributes"] = $attributes;
@@ -31,6 +32,7 @@ function getProductInfos($pid) {
     $r[0]["images"] = $images;
     $r[0]["cover"] = $cover;
     $r[0]["category"] = $category;
+    $r[0]["pose_details"] = $pose_details;
 
     return $r[0];
 }
@@ -100,6 +102,38 @@ function getProductCombination($pid) {
         return (null);
 
     return $o;
+}
+
+function getProductPoseDetail($pid) {
+    global $db;
+    $o = array();
+
+    $r = $db->rawQuery("select distinct b.id_pose_form, b.name , b.title
+        from av_product_pose_form a, av_pose_form b 
+        where a.id_pose_form = b.id_pose_form 
+        and a.id_product = ? 
+        and b.active=1", array($pid));
+
+    foreach ($r as $k => $q) {        
+        $o[$q["id_pose_form"]]["name"] = $q["name"];
+        $o[$q["id_pose_form"]]["title"] = $q["title"];
+        $o[$q["id_pose_form"]]["answers"] = getProductPoseDetailAnswer($q["id_pose_form"]);        
+    }
+    if (empty($o))
+        return (null);
+    return $o;
+}
+
+function getProductPoseDetailAnswer($ipf){
+    global $db;
+    
+    $a = $db->rawQuery("select *
+        from av_pose_form  
+        where id_pose_form_parent = ?
+        and active=1
+        order by position", array($ipf));
+    
+    return $a;
 }
 
 function getProductAttributes($pid, $paid) {

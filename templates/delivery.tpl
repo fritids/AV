@@ -4,7 +4,7 @@
     <div class="options">
         <div class="option option3">
             <p>
-                <input type="radio" name="" id="" checked="">
+                <input type="radio" name="delivery_option" id="" checked="" value="AV" {if $pose_enable}disabled="true"{/if}>
                 <span class="bd">&nbsp;</span>
                 <label for="">Livraison SEULE</label>	
             </p>
@@ -12,7 +12,7 @@
         </div>
         <div class="option option3">
             <p>
-                <input type="radio" name="" id="" disabled="true">
+                <input type="radio" name="delivery_option" id="" disabled="true">
                 <span class="bd">&nbsp;</span>
                 <label for="">Retrait chez un partenaire</label>
             </p>
@@ -20,7 +20,7 @@
         </div>
         <div class="option option3">
             <p>
-                <input type="radio" name="" id=""  disabled="true">
+                <input type="radio" name="delivery_option" id="" value="pose" {if $pose_enable}checked{else}disabled="true"{/if}>
                 <span class="bd">&nbsp;</span>
                 <label for="">Livraison et pose</label>
             </p>
@@ -61,19 +61,35 @@
         *}
     </div>
     <form action="?order-resume" method="post">
+        <input type="hidden" name="delivery_option" id="form_delivery_option" value="AV"> 
         <div class="options2 clearfix">
-
             <p class="un"><span class="orange">Suivi de commande par sms</span></p>
             <p>Désirez vous bénéficier du suivi de commande par SMS ?<br/>
                 Ce service vous permet de recevoir un sms sur le numero de téléphone portable de votre choix à chaque étape de votre commande.<br/>Il vous permet notamment d'etre informé de la date et du créneau horaire de votre livraison dès que celle-ci est programmée.</p>
             <p><input type="checkbox" name="alert_sms" class="alert_sms" value="1" checked="checked"> SMS (1€) 
-                
-                    Tél: <input type="tel" name="alert_sms_phone" class="alert_sms_phone" required="required" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal} > ( Format: 0612345678 )
-                
-
+                Tél: <input type="tel" name="alert_sms_phone" class="alert_sms_phone" required="required" {literal}pattern="^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$" {/literal} > ( Format: 0612345678 )
             </p>
         </div>
         <div class="clearfix"></div>
+        {if $pose_enable}
+            <div class="pose clearfix">
+                <p class="un"><span class="orange">Question Pose</span></p>
+                Disposez vous d'un stationnement<br>
+                <select name="pose_stationnement">
+                    <option>Gratuit</option>
+                    <option>Payant</option>
+                </select>
+                <br>
+                Mesure ?
+                oui<input type="radio" name="pose_mesure" value="1">
+                non<input type="radio" name="pose_mesure" value="0">
+                <br>
+                Récupération?
+                oui<input type="radio" name="pose_recup" value="1">
+                non<input type="radio" name="pose_recup" value="0">
+            </div>        
+            <div class="clearfix"></div>
+        {/if}
 
         <p class="deu"><span class="orange">commentaires sur le lieu</span> (accès difficile, batiment particulier, code portail, chien méchant etc...)</p>
         <textarea name="order_comment" id="" cols="30" rows="10">{$smarty.session.cart_summary.order_comment}</textarea>
@@ -92,5 +108,18 @@
         } else {
             $(".alert_sms_phone").removeAttr("required");
         }
-    })
+    });
+
+    $('input:radio[name=delivery_option]').click(function() {
+        if ($(this).val() === "pose") {
+            $("#form_delivery_option").val($(this).val());
+
+            $(".pose").show();
+        } else {
+            $(".pose").hide();
+        }
+    });
+
 </script>
+
+

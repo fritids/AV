@@ -213,8 +213,10 @@ $trucks = $db->get("av_truck");
             $z = implode(",", $_GET["id_zone"]);
             $queryOrder .= " and  substr(c.postcode , 1 , 2) in (select id_departement from av_departements where id_zone in ( " . $z . ") )";
         }
-        if (isset($_GET["id_supplier"]) && !empty($_GET["id_supplier"]))
+        /*if (isset($_GET["id_supplier"]) && !empty($_GET["id_supplier"]))
             $queryOrder .= " and id_supplier = " . $_GET["id_supplier"] . " ";
+         * 
+         */
 
         if (isset($_GET["invoice_date"]) && !empty($_GET["invoice_date"])) {
             $queryOrder .= " and date(a.invoice_date) >= ? ";
@@ -332,15 +334,12 @@ $trucks = $db->get("av_truck");
                                 ?>
 
                                 <?
-                                $not_deliverable = false;
+                                $not_deliverable = true;
                                 $helper = "";
                                 $icon = "";
                                 $cssalert = "";
                                 $supplier_date_delivery = new DateTime($OrderProduct["supplier_date_delivery"]);
                                 $dateLivraison = new DateTime($date_livraison);
-
-                                if ($OrderProduct["supplier_date_delivery"] == null || $supplier_date_delivery > $dateLivraison)
-                                    $not_deliverable = true;
 
                                 switch ($OrderProduct["product_current_state"]) {
                                     case 15:
@@ -353,7 +352,7 @@ $trucks = $db->get("av_truck");
                                         $cssalert = 8;
                                         $helper = "Commandé chez le fournisseur";
                                         break;
-                                    case 17:
+                                    case 17:                                        
                                         if ($OrderProduct["supplier_date_delivery"] == null || $supplier_date_delivery > $dateLivraison) {
                                             $helper = "Pas disponible entrepot";
                                             $icon = "glyphicon-exclamation-sign";
@@ -368,6 +367,7 @@ $trucks = $db->get("av_truck");
                                         $icon = "glyphicon-home";
                                         $cssalert = 5;
                                         $helper = "Recu entrepot";
+                                        $not_deliverable = false;
                                         break;
                                     case 19:
                                         $icon = "glyphicon-time";
@@ -378,7 +378,6 @@ $trucks = $db->get("av_truck");
                                         $icon = "glyphicon-ok";
                                         $helper = "Livré";
                                         $cssalert = 6;
-                                        $not_deliverable = true;
                                         break;
                                     case 21:
                                         $icon = "glyphicon-wrench";
@@ -397,7 +396,6 @@ $trucks = $db->get("av_truck");
                                     default:
                                         $cssalert = 0;
                                         $icon = "";
-                                        $not_deliverable = false;
                                         $helper = "";
                                 }
                                 ?>

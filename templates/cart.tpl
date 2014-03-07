@@ -60,6 +60,12 @@
                                 {/foreach}   
                                 <br>
                             {/if} 
+
+                            {if isset($product.pose_details)}                                
+                                {foreach key=key item=pose from=$product.pose_details}
+                                    {$pose.question} {$pose.answer}<br>
+                                {/foreach}
+                            {/if}
                         </a>
                     </td>
                     {if $product.dimension}

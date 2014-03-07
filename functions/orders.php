@@ -73,6 +73,8 @@ function getOrderInfos($oid) {
         $r[$k]["history"] = getUserOrdersDetailHistory($order["id_order"]);
         $r[$k]["customer"] = getUserOrdersCustomer($order["id_customer"]);
         $r[$k]["refund"] = getUserOrdersRefund($order["id_order"]);
+        $r[$k]["taxes"] = getUserOrdersTaxes($order["id_order"]);
+        $r[$k]["extra_cost"] = getUserOrdersExtraCost($order["id_order"]);
         if ($order["id_address_invoice"])
             $r[$k]["address"]["invoice"] = getUserOrdersAddress($order["id_address_invoice"]);
         if ($order["id_address_delivery"])
@@ -118,6 +120,35 @@ function getUserOrdersCustomer($cid) {
     $r = $db->where("id_customer", $cid)
             ->get("av_customer");
     return $r[0];
+}
+
+function getUserOrdersTaxes($oid) {
+    global $db;
+    $r = $db->rawQuery("select product_id_tax, name, sum(amount) amount
+                        from (select a.product_id_tax, b.name, sum(total_price_tax_incl-total_price_tax_excl) amount
+                            from av_order_detail a, av_tax b
+                            where a.product_id_tax = b.id_tax
+                            and id_order = ?
+                            group by a.product_id_tax, name
+                            union
+                            select a.cost_id_tax, b.name, sum(round(price * rate/100,2)) amount
+                            from av_order_extra_cost a, av_tax b
+                            where a.cost_id_tax = b.id_tax
+                            and id_order = ?
+                            group by a.cost_id_tax, name) g
+                        group by product_id_tax, name
+                        ", array($oid, $oid));
+    return $r;
+}
+
+function getUserOrdersExtraCost($oid) {
+    global $db;
+    $r = $db->rawQuery("SELECT a.id_order, b.name, a.price, round(a.price * ( rate /100 +1 ) ,2) amount
+                        FROM av_order_extra_cost a, av_extra_cost b, av_tax c
+                        WHERE a.id_extra_cost = b.id_extra_cost
+                        AND a.cost_id_tax = c.id_tax
+                        and a.id_order = ?", array($oid));
+    return $r;
 }
 
 function getUserOrdersRefund($oid) {
@@ -185,7 +216,8 @@ function getOrdersDetail($odid) {
 
     $r = $db->rawQuery("SELECT a.*, c.title product_state_label, b.name supplier_name
                         FROM av_order_detail a
-                        LEFT OUTER JOIN av_supplier b on (a.id_supplier = b.id_supplier)                        
+                        LEFT OUTER JOIN av_supplier_warehouse d on (a.id_supplier_warehouse = d.id_supplier_warehouse)                                                
+                        LEFT OUTER JOIN av_supplier b on (d.id_supplier = b.id_supplier)                    
                         LEFT OUTER JOIN av_order_status c on (a.product_current_state = c.id_statut)
                         where id_order_detail = ?
                         ", $params);
@@ -203,10 +235,10 @@ function getUserOrdersInvoice($oid) {
     $r = $db->where("id_order", $oid)
             ->get("av_order_invoice");
 
-    $r[0]["ref_invoice"] = str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
-
-    if ($r)
+    if ($r){
+        $r[0]["ref_invoice"] = str_pad($r[0]["id_order_invoice"], 9, '0', STR_PAD_LEFT);
         return $r[0];
+    }        
     return null;
 }
 
@@ -406,10 +438,27 @@ function saveOrder() {
     $r = $db->where("id_order", $oid)
             ->update("av_orders", array("reference" => str_pad($oid, 9, '0', STR_PAD_LEFT)));
 
+    // on rajoute les extra
+        if (isset($_SESSION["cart_summary"]["extra_cost"]) && !empty($_SESSION["cart_summary"]["extra_cost"])) {
+            foreach ($_SESSION["cart_summary"]["extra_cost"] as $id_cost => $cost_amount) {
+                $extraCostDetail = getExtraCostDetail($id_cost);
+                $order_extra_cost = array(
+                    "id_order" => $oid,
+                    "id_extra_cost" => $id_cost,
+                    "price" => $cost_amount,
+                    "cost_id_tax" => $extraCostDetail["cost_id_tax"]
+                );
+                
+                $db->insert("av_order_extra_cost", $order_extra_cost);
+            }
+        }
+        
     foreach ($cartItems as $item) {
 
         $nb_product++;
         $p = getProductInfos($item["id"]);
+        
+        $surface = $item["dimension"]["width"] * $item["dimension"]["height"] / 1000000;
 
         $order_detail = array(
             "id_order" => $oid,
@@ -417,19 +466,17 @@ function saveOrder() {
             "product_name" => $item["name"],
             "product_quantity" => $item["quantity"],
             "product_price" => $item["price"],
-            "product_shipping" => $item["shipping"],
             "product_width" => $item["dimension"]["width"],
-            "product_height" => $item["dimension"]["height"],
-            "product_depth" => $item["dimension"]["depth"],
-            "total_price_tax_incl" => $item["prixttc"] + $item["shipping"],
-            "total_price_tax_excl" => $item["prixttc"] + $item["shipping"]
+            "product_height" => $item["dimension"]["height"],            
+            "total_price_tax_incl" => $item["prixttc"],
+            "total_price_tax_excl" => $item["prixttc"]
         );
 
         if (isset($item["discount"])) {
             $order_detail["discount"] = $item["discount"];
             $order_detail["voucher_code"] = $item["voucher_code"];
-            $order_detail["total_price_tax_incl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
-            $order_detail["total_price_tax_excl"] = $item["prixttc"] + $item["shipping"] - $item["discount"];
+            $order_detail["total_price_tax_incl"] = $item["prixttc"] - $item["discount"];
+            $order_detail["total_price_tax_excl"] = $item["prixttc"] - $item["discount"];
         }
 
         $odid = $db->insert("av_order_detail", $order_detail);
@@ -438,12 +485,11 @@ function saveOrder() {
         if (isset($item["options"])) {
             $option_unit_weight = 0;
             $option_weight = 0;
-            $options_weight = 0;
+            $option_weight_tot = 0;
             foreach ($item["options"] as $k => $option) {
-                $option_unit_weight = getOptionWeight($option["o_id"]);
-                $o_surface = $option["o_surface"];
-                $option_weight = $o_surface * $option_unit_weight["weight"];
-                $options_weight = $option_weight;
+                $option_unit_weight = getOptionWeight($option["o_id"]);                
+                $option_weight = $surface * $option_unit_weight["weight"];
+                $option_weight_tot += $option_weight;
 
                 $order_product_attributes = array(
                     "id_order" => $oid,
@@ -457,6 +503,24 @@ function saveOrder() {
 
                 $db->insert("av_order_product_attributes", $order_product_attributes);
             }
+        }
+// on rajoute la pose            
+        if (isset($item["pose_details"])) {
+            foreach ($item["pose_details"] as $k => $pose) {
+                $answer = getPoseAnswerDetail($k);
+                $order_product_pose = array(
+                    "id_order" => $oid,
+                    "id_order_detail" => $odid,
+                    "id_pose_question" => $answer["id_question"],
+                    "id_pose_anwser" => $answer["id_pose_form"],
+                    "area" => $pose["surface"],
+                    "unit_price" => $answer["price"],
+                    "vat_rate" => $config["vat_rate"]
+                );
+                $db->insert("av_order_product_pose", $order_product_pose);
+            }
+            $r = $db->where("id_order_detail", $odid)
+                    ->update("av_order_detail", array("is_product_posable" => 1));
         }
 // on rajoute les options personalisé
         if (isset($item["custom"])) {
@@ -486,6 +550,7 @@ function saveOrder() {
                     }
                 }
             }
+
 // post update sur les details
             $r = $db->where("id_order_detail", $odid)
                     ->update("av_order_detail", array("is_product_custom" => $is_product_custom));
@@ -493,7 +558,7 @@ function saveOrder() {
 
 // post update sur les details
         $param = array(
-            "product_weight" => ($p["weight"] * $item["surface"] + $option_weight)
+            "product_weight" => ($p["weight"] * $surface + $option_weight_tot)
         );
         $r = $db->where("id_order_detail", $odid)
                 ->update("av_order_detail", $param);
@@ -569,6 +634,14 @@ function splitOrderDetail($odid, $qty_request) {
         unset($attribut["id_order_prd_attr"]);
         $attribut["id_order_detail"] = $new_odid;
         $prd_aid = $db->insert("av_order_product_attributes", $attribut);
+    }
+//les formes specifique
+    $r = $db->where("id_order_detail", $odid)
+            ->get("av_order_product_custom");
+    foreach ($r as $custom) {
+        unset($custom["id_order_product_custom"]);
+        $custom["id_order_detail"] = $new_odid;
+        $prd_aid = $db->insert("av_order_product_custom", $custom);
     }
     return $oid;
 }

@@ -156,9 +156,9 @@
                 option_price = result.price_option;
                 unit_weight = result.weight;
                 //console.log(result);
-                $('#total_price').text(unit_price);
+                $('#total_price').text(unit_price.toFixed(2));
                 //$('#total_poids').text(unit_weight);
-                $('#price').val(unit_price);
+                $('#price').val(unit_price.toFixed(2));
                 //$('#texte').text(unit_price);
             }
         });

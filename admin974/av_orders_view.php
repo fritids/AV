@@ -115,33 +115,6 @@ $orderRefund = false;
 if (!isset($_POST["order_action_refund"]))
     if (isset($_POST) && !empty($_POST) && isset($_POST["order_action_modify"]) || isset($_POST["supplier_date_delivery"]) || isset($_POST["order_state"])) {
 
-        if (isset($_POST["id_supplier"]) && !empty($_POST["id_supplier"]))
-            if (is_array($_POST["id_supplier"])) {
-                foreach ($_POST["id_supplier"] as $id => $supplier) {
-                    $r = $db->where("id_order_detail", $id)
-                            ->update("av_order_detail", array("id_supplier" => $supplier));
-                    addLog(array("tabs" => "av_order_detail",
-                        "rowkey" => $id,
-                        "col" => "id_supplier",
-                        "operation" => "update",
-                        "oldval" => '',
-                        "newval" => $supplier
-                    ));
-                }
-            } else {
-                foreach ($orderinfo["details"] as $od) {
-                    $r = $db->where("id_order_detail", $od["id_order_detail"])
-                            ->update("av_order_detail", array("id_supplier" => $_POST["id_supplier"]));
-
-                    addLog(array("tabs" => "av_order_detail",
-                        "rowkey" => $od["id_order_detail"],
-                        "col" => "id_supplier",
-                        "operation" => "update",
-                        "oldval" => $od["id_supplier"],
-                        "newval" => $_POST["id_supplier"]
-                    ));
-                }
-            }
         if (isset($_POST["id_supplier_warehouse"]) && !empty($_POST["id_supplier_warehouse"]))
             if (is_array($_POST["id_supplier_warehouse"])) {
                 foreach ($_POST["id_supplier_warehouse"] as $id => $warehouse) {
@@ -155,7 +128,7 @@ if (!isset($_POST["order_action_refund"]))
                         "newval" => $warehouse
                     ));
 
-//degreve du stock
+                    //degreve du stock
                     if (updQuantityWarehouse($id))
                         @$updated["text"] .= "Le stock a été mise à jour<br>";
                 }
@@ -568,7 +541,7 @@ if ((isset($new_state) && $new_state == REMBOURSE) || isset($_POST["order_action
 <?
 if ($orderinfo["current_state"] != ATTENTE_CHEQUE && $orderinfo["current_state"] != LIVREE && $orderinfo["current_state"] != ANNULE && $orderinfo["current_state"] != REMBOURSE && $orderinfo["current_state"] != ERREUR_PAIEMENT && $orderinfo["current_state"] != ATTENTE_VIREMENT && $orderinfo["current_state"] != 11)
     $orderLocked = true;
-if ($orderinfo["current_state"] != REMBOURSE && $orderinfo["current_state"] != ANNULE )
+if ($orderinfo["current_state"] != REMBOURSE && $orderinfo["current_state"] != ANNULE)
     $orderRefund = true;
 
 
@@ -1011,7 +984,7 @@ if ($orderinfo) {
                                         <th colspan="7" class="text-center">LIVRAISON</th>                          
                                     </tr>
                                     <tr>
-                                        <?/*<th>Rmbt</th>*/?>
+                                        <? /* <th>Rmbt</th> */ ?>
                                         <th>Produit</th>
                                         <th>Long x Larg</th>
                                         <th>Qte</th>
@@ -1034,18 +1007,18 @@ if ($orderinfo) {
                                         $isFournisseurOk = ($od["id_supplier_warehouse"] != '' ) ? true : false;
                                         ?>
                                         <tr id="id0">
-                                            <?/*<td>
-                                                <?
-                                                if ($od["product_current_state"] != 23) {
-                                                  ?>
-                                                  <input type="checkbox" name="RefundDetails[]" value="<?= $od["id_order_detail"] ?>" class="RefundDetails">
-                                                  <?
-                                                 
-                                                }
-                                                ?>
-                                            </td>
+                                            <? /* <td>
+                                              <?
+                                              if ($od["product_current_state"] != 23) {
+                                              ?>
+                                              <input type="checkbox" name="RefundDetails[]" value="<?= $od["id_order_detail"] ?>" class="RefundDetails">
+                                              <?
+
+                                              }
+                                              ?>
+                                              </td>
                                              * 
-                                             */?>
+                                             */ ?>
 
                                             <td nowrap> 
                                                 <?= $od["product_name"] ?> <br>
@@ -1071,12 +1044,12 @@ if ($orderinfo) {
                                             </td>
                                             <td nowrap><?= $od["product_width"] ?> x <?= $od["product_height"] ?> </td>
                                             <td>
-            <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
+                                                <?= ($od["product_quantity"] > 1 ) ? "<font color='red' size='3'><b>" . $od["product_quantity"] . "</b></font>" : $od["product_quantity"] ?>
                                             </td>
                                             <td nowrap>
                                                 <?= $od["total_price_tax_incl"] ?> €
                                                 <?= ($od["discount"] > 0) ? "<br><font color='red'>dont réduction: " . $od["discount"] . "€ " . $od["voucher_code"] . "</font>" : "" ?><br>
-            <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
+                                                <?= $od["product_quantity"] * $od["product_weight"] ?> Kg
                                             </td>
                                             <td>
                                                 <?
@@ -1088,7 +1061,7 @@ if ($orderinfo) {
                                                         foreach ($productStates as $pState) {
                                                             ?>
                                                             <option value="<?= $pState["id_statut"] ?>"
-                                                                    <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
+                                                            <?= ($od["product_current_state"] == $pState["id_statut"]) ? "selected" : "" ?>
                                                                     ><?= $pState["title"] ?> </option>
                                                                     <?
                                                                 }
@@ -1113,7 +1086,7 @@ if ($orderinfo) {
                                                         foreach ($warehouses as $warehouse) {
                                                             ?>
                                                             <option value="<?= $warehouse["id_warehouse"] ?>"
-                                                                    <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
+                                                            <?= ($od["id_warehouse"] == $warehouse["id_warehouse"] || (($orderinfo["address"]["delivery"]["warehouse"]["id_warehouse"] == $warehouse["id_warehouse"]) && $od["id_warehouse"] == '')) ? "selected" : "" ?>
                                                                     ><?= $warehouse["name"] ?> </option>
                                                                     <?
                                                                 }
@@ -1125,7 +1098,7 @@ if ($orderinfo) {
                                                         foreach ($suppliersWarehouse as $supplier) {
                                                             ?>
                                                             <option class="<?= $supplier["id_warehouse"] ?>" value="<?= $supplier["id_supplier_warehouse"] ?>"
-                                                                    <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
+                                                            <?= ($od["id_supplier_warehouse"] == $supplier["id_supplier_warehouse"]) ? "selected" : "" ?>
                                                                     ><?= $supplier["supplier_name"] ?> </option>
                                                                     <?
                                                                 }
@@ -1185,7 +1158,7 @@ if ($orderinfo) {
                                                     ?>
                                                     <button type="button" name="delProduitTruck" value="<?= $t["id_order_detail"] ?>" >
                                                         Retirer du camion<br>
-                                                    <?= $t["truck_name"] ?>
+                                                        <?= $t["truck_name"] ?>
                                                     </button>
                                                     <?
                                                 }
@@ -1363,7 +1336,7 @@ if ($orderinfo) {
                 foreach ($orderStates as $orderState) {
                     ?>
                     <div class="alert-<?= $orderState["id_statut"] ?>" >
-                    <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
+                        <?= $orderState["id_statut"] . " - " . $orderState["title"] ?>
                     </div>
                     <?
                 }

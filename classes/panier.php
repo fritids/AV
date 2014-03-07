@@ -23,7 +23,7 @@ class Panier {
     }
 
 // ajouter un article $refproduit
-    public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension, $productInfos, $n) {
+    public function addItem($refproduit = "", $nb = 1, $price = 0, $name, $surface, $dimension, $productInfos, $n) {
 
         if (empty($dimension))
             $surface = 1;
@@ -52,13 +52,11 @@ class Panier {
         @$this->panier[$n][$refproduit]['productinfos'] = $productInfos;
         @$this->panier[$n][$refproduit]['surface'] = round($surface, 2);
         @$this->panier[$n][$refproduit]['price'] = round($price, 2);
-        @$this->panier[$n][$refproduit]['shipping'] = round($this->panier[$refproduit]['shipping'], 2) + round($shipping, 2);
         @$this->panier[$n][$refproduit]['prixttc'] = round($this->panier[$refproduit]['prixttc'], 2) + round($montant_produit_ttc, 2);
 
-        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) + round($shipping, 2);
         @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) + round($montant_produit_ttc - $montant_produit_ttc / $this->vat_rate, 2);
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) + round($montant_produit_ttc, 2);
-        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2);
         @$this->panier[$n][$refproduit]['name'] = $name;
 
 
@@ -67,7 +65,7 @@ class Panier {
     }
 
 // ajouter un article $refproduit
-    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $shipping, $surface, $dimension, $n) {
+    public function addItemOption($refproduit = "", $refoption = "", $nb = 1, $price = 0, $name, $surface, $dimension, $n) {
 
         $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
 
@@ -75,18 +73,54 @@ class Panier {
         @$this->panier[$n][$refproduit]["options"][$refoption]['dimension'] = $dimension;
         @$this->panier[$n][$refproduit]["options"][$refoption]['surface'] = round($surface, 2);
         @$this->panier[$n][$refproduit]["options"][$refoption]['price'] = round($price, 2);
-        @$this->panier[$n][$refproduit]["options"][$refoption]['shipping'] = round($this->panier[$n][$refproduit]["options"][$refoption]['shipping'], 2) + round($shipping, 2);
         @$this->panier[$n][$refproduit]["options"][$refoption]['prixttc'] = round($this->panier[$n][$refproduit]["options"][$refoption]['prixttc'], 2) + round($montant_produit_ttc, 2);
         @$this->panier[$n][$refproduit]['prixttc'] = round($this->panier[$n][$refproduit]['prixttc'], 2) + round($montant_produit_ttc, 2);
 
-        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) + round($shipping, 2);
         @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) + round($montant_produit_ttc - $montant_produit_ttc / $this->vat_rate, 2);
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) + round($montant_produit_ttc, 2);
-        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2);
 
         @$this->panier[$n][$refproduit]["options"][$refoption]['name'] = $name;
         if ($nb <= 0)
             unset($this->panier[$n][$refproduit]["options"][$refoption]);
+    }
+
+    public function addItemPose($refproduit = "", $refoption = "", $price = 0, $answer, $surface, $dimension, $n) {
+
+        $montant_produit_ttc = $nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
+
+
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['dimension'] = $dimension;
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['surface'] = round($surface, 2);
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['price'] = round($price, 2);
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['prixttc'] = round($this->panier[$n][$refproduit]["options"][$refoption]['prixttc'], 2) + round($montant_produit_ttc, 2);
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['question'] = $answer["question"];
+        @$this->panier[$n][$refproduit]["pose_details"][$refoption]['answer'] = $answer["answer"];
+        @$this->panier[$n][$refproduit]['prixttc'] = round($this->panier[$n][$refproduit]['prixttc'], 2) + round($montant_produit_ttc, 2);
+
+        @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) + round($montant_produit_ttc - $montant_produit_ttc / $this->vat_rate, 2);
+        @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) + round($montant_produit_ttc, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2);
+        
+        if ($nb <= 0)
+            unset($this->panier[$n][$refproduit]["options"][$refoption]);
+    }
+
+    public function addExtraCost($id_cost, $price = 0) {
+        $extraCostDetail = getExtraCostDetail($id_cost);
+        if ($price == 0)
+            $price = $extraCostDetail["price_ttc"];
+        
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + $price;
+        @$this->panier_summary['extra_cost'][$id_cost] = $price;
+
+    }
+    public function removeExtraCost($id_cost, $price = 0) {
+        $extraCostDetail = getExtraCostDetail($id_cost);
+        if ($price == 0)
+            $price = $extraCostDetail["price_ttc"];        
+        @$this->panier_summary['total_amount'] -= $price;
+        unset($this->panier_summary['extra_cost'][$id_cost]);
     }
 
 // ajouter un article $refproduit
@@ -111,47 +145,25 @@ class Panier {
     }
 
 // supprimer un article $refproduit
-    public function removeItem($refproduit = "", $nb = 1, $price = 0, $shipping, $surface, $n) {
+    public function removeItem($refproduit = "", $nb = 1, $price = 0, $surface, $n) {
 
         $montant_produit_ttc = $price; //$nb * round($price, 2) * round($surface, 2) * $this->vat_rate;
 
         @$this->panier[$n][$refproduit]['quantity'] -= $nb;
         @$this->panier[$n][$refproduit]['surface'] = round($surface, 2);
-        @$this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) - round($shipping, 2);
         @$this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) - round($montant_produit_ttc - $montant_produit_ttc / $this->vat_rate, 2);
         @$this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($montant_produit_ttc, 2);
-        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($shipping, 2);
+        @$this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2);
 
         if (isset($this->panier[$n][$refproduit]['discount']) && $this->panier[$n][$refproduit]['discount'] > 0) {
-            echo $this->panier[$n][$refproduit]['discount'];
-
             $this->panier_summary['total_discount'] -= $this->panier[$n][$refproduit]['discount'];
         }
 
+
         if ($this->panier[$n][$refproduit]['quantity'] <= 0) {
-//remove option
-            /*$option_amount = 0;
-            if (isset($this->panier[$n][$refproduit]['options']))
-                foreach ($this->panier[$n][$refproduit]['options'] as $k => $option) {
-                    $option_amount += $option["quantity"] * $option["price"] * $this->vat_rate * $option["surface"] + $option['shipping'];
-                    $option_amount_produit += $option["quantity"] * $option["price"] * $this->vat_rate * $option["surface"];
-                }
-
-            $this->panier_summary['total_shipping'] = round($this->panier_summary['total_shipping'], 2) - round($option['shipping'], 2);
-            $this->panier_summary['total_taxes'] = round($this->panier_summary['total_taxes'], 2) - round($option_amount_produit - $option_amount_produit / $this->vat_rate, 2);
-            $this->panier_summary['total_produits'] = round($this->panier_summary['total_produits'], 2) - round($option_amount_produit, 2);
-            $this->panier_summary['total_amount'] = round($this->panier_summary['total_produits'], 2) + round($option['shipping'], 2);
-
-*/
             if ($this->panier_summary['total_taxes'] < 0)
                 $this->panier_summary['total_taxes'] = 0;
-
             unset($this->panier[$n][$refproduit]);
-//array_splice($this->panier,1);
-            /* $this->panier_summary['total_amount'] = 0;
-              $this->panier_summary['total_shipping'] = 0;
-              $this->panier_summary['total_taxes'] = 0;
-              $this->panier_summary['total_produits'] = 0; */
         }
     }
 
@@ -255,7 +267,6 @@ class Panier {
                 if (!empty($ref)) {
                     $list[$i]["id"] = $ref;
                     $list[$i]["quantity"] = $data['quantity'];
-                    $list[$i]["shipping"] = $data['shipping'];
                     $list[$i]["surface"] = $data['surface'];
                     $list[$i]["dimension"] = $data['dimension'];
                     $list[$i]["productinfos"] = $data['productinfos'];
@@ -266,6 +277,7 @@ class Panier {
                     $list[$i]["voucher_code"] = $data['voucher_code'];
                     $list[$i]["pro_discounted"] = $data['pro_discounted'];
                     $list[$i]["custom"] = $data['productinfos']['custom'];
+                    $list[$i]["pose_details"] = $data['pose_details'];
 
 //les options
                     if (!empty($this->panier[$i][$ref]['options'])) {
@@ -276,7 +288,6 @@ class Panier {
                                     "o_surface" => $option['surface'],
                                     "o_price" => $option['price'],
                                     "o_name" => $option['name'],
-                                    "o_shipping" => $option['shipping'],
                                     "o_prixttc" => $option['prixttc'],
                                 );
 //$list[$i]["options"][] = $option;

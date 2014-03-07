@@ -90,12 +90,6 @@ $opts['fdd']['id_order'] = array(
   'maxlen'   => 10,
   'sort'     => true
 );
-$opts['fdd']['id_supplier'] = array(
-  'name'     => 'ID supplier',
-  'select'   => 'T',
-  'maxlen'   => 10,
-  'sort'     => true
-);
 $opts['fdd']['id_product'] = array(
   'name'     => 'ID product',
   'select'   => 'T',

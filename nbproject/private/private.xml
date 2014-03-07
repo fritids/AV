@@ -4,7 +4,13 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/wamp/www/allovitres/index.php</file>
-            <file>file:/C:/wamp/www/allovitres/admin974/av_download_pdf.php</file>
+            <file>file:/C:/wamp/www/allovitres/functions/products.php</file>
+            <file>file:/C:/wamp/www/allovitres/templates/product.tpl</file>
+            <file>file:/C:/wamp/www/allovitres/classes/panier.php</file>
+            <file>file:/C:/wamp/www/allovitres/functions/orders.php</file>
+            <file>file:/C:/wamp/www/allovitres/functions/tools.php</file>
+            <file>file:/C:/wamp/www/allovitres/templates/pdf/front/front_order.tpl</file>
+            <file>file:/C:/wamp/www/allovitres/templates/order-resume.tpl</file>
         </group>
     </open-files>
 </project-private>

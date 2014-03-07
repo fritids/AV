@@ -146,7 +146,7 @@ if (isset($_GET["cart"])) {
                 );
             }
 
-            //Si option
+            //Si option 
             if (isset($_POST["custom"])) {
                 if (is_array($_POST["custom"])) {
                     foreach ($mapCustomAttribute as $custom_item) {
@@ -165,22 +165,40 @@ if (isset($_GET["cart"])) {
             }
 
             $nbItem = $cart->getNbItems() + 1;
+            $cart_item_price = $productInfos["price"];
+
+            //Pose
+            if (isset($_POST["presta_pose"]) && $_POST["presta_pose"] == 1) {
+                $cart_item_price = $productInfos["price_pose"];
+                $anwser_price = 0;
+                foreach ($productInfos["pose_details"] as $q) {
+                    $id_answer = $_POST[$q["name"]];
+                    $answer = getPoseAnswerDetail($id_answer);
+                    $anwser_price += $answer["price"];
+
+                    $cart->addItemPose($pid, $answer["id_pose_form"], $answer["price"], $answer, $surface, $dimension, $nbItem);
+                }
+                $cart_item_price += $anwser_price;
+            }
 
             if (empty($ko_msg))
-                $cart->addItem($pid, $pqte, $productInfos["price"] * $impact_coef, $productInfos["name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+                $cart->addItem($pid, $pqte, $cart_item_price * $impact_coef, $productInfos["name"], $surface, $dimension, $productInfos, $nbItem);
 
             //Si option
             if (empty($ko_msg) && isset($_POST["options"])) {
                 if (is_array($_POST["options"])) {
                     foreach ($_POST["options"] as $id_combination => $id_option) {
-                        $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price"];
+                        if ($_POST["presta_pose"] == 1) {
+                            $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price_pose"];
+                        } else {
+                            $option_price = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["price"];
+                        }
+
                         $option_name = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["name"];
                         $option_weight = $productInfos["combinations"][$id_combination]["attributes"][$id_option]["weight"];
-                        $shipping_ratio = getDeliveryRatio($option_weight);
-                        //$shipping_amount = $shipping_ratio * $option_weight;
-                        $shipping_amount = 0;
+                        //$shipping_ratio = getDeliveryRatio($option_weight);
 
-                        $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef * $shape_impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                        $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef * $shape_impact_coef, $option_name, $surface, $dimension, $nbItem);
                     }
                 }
             }
@@ -195,7 +213,7 @@ if (isset($_GET["cart"])) {
             $pqte = $_SESSION["cart"][$nitem][$pid]["quantity"];
             $price = $_SESSION["cart"][$nitem][$pid]["prixttc"];
 
-            $cart->removeItem($pid, $pqte, $price, $shipping_amount, $surface, $nitem);
+            $cart->removeItem($pid, $pqte, $price, $surface, $nitem);
             //$cart->removeCartItem($_POST["id_cart_item"]);
         }
 
@@ -207,6 +225,12 @@ if (isset($_GET["cart"])) {
 
 $cartItems = $cart->showCart();
 $cart_nb_items = count($cartItems);
+foreach ($cartItems as $item) {
+    if (isset($item["pose_details"])) {
+        $smarty->assign('pose_enable', 1);
+        break;
+    }
+}
 
 if ($cart_nb_items > 0)
     if ($_SESSION["user"]["customer_group"] == 1) {
@@ -242,20 +266,20 @@ if (isset($_GET["p"])) {
     $page = "product";
     $product = getProductInfos($_GET["id"]);
 
-    if (isset($product["name"]) && $product["active"]==1 ) {
+    if (isset($product["name"]) && $product["active"] == 1) {
         if (empty($product["meta_title"])) {
             $meta["title"] = $product["name"];
         } else {
             $meta["title"] = $product["meta_title"];
         }
-		
-		if (empty($product["meta_description"])) {
-            $meta["description"] = 'Spécialiste de la vente de vitre pas chers, Allovitres vous invite à acheter des '.$product["name"].'. Découvrez toute la gamme de vitrage sur mesure, livraison partout en France!';
+
+        if (empty($product["meta_description"])) {
+            $meta["description"] = 'Spécialiste de la vente de vitre pas chers, Allovitres vous invite à acheter des ' . $product["name"] . '. Découvrez toute la gamme de vitrage sur mesure, livraison partout en France!';
         } else {
             $meta["description"] = $product["meta_description"];
         }
-        
-		if (empty($product["meta_keywords"])) {
+
+        if (empty($product["meta_keywords"])) {
             $meta["keywords"] = $product["name"];
         } else {
             $meta["keywords"] = $product["meta_keywords"];
@@ -379,17 +403,18 @@ if (isset($_GET["order-resume"])) {
     $page_type = "full";
 
     if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1 && !isset($_SESSION["cart_summary"]["order_option"])) {
-        $_SESSION["cart_summary"]["total_amount"] += 1;
-        $_SESSION["cart_summary"]["order_option"] = "SMS";
-    }
-
-    if (isset($_POST["alert_sms"]) && $_POST["alert_sms"] == 1) {
-        $_SESSION["cart_summary"]["alert_sms_phone"] = $_POST["alert_sms_phone"];
+        if (isset($_POST["alert_sms_phone"]) && $_POST["alert_sms_phone"] != "" && is_numeric($_POST["alert_sms_phone"])) {
+            $cart->addExtraCost(1);
+            $_SESSION["cart_summary"]["order_option"] = "SMS";
+            $_SESSION["cart_summary"]["alert_sms_phone"] = $_POST["alert_sms_phone"];
+        } else {
+            $ko_msg = array("txt" => "Attention, le numéros de télephone est manquant pour l'option Alerte SMS");
+        }
     }
 
     // option déja souscrite on retire l'option
     if (!isset($_POST["alert_sms"]) && isset($_SESSION["cart_summary"]["order_option"])) {
-        $_SESSION["cart_summary"]["total_amount"] -= 1;
+        $cart->removeExtraCost(1);
         unset($_SESSION["cart_summary"]["order_option"]);
     }
 
@@ -824,7 +849,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $productInfos["custom"] = $pcustom;
             }
 
-            $cart->addItem($pid, $pqte, $odd["product_price"] * $impact_coef, "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+            $cart->addItem($pid, $pqte, $odd["product_price"] * $impact_coef, "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $surface, $dimension, $productInfos, $nbItem);
             foreach ($odd["combinations"] as $i => $attribute) {
                 $option_price = $attribute["prixttc"];
                 $option_name = $attribute["name"];
@@ -832,16 +857,14 @@ if (isset($_GET["action"]) && $_GET["action"] == "order_devis") {
                 $id_option = $attribute["id_attribute"];
                 //$shipping_amount = $shipping_ratio * $option_weight;
                 $shipping_amount = 0;
-                $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $shipping_amount, $surface, $dimension, $nbItem);
+                $cart->addItemOption($pid, $id_option, $pqte, $option_price * $impact_coef, $option_name, $surface, $dimension, $nbItem);
             }
-
-            // TOTO
         } else {
             $surface = 0;
             $dimension = array();
             $productInfos = array();
 
-            $cart->addItem($odd["id_devis_detail"], $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $shipping_amount, $surface, $dimension, $productInfos, $nbItem);
+            $cart->addItem($odd["id_devis_detail"], $pqte, $odd["product_price"], "DEVIS#" . $odd["id_devis"] . "-" . $odd["product_name"], $surface, $dimension, $productInfos, $nbItem);
         }
     }
 
@@ -858,46 +881,20 @@ if (isset($_GET["action"]) && $_GET["action"] == "add_voucher") {
         $voucherInfo = getVoucherCode($code, $_SESSION["user"]["id_customer"]);
 
     if (!empty($voucherInfo) && $voucherInfo["code"] == $code) {
-
-// Controle du minimum achat	
-		if($_SESSION["cart_summary"]["total_amount"] >= $voucherInfo["min_amount"]) {
-			$cart->addOrderVoucher($voucherInfo);
-			$ok_msg = array("txt" => "Bon de réduction a été ajouté");
-			$ko_msg = array();		
-		}
-		else {
-			$ko_msg = array("txt" => "Ce bon de réduction n'est utilisable que pour un panier d'au moins 150 euros.");
-		}
-
+        // Controle du minimum achat	
+        if ($_SESSION["cart_summary"]["total_amount"] >= $voucherInfo["min_amount"]) {
+            if ($voucherInfo["nb_customer_used"] == 0) {
+                $cart->addOrderVoucher($voucherInfo);
+                $ok_msg = array("txt" => "Bon de réduction a été ajouté");
+                $ko_msg = array();
+            } else {
+                $ko_msg = array("txt" => "Ce bon de réduction a déjà été utilisé.");
+            }
+        } else {
+            $ko_msg = array("txt" => "Ce bon de réduction n'est utilisable que pour un panier d'au moins " . $voucherInfo["min_amount"] . " euros.");
+        }        
     }
-	
-	
-
-    /* if ($code == "VICTOIREPAUC") {
-      $cart->addVoucher(array(
-      "code" => "VICTOIREPAUC",
-      "title" => "VICTOIREPAUC",
-      "group" => "category",
-      "value" => 12,
-      "reduction" => 10)
-      );
-      $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-      $ko_msg = array();
-      }
-
-      /* if ($code == "NOEL2013DV") {
-      $cart->addVoucher(array(
-      "code" => "NOEL2013DV",
-      "title" => "NOEL2013DV",
-      "group" => "category",
-      "value" => 12,
-      "reduction" => 10)
-      );
-      $ok_msg = array("txt" => "Bon de réduction a été ajouté");
-      $ko_msg = array();
-      } */
-
-	  }
+}
 
 // mot de passe oublié
 if (isset($_GET["action"]) && $_GET["action"] == "lost_pwd") {
@@ -1054,7 +1051,6 @@ $smarty->assign('promos', $promos);
 $smarty->assign('promoshome', $promoshome);
 $smarty->assign('searchs', $search);
 $smarty->assign('search_result', $search_result);
-
 $smarty->display('index.tpl');
 ?>
 <?

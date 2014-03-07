@@ -15,11 +15,11 @@ function getDeliveryRatio($pweight) {
     $params = array($pweight);
 
     $r = $db->rawQuery("
-        SELECT delivery_ratio 
+        SELECT price 
         FROM `av_range_weight` 
         WHERE ? between `delimiter1` and `delimiter2`", $params);
 
-    return($r[0]["delivery_ratio"]);
+    return($r[0]["price"]);
 }
 
 function getShippingPrice($pid, $pqte_order) {
@@ -27,9 +27,9 @@ function getShippingPrice($pid, $pqte_order) {
 
     $p_info = getProductInfos($pid);
 
-    $delivery_ratio = getDeliveryRatio($p_info["weight"]);
+    $deliveryPrice = getDeliveryRatio($p_info["weight"]);
 
-    return($p_info["weight"] * $ratio);
+    return($deliveryPrice);
 }
 
 function getLastOrderId() {
@@ -245,6 +245,50 @@ function getSupplierWarehouses() {
 function genSecureKey() {
 
     return(md5(RandomString()));
+}
+
+function getPoseAnswerDetail($ipf) {
+    global $db;
+    $r = $db->rawQuery("select * from av_pose_form "
+            . "where id_pose_form = ? "
+            . "and active=1", array($ipf));
+    if ($r) {
+        $q = getPoseQuestionDetails($r[0]["id_pose_form_parent"]);
+        $r[0]["question"] = $q["title"];
+        $r[0]["id_question"] = $q["id_pose_form"];
+    }
+    return $r[0];
+}
+
+function getPoseQuestionFromAnswer($ipf) {
+    global $db;
+    $a = getPoseAnswerDetail($ipf);
+    $r = $db->rawQuery("select * from av_pose_form "
+            . "where id_pose_form = ? "
+            . "and active=1", array($a["id_pose_form_parent"]));
+    return $r[0];
+}
+
+function getPoseQuestionDetails($ipfp) {
+    global $db;
+    $a = getPoseAnswerDetail($ipf);
+    $r = $db->rawQuery("select * from av_pose_form "
+            . "where id_pose_form = ? "
+            . "and active=1", array($ipfp));
+    return $r[0];
+}
+
+function getExtraCostDetail($iecd) {
+    global $db;
+    $r = $db->rawQuery("select a.*, rate/100+1 rate, round(a.price * (rate/100+1),2) price_ttc "
+            . "from av_extra_cost a , av_tax b "
+            . "where a.cost_id_tax = b.id_tax "
+            . "and a.id_extra_cost = ? ", array($iecd));
+
+    if ($r)
+        return $r[0];
+
+    return null;
 }
 
 ?>

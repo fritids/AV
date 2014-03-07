@@ -86,7 +86,7 @@ $opts['fdd']['delimiter2'] = array(
   'maxlen'   => 22,
   'sort'     => true
 );
-$opts['fdd']['delivery_ratio'] = array(
+$opts['fdd']['price'] = array(
   'name'     => 'Prix Ttc',
   'select'   => 'T',
   'maxlen'   => 22,

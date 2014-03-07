@@ -32,7 +32,7 @@
             <div class="features">
                 <div class="separ clearfix">
                     <div class="infos">
-                        <p class="prix" ><span id="total_price">{($product.price*$config.vat_rate)|round:2}</span> €</p>
+                        <p class="prix" ><span id="total_price"></span> €</p>
                         {if $product.id_category != 19 && !($product.width && $product.height)}
                             <p><span id="surface"></span> m² calculé</p>                            
                             {*<p><span id="total_poids"></span> kg calculés</p>*}
@@ -42,8 +42,7 @@
                     <div class="add_to_cart">
 
                         <input type="hidden" name="id_product" value="{$product.id_product}">
-                        <input type="hidden" name="add">
-                        <input type="hidden" name="price" id="price" value="">
+                        <input type="hidden" name="add">                        
                         <label for="qty">Quantité :</label>
                         <input type="text" class="qte" name="quantity" id ="quantity" value="1">
                         <input type="submit" value="Ajouter au panier" id="validation" class="indent submit">
@@ -81,20 +80,34 @@
                         <span class="info">de {$product.min_height} à {$product.max_height} mm</span>
                     </div>   
                     <div class="row clearfix">
-						<img src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;cursor : pointer;" />
-                       <!-- <input type="image" value="Calculer" id="calculer" src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;" disabled>-->
-						<!--<input type="button" value="Calculer" id="calculer" class="submit">	-->
+                        <img src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;cursor : pointer;" />
+                        <!-- <input type="image" value="Calculer" id="calculer" src="/img/btn_calculer.png" style="margin-left: 100px;margin-top: 10px;" disabled>-->
+                        <!--<input type="button" value="Calculer" id="calculer" class="submit">	-->
                     </div>
-                    <div class="row clearfix">
-                    </div>
+                    <div class="row clearfix"></div>
                     <div class="row clearfix">
                         {if isset($product.specific_combinations) && count($product.specific_combinations) > 0}
                             <a title="Formes spécifiques" href="/?product_custom&id={$product.id_product}"><img style="margin-left: 100px;" src="/img/btn_forme-specifique.png" alt="Formes spécifiques"/></a>
-                        {/if}
+                            {/if}
                     </div>
+
                 {/if}
 
+                {if isset($product.pose_details)}
+                    Pose ? : <input type="checkbox" name="presta_pose" id="presta_pose" value="1"><br>
 
+                    {foreach key=key item=question from=$product.pose_details}
+                        <div class="row clearfix">
+                            <label for="{$question.name}">{$question.title}</label>
+
+                            <select name="{$question.name}" id="{$question.name}" class="question">                                
+                                {foreach key=key item=answer from=$question.answers}
+                                    <option value='{$answer.id_pose_form}'>{$answer.answer}</option>                            
+                                {/foreach}
+                            </select>
+                        </div>                        
+                    {/foreach}
+                {/if}
             </div>   	
         </form>
     </div>
@@ -183,6 +196,7 @@
 
 <script>
     var unit_price = {($product.price*$config.vat_rate)|round:2};
+    var answer_price = 0;
 
     myArray = $('.attribute');
 
@@ -201,10 +215,8 @@
             unit_price = result.price;
             unit_weight = result.weight;
             // console.log(unit_price);
-            $('#total_price').text(unit_price);
-            //$('#total_poids').text(unit_weight);
-            $('#price').val(unit_price);
-            //$('#texte').text(unit_price);
+            $('#total_price').text(unit_price.toFixed(2));
+
         }
     });
 </script>
@@ -242,14 +254,19 @@
 
                 $('#surface').text(area.toFixed(2));
                 $('#total_poids').text((area.toFixed(2) * unit_weight * qte * coef).toFixed(2));
-                $('#total_price').text((area.toFixed(2) * unit_price * qte * coef).toFixed(2));
-                $('#price').val((area.toFixed(2) * unit_price * qte * coef).toFixed(2));
+                $('#total_price').text((area.toFixed(2) * (unit_price + answer_price) * qte * coef).toFixed(2));
+
             }
         }
 
-        $('.attribute').change(function() {
+        $('.attribute, .question, #presta_pose').change(function() {
             myArray = $('.attribute');
-            //console.log($('.attribute').serializeArray());
+            is_posable = 0;
+
+            if ($('#presta_pose').is(':checked')) {
+                is_posable = 1;
+            }
+            //console.log($('.question').serializeArray());
             $.ajax({
                 url: "/functions/ajax_declinaison.php",
                 type: "POST",
@@ -258,22 +275,21 @@
                 data: {
                     id: this.value,
                     id_product: {$product.id_product},
-                    ids: $('.attribute').serializeArray()
+                    ids: $('.attribute').serializeArray(),
+                    questions: $('.question').serializeArray(),
+                    posable: is_posable
                 },
                 success: function(result) {
                     unit_price = result.price;
                     unit_weight = result.weight;
-                    // console.log(unit_price);
-                    $('#total_price').text(unit_price);
-                    //$('#total_poids').text(unit_weight);
-                    $('#price').val(unit_price);
-                    //$('#texte').text(unit_price);
+                    answer_price = result.price_answer;
+                    //console.log(result.price_answer);
+                    $('#total_price').text(parseFloat(unit_price + answer_price).toFixed(2));
                 }
             });
-
             calculateprice();
 
-        });
+        });       
 
         $('#width').change(function() {
 
@@ -316,6 +332,7 @@
 
         $('#validation').submit(function() {
             if ($('#quantity').val() == "" || $('#width').val() == "" || $('#heigth').val() == "") {
+                alert("Merci de renseigner la quantité ainsi que la largeur et longueur du produit");
                 return false;
             }
         });
