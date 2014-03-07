@@ -59,7 +59,7 @@ $pdf->AddPage('L', 'A4');
 
             // on recupère les produits affectés au camion
             $listOrderProduct = $db->rawQuery("select a.id_address_delivery, a.id_address_invoice, a.id_order,
-                        a.reference, d.postcode, a.id_customer, b.*, c.*, a.order_comment, a.delivery_comment
+                        a.reference, d.postcode, a.id_customer, b.*, c.*, a.order_comment, a.delivery_comment, a.alert_sms_phone
                         from av_orders a, av_order_detail b , av_tournee c, av_address d
                         where a.id_order = b.id_order
                         and b.id_order_detail = c.id_order_detail 
@@ -78,7 +78,7 @@ $pdf->AddPage('L', 'A4');
     <table class = "col-md-12 table-condensed">
     <tr>
     <td>
-    <table style="border:1px solid #ccc" border="1" cellpadding="5">';
+    <table style="border:1px solid #ccc" border="1" cellpadding="2">';
             $tmpRef = "";
             foreach ($listOrderProduct as $OrderProduct) {
 
@@ -95,7 +95,7 @@ $pdf->AddPage('L', 'A4');
                 $addrs = $adresse["address1"] . "<br>";
                 if ($adresse["address2"])
                     $addrs .= $adresse["address2"] . "<br>";
-                $addrs .= $adresse["postcode"] . " " . $adresse["city"] . "<br>[". $adresse["warehouse"]["zone_name"]."]<br>[". $adresse["warehouse"]["warehouse_name"]."]";
+                $addrs .= $adresse["postcode"] . " " . $adresse["city"] . "<br>[" . $adresse["warehouse"]["zone_name"] . "]<br>[" . $adresse["warehouse"]["warehouse_name"] . "]";
 
                 if ($tmpRef != $OrderProduct["reference"]) {
 
@@ -103,7 +103,7 @@ $pdf->AddPage('L', 'A4');
             <tr>
                 <th bgcolor = "#ccc">' . $OrderProduct["reference"] . '</th>
                 <th bgcolor = "#ccc">' . $customer["firstname"] . ' ' . $customer["lastname"] . ' <br> ' . $addrs . '</th>
-                <th bgcolor = "#ccc">liv.: ' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '<br>fact.:' . $adresseInvoice["phone_mobile"] . '<br>' . $adresseInvoice["phone"] . '</th>
+                <th bgcolor = "#ccc">liv.: ' . $adresse["phone_mobile"] . '<br>' . $adresse["phone"] . '<br>fact.:' . $adresseInvoice["phone_mobile"] . '<br>' . $adresseInvoice["phone"] . '<br>Sms:<br>' . $OrderProduct["alert_sms_phone"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["comment1"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["comment3"] . '</th>
                 <th bgcolor = "#ccc">' . $OrderProduct["horaire"] . '</th>                       
@@ -130,9 +130,10 @@ $pdf->AddPage('L', 'A4');
                     foreach ($customs as $custom) {
                         $pdf_roadmap .= '- ' . $custom["main_item_name"];
                         foreach ($custom["sub_item"] as $sub_item) {
-                            $pdf_roadmap .= '- ' . $sub_item["sub_item_name"] . " : ";
+                            $pdf_roadmap .= ': ' . $sub_item["sub_item_name"] . " : ";
                             foreach ($sub_item["item_values"] as $item_value) {
-                                $pdf_roadmap .= $item_value["item_value_name"] . " : " . $item_value["custom_value"] . " - ";
+                                if (!empty($item_value))
+                                    $pdf_roadmap .= $item_value["item_value_name"] . " : " . $item_value["custom_value"] . " ";
                             }
                         }
                     }
@@ -140,7 +141,7 @@ $pdf->AddPage('L', 'A4');
 
                 $pdf_roadmap .= '
             </td>
-            <td colspan="2">' . $SupplierName . ' [' . $WarehouseName . '] ' . $OrderProduct["supplier_date_delivery"] . '</td>
+            <td colspan="2"> <table><tr><td>Fournisseur</td><td>' . $SupplierName . '</td></tr><tr><td>Dépot</td><td>' . $WarehouseName . '</td></tr><tr><td>Date liv. fourn. </td><td>' . strftime("%a %d %b %y", strtotime($OrderProduct["supplier_date_delivery"])) . '</td></tr></table></td>
             <td>' . $p_qty * $OrderProduct["product_weight"] . ' Kg</td>
             <td>' . $OrderProduct["total_price_tax_incl"] . ' €</td>
             </tr>';
@@ -158,7 +159,7 @@ $pdf->AddPage('L', 'A4');
 
             $pdf_roadmap .= '</table></td></tr></table>';
 
-            if($_SESSION['email'] =="stephane.alamichel@gmail.com")
+            if ($_SESSION['email'] == "stephane.alamichel@gmail.com")
                 echo $pdf_roadmap;
 
             $pdf->writeHTML($pdf_roadmap, true, false, true, false, '');
