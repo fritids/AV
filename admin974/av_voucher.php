@@ -90,6 +90,12 @@ $opts['fdd']['quantity'] = array(
     'default' => '1',
     'sort' => true
 );
+$opts['fdd']['min_amount'] = array(
+    'name' => 'Montant Min.',
+    'select' => 'T',
+    'maxlen' => 10,    
+    'sort' => true
+);
 $opts['fdd']['reduction_percent'] = array(
     'name' => 'Réduction (%)',
     'select' => 'T',
